@@ -1,0 +1,374 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/style.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/user.css"/>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			if('${(vo.zhlx)!}'=='0'){
+				$('#company').hide();
+				$('#personal').hide();
+				$('#carpt').show();
+				$('#pt').hide();
+			}else if('${(vo.zhlx)!}'=='1'){
+				$('#company').hide();
+				$('#personal').hide();
+				$('#carpt').hide();
+				$('#pt').show();
+			}
+			
+			$('.rz_lei a').click(function(){
+				$(this).addClass('hover').siblings().removeClass('hover');
+			});
+			$('#three').click(function(){
+				$('#company').hide();
+				$('#personal').hide();
+				$('#carpt').show();
+				$('#pt').hide();
+				$('#tb_zhlx').attr('value','0');
+			});
+			$('#four').click(function(){
+				$('#company').hide();
+				$('#personal').hide();
+				$('#carpt').hide();
+				$('#pt').show();
+				$('#tb_zhlx').attr('value','1');
+			});
+			
+			$('#yyzzsmj').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_yyzzsmj").attr('value',data);
+					$('#img_yyzzsmj').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+			
+			$('#yyzscsfzzp').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_yyzscsfzzp").attr('value',data);
+					$('#img_yyzscsfzzp').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+			
+			$('#gzzp').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_gzzp").attr('value',data);
+					$('#img_gzzp').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+			$('#sfzzpzm').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_sfzzpzm").attr('value',data);
+					$('#img_sfzzpzm').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+			$('#sfzzpbm').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_sfzzpbm").attr('value',data);
+					$('#img_sfzzpbm').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+			
+			$('#btn_gs').click(function(){
+				if($('#tb_yyzzsmj').val()=='') {$.dialog.alert("请上传营业执照扫描件！"); return false;}
+				
+				$.post("${CTX}/ab/mer/saverz",$("#myform").serializeArray(),function(data){
+		            if(data){
+						$.dialog.alert("认证已提交！");
+					}else{
+						$.dialog.alert("认证失败！");
+					}
+				});
+			});
+			
+			$('#btn_gr').click(function(){
+				if($('#tb_gzzp').val()=='') {$.dialog.alert("请上传半身免冠工作照图片！"); return false;}
+				if($('#tb_sfzzpzm').val()=='') {$.dialog.alert("请上传身份证正面图片！"); return false;}
+				if($('#tb_sfzzpbm').val()=='') {$.dialog.alert("请上传身份证反面图片！"); return false;}
+				$.post("${CTX}/ab/ywy/saverz",$("#myform").serializeArray(),function(data){
+		            if(data){
+						$.dialog.alert("认证已提交！");
+						window.location.href = "${CTX}/ab/certiCompanyIdentity";
+					}else{
+						$.dialog.alert("认证失败！");
+					}
+				});
+			});
+		});
+	</script>
+</head>
+  <body>
+  <form id="myform" name="myform" action="${CTX}/ab/reg/saveywyrz" method="post">
+  	<input type="hidden" id="tb_id" name="tb_id" value="${(vo.id)!}">
+  	<input type="hidden" id="tb_zhlx" name="tb_zhlx" value="${(vo.zhlx)!}">
+	<input type="hidden" id="tb_yyzzsmj" name="tb_yyzzsmj" value="${(vo.yyzzsmj)!}">
+	<input type="hidden" id="tb_yyzscsfzzp" name="tb_yyzscsfzzp" value="${(vo.yyzscsfzzp)!}">
+	<input type="hidden" id="tb_gzzp" name="tb_gzzp" value="${(vo.gzzp)!}">
+	<input type="hidden" id="tb_sfzzpzm" name="tb_sfzzpzm" value="${(vo.sfzzpzm)!}">
+	<input type="hidden" id="tb_sfzzpbm" name="tb_sfzzpbm" value="${(vo.sfzzpbm)!}">
+	
+  	<#include 'inc/top.html'>
+  	<!-- 搜索栏 -->
+	<#include 'inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+	<#include 'inc/nav.html'>
+	<div class="blank10"></div>
+	
+	<div class="common_banner">
+		<a href="${CTX}/ab/ks" class="xd">立即下单</a>
+	</div>
+<div class="rz_main">
+	<div class="rz_title">商家认证</div>
+	<div class="rz_describe">
+		<p>用户信息登记审核通过后您可以：</p>
+		<p>1. 使用商家认证的所有功能；</p>
+    	<p>2. 提高帐号可信任度；</p>
+    	<p>3. 点击查看商家认证平台信息登记指引。</p>
+    	<p>&nbsp;</p>
+    	<p>请确认你的账号属于政府、媒体、企业、其他组织或个人，并请按照对应的类别进行信息登记。 </p>
+	</div>
+	<div class="rz_lei">
+			账户类型：<a href="javascript:;" id="three" class="<#if strkit('0',(vo.zhlx)!)>hover</#if>">企业</a><a href="javascript:;" id="four" class="<#if strkit('1',(vo.zhlx)!)>hover</#if>">个人</a>
+	</div>
+	
+	<div id="carpt">
+	<div class="rz_title">企业信息登记</div>
+	<table class="rz_table">
+		<tr>
+			<td class="td1">公司名称：</td>
+			<td>
+				<input type="text" class="rz_from" name="tb_qymc" id="tb_qymc" value="${(vo.qymc)!}" />
+				<p class="ms">请填写该企业的名称</p>
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">企业邮箱：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_qyyx" name="tb_qyyx" value="${(vo.qyyx)!}" />
+				<p class="ms">请填写该企业的常用邮箱</p>
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">企业地址：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_qydz" name="tb_qydz" value="${(vo.qydz)!}" />
+				<p class="ms">请填写企业所在地址</p>
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">营业执照注册号：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_yyzzzch" name="tb_yyzzzch"  value="${(vo.yyzzzch)!}" />
+				<p class="ms">请输入15位营业执照注册号</p>
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">营业执照扫描件：</td>
+			<td>
+				
+				<p class="ms">请上传营业执照清晰彩色原件扫描件或数码照在有效期内且年检章齐全（当年成立的可无年检章）由中国大陆工商局或市场监督管理局颁发，支持.jpg .jpeg .bmp .gif格式照片，大小不超过2M。 </p>
+				<#if (vo.yyzzsmj)??>
+					<img src="${CTX}/upload/${(vo.yyzzsmj)!}"  width= "150px" height="150px"  id="img_yyzzsmj"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/sf1.png" width= "150px" height="150px"  id="img_yyzzsmj"/>
+				</#if>
+				<input type="file" name="yyzzsmj" id="yyzzsmj" multiple="false"/> 
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">组织机构代码：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_zzjgdm" name="tb_zzjgdm" value="${(vo.zzjgdm)!}" />
+				<p class="ms">请输入9位组织机构代码</p>
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">运营者身份证明：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_yyzsfzm" name="tb_yyzsfzm" value="${(vo.yyzsfzm)!}" />
+				<p class="ms">填写运营者姓名，如果名字包含分隔号"."，请勿省略。</p>
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">运营者身份证号码：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_yyzsfzh" name="tb_yyzsfzh" value="${(vo.yyzsfzh)!}" />
+				<p class="ms">输入运营都身份证号码</p>
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">运营者手持身份证照片：</td>
+			<td>
+				<#if (vo.yyzscsfzzp)??>
+					<img src="${CTX}/upload/${(vo.yyzscsfzzp)!}"  width= "150px" height="150px"  id="img_yyzscsfzzp"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/sf.png" width= "150px" height="150px"  id="img_yyzscsfzzp"/>
+				</#if>
+				<p class="ms">身份证上所有信息清晰可见，必须能看清证件号。照片需免冠，建议未化妆，手持证件人五冠清晰可见。照片内容真实有效，不得做任何修改。支持.jpg .jpeg .bmp .gif格式照片，大小不超过2M。 </p>
+				<input type="file" name="yyzscsfzzp" id="yyzscsfzzp" multiple="false"/> 
+			</td>
+		</tr>
+		<tr>
+			<td class="td1"></td>
+			<td>
+				<#if strkit('',(vo.sfrzzt)!)><a href="javascript:;" id="btn_gs" class="rz_submit">立即提交</a></#if>
+				<#if strkit('0',(vo.sfrzzt)!)><a href="javascript:;" id="btn_gs" class="rz_submit">立即提交</a></#if>
+				<#if strkit('1',(vo.sfrzzt)!)>认证中...</#if>
+				<#if strkit('2',(vo.sfrzzt)!)>认证通过</#if>
+				<#if strkit('3',(vo.sfrzzt)!)>
+				认证失败<br/>
+				<a href="javascript:;" id="btn_gs" class="rz_submit">立即提交</a>
+				</#if>
+			</td>
+		</tr>
+		</table>
+	</div>
+	
+	<div id="pt">
+	<div class="rz_title">
+		个人信息登记
+	</div>
+	<table class="rz_table">
+		<tr>
+			<td class="td1">半身免冠工作照:</td>
+			<td>
+				<#if (vo.gzzp)??>
+					<img src="${CTX}/upload/${(vo.gzzp)!}"  id="img_gzzp"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/bs.png"  id="img_gzzp"/>
+				</#if>
+				<input type="file" name="gzzp" id="gzzp" multiple="false"/> 
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">所在地区:</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_szqy" name="tb_szqy" value="${(vo.szqy)!}" placeholder="所在地区省市区" />
+				
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">真实姓名:</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_zsxm" name="tb_zsxm" value="${(vo.zsxm)!}" placeholder="请输入真实姓名" />
+				
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">身份证号：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_idcard" name="tb_idcard" value="${(vo.idcard)!}" placeholder="请输入身份证号" />
+				
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">紧急联络人：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_jjllr" name="tb_jjllr" value="${(vo.jjllr)!}" placeholder="请输入联络人姓名"  />
+				
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">联络人电话：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_jjllrdh" name="tb_jjllrdh" value="${(vo.jjllrdh)!}" placeholder="请输入联络人电话号码" />
+				
+			</td>
+		</tr>
+		<tr>
+			<td class="td1" rowspan="2">身份证照：</td>
+			<td ><p class="carms">拍照小窍门，手持身份证靠近面部，下反两面拍摄胸部以上，对焦使身份证字体清晰可见。 </p></td>
+		</tr>
+		<tr>
+			<td>
+				<#if (vo.sfzzpzm)??>
+					<img src="${CTX}/upload/${(vo.sfzzpzm)!}"  width= "150px" height="150px"  id="img_sfzzpzm"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/sf1.png" width= "150px" height="150px"  id="img_sfzzpzm"/>
+				</#if>
+				<input type="file" name="sfzzpzm" id="sfzzpzm" multiple="false"/> 
+			</td>
+			<td>
+				<#if (vo.sfzzpbm)??>
+					<img src="${CTX}/upload/${(vo.sfzzpbm)!}"  width= "150px" height="150px"  id="img_sfzzpbm"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/sf1.png" width= "150px" height="150px"  id="img_sfzzpbm"/>
+				</#if>
+				<input type="file" name="sfzzpbm" id="sfzzpbm" multiple="false"/> 
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">学历：</td>
+			<td>
+				<select id="tb_xl" name="tb_xl">
+					<option value="小学" <#if strkit('小学',(vo.xl)!)>selected</#if>>小学</option>
+					<option value="初中" <#if strkit('初中',(vo.xl)!)>selected</#if>>初中</option>
+					<option value="高中" <#if strkit('高中',(vo.xl)!)>selected</#if>>高中</option>
+					<option value="中专" <#if strkit('中专',(vo.xl)!)>selected</#if>>中专</option>
+					<option value="大学" <#if strkit('大学',(vo.xl)!)>selected</#if>>大学</option>
+					<option value="大专" <#if strkit('大专',(vo.xl)!)>selected</#if>>大专</option>
+					<option value="硕士" <#if strkit('硕士',(vo.xl)!)>selected</#if>>硕士</option>
+					<option value="博士" <#if strkit('博士',(vo.xl)!)>selected</#if>>博士</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="td1"></td>
+			<td>
+				<#if strkit('',(vo.sfrzzt)!)><a href="javascript:;" id="btn_gr" class="rz_submit">立即提交</a></#if>
+				<#if strkit('0',(vo.sfrzzt)!)><a href="javascript:;" id="btn_gr" class="rz_submit">立即提交</a></#if>
+				<#if strkit('1',(vo.sfrzzt)!)>认证中...</#if>
+				<#if strkit('2',(vo.sfrzzt)!)>认证通过</#if>
+				<#if strkit('3',(vo.sfrzzt)!)>
+				认证失败<br/>
+				<a href="javascript:;" id="btn_gr" class="rz_submit">立即提交</a>
+				</#if>
+			</td>
+		</tr>
+	</table>
+	</div>
+	</div>
+	
+	<!-- 栏目页 -->
+	<div class="blank10"></div>
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</form>
+	</body>
+</html>

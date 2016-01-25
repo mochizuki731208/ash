@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+</head>
+  <body>
+	<table class="input">
+		<tr>
+			<th align="right">头像：</th>
+			<td>
+				<#if strkit('',(vo.logo)!)>
+					<img src="${CTX}/upload/${(vo.logo)!}" style="max-width: 60px;max-height: 60px;">
+				<#else>无
+				</#if>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">商家名称：</th>
+			<td>${(vo.mc)!}</td>
+		</tr>
+		<tr>
+			<th align="right">帐号类型：</th>
+			<td><#if vo.zhlx=='0'>企业</#if><#if vo.zhlx=='1'>个人</#if></td>
+		</tr>
+		<tr>
+			<th align="right">半身免冠工作照：</th>
+			<td><a href="${CTX}/upload/${(vo.gzzp)!}" target="_blank"><img src="${CTX}/upload/${(vo.yyzzsmj)!''}" style="width: 160px;height:120px;"></a></td>
+		</tr>
+		<tr>
+			<th>所在地区：</th>
+			<td>${(vo.szqy)!}</td>
+		</tr>
+		<tr>
+			<th>真实姓名：</th>
+			<td>${(vo.zsxm)!}</td>
+		</tr>
+		<tr>
+			<th>身份证号：</th>
+			<td>${(vo.idcard)!}</td>
+		</tr>
+		<tr>
+			<th>紧急联络人：</th>
+			<td>${(vo.jjllr)!}</td>
+		</tr>
+		<tr>
+			<th>联络人电话：</th>
+			<td>${(vo.jjllrdh)!}</td>
+		</tr>
+		<tr>
+			<th>身份证照（正面）：</th>
+			<td><a href="${CTX}/upload/${(vo.sfzzpzm)!}" target="_blank"><img src="${CTX}/upload/${(vo.sfzzpzm)!}" style="width: 160px;height:120px;"></a></td>
+		</tr>
+		<tr>
+			<th>身份证照（背面）：</th>
+			<td><a href="${CTX}/upload/${(vo.sfzzpbm)!}" target="_blank"><img src="${CTX}/upload/${(vo.sfzzpzm)!}" style="width: 160px;height:120px;"></a></td>
+		</tr>
+		<tr>
+			<th>学历：</th>
+			<td>${(vo.xl)!}</td>
+		</tr>
+	</table>
+  </body>
+</html>
+

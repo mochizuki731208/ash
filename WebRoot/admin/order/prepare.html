@@ -1,0 +1,399 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_reset.css">
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_page.css">
+	<link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+    <link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-1.8.17.custom.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-zh-CN.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/tc_order.js"></script>
+	<script type="text/javascript">
+		var zb = '${(zb)!}';
+		var orderStyle = '${(tc_order.style)!}';
+		var total = '${(tc_order.total_price)!}' ;
+		var night = '${(tc_order.night_price)!}';
+		var minPrice = '${(tc_order.min_price)!}';
+		var maxPrice = '${(tc_order.max_price)!}';
+		var info = {};
+		$(function() {
+			$(".time_input").datetimepicker({
+	            showSecond: false,
+	            timeFormat: 'hh:mm:ss',
+	            stepHour: 1,
+	            stepMinute: 1,
+	            stepSecond: 1
+	        });
+	        $("input").attr("checked", false);
+		});
+		
+		function calcTotal(){
+			info['sum'] = parseFloat(total);
+			if(orderStyle == '2'){//招标模式
+				$("#totalRst").html(minPrice + " - " + maxPrice);
+				return;
+			}
+			if(zb == 'Y'){
+				$("#nightPrice").html('0');
+				$("#totalRst").html(info['sum']);
+				info['night_price'] = 0;
+				return;
+			}
+			if($("#lift").attr("checked")){
+				info['sum'] += 40;
+			}else{
+				info['sum'] += 70;
+			}			
+			if($("#huidan_price").attr("checked")){
+				info['sum'] += 3;
+			}
+			if($("#service_price").attr("checked")){
+				info['sum'] += 10;
+			}			
+			info['night_price'] = 0;
+			if($("#sendTime").val() != '' && night != ''){
+				var h = $("#sendTime").val().split(" ")[1].split(":")[0];
+				h = parseInt(h);
+				if(h >= 23 || h < 6){
+					info['sum'] += parseInt(night);
+					info['night_price'] = parseInt(night);
+					$("#night_price").show();
+					$("#nightPrice").html(night);
+				}
+			}
+			$("#totalRst").html(info['sum']);
+			var cardmoney = $('#ctm').val();
+			if(info['sum']>cardmoney){
+				$("#totalCm").html(cardmoney);
+			}else{
+				$("#totalCm").html(info['sum']);
+			}
+		}
+		function next(){
+			calcTotal();
+			info['weight'] = $("#weight").val();
+			if(info['weight'] == ''){
+				alert("请输入货物的大约重量");
+				return false;
+			}
+			if($("#wt_unit").val() == "2"){//吨的换算
+				info['weight'] = parseInt($("#weight").val()) * 1000;
+			}			
+			info['people'] = $("#people").val();
+			info['sendTime'] = $("#sendTime").val();
+			if(info['sendTime'] == ''){
+				alert("请选择发货的时间");
+				return false;
+			}
+			info['goodsType'] = $("#goodsType").val();
+			info['goods_volumn'] = $("#goods_volumn").val();
+			info['goods_mount'] = $("#goods_mount").val();
+			if(info['goods_volumn'] == ''){
+				alert("请输入货物的大约体积");
+				return false;
+			}
+			if(!/^\d+$/.test(info['goods_mount'])){
+				alert("请输入货物数量，为整型数字");
+				return false;
+			}
+			info['lift'] = $("#lift").attr("checked")?1:0;
+			info['moreMoney'] = $("input[name='moreMoney']:checked").length>0?$("input[name='moreMoney']:checked").val():0;
+			info['huidan_price'] = $("#huidan_price").attr("checked")?$("#huidan_price").val():0;
+			info['service_price'] = $("#service_price").attr("checked")?$("#service_price").val():0;
+			info['payType'] = $("input[name='payType']:checked").val();
+			info['remark'] = $("#remark").val();
+			$.post('saveStep2', info, function(data){
+				if(data == '1'){
+					alert('同城快递订单，已完成！');
+					self.location.href = 'pay';
+				}else if(data =='0'){//余额不足以支付			
+					alert('同城快递订单，已完成，但是您的账户余额不足，请使用支付宝在线支付！');
+					self.location.href = 'pay';
+				}else if(data =='3'){
+					alert('同城快递订单，已完成，但该用户尚未注册，系统自动更改为到付！敬请注意。');
+					self.location.href = 'pay';
+				}else{
+					alert('订单保存失败，请稍候再试！');
+				}
+			});
+		}
+		function needCart(ck){
+			if(ck.checked){
+				info['cart'] = ck.value;
+			}else{
+				info['cart'] = null;
+			}
+		}
+		function checkIt(d){
+			if(d.checked){
+				$(d).parent().find("img").hide();
+				$(d).parent().find("span").css("color","green")
+			}else{
+				$(d).parent().find("img").show();
+				$(d).parent().find("span").css("color","#ff5801")
+			}
+		}
+	</script>	
+	<style>
+	</style>
+ </head>
+  <body>
+	<div class="blank10"></div>
+	<div class="order-t" data-unuse="1"></div>
+<div class="wrap">
+<div class="con-wrap order1 body">
+  
+		<div class="content">
+                <div class="title mt18">
+                    <div class="word fl">
+                        <img src="${CTX}/res/css/ab/images/img6.png" />&nbsp;<span class="fb f14">完善订单信息</span></div>
+                    <div class="fl">
+                        <input type="button" class="button" value="返回修改" onclick="history.go(-1);"/></div>
+                    <div class="cl">
+                    </div>
+                </div>
+                <div class="address c666666">
+                    <table border="0" cellpadding="0" cellspacing="0" width="855" align="center">
+                        <tr>
+                            <td colspan="3" align="left" height="50">
+                                <span class="fb f14 c646464">您定制的服务</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="110">
+                            </td>
+                            <td align="left" height="24" width="160">
+                                服务车型：${tc_order["car"]}
+                            </td>
+                            <td align="left">
+                                发货人：${tc_order.send_name}&nbsp;${tc_order.send_phone}&nbsp;&nbsp;&nbsp;${tc_order.send_addr}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                            </td>
+                            <td align="left" height="24">
+                                行驶里程：${tc_order.kilo}公里
+                            </td>
+                            <td align="left">
+                                收货人：${tc_order.rcv_name1}&nbsp;${tc_order.rcv_phone1}&nbsp;&nbsp;&nbsp;${tc_order.rcv_addr1}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                            </td>
+                            <td align="left" height="24">
+                            	<#if tc_order.style == '2'>
+                            	<span>基本费用：￥${(tc_order.min_price)!} - ${(tc_order.max_price)!}元</span>
+                            	<#else>
+                                <span>基本费用：￥${tc_order.total_price}元</span>
+                                </#if>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                    </table>
+                    <table border="0" cellpadding="0" cellspacing="0" width="855" align="center">
+                        <tr>
+                            <td align="left" height="50" width="110" valign="middle">
+                                <span class="fb f14 c979797">选择发货时间：</span>
+                            </td>
+                            <td align="left">
+                               <input type="text" id="sendTime" class="time_input" autocomplete="off" placeholder="点击选择预订时间！" onblur="calcTotal()"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <table border="0" cellpadding="0" cellspacing="0" width="855" align="center">
+                        <tr>
+                            <td width="110" align="left" height="50">
+                                <span class="fb f14 c979797">货物类型：</span>
+                            </td>
+                            <td align="left">
+                                <select id="goodsType" class="selectbox">
+                                	<option value="">请选择...</option>
+									<#list goodsList as g>
+									<option value="${g.value}">${g.value}</option>
+									</#list>
+								</select>
+                            </td>
+                        </tr>
+                    </table>
+                    <table border="0" cellpadding="0" cellspacing="0" width="855" align="center">
+                        <tr>
+                            <td width="110" align="left" height="50">
+                                <span class="fb f14 c979797">货物重量：</span>
+                            </td>
+                            <td align="left">
+                               <input type="text" id="weight" placeholder="货物重量！" class="text_input"/> &nbsp;
+                               <select id="wt_unit">
+                               	<option value="1">公斤</option>
+                               	<option value="2">吨</option>
+                               </select>
+                            </td>
+                        </tr>
+                    </table>
+                    <table border="0" cellpadding="0" cellspacing="0" width="855" align="center">
+                        <tr>
+                            <td width="110" align="left" height="50">
+                                <span class="fb f14 c979797">货物体积：</span>
+                            </td>
+                            <td align="left">
+                               <input type="text" id="goods_volumn" placeholder="货物体积！" class="text_input"/> &nbsp;立方米
+                            </td>
+                        </tr>
+                    </table>
+                    <table border="0" cellpadding="0" cellspacing="0" width="855" align="center">
+                        <tr>
+                            <td width="110" align="left" height="50">
+                                <span class="fb f14 c979797">货物数量：</span>
+                            </td>
+                            <td align="left">
+                               <input type="text" id="goods_mount" placeholder="货物数量！" class="text_input"/> &nbsp;件
+                            </td>
+                        </tr>
+                    </table>
+                    <table border="0" cellpadding="0" cellspacing="0" width="855" align="center">
+                        <tr>
+                            <td width="110" align="left" height="50">
+                                <span class="fb f14 c979797">跟车(人)：</span>
+                            </td>
+                            <td align="left">
+                                <select class="selectbox" id="people">
+                                    <option value="">请选择...</option>
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                    <table border="0" cellpadding="0" cellspacing="0" width="855" align="center">
+                        <tr>
+                            <td width="110" align="left" height="50">
+                                <span class="fb f14 c979797">需要小推车？</span>
+                            </td>
+                            <td align="left">
+                                <input type="checkbox" id="cart" value="1" onchange="needCart(this)"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <table border="0" cellpadding="0" cellspacing="0" width="855" align="center">
+                        <tr>
+                            <td width="110" align="left" height="50">
+                                <span class="fb f14 c979797">回单：</span>
+                            </td>
+                            <td align="left">
+                                <input type="checkbox" name="huidan_price" value="3" id="huidan_price" onchange="calcTotal();checkIt(this)"/>
+                                <span class=cff5801>&nbsp;&nbsp;&nbsp;<img src=${CTX}/res/css/ab/images/img11.png />&nbsp;3元/次，回单周期：自货物到达收货地址获得回单之日起，7日以内。</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <table border="0" cellpadding="0" cellspacing="0" width="855" align="center">
+                        <tr>
+                            <td width="110"  align="left" height="50">
+                                <span class="fb f14 c979797">代收贷款：</span>
+                            </td>
+                            <td align="left">
+                                <input type="checkbox" name="service_price" value="10" id="service_price" onchange="calcTotal();checkIt(this)"/>
+                                <span class=cff5801>&nbsp;&nbsp;<img src=${CTX}/res/css/ab/images/img11.png />&nbsp;10元/次，回款周期：自货物到达收货地址获得回单之日起，2个工作日以内。</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <table border="0" cellpadding="0" cellspacing="0" width="855" align="center">
+                        <tr>
+                            <td width="110"  align="left" height="50">
+                               <span class="fb f14 c979797">电梯/平地:</span>
+                            </td>
+                            <td align="left">
+                            <input type="checkbox" id="lift" value="1" onchange="calcTotal();checkIt(this)"/>&nbsp;&nbsp;是否平地，或有电梯
+                            <span class=cff5801>&nbsp;&nbsp;<img src=${CTX}/res/css/ab/images/img11.png />&nbsp;有电梯需要搬运的收费40元，无电梯的收费70元。</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="title mt18">
+                    <div class="word fl">
+                        <img src="${CTX}/res/css/ab/images/img7.png" />&nbsp;<span class="fb f14">支付信息</span></div>
+                </div>
+                <div class=c979797>
+                    <table border="0" cellpadding="0" cellspacing="0" width="855" align="center">
+                        <tr>
+                            <td align="left" height="50" width="108">
+                            <br>
+                                <span class="fb f12 c646464">支付类型：</span>
+							<br>
+                            </td>
+                            <td  align="left">
+                            <label><input type="radio" name="payType" value="1"/>&nbsp;在线支付</label>&nbsp;&nbsp;
+							<label><input type="radio" name="payType" value="2"/>&nbsp;现付</label>&nbsp;&nbsp;
+							<label><input type="radio" name="payType" value="3"/>&nbsp;到付</label>
+                            </td>
+                        </tr>
+                    </table>
+                    <table border="0" cellpadding="0" cellspacing="0" width="855" align="center">
+                        <tr>
+                            <td align="left" height="50" width="108">
+                                &nbsp;
+							<br>
+                            </td>
+                            <td  align="left">
+							<span class=cff5801><img src=${CTX}/res/css/ab/images/img11.png />&nbsp;
+								悬赏模式下，选择在线支付则使用余额或支付宝支付；若是招标模式，则等选择中标后人去订单中心支付！
+							</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <table border="0" cellpadding="0" cellspacing="0" width="855" align="center">
+                        <tr>
+                            <td align="left" height="50" width=110 valign=top>
+                                <span class="fb f12 c646464">货物名称及备注：</span>
+                            </td>
+                            <td align="left">
+                                <textarea rows="5" onfocus="this.innerHTML=''" id="remark">如：我要跟车，货物是5箱德国啤酒，比较珍贵。要送到地下，限制高度，所以金杯一定要平顶的</textarea>
+                            </td>
+                            <td width=30></td>
+                            <td valign=middle align=left class=l24>
+                            	<input type="hidden" name="ctm" id="ctm" value="${cardtotalmoney}"/>
+                                <p class=fb id="night_price" style="display: none;">夜间服务费：￥<span id="nightPrice">${(tc_order.night_price)!'0'}</span>元</p><br />
+                                
+                                <p class=fb>订单合计费用：￥<span id="totalRst">
+                                <#if tc_order.style == '2'>
+                            	<span>${(tc_order.min_price)!} - ${(tc_order.max_price)!}</span>
+                            	<#else>
+                                <span>${tc_order.total_price}</span>
+                                </#if>
+                                </span>元</p><br />
+                                
+                                <#if ((cardtotalmoney > 0) && (cardtotalmoney<=tc_order.total_price))>
+                                	<p class=fb>会员卡抵扣金额：￥<span id="totalCm">${cardtotalmoney}</span>元</p><br />
+                                </#if>
+                                <#if (cardtotalmoney>tc_order.total_price)>
+                                	<p class=fb>会员卡抵扣金额：￥<span id="totalCm">${tc_order.total_price}</span>元</p><br />
+                                </#if>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td align="center">
+                                <input type="button" class="button2" value="下一步" onclick="next();"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <br>
+                </div>
+            </div>
+</div>
+</div>
+	</body>
+</html>

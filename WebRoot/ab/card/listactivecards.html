@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css"/>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		
+		function uf_activeconfirm(flag, id){
+			var cardnumber = $('#cardnumber').val();
+			$.dialog.confirm('是否要激活该会员卡？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/card/active",
+					type: "POST",
+					data: {id:id, activeflag:flag, cardnumber:cardnumber},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if("1" == data){
+							$('#actmsg').html("会员卡号无效，请重新输入！");
+							$('#actmsg').show();
+						}else if("0"  == data){
+							$.dialog.alert("激活成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("激活失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+	</script>	
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+  	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	
+	
+	
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">线下购买的会员卡，请直接输入卡号激活!</h2>
+			<div style="height: 40px;line-height: 40px;">	
+				&nbsp;&nbsp;会员卡号:&nbsp;&nbsp;
+				<input id="cardnumber" type="text" name="cardnumber" class="text" style="width: 180px;">
+				<input type="button" id="btn_active" class="button" value="激 活" onclick="uf_activeconfirm('2', '')"/>
+				<span id="actmsg" class="red" style="display: none;"></span>
+			</div>
+			<form id="myform" name="myform" method="post" action="">
+			<h2 class="box_title">未激活会员卡</h2>
+			<div style="height: 40px;line-height: 40px;">
+			&nbsp;
+  			卡号 <input type="text" name="number" id="number" class="text" style="width: 100px;" />
+			&nbsp;
+  			卡名称 <input type="text" name="name" id="name" class="text" style="width: 100px;" /> 
+  			&nbsp;
+  			类型 <select id="type" name="type" style="width:100px;">
+				<option value="">全部</option>
+				<option value="1">送餐卡</option>
+				<option value="2">消费卡</option>
+			</select> 
+			<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+			</div>
+			<table class="list">
+            <tr>
+	            <th width="30px;">序号</th>
+	            <th width="120px;">会员卡号</th>
+	            <th width="120px;">卡名称</th>
+	            <th width="80px;">类型</th>
+	            <th width="100px;">卡片</th>
+	           	<th width="100px;">购买时间</th>
+	           	<th width="60px;">操作</th>
+	        </tr>
+	        <#if listpage ??>
+      				<#list listpage.list as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!}</td>
+                    <td>${(lst.card_number)!}</td>
+                    <td>${(lst.name)!}</td>
+                    <td>
+						<#if strkit('1',(lst.type)!)>送餐卡</#if> 
+						<#if strkit('2',(lst.type)!)>消费卡</#if> 
+					</td>
+					
+					<td>
+						<#if lst.img_url??>
+							<#if lst.img_url?substring(0,4) == 'res/'>
+								<img src="${CTX}/${(lst.img_url)!''}" style="width: 80px;height: 60px;">
+							<#else>
+								<img src="${CTX}/upload/${(lst.img_url)!''}" style="width: 80px;height: 60px;">
+							</#if>
+						</#if>
+					</td>
+					<td>${(lst.p_datetime)!''}</td>
+					<td><a href="javascript:void(0);" onclick="uf_activeconfirm('1', '${(lst.id)}')">激活</a></td>
+                  </tr>
+					</#list> </#if>
+				<tr>
+					<td colspan="8">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+            </table>
+			</form>
+		</div>
+	</div>
+
+	</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" href="${CTX}/res/tc/css/state.css" />
+	
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-zh-CN.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/tc/js/param.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript" src="${CTX}/res/js/tc_address.js"></script>
+	<script type="text/javascript">
+		
+	
+	address_interval = null;
+	var clear_interval = function() {
+		if (address_interval)
+			window.clearInterval(address_interval);
+	};
+	var currLoc = "${(currcity.mc)!}";
+		$().ready(function() {
+			// 表单验证
+			$("#myform").validate({
+				rules: {
+					mer_mc: {required:true,stringMaxLength:50},
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$.post("${CTX}/admin/logi/savemer2",$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("保存数据成功！",function () {
+								$("#btn_save").attr('value','修改');
+								window.location.href="${CTX}/admin/logi/list";
+						    }).time(0.5);
+	                    } else {
+	                    	alert("保存数据失败！");
+	                    }
+					});
+				}
+			});
+			
+			//首页图片
+			$('#titleimg').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='tb_img_url' value='"+data+"'/>");
+                 }
+			});
+			
+			$('#file_upload').uploadify({
+				swf: '${CTX}/res/js/uploadify/uploadify.swf',
+				uploader: '${CTX}/common/upload',
+				debug:false,
+				multi: true,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+                onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='imgurl' value='"+data+"'/>");
+					$('#myform').append("<input type='hidden' name='imgsize' value='"+file.size+"'/>");
+					$('#myform').append("<input type='hidden' name='imgtype' value='"+file.type+"'/>");
+					$('#myform').append("<input type='hidden' name='imgname' value='"+file.name+"'/>");
+					$('#imgb').append("<img src='${CTX}/upload/"+data+"' width=130px height=100px/>");
+                 }
+			});
+			
+			addressSearch0 = new AddressSearch(currLoc,5,
+					function(search_data) {
+						if (!search_data) {
+							// 查询结果为空
+							return;
+						}
+						if (search_keyword != search_data.keyword) {
+							// 查询关键词与当前查询不匹配
+							return;
+						}
+						//sendSuggest.refresh(search_data['data']);
+						var html = '<div id="address-common">'
+								+ '   <div class="address-common-list-wrap">';
+						for ( var i = 0; i < search_data['data'].length; i++) {
+							var item = search_data['data'][i];
+							html += '       <div class="address-common-list" index="'
+									+ i
+									+ '">'
+									+ '           <span class="address-common-icon"></span>'
+									+ '           <p class="address-common-address">'
+									+ '               <span class="address-common-title">'
+									+ item['title']
+									+ '</span>'
+									+ '               <span class="address-common-detail-address"> 详细地址：<em>'
+									+ item['address']
+									+ '</em></span>'
+									+ '               <span style="display:none;" class="lng">'
+									+ item['lng']
+									+ '</span>'
+									+ '               <span style="display:none;" class="lat">'
+									+ item['lat'] + '</span>' + '           </p>'
+									+ '       </div>';
+						}
+						html += '   </div>' + '</div>';
+						$("#tb_xxdz_panel").html(html);
+						$(".address-common-list").click(function() {
+							$("#tb_xxdz").val($(this).find("em").html());
+							$("#tb_xxdz_panel").html('');
+							info['from'] = $(this).find("em").html();
+							info['from_lng'] = $(this).find(".lng").html();
+							info['from_lat'] = $(this).find(".lat").html();
+							tryDrive();
+						});
+					});
+			
+			$("#tb_xxdz").on('focus', function() {
+				var that = $(this);
+				var last_val = that.val();
+				
+				clear_interval();
+				address_interval = window.setInterval(function() {
+					search_keyword = that.val();
+					if (search_keyword && (search_keyword != last_val)) {
+						addressSearch0.search(search_keyword);
+						last_val = search_keyword;
+					}
+				}, 100);
+			}).on('blur', function() {
+				clear_interval();
+			});
+			
+			$("input[name!='tb_xxdz']").on('focus', function() {
+				$("#tb_xxdz_panel").html("");
+			});
+		});
+	</script>
+	<style type="text/css">
+	#mainline {
+		width: 120px;
+	}
+	</style>
+ </head>
+  <body>
+<div class="rightcon fr">
+			<h2 class="box_title">物流企业信息登记</h2>
+				<form id="myform" name="myform" action="" method="post">
+					<input type="hidden" class="text" name="lo_mid" value="${(vo.id)!}">
+			<input type="hidden" class="text" name="lo_id" value="${(lo.id)!}">
+			<input type="hidden" class="text" name="tb_id" value="${(vo.id)!}">
+					
+					<table class="input">
+					<!--================================ 地址  =========================================-->
+						<tr>
+							<th align="right">企业名称：<font color="red">*</font></th>
+							<td><input type="text" id="tb_mc"  name="tb_mc" class="text required" value="${(vo.mc)!''}"></td>
+						</tr>
+						<tr>
+							<th>手机号：<font color="red">*</font></th>
+								<td>
+								<input class="text" id="tb_mobile" name="tb_mobile" type="text" maxlength="11" value="${(vo.mobile)!''}"/>
+							</td>
+						</tr>
+						<tr>
+							<th>详细地址：<font color="red">*</font></th>
+							<td>
+								<input class="text required" id="tb_xxdz" name="tb_xxdz" type="text" value="${(vo.xxdz)!''}" style="width: 400px;" />
+								<span id="tb_xxdz_panel"></span>
+							</td>
+						</tr> 
+						<tr>
+							<th align="right">店铺LOGO展示图：</th>
+							<td>
+								<div id="imga"><#if vo.img_url?exists><img src="${CTX}/upload/${(vo.img_url)!''}" style="width: 130px;height: 100px;"></#if></div>
+								<input type="file" name="titleimg" id="titleimg" multiple="false"/> 
+							</td>
+						</tr>
+						<tr>
+							<th align="right">店铺图片(1280x300)：</th>
+							<td>
+								<div id="imgb">
+									<#list list_img as x>
+									    <img src="${CTX}/upload/${(x.lager)!''}" style="width: 130px;height: 100px;">
+									</#list>
+								</div>
+								<input id="file_upload" name="file_upload" type="file" multiple="true"></td>
+						</tr>
+						
+						<tr>
+							<th align="right">运输方式：</th>
+							<td><input type="checkbox" class="transtype" name="transtype" <#if (lo.transtype)?? && lo.transtype?contains("汽运")>checked="checked"</#if> value="汽运">汽运
+							<input type="checkbox" class="transtype"  name="transtype" <#if (lo.transtype)?? && lo.transtype?contains("铁路")>checked="checked"</#if> value="铁路">铁路
+							<input type="checkbox" class="transtype"  name="transtype" <#if (lo.transtype)?? && lo.transtype?contains("海运")>checked="checked"</#if> value="海运">海运
+							<input type="checkbox" class="transtype"  name="transtype" <#if (lo.transtype)?? && lo.transtype?contains("空运")>checked="checked"</#if> value="空运">空运</td>
+						</tr>
+						<tr>
+							<th align="right">运输承保公司：</th>
+							<td><input type="text" class="text" name="lo_ticc" value="${(lo.ticc)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">放款周期：</th>
+							<td><input type="text" class="text" name="lo_loan_period" value="${(lo.loan_period)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">放款时间：</th>
+							<td><input type="text" class="text" name="lo_loan_time" value="${(lo.loan_time)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">放款方式：</th>
+							<td>
+								<input type="checkbox" class="loan_type"  name="loan_type" <#if (lo.loan_type)?? && lo.loan_type?contains("人工")>checked="checked"</#if> value="人工">人工
+								<input type="checkbox" class="loan_type"  name="loan_type" <#if (lo.loan_type)?? && lo.loan_type?contains("银行")>checked="checked"</#if> value="银行">银行
+							</td>
+						</tr>
+						<tr>
+							<th align="right">查款电话：</th>
+							<td><input type="text" class="text" name="lo_checkphone" value="${(lo.checkphone)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">QQ：</th>
+							<td><input type="text" class="text" name="lo_qq" value="${(lo.qq)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">收货地址：</th>
+							<td><textarea rows="5" cols="80" name="lo_recaddress">${(lo.recaddress)!}</textarea>
+							</td>
+						</tr>
+						<tr>
+							<th align="right">卸货地址：</th>
+							<td><textarea rows="5" cols="80" name="lo_disaddress">${(lo.disaddress)!}</textarea>
+							</td>
+						</tr>
+						<tr>
+							<th align="right">公司简介：</th>
+							<td><textarea rows="5" cols="80" name="lo_profile">${(lo.profile)!}</textarea>
+							</td>
+						</tr>
+						<tr>
+							<th align="right">服务承诺：</th>
+							<td><textarea rows="5" cols="80" name="lo_servpromise">${(lo.servpromise)!}</textarea>
+							</td>
+						</tr>
+						<tr>
+							<th align="right">负责人：<font color="red">*</font></th>
+							<td><input type="text" class="text required" name="lo_chief" value="${(lo.chief)!}" ></td>
+						</tr>
+						<tr>
+							<th align="right">服务监督电话：<font color="red">*</font></th>
+							<td><input type="text" class="text required" name="lo_servhotline" value="${(lo.servhotline)!}"></td>
+						</tr>
+		
+						
+						<tr>
+							<td>&nbsp;</td>
+							<td><input type="button" id="btn_save" name="btn_save" class="button" value="保 存"/></td>
+						</tr>
+					</table>
+				</form>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+</head>
+  <body>
+	<table class="input">
+		<tr>
+			<th align="right">商家名称：</th>
+			<td>${(vo.mc)!}</td>
+		</tr>
+		<tr>
+			<th align="right">头像：</th>
+			<td>
+				<#if !strkit('',(vo.logo)!)>
+					<img src="${CTX}/upload/${(vo.logo)!}" style="max-width: 60px;max-height: 60px;">
+				<#else>无
+				</#if>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">帐号类型：</th>
+			<td><#if vo.zhlx=='0'>企业</#if><#if vo.zhlx=='1'>个人</#if></td>
+		</tr>
+		<tr>
+			<th>企业邮箱：</th>
+			<td>${(vo.email)!}</td>
+		</tr>
+		<tr>
+			<th>企业地址：</th>
+			<td>${(vo.xxdz)!}</td>
+		</tr>
+		<tr>
+			<th>营业执照注册号：</th>
+			<td>${(vo.yyzzzch)!}</td>
+		</tr>
+		<tr>
+			<th align="right">营业执照扫描件：</th>
+			<td><a href="${CTX}/upload/${(vo.yyzzsmj)!''}" target="_blank"><img src="${CTX}/upload/${(vo.yyzzsmj)!''}" style="width: 160px;height:120px;"></a></td>
+		</tr>
+		<tr>
+			<th>组织机构代码：</th>
+			<td>${(vo.zzjgdm)!}</td>
+		</tr>
+		<tr>
+			<th>运营者身份证明：</th>
+			<td>${(vo.yyzsfzm)!}</td>
+		</tr>
+		<tr>
+			<th>运营者身份证号码：</th>
+			<td>${(vo.yyzsfzh)!}</td>
+		</tr>
+		<tr>
+			<th align="right">运营者手持身份证照片：</th>
+			<td><a href="${CTX}/upload/${(vo.yyzscsfzzp)!}" target="_blank"><img src="${CTX}/upload/${(vo.yyzscsfzzp)!''}" style="width: 160px;height:120px;"></a></td>
+		</tr>
+	</table>
+  </body>
+</html>
+

@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					oldpwd: {required:true,stringMaxLength:50,
+						remote: { 
+							url: "${CTX}/ab/checkpwd", //url地址 
+							type: "post", //发送方式 
+							dataType: "json", //数据格式 
+							data: { //要传递的数据 
+								loginid: $("#loginid").val(),
+								pwd: $("#oldpwd").val()
+							}
+						}
+					}, 
+					newpwd: {required:true,stringMaxLength:50},
+					cfnewpwd: {required:true,equalTo:"#newpwd"}
+				},
+				messages:{
+					oldpwd:{
+						required: "请输入旧密码地址！",  
+    					remote: "旧密码输入不正确！"
+					}
+				}
+			});
+			
+			$("#btn_send").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$("#btn_send").attr('disabled',true);
+					$("#btn_send").val("修改中...");
+					$.ajax({
+						url: "${CTX}/ab/savemodifypwd",
+						type: "POST",
+						data: {loginid:$('#loginid').val(),newpwd:$('#newpwd').val()},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("密码修改成功，请妥善保管好新密码！",function(){
+									refresh();	
+								});
+							}else{
+								$.dialog.alert("密码修改失败，请检查操作是否正确！",function(){
+									$("#btn_send").attr('disabled',false);
+									$("#btn_send").val("发送")
+								});
+							}
+						}
+					});
+				}
+			});
+		});
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>	
+ </head>
+  <body>
+  	<#include 'inc/top.html'>
+	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include 'inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">账号信息</h2>
+			<div class="editinfo">
+			<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+				<input type="hidden" id="userid" name="userid" class="text" value="${(abuser.id)!}">
+				<input type="hidden" id="loginid" name="loginid" class="text" value="${(abuser.loginid)!}">
+				<table class="input">
+						<tr>
+							<th align="right">姓 名：</th>
+							<td><input type="text" class="text" disabled="disabled" value="${(abuser.mc)!''}"></td>
+						</tr>
+						<tr>
+							<th align="right">用户名：</th>
+							<td><input type="text" class="text" disabled="disabled" value="${(abuser.loginid)!''}"></td>
+						</tr>
+						<tr>
+							<th align="right">输入老密码：</th>
+							<td><input type="password" id="oldpwd" name="oldpwd" class="text" value=""></td>
+						</tr>
+						<tr>
+							<th align="right">输入新密码：</th>
+							<td><input type="password" id="newpwd" name="newpwd" class="text" value=""></td>
+						</tr>
+						<tr>
+							<th align="right">重新输入新密码：</th>
+							<td><input type="password" id="cfnewpwd" name="cfnewpwd" class="text" value=""></td>
+						</tr>
+						<tr>
+							<th align="right"></th>
+							<td>
+								<input type="button" id="btn_send" class="button" value="修改密码" />
+							</td>
+						</tr>
+				</table>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</body>
+</html>

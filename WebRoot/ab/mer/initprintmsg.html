@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>易生活网</title>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			$("#myform").validate({
+				rules: {
+					msg: {required:true}
+				}
+			});
+		});
+	</script>
+ </head>
+  <body>
+	<!-- 用户中心 -->
+		<div style="margin-top: 10px;text-align: center;" >
+			<form id="myform" name="myform" action="${CTX}/ab/mer/doPrintMsg" method="post">
+				<input type="hidden" name="id" id="id" value="${(id)!}"/>
+				<textarea type="text" name="msg" id="msg" cols="40" rows="13" placeholder="请输入要打印的内容"></textarea>
+			</form>
+		</div>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<link rel="stylesheet" type="text/css"	href="${CTX}/res/css/admin/admin.css" />
+<script type="text/javascript">
+$().ready(function() {
+})
+function AddBlankMobile(){
+	$.dialog({
+		title:'添加黑名单',
+		content: 'url:${CTX}/ab/fmcar/addBlankMobile',
+	    lock:true,
+	    resize: false,
+	    width : 400,
+		height : 50,
+		cover:true,
+		max:false,
+		min:true,
+		cancel:true,
+		fixed:true,
+		button:[{
+			name: '保 存',
+			callback:function(){
+				var r = this.content.$("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$.post("${CTX}/ab/fmcar/addBlankMobile",this.content.$("#myform").serializeArray(),function(data){
+	                    if(data.result=="addsuccess"){
+							$.dialog.tips("黑名单添加成功！",1,'success.gif',function () {
+								refresh();
+					        });
+						}else if(data.result=="adderror"){
+							$.dialog.alert("保存黑名单失败！");
+						}else if(data.result=="blankmobileisnotnull"){
+							$.dialog.alert("该号码已在您的黑名单中");
+						}else if(data.result=="mobileisnull"){
+							$.dialog.alert("手机号码不能为空！");
+						}else{
+							$.dialog.alert("保存黑名单失败！");
+						}
+					});
+				}
+				return false;
+			},
+			focus: true
+			}],
+        cancelVal:'关 闭'
+	});
+}
+function deleteMobile(balnkMobile){
+	$.post("${CTX}/ab/fmcar/deleteBlankMobile",{balnkMobile:balnkMobile},function(data){
+        if(data.result=="deletesuccess"){
+			$.dialog.tips("黑名单删除成功！",1,'success.gif',function () {
+				refresh();
+	        });
+		}else if(data.result=="deleteeror"){
+			$.dialog.alert("删除黑名单失败！");
+		}else if(data.result=="blankmobileisnull"){
+			$.dialog.alert("该号码不在您的黑名单中，无需删除");
+		}else if(data.result=="mobileisnull"){
+			$.dialog.alert("手机号码不能为空！");
+		}else{
+			$.dialog.alert("删除黑名单失败！");
+		}
+	});
+}
+function refresh(){
+	$('#myform').submit();
+	$('#myform').action = "";
+	$('#myform').target = "_self";
+}
+</script>
+</head>
+
+<body>
+	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<form id="myform" name="myform" method="post" action="">
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">我的黑名单</h2>
+			<div style="height: 40px;line-height: 40px;margin-left: 10px">
+				<input type="button" id="btn_Add" class="button" value="新增" onclick="AddBlankMobile();"/>
+			</div>
+			<table class="list">
+				<tr>
+		            <th>序号</th>
+		            <th>手机号</th>
+		            <th>操作</th>
+		        </tr>
+		        <#if listpage ??>
+      				<#list listpage.list as lst>
+      				<tr>
+      					<td>${(lst_index+1)!}</td>
+      					<td>${(lst.mobile)!}</td>
+      					<td>
+      						<button type="button" class="button" onclick="deleteMobile('${(lst.mobile)!}')">删除</button>
+      					</td>
+      				</tr>
+      				</#list>
+      				<tr>
+						<td colspan="3">
+							<#include '../../common/_paginate.html'>
+						</td>
+					</tr>
+      			</#if>
+			</table>
+		</div>
+	</div>
+	</form>
+	<#include '../inc/foot.html'>
+</body>
+</html>

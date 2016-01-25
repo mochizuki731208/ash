@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>易生活网</title>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			$("#myform").validate({
+				rules: {
+					partner: {required:true,stringMaxLength:32},
+					machinecode: {required:true,stringMaxLength:32},
+					apikey: {required:true,stringMaxLength:100},
+					mkey: {required:true,stringMaxLength:32},
+					mobile: {required:true,stringMaxLength:32},
+					iswork: {required:true}
+				}
+			});
+		});
+	</script>
+ </head>
+  <body>
+	<!-- 用户中心 -->
+			<div style="margin-top: 10px" >
+				<form id="myform" name="myform" action="${CTX}/ab/mer/doSaveUpdatePrint" method="post">
+					<input type="hidden" name="id" id="id" value="${(vo.id)!}"/>
+					<input type="hidden" name="mid" id="mid" value="${(vo.mid)!}"/>
+					<table class="input">
+						<tr>
+							<th align="right">用户id：</th>
+							<td>
+								<input type="text" name="partner" id="partner" class="text" value="${(vo.partner)!}">
+							</td>
+						</tr>
+						<tr>
+							<th align="right">打印机终端号：</th>
+							<td>
+								<input type="text" name="machinecode" id="machinecode" class="text" value="${(vo.machinecode)!}">
+							</td>
+						</tr>
+						<tr>
+							<th align="right">API密钥：</th>
+							<td>
+								<input type="text" name="apikey" id="apikey" class="text" value="${(vo.apikey)!}">
+							</td>
+						</tr>
+						<tr>
+							<th align="right">打印机密钥：</th>
+							<td><input type="text" name="mkey" id="mkey" class="text" value="${(vo.mkey)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">手机号：</th>
+							<td><input type="text" name="mobile" id="mobile" class="text" value="${(vo.mobile)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">是否启用：</th>
+							<td>
+								<select name="iswork" id="iswork">
+									<option value="0" <#if strkit('0',(vo.iswork)!)>selected</#if>>未启用</option>
+									<option value="1" <#if strkit('1',(vo.iswork)!)>selected</#if>>已启用</option>
+								</select>
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+	</body>
+</html>

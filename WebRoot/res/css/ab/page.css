@@ -1,0 +1,87 @@
+﻿.c999{ color:#999}.c666{ color:#666}.cCF3E41{ color:#CF3E41}.c333{ color:#333}.ca6adb3{ color:#a6adb3}.c494947{ color:#494947}.c36353a{ color:#36353a}
+.f12{ font-size:12px}.fb{ font-weight:bold}.f14{ font-size:14px}
+img{ vertical-align:middle; border:0}
+.h10{ height:10px}
+lh32{ line-height:32px}
+.h32{ height:32px}
+.mt5{ margin-top:5px}
+.tl{ text-align:left}
+.cl{ clear:both}
+body{ text-align:center}
+
+.advert-box{ width:100; height:127px; background:url(images/credit_store_logo_back.jpg); background-repeat:no-repeat; background-color:#F13647; background-position:center top; line-height:147px; padding-top:20px}
+.advert-box-exchange{ width:360px; height:93px;background:url(images/credit_store_title_now.png); margin-left:auto; margin-right:auto; position:relative }
+.advert-box-exchange .go{ width:107px; height:35px; position:absolute; right:-80px; top:-20px}
+
+
+.pagemain{ width:980px; margin-left:auto; margin-right:auto;}
+.pagemain .voucher_list_con_top{ border-bottom:solid 2px #CF3F3F}
+.pagemain .voucher_list_con_top li{ width:115px; height:32px; line-height:32px; background-color:#CF3F3F}
+.pagemain .voucher_list_con_top li a{ font-size:14px; font-weight:bold; color:#fff}
+
+.itemlist{ margin-top:10px}
+.item-wrap{ width:312px; height:286px; overflow:hidden; float:left; margin-right:10px; margin-bottom:15px;}
+.item-wrap .item-conent{width:310px; height:277px; border:solid 1px #E3E3E3; overflow:hidden}
+.item-wrap .item-conent .top{ height:160px;border-bottom:solid 1px #E3E3E3;}
+.item-wrap .item-conent .middle{ background-color:#F9F9F9; border-bottom:dotted 1px #E4E4E4}
+.item-wrap .item-conent .middle p{ line-height:30px; text-align:left; padding-left:8px; margin-left:1px}
+.item-wrap .item-conent .bottom{ background-color:#F9F9F9; line-height:23px;}
+.item-wrap .item-conent .bottom .left{ text-align:left; float:left; width:196px; height:46px; margin-top:3px; padding-left:5px}
+.item-wrap .item-conent .bottom .left .morebess{ background-image:url(images/people.jpg)}
+.item-wrap .item-conent .bottom .right{float:left; width:90px; line-height:46px; text-align:center}
+.item-wrap .item-conent .bottom .right input{ background-image:url(images/exchanged.jpg); border:none; width:74px; height:36px; line-height:36px; color:#fff; font-size:16px; font-weight:bold}
+.mright-no{ margin-right:0px}
+.many_business_img{background-position:center; width:20px; background-repeat:no-repeat; height:11px; display:inline-block;position:relative }
+.item-wrap .item-conent .img1{background:url(images/many_business_img.jpg) no-repeat center; }
+.item-wrap .item-conent .img2{background:url(images/many_business_img1.jpg) no-repeat center; }
+.many_business_show{ width:204px; height:70px; background-color:rgb(206,61,63); position:absolute;bottom:0px; left:15px ;}
+.many_business_show ul{ width:194px; height:62px; list-style:none; background-color:#fff; margin-left:auto; margin-right:auto; margin-top:4px }
+.many_business_show ul li{ float:left; width:60px; height:22px;text-align:center}
+
+.appraise-box{ width:600px; height:400px; border:solid 3px #f3f3f3; position:absolute;  z-index:200; background-color:#fff; overflow:hidden}
+.appraise-box-top{ height:32px; line-height:32px; position:relative; border-bottom:solid 1px #ccc; text-align:left; padding-left:5px; font-size:14px; font-weight:bold; background-color:#FF7F24; color:#fff}
+.appraise-box-top .close{ width:16px; height:16px; display:block; position:absolute; top:0px; right:5px}
+.appraise-box-body{ height:332px;}
+.appraise-box-body-conent{ height:220px; border-bottom: solid 1px #ccc}
+.appraise-box-body-conent-left{ width:150px; height:175px; float:left;}
+.appraise-box-body-conent-left .logopic{ width:130px; height:130px; border:solid 1px #e7e7e7; padding:2px; margin-top:20px; margin-left:auto; margin-right:auto}
+.appraise-box-body-conent-right{ width:330px; height:178px; float:left;  padding-left:20px}
+.appraise-box-body-conent-right-hua{ padding-left:10px; text-align:left; margin-top:10px}
+.appraise-box-body-conent-right-text{width:385px; height:150px; padding:3px; overflow:hidden; border:solid 1px #e2eeee; background-color:#f0f8fb; }
+.appraise-box-body-conent-right-text textarea{width:380px; height:116px; border:solid 1px #cfc9d3;}
+.appraise-box-body-conent-right-text .pic{ height:30px; line-height:30px; text-align:left;position:relative}
+.appraise-box-body-conent-right-text .pic-img{ width:40px; line-height:22px; height:22px; display:inline-block; color:#fff; text-align:left; background-color:#8fb2c8; border:solid 1px #89a0a8; background-image:url(images/img5.png); background-position:2px 2px; background-repeat:no-repeat; padding-left:20px}
+.appraise-box-body-conent-right-text .private{ position:absolute;right:0px; width:100px; top:0px}
+.appraise-box-body-conent-right-text .pic-mimg{width:60px; line-height:22px; height:22px; display:inline-block; color:#fff; text-align:center; background-color:#f2a76d; border:solid 1px #dba277}
+.appraise-box-body-bottom{ line-height:28px}
+.appraise-box-body-bottom .item{ height:28px; line-height:28px;overflow:hidden}
+.appraise-box-body-bottom .service-item{ width:100px;height:28px; line-height:28px; display:inline-block; float:left}
+
+.score-box,.score-box1,.score-box2,.score-box3,.score-box4,.score-box5{ display:inline-block; height:28px; line-height:28px; margin-left:20px; float:left}
+
+.score-box div,.score-box1 div,.score-box2 div,.score-box3 div,.score-box4 div,.score-box5 div{ width:28px; height:28px; display:inline-block;}
+
+.score-box .score1,.score-box .score2,.score-box .score3,.score-box .score4,.score-box .score5{ background:url(images/img6.png) no-repeat 0px 0px;}
+
+.score-box1 .score1{ background:url(images/img7.png)  no-repeat 0px 0px;}
+.score-box1 .score2,.score-box1 .score3,.score-box1 .score4,.score-box1 .score5{ background:url(images/img6.png) no-repeat 0px 0px}
+
+.score-box2 .score1,.score-box2 .score2{ background:url(images/img7.png)  no-repeat 0px 0px}
+.score-box2 .score3,.score-box2 .score4,.score-box2 .score5{ background:url(images/img6.png) no-repeat 0px 0px}
+
+.score-box3 .score1,.score-box3 .score2,.score-box3 .score3{ background:url(images/img7.png) no-repeat 0px 0px}
+.score-box3 .score4,.score-box3 .score5{ background:url(images/img6.png)  no-repeat 0px 0px}
+
+.score-box4 .score1,.score-box4 .score2,.score-box4 .score3,.score-box4 .score4{ background:url(images/img7.png)  no-repeat 0px 0px}
+.score-box4 .score5{ background:url(images/img6.png) no-repeat 0px 0px}
+
+.score-box5 .score1,.score-box5 .score2,.score-box5 .score3,.score-box5 .score4,.score-box5 .score5{ background:url(images/img7.png)  no-repeat 0px 0px}
+
+.appraise-box-body-bottom-left{ width:150px; height:100px; float:left;}
+.appraise-box-body-bottom-left span{ background-color:#f3f3f3; display:block; width:130px; height:58px; color:#9d9aa5; font-weight:bold; line-height:54px; margin-top:20px; margin-left:20px}
+.appraise-box-body-bottom-right{ width:350px; height:100px; float:left}
+
+.appraise-box-bottom{ height:32px; line-height:32px; border-top: solid 1px #ccc;  text-align:center}
+.appraise-box-bottom .save{ width:100px; height:26px; line-height:26px;margin-top:5px; background:url(images/save.png); display:inline-block; font-size:14px; color:#fff; font-weight:bold}
+.appraise-box-bottom .cancel{width:100px; height:26px; margin-top:5px; line-height:26px; background:url(images/cancel.png);display:inline-block;font-size:14px; color:#999; font-weight:bold}
+

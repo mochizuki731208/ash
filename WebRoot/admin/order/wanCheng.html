@@ -1,0 +1,205 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <style type="text/css">
+    	.back{
+    		background: #0099FF
+    	}
+    </style>
+     <script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript">
+	var time = 60;
+	var geoc = new BMap.Geocoder();
+	$().ready(function() {
+		time = 60;
+		var tab = '${tab}';
+		searchbyday(tab);
+		do_timer();
+	});
+	function do_timer(){
+		$("#time").html("<font size='100' color='red'><strong>" + time +"</strong></font>");
+		if(0==time){
+			refresh();
+		}
+		time--;
+		setTimeout('do_timer()',1000);
+	}
+	function searchbyday(id){
+		//alert(id);
+		//$("#" + id).addClass("back");
+		for(var i = 0; i <7; i++){
+			if(id!= ("t" + i) && $("#t" + i).hasClass("back")){
+				$("#t" + i).removeClass("back");
+			}else{
+				$("#" + id).addClass("back");
+				$("#tab").val(id);
+			}
+		}
+	}
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+
+		function genzong(id){
+			$.dialog({
+				title:'订单轨迹-原始',
+				content: 'url:${CTX}/admin/order/guiji?id=' + id,
+			    lock:true,
+			    resize: true,
+			    width : 1440,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true
+			}).max();//
+		}
+	</script>
+ </head>
+  <body>
+  <div>
+	  <div style="width: 200px;height:30px;text-align: center;background-color: rgb(237,200,58);">
+	  	 <font color="#e66629" style="font-size: 20px;">已完成订单</font>
+	  </div>
+	   <div style="margin-right: 100px;float: right;margin-top: -25px">
+   		<span id="time">&nbsp;</span>秒后自动刷新. 	<input value="手动刷新" type="button" class="button" onclick="refresh()">
+  	 </div>
+  </div>
+  	  <form id="myform" name="myform" method="post" action="">
+  	 	<input type="hidden" name="tab" id="tab" value="${(tab)!''}"/>
+  	 	<table class="list">
+  			<tr>
+  				<td onclick="searchbyday('t0'),refresh();" id="t0" style="cursor: pointer;">今日</td>
+  				<td onclick="searchbyday('t1'),refresh();" id="t1" style="cursor: pointer;">昨日</td>
+  				<td onclick="searchbyday('t2'),refresh();" id="t2" style="cursor: pointer;">前日</td>
+  				<td onclick="searchbyday('t3'),refresh();" id="t3" style="cursor: pointer;">最近七天</td>
+  				<td onclick="searchbyday('t4'),refresh();" id="t4" style="cursor: pointer;">本月</td>
+  				<td onclick="searchbyday('t5'),refresh();" id="t5" style="cursor: pointer;">上月</td>
+  				<td onclick="searchbyday('t6'),refresh();" id="t6" style="cursor: pointer;">所有订单</td>
+  				<td></td><td></td><td></td>
+  			</tr>
+  			<tr>
+  				<th>订单编号：</th><td><input type="text" id="sn" name="sn" value="${(order.sn)!''}"/></td>
+  				<th>出发地址：</th><td><input type="text" id="startdz" name="startdz" value="${(startdz)!''}"/></td>
+  				<th>目的地址：</th><td><input type="text" id="shdz" name="shdz" value="${(order.shdz)!''}"/></td>
+  				<th>用途：</th>
+  				<td>
+  					<select id="yt" name="yt" value="${(order.yt)!''}" style="width:150px;" class="required">
+						<option value="">请选择</option>
+						<option value="0" <#if strkit('0',(order.yt)!)>selected</#if>>犒劳自己</option>
+						<option value="1" <#if strkit('1',(order.yt)!)>selected</#if>>赠送他人</option>
+					</select>
+  				</td>
+  				<th>类型：</th>
+  				<td>
+  					<select id="is_type" name="is_type" value="${(order.is_type)!''}" style="width:150px;" class="required">
+						<option value="">请选择</option>
+						<option value="0" <#if strkit('0',(order.is_type)!)>selected</#if>>货物类</option>
+						<option value="1" <#if strkit('1',(order.is_type)!)>selected</#if>>服务类</option>
+					</select>
+  				</td>
+  			</tr>
+  			<tr>
+  				<th>下单人：</th><td><input type="text" id="xdrmc" name="xdrmc" value="${(order.xdrmc)!''}"/></td>
+  				<th>下单人电话：</th><td><input type="text" id="xdrdh" name="xdrdh"  value="${(order.xdrdh)!''}"/></td>
+  				<th>收货人：</th><td><input type="text" id="lxr" name="lxr" value="${(order.lxr)!''}"/></td>
+  				<th>收货人电话：</th><td><input type="text" id="lxrdh" name="lxrdh" value="${(order.lxrdh)!''}"/></td>
+  				<th>订单状态：</th>
+  				<td>
+  					<select id="ddzt" name="ddzt" value="${(order.ddzt)!''}" style="width:150px;" class="required">
+						<option value="">请选择</option>
+						<option value="0" <#if strkit('0',(order.ddzt)!)>selected</#if>>购物车</option>
+						<option value="1" <#if strkit('1',(order.ddzt)!)>selected</#if>>已受理</option>
+						<option value="2" <#if strkit('2',(order.ddzt)!)>selected</#if>>已预定</option>
+						<option value="3" <#if strkit('3',(order.ddzt)!)>selected</#if>>配送中</option>
+						<option value="4" <#if strkit('4',(order.ddzt)!)>selected</#if>>已完成</option>
+						<option value="5" <#if strkit('5',(order.ddzt)!)>selected</#if>>已退单</option>
+					</select>
+  				</td>
+  			</tr>
+  			<tr>
+  				<td colspan="10">
+  					创建时间：
+  					 <input value="${(startxdsj)!''}" type="text" id="startxdsj" name="startxdsj" class="Wdate" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'endxdsj\')}'})"/>
+  					~<input value="${(endxdsj)!''}" type="text" id="endxdsj" name="endxdsj" class="Wdate" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'startxdsj\')}'})"/>
+  					<input type="button" value="查询" class="button" onclick="refresh()">
+  					<input type="reset" class="button">
+  				</td>
+  			</tr>
+  		</table>
+  	 <br>
+  	<table class="list">
+  		<tr>
+  			<th>序号</th>
+  			<th>订单编号</th>
+  			<th>来源</th>
+  			<th>用途</th>
+  			<th>类型</th>
+  			<th>商家</th>
+  			<th>接单公司</th>
+  			<th>派单员</th>
+  			<th>下单人</th>
+  			<th>下单人电话</th>
+  			<th>收货人</th>
+  			<th>收货人电话</th>
+  			<th>出发地点</th>
+  			<th>目的地点</th>
+  			<th>出发时间</th>
+  			<th>收费金额</th>
+  			<th>创建时间</th>
+  			<th>账户余额</th>
+  			<th>公里数</th>
+  			<th>操作</th>
+  		</tr>
+  		<#if listpage??>
+  			<#list listpage.list as x>
+  				<tr>
+  					<td>${(x_index+1)!''}</td>
+  					<td>${(x.sn)!''}</td>
+  					<td>${(x.mapbusiness)!''}</td>
+  					<td><#if strkit('0',(x.yt)!)>犒劳自己</#if><#if strkit('1',(x.yt)!)>赠送他人</#if></td>
+  					<td><#if strkit('0',(x.is_type)!)>货物</#if><#if strkit('1',(x.is_type)!)>服务</#if></td>
+  					<td>${(x.mname)!''}</td>
+  					<td>易生活</td>
+  					<td>${(x.qdrname)!''}</td>
+  					<td>${(x.xdrmc)!''}</td>
+  					<td>***</td>
+  					<td>${(x.lxr)!''}</td>
+  					<td>***</td>
+  					<td>
+  						<span id="dd${(x_index+1)!''}">&nbsp;</span>
+  						<script type="text/javascript">
+  							geoc.getLocation(new BMap.Point("${(x.sjjd)!''}","${(x.sjwd)!''}"), function(rs){
+  								var addComp = rs.addressComponents;
+  								var address = addComp.province + ", " + addComp.city + ", " + addComp.district + ", " + addComp.street + ", " + addComp.streetNumber;
+  								$("#dd${(x_index+1)!''}").html(address);
+  							}); 
+  						</script>
+  					</td>
+  					<td>${(x.shdz)!''}</td>
+  					<td>${(x.xdsj)!''}</td>
+  					<td>${(x.ddzje)!''}</td>
+  					<td>${(x.xdsj)!''}</td>
+  					<td>${(x.zhye)!''}</td>
+  					<td>${(x.jl)!''}</td>
+  					<td>
+  						<a href="javascript:void(0)" onclick="genzong('${(x.id)!''}')">轨迹</a>
+  					</td>
+  				</tr>
+			</#list>
+  		</#if>
+  		<tr>
+			<td colspan="20">
+				<#include '../../common/_paginate.html'>
+			</td>
+		</tr>
+  	</table>
+  	</form>
+  </body>
+</html>
+

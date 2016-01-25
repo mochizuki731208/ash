@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<#include '../inc/meta.html'>
+<link rel="stylesheet" type="text/css" href="style.css"/>
+<script src="js/jquery-1.11.0.js"></script>
+
+</head>
+<body>
+	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+<div class="main_common">
+	<div class="main_common_left">
+		<ul>
+			<@_cms_ctx_list lbid=1>
+				<#list list as lst>
+					<#if strkit(lst.id,id)>
+					<li class="d" ><a href="${CTX}/ab/news/about-${(lst.id)!}">${(lst.title)!}<span></span></a></li>
+					<#else>
+					<li><a href="${CTX}/ab/news/about-${(lst.id)!}">${(lst.title)!}<span></span></a></li>
+					</#if>
+				</#list>
+			</@_cms_ctx_list>
+		</ul>
+	</div>
+	<div class="main_common_right">
+		<p class="title">${(vo.title)!}</p>
+		<div class="clear"></div>
+		${(vo.txt)!}
+		</div>
+	</div>
+
+<!-- 栏目页 -->
+<div class="blank10"></div>
+<!-- foot页 --> 
+
+<!-- foot页 -->
+<#include '../inc/foot.html'>
+</body>
+</html>

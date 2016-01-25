@@ -1,0 +1,87 @@
+<html>
+	<head>
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="expires" content="0">
+		<meta http-equiv="Content-Type" content="text/html;charset=GBK">
+		<link href="otree.css" rel="stylesheet" type="text/css">
+		<script type=text/javascript src="common.js"></script>
+		<script type=text/javascript src="otree.js"></script>
+		<script type=text/javascript src="china.js"></script>
+		<script type=text/javascript src="jquery.js"></script>
+	</head>
+<body>
+<input type='button' value='删除' onclick='fdelete()'>
+<input type='button' value='查看' onclick='flook()'>
+<input type='text' value="{'pid':'110000','id':'XXXXXX','text':'测试节点'}" id='testItem' style='width:300px;'>
+<input type='button' value='增加' onclick='fadd()'>
+<input type='button' value='查看选中' onclick='fChecked()'>
+</body>
+<script type=text/javascript>
+		//alert( '共' + chinaAreas.length + '个节点');
+		var l0 = new Date().getTime();
+		var otree = new OTree({
+			panel 	: document.body,
+			data		: chinaAreas
+		});
+		otree.paint();
+		alert( chinaAreas.length + ':'+ (new Date().getTime()-l0));
+
+		function ClickEvent(node){
+			alert('NodePath: '+node.getPath() + ' text:'+node.attributes.text);
+		}
+		otree.addListener('click',ClickEvent);
+
+		function fdelete(){
+			var node = otree.getSelectedNode();
+			if(node){
+				otree.removeNode(node)
+			}
+		}
+
+		function flook(){
+			var node = otree.getSelectedNode();
+			if(node)
+				alert(
+					'id:' +	node.attributes.id + '; ' +
+					'pid:' +	node.attributes.pid + '; ' +
+					'text:' +	node.attributes.text + '; ' 
+				);
+		}
+
+		function fadd(){
+
+			var json = document.getElementById('testItem').value;
+			try{
+				 alert(otree.getSelectedNode());
+				 eval("var item=({'pid':'ROOT','id':'40280e62b943b70012b945455770004','text':'机构性质'})");
+				eval( 'var item=(' + json + ')');
+				alert('(' + json + ')');
+				//otree.appendNode(item);				
+			}catch(e){
+				alert('添加的节点描述错误');
+			}
+			otree.updateNode(item);
+      /*
+		var node = otree.getSelectedNode();
+		if(node!=null){
+			var text = window.prompt('输入节点名称!','')
+			eval( 'var item=(' + json + ')');
+			if(text){
+				var newNode = new TreeNode({text:text});
+				node.appendChild(newNode);
+			}
+		}else{
+			alert('没有选中节点')
+		}
+       */
+		}
+		function fChecked(){
+			alert(otree.getCheckeds('id'));
+			alert(otree.getCheckeds('text'));
+		}
+		//window.onunload=function(){otree.destroy();};
+
+		
+
+</script>
+</html>

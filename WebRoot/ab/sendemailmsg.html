@@ -1,0 +1,110 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					email: {required:true,stringMaxLength:50,
+						remote: { 
+							url: "${CTX}/ab/checkMobileExist", //url地址 
+							type: "post", //发送方式 
+							data: { //要传递的数据 
+								email:function(){return $("#email").val();}
+							}
+						}
+					}
+				},
+				messages:{
+					email:{
+						required: "请输入注册时填写的邮箱地址！",  
+    					remote: "当前邮箱不存在，请输入正确的邮箱地址！"
+					}
+				}
+			});
+			
+			$("#btn_send").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$("#btn_send").attr('disabled',true);
+					$("#btn_send").val("找回中...");
+					$.ajax({
+						url: "${CTX}/ab/sendmodifypwd",
+						type: "POST",
+						data: {email:$('#email').val()},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("重置密码链接已发送到您的邮箱，请登录邮箱进行操作！",function(){
+									refresh();	
+								});
+							}else{
+								$.dialog.alert("重置密码邮件发送失败！",function(){
+									$("#btn_send").attr('disabled',false);
+									$("#btn_send").val("发送")
+								});
+							}
+						}
+					});
+				}
+			});
+		});
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>	
+ </head>
+  <body>
+  	<#include 'inc/top.html'>
+	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include 'inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">账号信息</h2>
+			<div class="editinfo">
+			<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+				<table class="input">
+						<tr>
+							<th align="right">请选择找回密码方式：</th>
+							<td>
+								<input type="radio" name="zhmmfs" value="" onclick="javascript:window.location.href='${CTX}/ab/sendmobilemsg'"/>手机
+								<input type="radio" name="zhmmfs" value="" checked="checked" onclick="javascript:window.location.href='${CTX}/ab/sendemailmsg'"/>邮箱
+							</td>
+						</tr>
+						<tr>
+							<th align="right">邮箱：</th>
+							<td><input type="text" class="text" id="email" name="email" value=""></td>
+						</tr>
+						<tr>
+							<th align="right"></th>
+							<td>
+								<input type="button" id="btn_send" value="发送密码重置链接" />
+							</td>
+						</tr>
+				</table>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</body>
+</html>

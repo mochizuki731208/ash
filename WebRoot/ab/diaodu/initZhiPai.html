@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base href="${CTX}/">
+<#include '../inc/meta.html'>
+  	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/page.css"/> 
+<!--	<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+    <link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+    
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/common.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-1.8.17.custom.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-zh-CN.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+ -->    
+
+<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<link rel="stylesheet" type="text/css"	href="${CTX}/res/css/admin/admin.css" />
+	
+
+<script type="text/javascript">
+	$(function() {
+		/* 表单验证*/
+		$("#myform").validate({
+			rules : {
+				car_id : {
+					required : true
+				},
+				order_id : {
+					required : true
+				}
+			}
+		});
+	})
+</script>
+</head>
+
+<body>
+	<#include '../inc/top.html'> <#include '../inc/header.html'> <#include
+	'../inc/nav.html'>
+	<div class="blank5"></div>
+	<div class="cm">
+		<div class="leftmenu fl"><#include '../inc/leftmenu.html'></div>
+
+		<div class="rightcon fr">
+			<form action="" method="post" id="myform">
+				<input type="hidden" value="${(id)!}" name="id" id="id">
+				<h2 class="box_title">待发货订单列表</h2>
+				<h3>调车发货(订单和车队分别至少勾选一项)</h3>
+				<div>
+					<table class="list">
+						<tr>
+							<th></th>
+							<th>订单号</th>
+							<th>总金额</th>
+							<th>保证金</th>
+							<th>联系人</th>
+							<th>联系电话</th>
+							<th>收货地址</th>
+							<th>支付状态</th>
+							<th>订单状态</th>
+						</tr>
+	        <#if listpage ?? && listpage.list??>
+						<#list listpage.list as lst>
+						<tr>
+							<td><input type="checkbox" id="order_id" name="order_id"
+								value="${(lst.id)}"></td>
+							<td>${(lst.sn)!''}</td>
+							<td class="red"><#if lst.style?exists && lst.style==2 &&
+								lst.min_price?exists && lst.max_price?exists>
+								￥${(lst.min_price)!}元 - ￥${(lst.max_price)!}元 <#else>
+								${(lst.ddzje)?string("currency")} </#if></td>
+							<td class="red">￥ ${(lst.bzj)!'--'}</td>
+							<td>${(lst.lxr)!}</td>
+							<td>${(lst.lxrdh)!}</td>
+							<td>${(lst.shdz)!}</td>
+							<td><#if lst.sn.substring(0,2)=='TC' && lst.pay_type?exists
+								> <#if lst.pay_type==1>在线支付</#if> <#if lst.pay_type==2>现付</#if>
+								<#if lst.pay_type==3>到付</#if> - </#if> <#if
+								strkit('0',(lst.zfzt)!)><span class="red">未支付</span></#if><#if
+								strkit('1',(lst.zfzt)!)>已支付</#if>
+							</td>
+							<td><#if strkit('0',(lst.ddzt)!)><span class="red">未提交</span></#if>
+								<#if strkit('1',(lst.ddzt)!)>已提交</#if> <#if
+								strkit('2',(lst.ddzt)!)>取货中</#if> <#if
+								strkit('3',(lst.ddzt)!)>送货中</#if> <#if
+								strkit('4',(lst.ddzt)!)>已送达</#if> <#if
+								strkit('5',(lst.ddzt)!)>已签收</#if> <#if
+								strkit('6',(lst.ddzt)!)>拒单</#if> <#if
+								strkit('7',(lst.ddzt)!)>已退单</#if> <#if strkit('8',(lst.ddzt)!)><span
+								class="red">已撤单</span></#if>
+							</td>
+						</tr>
+						</#list>
+                      <tr>
+					<td colspan="11">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+                </#if>
+					</table>
+				</div>
+				<div id="mycars">
+					<h2 class="box_title">我的车队</h2>
+					<label for="cargroup">车队分组</label> <select name="cargroup"
+						class="form-control" id="cargroup">
+						<option value="">全部</option> 
+                        <#if grouplist??> 
+                        <#list grouplist as	grouplst>
+						<option value="${(grouplst.id)!''}"<#if currentgroup??><#if	grouplst.id==currentgroup>selected</#if></#if>>${(grouplst.groupname)!''}</option>
+						</#list> </#if>
+					</select>
+					<table class="list">
+						<tr>
+							<th></th>
+							<th>车辆信息</th>
+							<th>车主信息</th>
+							<th>常跑城市</th>
+						</tr>
+						<#list mycarList as ls>
+						<tr>
+							<td><input type="checkbox" id="car_id" name="car_id"
+								value="${(ls.id)!''}"></td>
+							<td>${(ls.car_no)!''}&nbsp;&nbsp;${(ls.type)!''}&nbsp;&nbsp;${(ls.length)!''}&nbsp;&nbsp;${(ls.vv)!'-'}立方米</td>
+							<td>${(ls.driver)!''}&nbsp;&nbsp;${(ls.mobile)!''}</td>
+							<td>
+                            	<#if ls.city_name??>
+                            		<#if ls.city_name?length gt	10> 
+                                		${(ls.city_name.substring(0,10))}... 
+                                	<#else>
+										${(ls.city_name)} 
+                                	</#if>
+                                </#if>
+                            </td>
+						</tr>
+						</#list>
+					</table>
+					
+<!-- 				<table class="easyui-datagrid" title="我的车队" id="fmcarlist"
+					data-options="rownumbers:true,singleSelect:false,url:'${CTX}/diaodu/showMyFmCars',method:'post'">
+					<thead>
+						<tr>
+							<th data-options="field:'ck',checkbox:true"></th>
+							<th field="car_no">车牌号</th>
+							<th field="type">车辆类型</th>
+							<th field="length">车辆长度</th>
+							<th field="vv">车辆体积</th>
+							<th field="driver">司机姓名</th>
+							<th field="mobile">联系电话</th>
+							<th field="city_name">常跑城市</th>
+						</tr>
+					</thead>
+				</table>
+ -->
+				</div>
+				
+				
+		</div>
+
+		<div class="cm">
+			<input type="button" id="btn_to_yc" class="button" value="确定调车"
+				onclick="doZhiPai()" />
+		</div>
+
+	</div>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	<script type="text/javascript">
+		function doZhiPai() {
+			var r = $("#myform").valid();
+			//r=true;
+			if (!r) {
+				return false;
+			}
+			$.post("${CTX}/diaodu/doZhiPai", $("#myform").serializeArray(),
+					function(data) {
+						if (data) {
+							$.dialog.tips("操作成功！", 1, 'success.gif',
+									function() {
+										//refresh();
+										location.reload();
+									});
+
+						} else {
+							$.dialog.alert("指派失败！");
+						}
+					});
+		}
+
+		$('#cargroup').off("change").on(
+				"change",
+				function() {
+
+					window.location.href = "${CTX}/diaodu/initZhiPai?cargroup="
+							+ $('#cargroup').val();
+				});
+		function regroup() {
+			//$('#queryType').val("");
+			$('#groupform').submit();
+			$('#groupform').action = "";
+			$('#groupform').target = "_self";
+		}
+	</script>
+</body>
+</html>

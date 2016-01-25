@@ -1,0 +1,178 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/liuyan.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/page.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+    <script type="text/javascript" src="${CTX}/res/js/common.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+    <script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+    <script type="text/javascript">
+		function uf_showdd(id){
+			$.dialog({
+				title:'订单明细',
+				content: 'url:${CTX}/admin/dd/showdd?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function refreshBackSafecode() {
+			var d = new Date();
+			document.getElementById("backSafecode").src = "${CTX}/25console/imgcode?t="
+					+ d.toString(40);
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		
+		$().ready(function() {
+			$('#applyimage').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#apyimg').val(data);
+					$('#imga').html("<img src='${CTX}/upload/"+data+"' width=80px height=60px/>");
+	             }
+			});
+        });
+	</script>
+ </head>
+  <body>
+  <form id="myform" name="myform" method="post" action="">
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<input type="hidden" name="apyimg" id="apyimg"/>
+	<input type="hidden" name="backorderid" id="backorderid"/>
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">本商家订单维权</h2>
+			<div style="height: 35px;line-height: 35px;">
+			&nbsp;支付状态
+  			<select name="zfzt" id="zfzt" style="width: 80px;">
+					<option value="">全部</option>
+					<option value="0" <#if (((zfzt)!) == '0')>selected="selected"</#if> >未支付</option>
+					<option value="1" <#if (((zfzt)!) == '1')>selected="selected"</#if> >已支付</option>
+			</select>
+			&nbsp;订单状态
+  			<select name="ddzt" id="ddzt" style="width: 80px;">
+					<option value="">全部</option>
+					<option value="1" <#if (((ddzt)!) == '1')>selected="selected"</#if> >已提交</option>
+					<option value="2" <#if (((ddzt)!) == '2')>selected="selected"</#if> >取货中</option>
+					<option value="3" <#if (((ddzt)!) == '3')>selected="selected"</#if> >送货中</option>
+					<option value="4" <#if (((ddzt)!) == '4')>selected="selected"</#if> >已送达</option>
+					<option value="5" <#if (((ddzt)!) == '5')>selected="selected"</#if> >已签收</option>
+					<option value="6" <#if (((ddzt)!) == '6')>selected="selected"</#if> >拒单</option>
+					<option value="7" <#if (((ddzt)!) == '7')>selected="selected"</#if> >已退单</option>
+					<option value="8" <#if (((ddzt)!) == '8')>selected="selected"</#if> >已撤单</option>
+			</select>
+			<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+			</div>
+			<table class="list">
+            <tr>
+	            <th width="40px;">序号</th>
+	            <th width="15%;">订单号</th>
+	            <th width="10%;">总金额</th>
+	            <th width="10%;">联系人</th>
+	            <th width="10%;">联系电话</th>
+	            <th width="*;">收货地址</th>
+	            <th width="15%;">支付状态</th>
+	            <th width="10%;">订单状态</th>
+	            <th width="8%">操作</th>
+	        </tr>
+	        <#if listpage ??>
+      				<#list listpage.list as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!}</td>
+                    <td><a href="JavaScript:void(0);" onclick="uf_showdd('${(lst.id)!}')">${(lst.sn)!}</a></td>
+                    <td class="red">${(lst.ddzje)?string("currency")}</td>
+                    <td><#if strkit('1',(lst.ddzt)!)>***<#else>${(lst.lxr)!}</#if></td>
+                    <td><#if strkit('1',(lst.ddzt)!)>***<#else>${(lst.lxrdh)!}</#if></td>
+                    <td><#if strkit('1',(lst.ddzt)!)>***<#else>${(lst.shdz)!}</#if></td>
+                    <td><#if strkit('0',(lst.zfzt)!)>未支付</#if><#if strkit('1',(lst.zfzt)!)>已支付</#if></td>
+                    <td>
+                    	<#if strkit('0',(lst.ddzt)!)><span class="red">未提交</span></#if>
+                    	<#if strkit('1',(lst.ddzt)!)>已提交</#if>
+                    	<#if strkit('2',(lst.ddzt)!)>取货中</#if>
+                    	<#if strkit('3',(lst.ddzt)!)>送货中</#if>
+                    	<#if strkit('4',(lst.ddzt)!)>已送达</#if>
+                    	<#if strkit('5',(lst.ddzt)!)>已签收</#if>
+                    	<#if strkit('6',(lst.ddzt)!)><span class="red">拒单</span></#if>
+                    	<#if strkit('7',(lst.ddzt)!)><span class="red">已退单</span></#if>
+                    	<#if strkit('8',(lst.ddzt)!)><span class="red">已撤单</span></#if>
+                    </td>
+                    <td>
+                    <#if lst.cbid?? && lst.cbid != ''>
+                    <#else>
+                    	<a href="javascript:void(0);" onclick="uf_back_show('${(lst.id)!}', '')">维权</a>
+                    </#if>
+                    </td>
+                  </tr>
+				</#list>
+				<tr>
+					<td colspan="9">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+			</#if>
+            </table>
+		</div>
+	</div>
+	</form>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	
+	<div id="lean_overlay" style="display: none; opacity: 0.45;"></div>
+	<!-- 退单弹出框 -->
+	<div id="backMsgDiv" style="left: 50%; top: 191px; margin-left: -270px; display: none; position: fixed; z-index: 11000; opacity: 1;">
+	<div class="divTop">
+    	<h3>
+    		我要维权
+    	</h3>
+    	<a href="javascript:;" class="closebtn" alt="关闭" onclick="uf_back_close()"></a>   
+    </div>
+    <div class="msg_cont clear">
+        <textarea placeholder="请输入内容" name="applyBackContent" id="applyBackContent"></textarea>
+    </div>
+    <div id="imga">
+    </div>
+    <div class="pic">
+    	<input type="file" name="applyimage" id="applyimage"  multiple="false"/>
+    </div>
+    <div class="msg_op">
+    	<input id="backCaptchaCode" name="backCaptchaCode" class="fl" type="text" placeholder="请输入验证码" size="20"/>
+        <img  class="fl" class="msgcode" src="${CTX}/25console/imgcode" id="backSafecode" alt="点击刷新" onclick="refreshBackSafecode()"/>
+        <a href="javascript:;" class="fr msgbtn" onclick="uf_addback('${CTX}')"> 保存
+        </a>  
+    </div>
+    <div id="backMsg" class="message"/>
+	</div>
+	</div>
+	<div class="blank10"></div>
+	
+	</body>
+</html>

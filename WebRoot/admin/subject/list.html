@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_delete(id){
+			$.dialog.confirm('确认要删除当前选择的数据吗？', function(){
+			 	$.ajax({
+					url: "${CTX}/admin/subject/delete",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除数据成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("删除数据失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		function uf_edit(id,pid){
+			var url = "";
+			if(id==''){
+				url = "${CTX}/admin/subject/edit?id="+id+"&p_id=${(p_id)!}&m=add";
+			}else{
+				url = "${CTX}/admin/subject/edit?id="+id+"&p_id=${(p_id)!}&m=edit";
+			}
+			$.dialog({
+				title:'信息编辑',
+				content: 'url:'+url,
+			    lock:true,
+			    resize: false,
+			    width : 600,
+				height :240,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							$.post("${CTX}/admin/subject/save",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+			                    	$.dialog.alert("保存数据成功！",function () {
+										refresh();
+							        }).title('3秒后关闭').time(3);
+								}else{
+									$.dialog.alert("保存数据失败！");
+								}
+							});
+						}
+			            return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		
+		
+		//服务类的商品
+		function fw_edit(id){
+			var url = "";
+			if(id==''){
+				url = "${CTX}/admin/subject/editFw?id="+id+"&p_id=${(p_id)!}&m=add";
+			}else{
+				url = "${CTX}/admin/subject/editFw?id="+id+"&p_id=${(p_id)!}&m=edit";
+			}
+			
+			$.dialog({
+				title:'信息编辑',
+				content: 'url:'+url,
+			    lock:true,
+			    resize: false,
+			    width : 600,
+				height :350,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							$.post("${CTX}/admin/subject/saveFw",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+			                    	$.dialog.alert("保存数据成功！",function () {
+										refresh();
+							        }).title('3秒后关闭').time(3);
+								}else{
+									$.dialog.alert("保存数据失败！");
+								}
+							});
+						}
+			            return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		function fw_delete(id){
+			$.dialog.confirm('确认要删除当前选择的数据吗？', function(){
+			 	$.ajax({
+					url: "${CTX}/admin/subject/deleteFw",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除数据成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("删除数据失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+	</script>	
+</head>
+  <body>
+<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+	<input type="hidden" name="p_id" id="p_id" value="${(p_id)!}"/>
+	<input type="button" id="btn_add" class="button" value="添 加" onclick="uf_edit('');"/>
+	<input type="button" id="btn_query" class="button" value="刷 新" onclick="refresh();" />
+  	<table class="list">
+                  <tr>
+                    <th width="4%">序号</th>
+                    <th width="20%">分类名称</th>
+					<th width="12%">分类层次</th>
+					<th width="15%">导航是否显示</th>
+					<th width="12%">首页是否显示</th>
+					<th width="12%">类型</th>
+					<th width="12%">排序号</th>
+					<th width="*%">操作</th>
+                  </tr>
+      		<#if list ?? && (list.size()>0)>
+      			<#list list as lst>
+                  <tr>
+                    <td>${(lst_index+1)!''}</td>
+                    <td>${(lst.mc)!''}</td>
+                    <td>${(lst.ccm)!''}</td>
+					<td><#if lst.is_enable="0">否<#elseif lst.is_enable="1">是</#if></td>
+					<td><#if lst.is_display="0">否<#elseif lst.is_display="1">是</#if></td>
+                    <td>
+                    	<#if lst.is_type="0">
+						货物类
+						<#elseif lst.is_type="1">
+						服务类
+						</#if>
+					</td>
+                    <td>${(lst.seq_num)!''}</td>
+                    <td>
+                    	<a href="javascript:void(0);" onclick="uf_edit('${(lst.id)!}')">修 改</a>
+	                    <a href="javascript:void(0);" onclick="uf_delete('${(lst.id)!}')">删 除</a>
+					</td>
+                  </tr>
+				</#list>
+			</#if>
+            </table>
+       </form>
+  </body>
+</html>

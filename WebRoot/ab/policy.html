@@ -1,0 +1,517 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/style.css"/>
+	<title>易生活网</title>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript"	src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/info/css/reset.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/info/css/style-ms.css" />
+ </head>
+  <body>
+  	<#include 'inc/top.html'>
+  	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+	<script type="text/javascript">
+		var map;// 创建地图实例    
+		var point;// 创建点坐标
+		var opts = {
+			width : 200,     // 信息窗口宽度
+			height: 100,     // 信息窗口高度
+			title : "信息窗口" , // 信息窗口标题
+			enableMessage:true//设置允许信息窗发送短息
+		 };
+		$(function() {
+			$("#InputArea").bind({
+	              focus: function () { },
+	              blur: function () { },
+	              keydown: function (event) {
+	                  if (event.keyCode == 13) {
+	                      unitSearch();
+	                      return false;
+	                  }
+	            }
+	         });
+			//$("#NoMainContent").hide();
+            $("#MainContent").hide();
+			map = new BMap.Map("MblogMap");          // 创建地图实例    
+			point = new BMap.Point(113.67311, 34.716755);  // 创建点坐标    
+			map.centerAndZoom(point, 11);
+			map.addControl(new BMap.NavigationControl());    
+			map.addControl(new BMap.ScaleControl());    
+			map.addControl(new BMap.OverviewMapControl());  
+			map.enableScrollWheelZoom(true);     //开启鼠标滚
+			map.addEventListener("click", function(e){    
+				//alert(e.point.lng + ", " + e.point.lat);    
+			});
+			var myCity = new BMap.LocalCity();
+			myCity.get(myFun);
+			// 初始化时候就查询
+			<#if sn??>
+				//不为空操作
+				$("#InputArea").val('${sn!}');
+				alert("投保成功!");
+				unitSearch();
+			<#else>
+			</#if>
+		});
+		function myFun(result){
+			var cityName = result.name;
+			map.setCenter(cityName);
+		}
+		function showWaybill() {
+			$.dialog.alert("请输入9位及以上运单号");
+		}
+		function unitSearch() {
+            var unit = $("#InputArea").val();
+            Search(unit);
+        }
+		/*
+		查询运单 跟踪信息
+		*/
+		function Search(strTyd) {
+			map.clearOverlays();     
+		    //检查输入内容
+		    if (strTyd == "" || strTyd.length < 6) {
+		        showWaybill();
+		    }
+		    else {
+		        if (strTyd == '请输入类似右边的运单号，如：756824193') strTyd = '756824193';
+		        //AJAX检测是否存在单号，或信息
+		        $.ajax({
+		        	type: "POST",
+		            url: "${CTX}/admin/dd/policyBySn",// 根据运单号投保险
+		            data:{sn: strTyd},
+		            dataType: "json",
+		            cache: false,
+		            success: function (data) {
+		            	if(data.vo){
+		            		var vo = data.vo;
+		            		if(vo.ddzt != '1' || !data.isTC) {
+		            			// 状态或者类型不正确
+		            			$(".NoMainContent").each(function(index,obj){
+			            			if(index==0){
+			            				$(this).show();
+			            				$(this).html("<h2>抱歉！此运单" + strTyd + "不符合投保要求，请致电客服热线10086!</h2>");
+			            			}else{
+			            				$(this).hide();
+			            			}
+			            		})
+				                $("#MainContent").hide();
+		            		}
+		            		if(!data.policy) {
+		            			// 暂时没有保单,可以下单
+		            			if(confirm("此运单暂未投保，无法查看保单信息。您希望投保吗?")) {
+		            				// 投保
+		            				$.dialog({
+										title:'保险单信息',
+										content: 'url:${CTX}/admin/dd/issued_policy/'+vo.id + "-fromPolicy",
+									    lock:true,
+									    resize: false,
+									    width : 900,
+										height : 480
+									});//弹出框
+		            			}
+		            			return;
+		            		}
+		            		alert("此运单已投保!");
+		            		var aeo = data.aeo;
+			                $(".NoMainContent").hide();
+			                $("#MainContent").show();
+			                if(data.isTC){
+			                	var fhinfo = "";
+			                	if(aeo.send_addr){
+			               			fhinfo += aeo.send_addr;
+			               		}
+					            $("#dz").html(fhinfo);
+					            $("#msj").hide();
+					            var shinfo = "";
+					            if(aeo.rcv_addr1){
+					              shinfo += "第一收货人：" + aeo.rcv_name1 + ",地址：" + aeo.rcv_addr1;
+					              shinfo +="<br>";
+					              point = new BMap.Point(aeo.rcv_addr1_jd, aeo.rcv_addr1_wd);  // 创建点坐标    
+								  var maker = new BMap.Marker(point);  // 创建标注
+								  map.addOverlay(maker);
+								  var label = new BMap.Label("第一收货地",{offset:new BMap.Size(20,-10)});
+								  maker.setLabel(label);
+								  var content = "第一收货地 ：<br>收货人：" + aeo.rcv_name1 + "<br>地址：" + aeo.rcv_addr1;
+								  content += "<br>电话：" + aeo.rcv_phone1;
+								  addClickHandler(content,maker);
+				                }
+				                if(aeo.rcv_addr2){
+				                	shinfo += "第二收货人：" + aeo.rcv_name2 + ",地址：" + aeo.rcv_addr2;
+				                	shinfo +="<br>";
+				                	 point = new BMap.Point(aeo.rcv_addr2_jd, aeo.rcv_addr2_wd);  // 创建点坐标    
+									 var maker = new BMap.Marker(point);  // 创建标注
+									 map.addOverlay(maker);
+									 var label = new BMap.Label("第二收货地",{offset:new BMap.Size(20,-10)});
+									 maker.setLabel(label);
+									 var content = "第二收货地 ：<br>收货人：" + aeo.rcv_name2 + "<br>地址：" + aeo.rcv_addr2;
+									 content += "<br>电话：" + aeo.rcv_phone1; 
+									 addClickHandler(content,maker);
+				                }
+					            if(aeo.rcv_addr3){
+					               	shinfo += "第三收货人：" + aeo.rcv_name3 + ",地址：" + aeo.rcv_addr3;
+					               	shinfo +="<br>";
+					               	point = new BMap.Point(aeo.rcv_addr3_jd, aeo.rcv_addr3_wd);  // 创建点坐标    
+									 var maker = new BMap.Marker(point);  // 创建标注
+									 map.addOverlay(maker);
+									 var label = new BMap.Label("第三收货地",{offset:new BMap.Size(20,-10)});
+									 maker.setLabel(label);
+									 var content = "第三收货地 ：<br>收货人：" + aeo.rcv_name3 + "<br>地址：" + aeo.rcv_addr3;
+									 content += "<br>电话：" + aeo.rcv_phone3; 
+									 addClickHandler(content,maker);
+					             }
+					             if(aeo.rcv_addr4){
+					               	shinfo += "第四收货人：" + aeo.rcv_name4 + ",地址：" + aeo.rcv_addr4;
+					               	shinfo +="<br>";
+					            	point = new BMap.Point(aeo.rcv_addr4_jd, aeo.rcv_addr4_wd);  // 创建点坐标    
+									 var maker = new BMap.Marker(point);  // 创建标注
+									 map.addOverlay(maker);
+									 var label = new BMap.Label("第四收货地",{offset:new BMap.Size(20,-10)});
+									 maker.setLabel(label);
+									 var content = "第四收货地 ：<br>收货人：" + aeo.rcv_name4 + "<br>地址：" + aeo.rcv_addr4;
+									 content += "<br>电话：" + aeo.rcv_phone4; 
+									 addClickHandler(content,maker);
+				              	}
+				                if(aeo.rcv_addr5){
+				                	shinfo += "第五收货人：" + aeo.rcv_name5 + ",地址：" + aeo.rcv_addr5;
+				                	shinfo +="<br>";
+				                	point = new BMap.Point(aeo.rcv_addr5_jd, aeo.rcv_addr5_wd);  // 创建点坐标    
+									 var maker = new BMap.Marker(point);  // 创建标注
+									 map.addOverlay(maker);
+									 var label = new BMap.Label("第五收货地",{offset:new BMap.Size(20,-10)});
+									 maker.setLabel(label);
+									 var content = "第五收货地 ：<br>收货人：" + aeo.rcv_name5 + "<br>地址：" + aeo.rcv_addr5;
+									 content += "<br>电话：" + aeo.rcv_phone5; 
+									 addClickHandler(content,maker);
+				                }
+					            $("#shlxr").html(shinfo);
+					            if(aeo.pay_type == 1){
+					            	$("#zffs").html("在线支付");
+					            }else if(aeo.pay_type == 2){
+					            	$("#zffs").html("现付");
+					            }else{
+					            	$("#zffs").html("到付");
+					            }
+					            $("#list_order").empty();
+					            if(aeo.send_time){
+					            	 $("#sdsj").html(aeo.send_time);
+					            }else{
+					            	 $("#sdsj").html("用户未设置!");
+					            }
+					            point = new BMap.Point(aeo.send_addr_jd, aeo.send_addr_wd);  // 创建点坐标    
+								map.centerAndZoom(point, 11);
+								var maker = new BMap.Marker(point);  // 创建标注
+								map.addOverlay(maker);
+								var label = new BMap.Label("发货地",{offset:new BMap.Size(20,-10)});
+								maker.setLabel(label);
+								var content = "发货地 ：<br>发货人：" + aeo.send_name + "<br>地址：" + aeo.send_addr;
+								 content += "<br>电话：" + aeo.send_phone; 
+								 addClickHandler(content,maker);
+								$("#tchwinfo").show();
+								$("#tchwinfolist").html("货物类型:" +　aeo.goods_type + ",货物重量:" + aeo.weight + "公斤.货物体积：" + aeo.goods_volumn + "立方米,货物数量:" + aeo.goods_mount + "件");
+								$("#kilo").html(aeo.kilo +　"公里");
+								$("#tccarfo").show();
+								$("#tccarfolist").html(aeo.car);
+								// 保单信息 
+								$("#hwmc").html(data.policy.goods_name);
+								$("#ysgj").html(data.policy.transport_name);
+								$("#bdje").html(data.policy.policy_money + " ¥");
+								$("#tbsj").html(data.policy.opt_date);
+			                }else{
+			                	$("#tccarfo").hide();
+			                	$("#tchwinfo").hide();
+			                	if(data.addressSj.xxdz){
+			                		$("#dz").html(data.addressSj.xxdz);
+			                	}else if(data.mer.xxdz){
+			                		$("#dz").html(data.mer.xxdz);
+			                	}else{
+			                		$("#dz").html("--");
+			                	}
+			                	
+					            $("#sj").html(vo.mname);
+					            $("#shlxr").html(vo.lxr);
+					            if(vo.yqsdsj){
+					            	 $("#sdsj").html(vo.yqsdsj);
+					            }else{
+					            	 $("#sdsj").html("用户未设置!");
+					            }
+					            $("#msj").show();
+					            $("#kilo").html(vo.jl +　"公里");
+					            if(data.list_item){
+					              	var list_order = $("#list_order");list_order.empty();
+					               	var tr = $("<tr>");
+						   			 $("<th>").html("序号").appendTo(tr); 
+						   			 $("<th>").html("商品名").appendTo(tr); 
+						   			 $("<th>").html("单价").appendTo(tr); 
+						   			 $("<th>").html("数量").appendTo(tr); 
+						   			 $("<th>").html("商品总价").appendTo(tr); 
+						   			 tr.appendTo(list_order);
+					               	var list_item = data.list_item;
+					               	$.each(list_item,function(index,obj){
+					               		var tr = $("<tr>");
+					               		 $("<td align='center'>").html(index + 1).appendTo(tr);
+					               		 $("<td align='center'>").html(obj.itemname).appendTo(tr);
+					               		 $("<td align='center'>").html(obj.quantity).appendTo(tr);
+					               		 $("<td align='center'>").html(obj.price).appendTo(tr);
+					               		 $("<td align='center'>").html(obj.totalmoney).appendTo(tr);
+					               		 tr.appendTo(list_order);
+					               	})
+					               	if(vo.zffs==1){
+					               		$("#zffs").html("充值直扣");
+					               	}else if(vo.zffs==2){
+					               		$("#zffs").html("支付宝");
+					               	}else if(vo.zffs==3){
+					               		$("#zffs").html("餐到付款");
+					               	}else{
+					               		$("#zffs").html("无支付");
+					               	}
+					            }
+					             if(data.addressSj.lng && data.addressSj.lat){
+					            	 point = new BMap.Point(data.addressSj.lng, data.addressSj.lat);
+					             }
+					             if(data.mer.lng && data.mer.lat){
+					            	 point = new BMap.Point(data.mer.lng, data.mer.lat);
+					             }
+			                	   // 创建点坐标    
+								 var maker = new BMap.Marker(point);  // 创建标注
+								 map.addOverlay(maker);
+								 var label = new BMap.Label("发货地",{offset:new BMap.Size(20,-10)});
+								 maker.setLabel(label);
+								 var content = "发货地 ：<br>商家：" + data.addressSj.mc + "<br>地址：" + data.addressSj.xxdz;
+								 content += "<br>电话：" + data.addressSj.mobile; 
+								 addClickHandler(content,maker);
+								 point = new BMap.Point(data.vo.shdzjd, data.vo.shdzwd);  // 创建点坐标    
+								 var maker = new BMap.Marker(point);  // 创建标注
+								 map.addOverlay(maker);
+								 var label = new BMap.Label("收货地",{offset:new BMap.Size(20,-10)});
+								 maker.setLabel(label);
+								 var content = "收货地：<br>收货人：" + data.vo.lxr + "<br>地址：" + data.vo.shdz;
+								 content += "<br>电话：" + data.vo.lxrdh; 
+								 addClickHandler(content,maker);
+			                }
+			                $("#totalfee_1").html(vo.spzj + "￥");
+			                $("#yjje").html(vo.yhje + "￥");
+			                $("#totalfee_2").html(vo.ddzje + "￥");
+			                $("#jf").html(vo.zsjf);
+			                $("#xdsj").html(vo.xdsj);
+			                if(vo.ddzt==0){
+			                	$("#ddzt").html("待服务");
+			                }else if(vo.ddzt==1){
+			                	$("#ddzt").html("待服务");
+			                }else if(vo.ddzt==2){
+			                	$("#ddzt").html("取货中");
+			                }else if(vo.ddzt==3){
+			                	$("#ddzt").html("送货中");
+			                }else if(vo.ddzt==4){
+			                	$("#ddzt").html("已送达");
+			                }else if(vo.ddzt==5){
+			                	$("#ddzt").html("已签收");
+			                }else if(vo.ddzt==6){
+			                	$("#ddzt").html("拒单");
+			                }else if(vo.ddzt==7){
+			                	$("#ddzt").html("已退单");
+			                }else if(vo.ddzt==8){
+			                	$("#ddzt").html("撤单");
+			                }
+			                if(data.asp){
+			                	$.each(data.asp,function(index,obj){
+			                		var point = new BMap.Point(obj.jd,obj.wd);
+			                		var maker = new BMap.Marker(point);
+			                		map.addOverlay(maker);
+			                		var label = new BMap.Label(index==0 ? "司机当前位置" : "经过的位置",{offset:new BMap.Size(20,-10)});
+			                		maker.setLabel(label);
+			                		var content = "司机位置：<br>司机：" + data.usersj.mc + "<br>地址：" + data.usersj.xxdz;
+									content += "<br>电话：" + data.usersj.mobile; 
+									addClickHandler(content,maker);
+			                	})
+			                	$("#jdr").html("接单人姓名：" +data.usersj.mc + ",手机号:" + data.usersj.mobile);
+			                }else{
+			                	$("#jdr").html("暂无接单人！");
+			                }
+		            	}else{
+		            		//$(".NoMainContent").show();
+		            		$(".NoMainContent").each(function(index,obj){
+		            			if(index==0){
+		            				$(this).show();
+		            				$(this).html("<h2>抱歉！未查到此运单" + strTyd + "信息，请确认运单号码是否正确，或致电客服热线10086!</h2>");
+		            			}else{
+		            				$(this).hide();
+		            			}
+		            		})
+			                $("#MainContent").hide();
+		            	}
+		            },
+		            error: function (error) {
+		                $(".NoMainContent").show();
+		                $("#MainContent").hide();
+		            }
+		        });
+		    }
+		}
+		function addClickHandler(content,marker){
+			marker.addEventListener("click",function(e){
+				openInfo(content,e)}
+			);
+		}
+			
+		function openInfo(content,e){
+			var p = e.target;
+			var point = new BMap.Point(p.point.lng, p.point.lat);
+			var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
+			map.openInfoWindow(infoWindow,point); //开启信息窗口
+		}
+	</script>	
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div style="text-align: center;" >
+			<input type="text" id="InputArea" placeholder="请输入类似右侧的运单号，如：756824193" style="width: 540px; height: 41px; font-size: 14pt;border: solid 2px #FF7F24" />
+	        <input id="imgSearch"  type="button" onclick="unitSearch()" value="搜  索" style="width: 129px;color:white; height: 46px; font-size: 18pt;cursor: pointer;background-color: #FF7F24;border: solid 1px #ff9c00"></input>
+        </div>
+        <br>
+        <div style="border-bottom: solid #FF7F24;width: 100%;">&nbsp;</div>
+        <div id="MainContent" style="display: none;">
+        	<div id="leftContent" style="float: left; font-size: 20px;width: 495px">
+	        		<div id="title">
+	        			<span style="font-size: 20px;color: red">运单信息</span>
+	        		</div>
+	        		<div id="msj">
+	        			<span style="font-size: 20px">商家：</span>
+	        			<span id="sj" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<table id="list_order" width="100%"></table>
+	        		<div id="tchwinfo">
+	        			<span style="font-size: 20px">货物信息：</span>
+	        			<span id="tchwinfolist" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">商品总价：</span>
+	        			<span id="totalfee_1" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">优惠价：</span>
+	        			<span id="yjje" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">订单总价：</span>
+	        			<span id="totalfee_2" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">支付方式：</span>
+	        			<span id="zffs" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">订单状态：</span>
+	        			<span id="ddzt" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">收货信息：</span>
+	        			<span id="shlxr" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">赠送积分：</span>
+	        			<span id="jf" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">发货信息：</span>
+	        			<span id="dz" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">里程：</span>
+	        			<span id="kilo" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div id="tccarfo">
+	        			<span style="font-size: 20px">所需车类型：</span>
+	        			<span id="tccarfolist" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">接单信息：</span>
+	        			<span id="jdr" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">下单时间：</span>
+	        			<span id="xdsj" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">要求送达时间：</span>
+	        			<span id="sdsj" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">货物名称：</span>
+	        			<span id="hwmc" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">运输工具：</span>
+	        			<span id="ysgj" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">保单金额：</span>
+	        			<span id="bdje" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+	        		<div>
+	        			<span style="font-size: 20px">投保时间：</span>
+	        			<span id="tbsj" style="color: red;font-size: 20px">&nbsp;</span>
+	        		</div>
+        	</div>
+        	<div id="rightMap" style="float: right;">
+        		<div style="height:500px;width:700px;border:1px solid gray;" id="MblogMap"></div>
+        	</div>
+        </div>
+        <div class="NoMainContent">
+        	<div class="contain c_1000">
+				<h2 class="dl-tit"><b>下载客户端</b></h2>
+				<dl class="version">
+			    <dt>下单版本(个人、工厂、批发市场、贸易公司、第三方物流等)</dt>
+			    <dd class="clearfix"><i class="floatl"><img src="${CTX}/res/info/images/anzs.png" /></i><div class="ewm floatl"><img src="${CTX}/res/info/images/ewm.png" alt="二维码" /><p>扫描二维码下载</p></div><div class="download floatl"><p>电脑直接下载</p><a href="${CTX}/res/app/app_1_01.apk" class="red-btn">Android手机</a></div></dd>
+			    <dd class="clearfix"><i class="floatl"><img src="${CTX}/res/info/images/ios.png" /></i><div class="ewm floatl"><img src="${CTX}/res/info/images/ewm.png" alt="二维码" /><p>扫描二维码下载</p></div><div class="download floatl"><p>电脑直接下载</p><a href="${CTX}/res/app/app_1_02.ipa" class="red-btn">IPhone手机</a></div></dd>
+			    <dt>接单版本（司机、物流企业、商超粮油供应商等）</dt>
+			     <dd class="clearfix"><i class="floatl"><img src="${CTX}/res/info/images/anzs.png" /></i><div class="ewm floatl"><img src="${CTX}/res/info/images/ewm.png" alt="二维码" /><p>扫描二维码下载</p></div><div class="download floatl"><p>电脑直接下载</p><a href="${CTX}/res/app/app_2_01.apk" class="red-btn">Android手机</a></div></dd>
+			    <dd class="clearfix"><i class="floatl"><img src="${CTX}/res/info/images/ios.png" /></i><div class="ewm floatl"><img src="${CTX}/res/info/images/ewm.png" alt="二维码" /><p>扫描二维码下载</p></div><div class="download floatl"><p>电脑直接下载</p><a href="${CTX}/res/app/app_2_02.ipa" class="red-btn">IPhone手机</a></div></dd>
+			 <dt>商家版本（商超、粮油、桶装水、外卖等商家商铺展示，提供给用户下单使用）</dt>
+			     <dd class="clearfix"><i class="floatl"><img src="${CTX}/res/info/images/anzs.png" /></i><div class="ewm floatl"><img src="${CTX}/res/info/images/ewm.png" alt="二维码" /><p>扫描二维码下载</p></div><div class="download floatl"><p>电脑直接下载</p><a href="${CTX}/res/app/app_3_01.apk" class="red-btn">Android手机</a></div></dd>
+			    <dd class="clearfix"><i class="floatl"><img src="${CTX}/res/info/images/ios.png" /></i><div class="ewm floatl"><img src="${CTX}/res/info/images/ewm.png" alt="二维码" /><p>扫描二维码下载</p></div><div class="download floatl"><p>电脑直接下载</p><a href="${CTX}/res/app/app_3_02.ipa" class="red-btn">IPhone手机</a></div></dd>
+			    </dl>
+			</div>
+        </div>
+        <div style="height: 10px;"></div>
+        <div class="NoMainContent">
+        	<div style="float: left;width: 590px;border: 1px solid #EAEAEA;">
+        		<div style="float:left; background-color:#EAEAEA;font-size: 16px; padding-left:20px; font-weight: bold;line-height: 28px;color: #FF7F24;">动态</div>
+        		<div style="float: right;line-height: 28px;padding-right: 15px;"><a href="${CTX}/ab/newslist/9">更多...</a></div>
+	        	<table style="width: 100%;">
+	        		<#if list_news??>
+				        	<#list list_news as lst>
+				      		<tr style="line-height: 28px;">
+	        			  	<td style="border-bottom: dotted 1px #EAEAEA;padding-left:10px;width: 70%;"><a href="${CTX}/ab/newsshow/${(lst.id)!}">${(lst.title)!}</a></td>
+	        			  	<td style="border-bottom: dotted 1px #EAEAEA;padding-left:10px;width: 30%;">${(lst.release_date)!}</td>
+	        				</tr>
+	        				</#list>
+				    </#if>
+	        	</table>
+        	</div>
+        	<div style="float: right;width: 590px;border: 1px solid #EAEAEA;">
+        		<div style="float:left;background-color:#EAEAEA;font-size: 16px; padding-left:20px; font-weight: bold;line-height: 28px;color: #FF7F24;">活动</div>
+	        	<div style="float: right;line-height: 28px;padding-right: 15px;"><a href="${CTX}/ab/newslist/10">更多...</a></div>
+	        	<table style="width: 100%;">
+	        		<#if list_hd??>
+				        	<#list list_hd as lst>
+				      		<tr style="line-height: 28px;">
+	        			  	<td style="border-bottom: dotted 1px #EAEAEA;padding-left:10px;width: 70%;"><a href="${CTX}/ab/newsshow/${(lst.id)!}">${(lst.title)!}</a></td>
+	        			  	<td style="border-bottom: dotted 1px #EAEAEA;padding-left:10px;width: 30%;">${(lst.release_date)!}</td>
+	        				</tr>
+	        				</#list>
+				    </#if>
+	        	</table>
+        	</div>
+        </div>
+	</div>
+	<div class="blank10"></div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</body>
+</html>

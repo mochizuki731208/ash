@@ -1,0 +1,145 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			$("#myform").validate({
+				rules: {
+					/**
+					user_mobile: {required:true,stringMaxLength:11},
+					smsCodeRand: {required:true,stringMaxLength:6},
+					user_password: {required:true,stringMaxLength:11},
+					user_rpassword: {required:true,equalTo:"#user_password"},
+					jiaoyanma: {required:true,stringMaxLength:4}
+					*/
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$.post("${CTX}/ab/mer/savemerinfo",$("#myform").serializeArray(),function(data){
+	                    if(data){window.location.href="${CTX}/ab/mer/editmerinfo";}
+					});
+				}
+			});
+			
+			$("#btn_sellng").click(function(){
+				$.dialog({
+				title:'获取经纬度',
+				content: 'url:${CTX}/ab/reg/seljwd',
+			    lock:true,
+			    resize: false,
+			    width : 990,
+				height : 480,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				fixed: true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        if(this.content.$("#lng").val()==''){
+				        	$.dialog.alert("请在地图上点击您所在位置，获取经纬度坐标！");
+				        	return false;
+				        }else{
+				        	$("#mer_lng").attr('value',this.content.$("#lng").val());
+				        	$("#mer_lat").attr('value',this.content.$("#lat").val());
+				        }
+			            //return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+			});
+			
+			//首页图片
+			$('#titleimg').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='tb_img_url' value='"+data+"'/>");
+					$('#imga').append("<img src='${CTX}/upload/"+data+"' width=130px height=100px/>");
+                 }
+			});
+			
+			$('#file_upload').uploadify({
+				swf: '${CTX}/res/js/uploadify/uploadify.swf',
+				uploader: '${CTX}/common/upload',
+				debug:false,
+				multi: true,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+                onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='imgurl' value='"+data+"'/>");
+					$('#myform').append("<input type='hidden' name='imgsize' value='"+file.size+"'/>");
+					$('#myform').append("<input type='hidden' name='imgtype' value='"+file.type+"'/>");
+					$('#myform').append("<input type='hidden' name='imgname' value='"+file.name+"'/>");
+					$('#imgb').append("<img src='${CTX}/upload/"+data+"' width=130px height=100px/>");
+                 }
+			});
+		});
+	</script>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">账号信息</h2>
+			<form id="myform" name="myform" action="" method="post">
+			<input type="hidden" class="text" name="tb_id" value="${(vo.id)!}">
+			<table class="input">
+				<tr>
+					<th>序号</th>
+					<th>分类</th>
+					<th>跑腿费</th>
+				</tr>
+				<@_subject_list p_id=vo.subject_id is_type='1' is_display='1'>
+   							<#list list as sub>
+   								<tr>
+									<td><input type="text" class="text" readonly="readonly" value="${(vo.mc)!''}"></td>
+									<td><input type="text" class="text" readonly="readonly" value="${(vo.mc)!''}"></td>
+								</tr>
+   							</#list>
+				</@_subject_list>
+				<tr>
+					<th align="right">商家名称：</th>
+					<td><input type="text" class="text" readonly="readonly" value="${(vo.mc)!''}"></td>
+				</tr>
+				
+				<tr>
+					<td>&nbsp;</td>
+					<td><input type="button" id="btn_save" name="btn_save" class="button" value="保 存"/></td>
+				</tr>
+			</table>
+			</form>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

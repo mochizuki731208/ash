@@ -1,0 +1,230 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <base href="${CTX}/">
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/logi/css/style.css" />
+   	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/citys.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/select-city.min.css" />
+	
+    <script type="text/javascript">
+		function submitForm(id, curPage){
+			//var curPage = document.all.curPage.value;
+			//alert(curPage);
+			//curPage=100;
+			//var curPage = document.all.curPage.value;
+			//alert(curPage);
+			document.all.curPage.value=curPage;
+			var form = document.getElementById(id);
+			form.submit();
+		}
+		
+		function myformSub(){
+			document.getElementById("myform").action="${CTX}/ab/logi/index1";
+			document.getElementById("myform").submit();
+		}
+		function uf_page_setcurpage(page){
+			document.all.curPage.value = page;
+			document.myform.submit();
+		}
+		function tolist() {
+			$("#myform").attr("action", "${CTX}/ab/logi");
+			document.myform.submit();
+		}
+		
+		function tomap() {
+			$("#myform").attr("action", "${CTX}/ab/logi/map");
+			document.myform.submit();
+		}
+		
+		function setAreaAllColor() {
+			var vlen = $("input[name='cityarea']").length;
+			var clen = $("input[name='cityarea']:checked").length;
+			if(vlen==clen) {
+				$("#area_all").css("backgroundColor","#ff7f24");
+			} else {
+				$("#area_all").removeAttr("style");
+			}
+		}
+		
+		function setSubjectAllColor() {
+			var vlen = $("input[name='subject']").length;
+			var clen = $("input[name='subject']:checked").length;
+			if(vlen==clen) {
+				$("#subject_all").css("backgroundColor","#ff7f24");
+			} else {
+				$("#subject_all").removeAttr("style");
+			}
+		}
+		
+		$(document).ready(function(){
+			//默认排序
+			$("input[name='mrorder']").attr("checked", true);
+		
+			$("input[name='cityarea']").change(setAreaAllColor);
+			
+			$("#area_all").click(function(){
+				//	第二次修改状态使用prop
+				$("input[name='cityarea']").prop("checked", true);
+				setAreaAllColor();
+			});
+			
+			$("input[name='subject']").change(setSubjectAllColor);
+			
+			$("#subject_all").click(function(){
+				$("input[name='subject']").prop("checked", true);
+				setSubjectAllColor();
+			});
+		});
+    </script>
+</head>
+<body>    
+    <#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+          <article>
+			<form id="myform" name="myform" action="${CTX}/ab/logi/" method="post">
+			<!--
+			<#if listpage ??>
+			<input type="hidden" id="curPage" name="curPage" value="${(listpage.curPage)!}"/>
+			</#if>
+			-->
+          	<div class="selecter">
+				
+               	<ul>
+                    	<li class="fl">
+                  		<div style="position:relative;">
+	                    	<div style="float:left;"><label>起始地：</label></div>
+	                    	<div style="padding-left:0px;float:left;width:165px" class="col-xs-4 addrselector">
+								<input data-val="true" data-val-number="字段 ToProvinceCode 必须是一个数字。" data-val-required="ToProvinceCode 字段是必需的。" id="depProvinceCode" name="order_start_province_code" value="${(order.start_province_code)!''}" type="hidden">
+								<input id="depProvinceName"  name="order_start_province_name" value="${(start_province_name)!''}"  type="hidden">
+								<input data-val="true" data-val-number="字段 ToCityCode 必须是一个数字。" data-val-required="ToCityCode 字段是必需的。" id="depCityCode"  name="order_start_city_code" value="${(order.start_city_code)!''}"  type="hidden">
+								<input id="depCityName"  name="order_start_city_name" value="${(start_city_name)!''}"   type="hidden">
+								<input data-val="true" data-val-number="字段 ToCountyCode 必须是一个数字。" id="depCountyCode"  name="order_start_county_code" value="${(order.start_county_code)!''}"   type="hidden">
+								<input id="depCountyName"  name="order_start_county_name" value="${(start_county_name)!''}"  type="hidden" value="">
+						    </div>
+					    </div>                    	</li>
+                    	<li class="fl">
+         				<div style="position:relative;">
+	                    	<div style="float:left;"><label>到达地：</label></div>
+	                    	<div style="padding-left:0px;float:left;width:165px" class="col-xs-4 addrselector">
+								<input data-val="true" data-val-number="字段 ToProvinceCode 必须是一个数字。" data-val-required="ToProvinceCode 字段是必需的。" id="ToProvinceCode" name="order_arr_province_code" value="${(order.arr_province_code)!''}" type="hidden">
+                                <input id="ToProvinceName"  name="order_arr_province_name" value="${(arr_province_name)!''}"  type="hidden">
+                                <input data-val="true" data-val-number="字段 ToCityCode 必须是一个数字。" data-val-required="ToCityCode 字段是必需的。" id="ToCityCode"  name="order_arr_city_code" value="${(order.arr_city_code)!''}"  type="hidden">
+                                <input id="ToCityName"  name="order_arr_city_name" value="${(arr_city_name)!''}"   type="hidden">
+                                <input data-val="true" data-val-number="字段 ToCountyCode 必须是一个数字。" id="depCountyCode"  name="order_arr_county_code" value="${(order.arr_county_code)!''}"   type="hidden">
+                                <input id="ToCountyName"  name="order_arr_county_name" value="${(arr_county_name)!''}"  type="hidden" value="">
+                            </div>
+					    </div>                    	
+					    </li>
+                    	<input class="btn cp fr hand" type="button" onclick="tolist()"  value="返回列表形式查看" />
+                    	<input class="btn cp fr" type="button" onclick="myformSub()" value="搜索>>" />
+                    </ul>
+               	<ul>
+                    	<li class="fl"><label>物流公司：</label><input style="height:30px;" class="txt" type="text" id="loginame" name="loginame" value="${(loginame)!}" /></li>
+                    	<!-- <li class="fl"><label>关键词：</label><input style="height:30px;" class="txt" type="text" id="keywords" name="keywords" value="${(keywords)!}" /></li> -->
+                    	<input class="btn cp fr hand" type="button" onclick="tomap()" value="返回地图形式查看" />
+                    	<input class="btn cp fr" type="submit" value="搜索>>" />
+                    </ul>
+					<ul>
+                    	<li class="tsela fl"><label>所属商圈：</label><input class="select_all" type="button" id="area_all" value="全部" />
+						<#if listcity?? >
+						<#list listcity as c>
+							${(c.mc)!}<input class="tsel" type="checkbox" id="cityarea" name="cityarea" value="${(c.id)!}" <#if cityarea??>${cityarea?seq_contains("${(c.id)!}")?string("checked='checked'","")}</#if>/>
+						</#list>
+						</#if>
+						</li>
+               
+                    	<li class="tsela fl"><label>服务分类：</label><input class="select_all" type="button" id="subject_all" value="全部" />
+						<#if logis?? >
+						<#list logis as c>
+							${(c.mc)!}<input class="tsel" type="checkbox" id="subject" name="subject" value="${(c.id)!}" <#if subject??>	${subject?seq_contains("${(c.id)!}")?string("checked='checked'","")}</#if>/>
+						</#list>
+						</#if>
+						</li>
+            <!--
+                    	<li class="tsela fl"><label>排序方式：</label><input class="selall" type="button" value="默认排序" />
+							<input class="tsel" type="checkbox" id="mrorder" name="mrorder" value="ASC"/>
+							按销量[<input class="tsel" type="radio" id="zxlorder" name="zxlorder" value="ASC"/>升<input class="tsel" type="radio" id="zxlorder" name="zxlorder" value="DESC"/>降]&nbsp;&nbsp;
+							按价格[<input class="tsel" type="radio" id="avgpriceorder" name="avgpriceorder" value="ASC"/>升<input class="tsel" type="radio" id="avgpriceorder" name="avgpriceorder" value="DESC"/>降]&nbsp;&nbsp;
+							按好评[<input class="tsel" type="radio" id="hpsorder" name="hpsorder" value="ASC"/>升<input class="tsel" type="radio" id="hpsorder" name="hpsorder" value="DESC"/>降]&nbsp;&nbsp;
+						</li>
+			-->
+                 </ul>
+               </div>
+               <div class="selectrecord tl">共 <i class="logicount"><#if listpage ??>${(listpage.totalRow)!'--'}<#else>--</#if></i> 个结果</div>
+               <div class="body">
+                     <div class="bodyleftlist fl">
+                     	<div class="pagetop">
+                         	<dt class="fl">默认</dt>
+                              <dd class="fr"><span>${(listpage.curPage)!}/${(listpage.totalPage)!}</span>
+							  <#if listpage ??>
+								<#if listpage.curPage==1>
+								<a  class="prev cp"href="javascript:void(0);" onclick="uf_page_setcurpage('1');"></a>
+								<#else>
+								<a class="prev cp" href="javascript:void(0);" onclick="uf_page_setcurpage('${listpage.curPage-1}');"></a>
+								</#if>
+								<#if listpage.curPage lt listpage.totalPage>
+								<a class="next cp" href="javascript:void(0);" onclick="uf_page_setcurpage('${listpage.curPage+1}');"></a>
+								<#else>
+								<a class="next cp" href="javascript:void(0);" onclick="uf_page_setcurpage('${listpage.totalPage}');"></a>
+								</#if>
+							<#else>
+								<a class="prev cp"></a><a class="next cp"></a>
+							</#if>
+								<input type="text" id="curPage" name="curPage" value="<#if listpage ??>${(listpage.curPage)!'1'}</#if>"/>
+								<input class="btn cp fr" type="submit" value="跳转" />
+							</dd>
+                         </div>
+                         <ul class="seachlist">
+							<#if listpage ??>
+							<#list listpage.list as lst>
+							<a href="${CTX}/trans/${(lst.mobile)}">
+                              	<img class="fl" src="<#if (lst.img_url)??>${CTX}/upload/${lst.img_url}<#else>${CTX}/res/logi/images/1.jpg</#if>" />
+                                   <span class="fl">
+                                        <tt>${(lst.mc)!}
+                                         <#if strkit('1',(lst.is_recommend)!)>
+				     						<span class="tooltip" title="推荐开始时间：${(lst.tjkssj)!}-截止时间：${(lst.tjjzsj)!}" style="padding:4px 4px 4px 4px;background-color:#EE2C2C;color: white;">荐</span>
+				     					</#if>
+                                        </tt><br />
+                                        	所在位置：${(lst.city_name)!}-${(lst.maincity)!}<br />
+                                        	服务类型：${(lst.subject_name)!}<br />
+                                        	辐射范围：${(lst.mainline)!}....
+                                   </span>
+                                   <span class="fr"><big>${(lst.score)!'0'}</big> / <small>5分</small><br /><br /><i>${(lst.comments_total)!'0'}</i> 条用户评价</span>
+                              </a>
+							</#list>
+							</#if>
+                         </ul>
+                     </div>
+               	 <div class="bodyrightcompany fr">
+                     	<dl>推荐诚信企业</dl>
+                         <ul>
+							<#if tuijian ??>
+							<#list tuijian.list as lst>
+                         	<a href="${CTX}/trans/${(lst.mobile)}">
+                              	<img class="fl" src="<#if (lst.img_url)??>${CTX}/upload/${lst.img_url}<#else>${CTX}/res/logi/images/1.jpg</#if>" />
+                                   <span class="fr">
+                                        <tt>${(lst.mc)!}</tt><br />
+                                        ${(lst.city_name)!}-${(lst.maincity)!}<br />
+                                        ${(lst.mainline)!}.....
+                                   </span>
+                              </a>
+                         	</#list>
+							</#if>
+                         </ul>
+                     </div>
+               </div>
+			   </form>
+          </article>
+          <!-- foot页 -->
+	<#include '../inc/foot.html'>
+	<script type="text/javascript" src="${CTX}/res/js/fmcar/plugins/require.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script>
+	    require(['./res/js/fmcar/boot'], function () {
+	        require(['truck-orders-edit']);
+	    });
+	</script>
+     </body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>后台管理系统</title>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/admin.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/tab/style.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<!--加载鼠标绘制工具-->
+	<script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+  	<link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+ 	<!--加载检索信息窗口-->
+ 	<script type="text/javascript" src="http://api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.js"></script>
+ 	<link rel="stylesheet" href="http://api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.css" />
+ 	<script src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js" type="text/javascript"></script>
+ 	<style type="text/css">
+ 	dl,dt,dd,ul,li{margin:0;padding:0;list-style:none;}
+	p{font-size:12px;}
+	dt{font-size:14px;font-family:"微软雅黑";font-weight:bold;
+		border-bottom:1px dotted #000;padding:5px 0 5px 5px;margin:5px 0;}
+	dd{padding:5px 0 0 5px;}
+	li{line-height:28px;}
+ 	</style>
+	<script type="text/javascript">
+	var shdzjd = '';
+	var shdzwd = '';//收获人经纬度
+	var sjjd = '';
+	var sjwd = '';//商家经纬度
+	var jdrjd = '';
+	var jdrwd = '';//接单人经纬度
+	var map = null;
+	var point = null;
+	var point1 = null;
+	var point2 = null;
+	var point3 = null;
+	var myDis = null ;
+	var psfs = 0;//是否是商家自送  1 表示是   0表示否
+	var opts = {
+			width : 250,     // 信息窗口宽度
+ 			height: 80,     // 信息窗口高度
+  			title : "跑腿人员位置" , // 信息窗口标题
+  			enableMessage:true//设置允许信息窗发送短息
+	};
+	var geoc = new BMap.Geocoder();
+	$(function() {
+		map = new BMap.Map("MblogMap");  
+		psfs = '${(order.psfs)!''}';//是否是商家自己送单
+		sjjd = '${(mer.lng)!''}';
+		sjwd = '${(mer.lat)!''}';// 创建地图实例    
+		point = new BMap.Point(sjjd,sjwd); 
+		map.centerAndZoom(point, 10);
+		myDis = new BMapLib.DistanceTool(map); 
+		myDis.close();
+			 
+		//添加缩放控件  
+		map.addControl(new BMap.NavigationControl());    
+		map.addControl(new BMap.ScaleControl());    
+		map.addControl(new BMap.OverviewMapControl());   
+		map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+		 
+		shdzjd = '${(order.shdzjd)!''}';
+		shdzwd = '${(order.shdzwd)!''}';
+		 //派单坐标
+		 if("1"==psfs){
+			 jdrjd = '${(mer.lng)!''}';
+			 jdrwd = '${(mer.lat)!''}';
+		 }else{
+			 jdrjd = '${(order.jdrjd)!''}';
+			 jdrwd = '${(order.jdrwd)!''}';
+		 }
+		if(sjjd !=''&&sjwd !=''){
+			point1 = new BMap.Point(sjjd,sjwd);
+		}
+		if(shdzjd != ''&&shdzwd !=''){
+			point2 = new BMap.Point(shdzjd,shdzwd);
+		}
+		if(jdrjd != ''&&jdrwd != ''){
+			point3 = new BMap.Point(jdrjd,jdrwd);
+		}
+		drawDyTU();
+		//setTimeout(drawDyTU,10*60*1000);
+	});
+	function drawDyTU(){
+		map.clearOverlays();  
+		var icon = new BMap.Icon("http://developer.baidu.com/map/jsdemo/img/location.gif", new BMap.Size(14, 23));
+		//var isQiu = '${(isQiu)!''}';
+		//var driving3 = new BMap.DrivingRoute(map, {renderOptions:{map: map, autoViewport: true}});    //驾车实例
+		//if(isQiu){
+		//	driving3.setMarkersSetCallback(function(result){
+		//		result[0].marker.setIcon(icon);
+		//		result[1].marker.setIcon(icon);
+		//	});
+		//}
+		var myIcon = new BMap.Icon("${CTX}/res/images/q.png", new BMap.Size(40,80));
+		if(point1 != null){
+			marker1 = new BMap.Marker(point1,{icon:myIcon});
+			map.addOverlay(marker1);
+			var label = new BMap.Label("发货地址：" +　'${(mer.xxdz)!'-'}',{offset:new BMap.Size(20,-10)});
+			marker1.setLabel(label);
+		}else{
+			//alert("无法获取发货地经纬度");
+		}
+		var myIcon2 = new BMap.Icon("${CTX}/res/images/z.png", new BMap.Size(40,80));
+		if(point2 != null){
+			marker2 = new BMap.Marker(point2,{icon:myIcon2});
+			map.addOverlay(marker2);
+			var label = new BMap.Label("收货地址：" +　'${(order.shdz)!'-'}',{offset:new BMap.Size(20,-10)});
+			marker2.setLabel(label);
+		}else{
+			//alert("无法获取收货地经纬度");
+		}
+		var orderid = "${(order.id)!''}";
+		var mid = "${(order.mid)!''}";
+		var shrid ="${(order.qdrid)!''}";
+		if(shrid == ''){
+			return;
+		}
+		//其他点的查询
+		$.ajax({
+			url: "${CTX}/admin/order/huaGuiJi",
+			type: "POST",
+			data: {orderid:orderid,mid:mid,shrid:shrid,xdsj:"${(order.xdsj)!''}",qdsj:"${(order.qdsj)!''}",shsj:"${(order.shsj)!''}"},
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				var line = new Array();
+				$.each(data.data, function(index, objVal) {
+					var new_point = new BMap.Point(objVal.jd,objVal.wd);
+					line.push(new_point);
+					var marker = new BMap.Marker(new_point); // 创建标注
+					var content = "时间：" +objVal.dqsj + "<br>位置：" + objVal.jd + "," + objVal.wd;
+					map.addOverlay(marker);  
+					addClickHandler(content,marker);// 将标注添加到地图中
+					if (index == (data.data.length-1)){
+						var label = new BMap.Label("跑腿人员当前位置",{offset:new BMap.Size(20,-10)});
+						marker.setLabel(label);
+					}
+					if(index==0){
+						var label = new BMap.Label("跑腿人员初始位置",{offset:new BMap.Size(20,-10)});
+						marker.setLabel(label);
+					}
+	            });
+				var polyline = new BMap.Polyline(line, {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.5});
+				map.addOverlay(polyline);         
+			}
+		});
+	}
+		
+	function refresh(){
+		var isQiuDes = '<#if isQiuDes??>${isQiuDes}</#if>';
+		if(isQiuDes == "显示小球"){
+			$("#isQiu").val("1");
+		}else{
+			$("#isQiu").val("");
+		}
+		$('#myform').submit();
+		$('#myform').action = "";
+		$('#myform').target = "_self";
+	}
+	
+	var overlays = [];
+	
+	 var styleOptions = {
+		 strokeColor:"red",    //边线颜色。
+		 fillColor:"red",      //填充颜色。当参数为空时，圆形将没有填充效果。
+		 strokeWeight: 3,       //边线的宽度，以像素为单位。
+		 strokeOpacity: 0.8,	   //边线透明度，取值范围0 - 1。
+		 fillOpacity: 0.6,      //填充的透明度，取值范围0 - 1。
+		 strokeStyle: 'solid' //边线的样式，solid或dashed。
+	}
+	 var overlaycomplete = function(e){
+	    overlays.push(e.overlay);
+	 };
+	    
+		 //实例化鼠标绘制工具
+	 var drawingManager = new BMapLib.DrawingManager(map, {
+	      isOpen: true, //是否开启绘制模式
+	        enableDrawingTool: true, //是否显示工具栏
+	        drawingToolOptions: {
+	           anchor: BMAP_ANCHOR_TOP_RIGHT, //位置
+	            offset: new BMap.Size(5, 5), //偏离值
+	        },
+	        circleOptions: styleOptions, //圆的样式
+	        polylineOptions: styleOptions, //线的样式
+	        polygonOptions: styleOptions, //多边形的样式
+	        rectangleOptions: styleOptions //矩形的样式
+	  });  
+		 //添加鼠标绘制工具监听事件，用于获取绘制结果
+	  drawingManager.addEventListener('overlaycomplete', overlaycomplete);
+	  function clearAll() {
+		for(var i = 0; i < overlays.length; i++){
+	       map.removeOverlay(overlays[i]);
+	    }
+	    overlays.length = 0   
+	  }
+	  function addClickHandler(content,marker){
+		marker.addEventListener("click",function(e){
+			openInfo(content,e)}
+		);
+	  }
+	function openInfo(content,e){
+		var p = e.target;
+		var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+		var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
+		map.openInfoWindow(infoWindow,point); //开启信息窗口
+	}
+	</script>
+</head>
+  <body>
+  <form action="" id="myform">
+  	<input name="isQiu" value="1" id="isQiu" type="hidden"/>
+  	<input name="id" value="${(order.id)!''}" id="id" type="hidden"/>
+  </form>
+  <div id="MapContainer" style="margin: 3px 0px 3px 0px; display: block;height:100%">
+	<div style="width:80%;height:500px;border:1px solid gray; float:left" id="MblogMap"></div> 
+	<h3>订单信息</h3> 
+	<hr style=""/>
+	订单号：${(order.sn)!'-'}<br>
+	下单人：${(order.xdrmc)!'-'}<br>
+	收货人：${(order.lxr)!'-'}<br>
+	接单人：${(order.qdrname)!'-'}<br>
+	电话：${(su.mobile)!'-'}<br>
+	发货地点：${(mer.xxdz)!'-'}<br>
+	收货地点：${(order.shdz)!'-'}<br>
+	公里数：${(order.jl)!'-'}<br>
+	出发时间：${(order.xdsj)!'-'}<br>
+ </div>
+ <hr style=""/>
+ <div><input type="button" value="开启测距" onclick="myDis.open()"/><input type="button" value="关闭测距" onclick="myDis.close()"/></div>
+ <div style="display: none;"><input type="button" value="原始轨迹"/><input type="button" value="${(isQiuDes)!''}" onclick="refresh()"/></div>
+ 里程：${(order.jl)!'-'}<br>
+ <hr style=""/>
+ <div style="display: none;">
+ <H3>订单轨迹时间</H3>
+ 派单:<span style="background-color: blue;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br>
+ ${(order.xdsj)!'0000-00-00 00:00:00'}<br>
+ 接单:<span style="background-color: blue;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br>
+ ${(order.xdsj)!'0000-00-00 00:00:00'}<br>
+  到达:<span style="background-color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br>
+ ${(order.sdsj)!'0000-00-00 00:00:00'}<br>
+  出发:<span style="background-color: blue;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br>
+ ${(order.xdsj)!'0000-00-00 00:00:00'}<br>
+ </div>
+  </body>
+</html>
+

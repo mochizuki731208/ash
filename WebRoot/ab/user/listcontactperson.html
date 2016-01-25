@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/liuyan.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/page.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+    <script type="text/javascript" src="${CTX}/res/js/common.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+    <script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+	</script>	
+ </head>
+ <script type="text/javascript">
+ 	$(function() {
+ 		$("#btn_cancel").hide();
+ 	});
+ 	function add() {
+ 		var add_name = $("#add_name").val();
+ 		var add_mobile = $("#add_mobile").val();
+ 		if(add_name == "") {
+ 			alert("收货人姓名不能为空!");
+ 			return;
+ 		}
+ 		if(add_mobile == "") {
+ 			alert("收货人联系方式不能为空!");
+ 			return;
+ 		}
+ 		$("form").submit();
+ 	}
+ 	
+ 	function edit(_id,_linkman,_mobile) {
+ 		$("#add_user_id").val(_id);
+ 		$("#add_name").val(_linkman);
+ 		$("#add_mobile").val(_mobile);
+ 		$("#btn_return").val("修改");
+ 		$("#btn_cancel").show();
+ 	}
+ 	
+ 	function cancel() {
+ 		$("#add_user_id").val("");
+ 		$("#add_name").val("");
+ 		$("#add_mobile").val("");
+ 		$("#btn_return").val("添加");
+ 		$("#btn_cancel").hide();
+ 	}
+ 	
+ 	function del(_id) {
+ 		if(confirm("您确定删除该收货人信息?信息删除后将不能恢复!")) {
+ 			$("#add_user_id").val(_id);
+ 			$("form").attr("action","${CTX}/ab/tc/deletePerson").submit();
+ 		}
+ 	}
+ </script>
+  <body>
+  	<#include '../inc/top.html'>
+  	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<form id="myform" name="myform" method="post" action="${CTX}/ab/tc/cylxr_deal">
+	<input type="hidden" name="user_id" id="user_id" value="${user_id}"/>
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">我的常用联系人</h2>
+			<div style="height: 40px;line-height: 40px;text-align: left;padding:0 10px;">
+				<input type="hidden" id="add_user_id" name="add_user_id" value="">
+				收货人姓名：<input type="text" name="add_name" id="add_name" size="30" value=""/>
+				收货人联系方式：<input type="text" id="add_mobile" name="add_mobile" size="30" value=""/>
+				<input type="button" id="btn_return" class="button" value="添加" onclick="add();"/>
+				<input type="button" id="btn_cancel" class="button" value="取消" onclick="cancel();"/>
+			</div>
+			<table class="list" style="width:98%;margin:0 auto;">
+            <tr>
+	            <th width="30">序号</th>
+	            <th width="90">联系人</th>
+	            <th width="90">联系电话</th>
+				<th width="120">操作</th>
+	        </tr>
+	        <#if personlist ??>
+      				<#list personlist as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!}</td>
+                    <td>
+                    	${(lst.linkman)!}
+                    </td>
+                    <td>
+                    	${(lst.mobile)!}
+                    </td>
+                    <td>
+                    	<a href="javascript:void(0);" onclick="edit('${lst.id}','${lst.linkman}','${lst.mobile}');">编辑</a>
+                    	<a href="javascript:void(0);" onclick="del('${lst.id}');">删除</a>
+                    </td>
+                  </tr>
+				</#list>
+			</#if>
+            </table>
+		</div>
+	</div>
+	</form>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

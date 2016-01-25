@@ -1,0 +1,140 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<script type="text/javascript"
+	src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+<script type="text/javascript">
+		function uf_showdd(id){
+			$.dialog({
+				title:'维权流程明细',
+				content: 'url:${CTX}/admin/chargeback/editcb?id='+id+'&isshow='+0,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							$.post("${CTX}/admin/chargeback/updatecb",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+			                    	$.dialog.alert("保存数据成功！",function () {
+										refresh();
+							        }).title('3秒后关闭').time(3);
+								}else{
+									$.dialog.alert("保存数据失败！");
+								}
+							});
+						}
+			            return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function uf_showcb(id){
+			$.dialog({
+				title:'维权流程明细',
+				content: 'url:${CTX}/admin/chargeback/editcb?id='+id+'&isshow='+1,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+<body>
+	<form id="myform" name="myform" method="post" action="">
+		订单号：<input type="text" name="sn" id="sn" class="text" value="${(sn)!}"
+			style="width: 100px;" /> 
+		 商家名称：<input type="text" name="mname" id="mname" class="text"
+			value="${(mname)!}" style="width: 100px;" /> <input type="button"
+			id="btn_return" class="button" value="查 询" onclick="refresh();" />
+		<table class="list">
+			<tr>
+				<th width="3%">序号</th>
+				<!-- <th width="8%">订单编号</th>
+				<th width="4%">订单金额</th>
+				<th width="6%">商户名称</th>
+				<th width="6%">下单人名称</th>
+				<th width="6%">接单人名称</th> -->
+				<th width="4%">状态</th>
+				<th width="6%">申请人名称</th>
+				<th width="8%">申请描述</th>
+				<th width="10%">申请时间</th>
+				<th width="8%">回复内容</th>
+				<th width="10%">回复时间</th>
+				<th width="8%">申请仲裁描述</th>
+				<th width="10%">申请仲裁时间</th>
+				<th width="8%">维权总结</th>
+				<th width="10%">完结时间</th>
+				<th width="6%">仲裁人</th>
+				<th width="*%">操作</th>
+			</tr>
+			<#if listpage ??> <#list listpage.list as lst>
+			<tr ondblclick="uf_showdd('${(lst.id)!}');">
+				<td>${(lst_index+1)!''}</td>
+				
+				<td>
+                    	<#if strkit('01',(lst.cb_status)!)>用户申请</#if>
+                    	<#if strkit('02',(lst.cb_status)!)>商户申请</#if>
+                    	<#if strkit('03',(lst.cb_status)!)>商户申诉</#if>
+                    	<#if strkit('04',(lst.cb_status)!)>取消退单</#if>
+                    	<#if strkit('05',(lst.cb_status)!)>客服介入</#if>
+                    	<#if strkit('06',(lst.cb_status)!)>退单成功</#if>
+                    	<#if strkit('07',(lst.cb_status)!)>退单失败</#if>
+                    	<#if strkit('08',(lst.cb_status)!)>业务员申请</#if>
+                    	<#if strkit('09',(lst.cb_status)!)>申请客服</#if>
+                </td>
+                <td>${(lst.mc)!''}</td>
+				<td>${(lst.apply_desc)!''}</td>
+				<td>${(lst.apply_time)!''}</td>
+				<td>${(lst.rep_desc)!''}</td>
+				<td>${(lst.rep_time)!''}</td>
+				<td>${(lst.judge_desc)!''}</td>
+				<td>${(lst.judge_time)!''}</td>
+				<td>${(lst.result_desc)!''}</td>
+				<td>${(lst.result_time)!''}</td>
+				<td>${(lst.ssmc)!''}</td>
+				<td>
+					<#if lst.cb_status == '05'>
+						<a href="javascript:void(0);" onclick="uf_showdd('${(lst.id)!}')">仲裁</a>
+					</#if>
+					<a href="javascript:void(0);" onclick="uf_showcb('${(lst.id)!}')">查看</a>
+					
+				</td>
+			</tr>
+			</#list>
+			 </#if>
+			 
+			 <tr>
+					<td colspan="18">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+		</table>
+
+	</form>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>后台管理系统</title>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<!-- 	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/admin.css"/> -->
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<style type="text/css">
+	div{text-align: center;	margin-top: 20px}
+	input{width: 200px;height: 50px;font-size: 22px;background-color: red;color: white;}
+	</style>
+	<script type="text/javascript">
+		$().ready(function() {
+			//addUp(0);
+		});
+		function addUp(flag){
+			var url = "";
+			if(flag==1 || flag ==2){
+				url = '${CTX}/admin/order/initAddTcOrder?flag=' + flag;
+			}else{
+				url = '${CTX}/admin/order/addUpPage';
+			}
+			self.location.href=url;
+// 			$.dialog({
+// 				title:'添加订单',
+// 				content: url,
+// 			    lock:true,
+// 			    resize: true,
+// 			    width : 1440,
+// 				height : 480,
+// 				cover:true,
+// 				max:true,
+// 				min:true,
+// 				cancel:true
+// 			}).max();//
+		}
+	</script>
+	<body>
+		<div>
+			<input type="button" value="店铺订单" onclick="addUp(0)">
+			<input type="button" value="市内发货" onclick="addUp(1)">
+			<input type="button" value="全国发货" onclick="addUp(2)">
+		</div>
+		<div>说明：请选择不同的通道进行代客下单(默认是店铺订单)</div>
+	</body>
+</head>
+</html>
+

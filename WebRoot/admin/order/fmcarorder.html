@@ -1,0 +1,222 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+     <style type="text/css">
+    	.back{
+    		background: #0099FF
+    	}
+    </style>
+     <script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript">
+	var time = 60;
+	var geoc = new BMap.Geocoder();
+	$(function() {
+		time = 60;
+		var tab = '${tab}';
+		searchbyday(tab);
+		do_timer();
+	});
+	function do_timer(){
+		$("#time").html("<font size='100' color='red'><strong>" + time +"</strong></font>");
+		if(0==time){
+			refresh();
+		}
+		time--;
+		setTimeout('do_timer()',1000);
+	}
+	function searchbyday(id){
+		for(var i = 0; i <7; i++){
+			if(id!= ("t" + i) && $("#t" + i).hasClass("back")){
+				$("#t" + i).removeClass("back");
+			}else{
+				$("#" + id).addClass("back");
+				$("#tab").val(id);
+			}
+		}
+	}
+	function refresh(){
+		if(document.getElementById("flagExport")){
+			var child=document.getElementById("flagExport");
+			child.parentNode.removeChild(child);
+		}
+		$('#myform').submit();
+		$('#myform').action = "";
+		$('#myform').target = "_self";
+	}
+	function exportOrder(){///admin/order/all?orderType=0&flagExport=0
+		//self.location.href="/admin/order/all?orderType=0&flagExport=0";
+		$("#myform").append($("<input name='flagExport' id='flagExport' type='hidden' value='0'>"));
+		$('#myform').submit();
+		$('#myform').action = "";
+		$('#myform').target = "_self";
+	}
+	function uf_showddinfo(id){
+		$.dialog({
+			title:'订单明细',
+			content: 'url:${CTX}/admin/dd/showdd?id='+id,
+		    lock:true,
+		    resize: false,
+		    width : 900,
+			height : 480,
+			cover:true,
+			max:true,
+			min:true,
+			cancel:true,
+			fixed:true,
+	        cancelVal:'关 闭'
+		}).max();//弹出框
+	}
+	</script>
+ </head>
+  <body>
+  	 <form id="myform" name="myform" method="post" action="">
+  	  <div>
+	  	 <div style="width: 400px;height:30px;text-align: center;background-color: rgb(237,200,58);">
+	  	 	<font color="#e66629" style="font-size: 20px;font-weight: 700">熟车订单</font>
+	  	 </div>
+	 	 <div style="margin-right: 100px;float: right;margin-top: -25px">
+	   		<span id="time">&nbsp;</span>秒后自动刷新.<input value="手动刷新" type="button" class="button" onclick="refresh()">
+	  	 </div>
+	  </div>
+  	 	<input type="hidden" name="tab" id="tab" value="${(tab)!''}"/>
+  	 	<table class="list">
+  			<tr>
+  				<td onclick="searchbyday('t0'),refresh();" id="t0" style="cursor: pointer;">今日</td>
+  				<td onclick="searchbyday('t1'),refresh();" id="t1" style="cursor: pointer;">昨日</td>
+  				<td onclick="searchbyday('t2'),refresh();" id="t2" style="cursor: pointer;">前日</td>
+  				<td onclick="searchbyday('t3'),refresh();" id="t3" style="cursor: pointer;">最近七天</td>
+  				<td onclick="searchbyday('t4'),refresh();" id="t4" style="cursor: pointer;">本月</td>
+  				<td onclick="searchbyday('t5'),refresh();" id="t5" style="cursor: pointer;">上月</td>
+  				<td onclick="searchbyday('t6'),refresh();" id="t6" style="cursor: pointer;">所有订单</td>
+  				<td>
+  					订单总数：<font color="#e66629" style="font-size: 20px;font-weight: 700">${(totalcount)!'0'}件</font>,
+  				</td>
+  			</tr>
+  			<tr>
+  				<th>起始地址：</th><td><input type="text" id="startaddr" name="startaddr" value="${(startaddr)!''}"/></td>
+  				<th>到达地址：</th><td><input type="text" id="arraddr" name="arraddr" value="${(arraddr)!''}"/></td>
+  				<th>车型：</th>
+  				<td>
+  					<select id="car_type" name="car_type" value="${(car_type)!''}" style="width:150px;" class="required">
+						<option value="">请选择</option>
+                        <option value="三轮车" <#if strkit('三轮车',(car_type)!)>selected</#if>>三轮车</option>
+                        <option value="面包车" <#if strkit('面包车',(car_type)!)>selected</#if>>面包车</option>
+                        <option value="厢车" <#if strkit('厢车',(car_type)!)>selected</#if>>厢车</option>
+                        <option value="平板车" <#if strkit('平板车',(car_type)!)>selected</#if>>平板车</option>
+                        <option value="高低板车" <#if strkit('高低板车',(car_type)!)>selected</#if>>高低板车</option>
+                        <option value="高栏车" <#if strkit('高栏车',(car_type)!)>selected</#if>>高栏车</option>
+                        <option value="冷藏车" <#if strkit('冷藏车',(car_type)!)>selected</#if>>冷藏车</option>
+                        <option value="危险品车" <#if strkit('危险品车',(car_type)!)>selected</#if>>危险品车</option>
+                        <option value="大件车" <#if strkit('大件车',(car_type)!)>selected</#if>>大件车</option>
+					</select>
+  				</td>
+  				<th>车长：</th>
+  				<td>
+  					 <select name="car_length" class="form-control" id="car_length" style="width:150px;">
+                            <option value="">全部</option>
+                            <option value="1.8米" <#if strkit('1.8米',(car_length)!)>selected</#if>>1.8米</option>
+                            <option value="2.6米" <#if strkit('2.6米',(car_length)!)>selected</#if>>2.6米</option>
+                            <option value="3.2米" <#if strkit('3.2米',(car_length)!)>selected</#if>>3.2米</option>
+                            <option value="4.2米" <#if strkit('4.2米',(car_length)!)>selected</#if>>4.2米</option>
+                            <option value="5.2米" <#if strkit('5.2米',(car_length)!)>selected</#if>>5.2米</option>
+                            <option value="5.8米" <#if strkit('5.8米',(car_length)!)>selected</#if>>5.8米</option>
+                            <option value="6.2米" <#if strkit('6.2米',(car_length)!)>selected</#if>>6.2米</option>
+                            <option value="6.5米" <#if strkit('6.5米',(car_length)!)>selected</#if>>6.5米</option>
+                            <option value="6.8米" <#if strkit('6.8米',(car_length)!)>selected</#if>>6.8米</option>
+                            <option value="7.2米" <#if strkit('7.2米',(car_length)!)>selected</#if>>7.2米</option>
+                            <option value="8米" <#if strkit('8米',(car_length)!)>selected</#if>>8米</option>
+                            <option value="9.6米" <#if strkit('9.6米',(car_length)!)>selected</#if>>9.6米</option>
+                            <option value="13米" <#if strkit('13米',(car_length)!)>selected</#if>>13米</option>
+                            <option value="15米" <#if strkit('15米',(car_length)!)>selected</#if>>15米</option>
+                            <option value="16.5米" <#if strkit('16.5米',(car_length)!)>selected</#if>>16.5米</option>
+                            <option value="17.5米" <#if strkit('17.5米',(car_length)!)>selected</#if>>17.5米</option>
+                            <option value="18.5米" <#if strkit('18.5米',(car_length)!)>selected</#if>>18.5米</option>
+                            <option value="20米" <#if strkit('20米',(car_length)!)>selected</#if>>20米</option>
+                            <option value="22米" <#if strkit('22米',(car_length)!)>selected</#if>>22米</option>
+                            <option value="24米" <#if strkit('24米',(status)!)>selected</#if>>24米</option>
+                        </select>
+  				</td>
+  			</tr>
+  			<tr>
+  				<th>下单人：</th><td><input type="text" id="xdrmc" name="xdrmc" value="${(xdrmc)!''}"/></td>
+  				<th>联系电话：</th><td><input type="text" id="mobile" name="mobile" value="${(mobile)!''}"/></td>
+  				<th>订单状态：</th>
+  				<td>
+  					<select id="status" name="status" value="${(status)!''}" style="width:150px;" class="required">
+						<option value="">请选择</option>
+						<option value="待成交" <#if strkit('待成交',(status)!)>selected</#if>>待成交</option>
+						<option value="进行中" <#if strkit('进行中',(status)!)>selected</#if>>进行中</option>
+					</select>
+  				</td>
+  				<th>管理员：</th>
+  				<td>
+  					<select id="admin_id" name="admin_id" style="width:150px;">
+						<option value="">请选择</option>
+						<#if admin_list ??>
+							<#list admin_list as x>
+						   		<option value="${(x.id)!''}" <#if strkit((x.id)!'',(admin_id)!)>selected</#if>>${(x.mc)!''}</option>
+							</#list>
+						</#if>
+					</select>
+  				</td>
+  			</tr>
+  			<tr>
+  				<td colspan="8">
+  					<input type="button" value="查询" class="button" onclick="refresh()">
+  					<input type="button" onclick="exportOrder()" value="导出" class="button">
+  				</>
+  			</tr>
+  		</table>
+  	 <br>
+  	<table class="list" style="width:100%">
+  		<tr>
+  			<th>序号</th>
+  			<th>下单人</th>
+  			<th>起始省份</th>
+  			<th>起始城市</th>
+  			<th>起始详细地址</th>
+  			<th>到达省份</th>
+  			<th>到达城市</th>
+  			<th>到达详细地址</th>
+  			<th>车厂</th>
+  			<th>车型</th>
+  			<th>装货时间</th>
+  			<th>创建时间</th>
+  			<th>联系电话</th>
+  			<th>订单状态</th>
+  			<th>备注</th>
+  		</tr>
+  		<#if listpage??>
+  			<#list listpage.list as x>
+  				<tr>
+  					<td>${(x_index+1)!''}</td>
+  					<td>${(x.create_mc)!''}</td>
+  					<td>${(x.start_province_name)!''}</td>
+  					<td>${(x.start_city_name)!''}、${(x.start_county_name)!''}</td>
+  					<td>${(x.start_addr)!''}</td>
+  					<td>${(x.arr_province_name)!''}</td>
+  					<td>${(x.arr_city_name)!''}、${(x.arr_county_name)!''}</td>
+  					<td>${(x.arr_addr)!''}</td>
+  					<td>${(x.car_length)!''}</td>
+  					<td>${(x.car_type)!''}</td>
+  					<td>${(x.load_time)!''}</td>
+  					<td>${(x.create_time)!''}</td>
+  					<td>${(x.mobile)!''}</td>
+  					<td>${(x.status)!''}</td>
+  					<td>${(x.remark)!''}</td>
+  				</tr>
+			</#list>
+  		</#if>
+  		<tr>
+			<td colspan="16">
+				<#include '../../common/_paginate.html'>
+			</td>
+		</tr>
+  	</table>
+  	</form>
+  </body>
+</html>
+

@@ -1,0 +1,139 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_edit(id){
+			$.dialog({
+				title:'商户信息编辑',
+				content: 'url:${CTX}/admin/merchant/editsj?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							this.content.$("#product_sub_name").attr('value',this.content.$("#product_sub_id").find("option:selected").text());
+							$.post("${CTX}/admin/merchant/saveproduct",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+									$.dialog.alert("保存数据成功！",function () {
+										refresh();
+							        }).title('3秒后关闭').time(3);
+								}else{
+									$.dialog.alert("删除数据失败！");
+								}
+							});
+						}
+			            return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function uf_show(id){
+	    	$.dialog({
+				title:'企业信息',
+				content: 'url:${CTX}/admin/merchant/showmerchant/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 500,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});
+	    }
+	    
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+  <body>
+  	  <form id="myform" name="myform" method="post" action="">
+			名称：<input type="text" name="mc" id="mc" class="text" value="${(mc)!}" style="width: 120px;"/>
+			手机号：<input type="text" name="sjh" id="sjh" class="text" value="${(sjh)!}" style="width: 120px;"/>
+			分类
+			<select name="subjectid" id="subjectid">
+				<optgroup label="联盟商家">
+					<#list list_subject as x>
+						<#if x.p_id=='1019'>
+				    		<option value="${(x.id)!''}" <#if strkit((x.id)!'',(subjectid)!)>selected</#if>>${(x.mc)!''}</option>
+				    	</#if>
+					</#list>
+				</optgroup>
+				<optgroup label="物流企业">
+					<#list list_subject as x>
+						<#if x.p_id=='1020'>
+				    		<option value="${(x.id)!''}" <#if strkit((x.id)!'',(subjectid)!)>selected</#if>>${(x.mc)!''}</option>
+				    	</#if>
+					</#list>
+				</optgroup>
+			</select>
+			城市
+			<select name="cityid" id="cityid">
+				<option value="">全部...</option>
+				<#list list_city as x>
+				    <option value="${(x.id)!''}" <#if strkit((x.id)!'',(cityid)!)>selected</#if>>${(x.mc)!''}</option>
+				</#list>
+			</select>
+			
+			<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+	  		<table class="list">
+	            <tr>
+		            <th width="4%">序号</th>
+		            <th width="15%">名称</th>
+		            <th width="10%">分类</th>
+		            <th width="6%">类型</th>
+		            <th width="6%">城市</th>
+		            <th width="8%">商圈</th>
+					<th width="*%">地址</th>
+					<th width="8%">手机号</th>
+					<th width="8%">电话</th>
+					<th width="10%">审核状态</th>
+		        </tr>
+	      		<#if listpage ??>
+      				<#list listpage.list as lst>
+	                  <tr>
+	                  	<td>${(lst_index+1)!''}</td>
+	                    <td><a href="javascript:void(0);" onclick="uf_show('${(lst.id)!''}')">${(lst.mc)!''}</a></td>
+	                    <td>${(lst.subject_name)!''}</td>
+	                    <td><#if strkit('0',(lst.is_type)!)>货物</#if><#if strkit('1',(lst.is_type)!)>服务</#if></td>
+	                    <td>${(lst.city_name)!''}</td>
+	                    <td>${(lst.area_name)!''}</td>
+	                    <td>${(lst.xxdz)!''}</td>
+	                    <td>${(lst.mobile)!''}</td>
+	                    <td>${(lst.tel)!''}</td>
+	                    <td>
+	                    	<#if strkit('0',(lst.check_status)!)>待审</#if>
+	                    	<#if strkit('1',(lst.check_status)!)>审核通过</#if>
+	                    	<#if strkit('2',(lst.check_status)!)><font color="red">审核不通过</font></#if>
+                    	</td>
+	                  </tr>
+					</#list>
+				</#if>
+				<tr>
+					<td colspan="10">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+            </table>
+   
+			</form>
+  </body>
+</html>

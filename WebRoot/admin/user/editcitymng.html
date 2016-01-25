@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					user_mc:{required:true,stringMaxLength:50},
+					user_idcard:{required:true,stringMaxLength:20},
+					user_loginid:{required:true,stringMaxLength:20,
+						remote:{
+							type:"POST",
+							url:"${CTX}/common/checkloginid",
+			               	dataType:"json",
+			                data: {
+			                    id: function() { return $("#user_id").val();},
+			                    loginid: function() { return $("#user_loginid").val();}
+			                }
+						}
+					},
+					user_loginpwd:{required:true,stringMaxLength:32},
+					user_email:{email:true,stringMaxLength:50},
+					user_mobile:{required:true,mobile:true,stringMaxLength:20},
+					user_qq:{stringMaxLength:20},
+					user_roleid:{required:true},
+					user_per:{required:true,integer:true,min:0,max:100}
+				},
+				messages:{
+					user_loginid:{required:"登录号不能为空！",remote:"该登录号已经被注册，请重新选择！"}
+				}
+			});
+			
+			$("#user_name").focus();
+		});
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" action="${CTX}${NAME_SPACE}/save" method="post" >
+	<input type="hidden" name="user_id" id="user_id" value="${(vo.id)!}"/>
+	<input type="hidden" name="user_role_id" id="user_role_id" value="103"/>
+	<input type="hidden" name="user_role_name" id="user_role_name" value="区域管理员"/>
+	<input type="hidden" name="user_p_id" id="user_p_id" value="${(vo.p_id)!}"/>
+	<input type="hidden" name="oldpwd" id="oldpwd" value="${(vo.loginpwd)!}"/>
+	<table class="input">
+		<tr>
+			<th align="right" width="20%;">姓名：</th>
+			<td><input type="text" name="user_mc" id="user_mc" class="text" value="${(vo.mc)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">身份证：</th>
+			<td><input type="text" name="user_idcard" id="user_idcard" class="text" maxlength="18" value="${(vo.idcard)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">用户名：</th>
+			<td><input type="text" name="user_loginid" id="user_loginid" class="text" value="${(vo.loginid)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">密码：</th>
+			<td><input type="password" name="user_loginpwd" id="user_loginpwd" class="text" value="${(vo.loginpwd)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">邮箱：</th>
+			<td><input type="text" name="user_email" id="user_email" class="text" value="${(vo.email)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">手机：</th>
+			<td><input type="text" name="user_mobile" id="user_mobile" class="text" maxlength="11" value="${(vo.mobile)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">QQ：</th>
+			<td><input type="text" name="user_qq" id="user_qq" class="text" value="${(vo.qq)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">佣金比例：</th>
+			<td><input type="text" name="user_per" id="user_per" class="text" value="${(vo.per)!}">％ <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">备注：</th>
+			<td><textarea id="user_remark" name="user_remark" class="text">${(vo.remark)!}</textarea></td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

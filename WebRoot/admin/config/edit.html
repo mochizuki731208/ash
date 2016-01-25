@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>后台管理系统</title>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/admin.css"/>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			 $("#inputForm").validate({
+				rules: {
+					config.name: "required",
+					config.type_id: "required",
+					config.is_display: "required",
+					config.seqNum: {
+						required:true,
+						integer:true,
+						min:1
+					},
+					config.remark: "stringMaxLength:500"
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				alert('sd');
+				  //$("#config.name").val($("select[@config.name] option[@selected]").text());
+				  
+				  if($("#inputForm").valid()){
+				    	//$("#inputForm").submit();
+				  }
+			});
+		});
+		
+		
+	</script>
+</head>
+
+  <body>
+    <form id="inputForm" name="inputForm" action="${CTX}${NAME_SPACE}/save" method="post" >
+	<input type="hidden" name="config.id" id="config.id" value="${(vo.id)!}"/>
+	<div class="path">
+		<a href="javascript:void(0);">首页</a> &raquo; 编辑
+	</div>
+	<table class="input">
+		<tr>
+			<th align="right">名称：</th>
+			<td><input type="text" name="config.yt" id="config.yt" class="text" value="${(vo.yt)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">服务器地址：</th>
+			<td><input type="text" name="config.c1" id="config.c1" class="text" value="${(vo.c1)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">服务器地址：</th>
+			<td><input type="text" name="config.c1" id="config.c1" class="text" value="${(vo.c1)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">服务器地址：</th>
+			<td><input type="text" name="config.c1" id="config.c1" class="text" value="${(vo.c1)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">服务器地址：</th>
+			<td><input type="text" name="config.c1" id="config.c1" class="text" value="${(vo.c1)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">排列顺序：</th>
+			<td><input type="text" id="config.seq_num" name="config.seq_num" class="text" value="${(vo.seq_num)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">备注：</th>
+			<td><textarea id="config.remark" name="config.remark" class="text">${(vo.remark)!}</textarea></td>
+		</tr>
+		
+		<tr>
+		<td>&nbsp;</td>
+		<td>
+			<input type="submit" id="btn_save" class="button" value="保 存" />
+			<input type="button" id="btn_return" class="button" value="返 回" onclick="javascript:window.location.href='${CTX}${NAME_SPACE}/list?p_id=${(vo.p_id)!}'"/>
+		</td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

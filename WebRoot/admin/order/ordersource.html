@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+   <title>后台管理系统</title>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script src="build/dist/echarts.js"></script>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/admin.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/tab/style.css"/>
+  </head>
+  
+  <body onload="refreshChart(0);">
+  	<div>
+  	时间：<input type="text" id="starttime" name="starttime" class="Wdate" 
+  			onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'endtime\')}'})"/>
+  	    至<input type="text" id="endtime" name="endtime" class="Wdate"
+  			onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'starttime\')}'})"/>
+ 		<input type="button" class="button" value="搜索" onclick="refreshChart('0')">
+ 		<input type="button" class="button" value="昨天" onclick="refreshChart('1')">
+ 		<input type="button" class="button" value="今天" onclick="refreshChart('2')">
+ 		<input type="button" class="button" value="前一天" onclick="refreshChart('3')">
+ 		<input type="button" class="button" value="后一天" onclick="refreshChart('4')">
+ 		<input type="button" class="button" value="本周" onclick="refreshChart('5')">
+ 		<input type="button" class="button" value="本月" onclick="refreshChart('6')">
+ 		<input type="button" class="button" value="本年" onclick="refreshChart('7')">
+ 		<div style="margin-right: 100px;float: right;margin-top: 0px">
+   			<span id="time">&nbsp;</span>秒后自动刷新. 	<input value="手动刷新" type="button" class="button" onclick="refresh()">
+  		</div>
+  </div>
+   <div id="mian" style="height: 400px;width: 100%;"></div>
+    <script type="text/javascript">
+    var now = new Date(); 
+	var nowDayOfWeek = (now.getDay() == 0) ? 7 : now.getDay() - 1;//今天是本周的第几天。周一=0，周日=6
+	var nowDay = now.getDate();//当前日
+	var nowMonth = now.getMonth();//当前月值（1月=0，12月=11）
+	var nowMonReal = now.getMonth() + 1;//当前月实际数字
+	var nowYear = now.getFullYear();//当前年 
+    var myChart;
+    var	option;
+    require.config({
+   		paths:{
+   			echarts:"build/dist"
+   		}
+   	});    	
+    require(
+   		['echarts','echarts/chart/bar','echarts/chart/line','echarts/chart/pie'],
+   		initCharts
+   	);
+   	function initCharts(ec){
+   	 myChart  = ec.init(document.getElementById("mian"));
+	 option = {
+		title : {text: '订单来源分布(店铺)'},
+		tooltip : {trigger: 'axis'},
+		legend: {show:true,data:[]},
+		toolbox: {show : true,feature : {
+			mark : {show: true},dataView : {show: true, readOnly: true},
+			magicType : {show: true, type: ['line', 'bar']},
+			restore : {show: true},saveAsImage : {show: true}}},
+		calculable : true,
+		xAxis : [{type : 'category',data : []}],
+		yAxis : [{type : 'value',boundaryGap: [0, 0.1]}],
+		series : [{name:'订单量',type:'bar',data:[]},{name:'总金额',type:'bar',data:[]}]};
+		window.onresize = myChart.resize;
+    }
+    	
+    function refreshChart(flag){
+    	if(1==flag){//昨天
+    		now = new Date();
+    		now.setDate(now.getDate() - 1);
+    		$("#starttime").val(now.getFullYear() + "-" + padleft((now.getMonth() + 1),2) + "-" + padleft(now.getDate(),2));
+    		$("#endtime").val(now.getFullYear() + "-" + padleft((now.getMonth() + 1),2) + "-" + padleft(now.getDate(),2));
+    	}else if(2==flag){
+    		now = new Date();
+    		$("#starttime").val(now.getFullYear() + "-" + padleft((now.getMonth() + 1),2) + "-" + padleft(now.getDate(),2));
+    		$("#endtime").val(now.getFullYear() + "-" + padleft((now.getMonth() + 1),2) + "-" + padleft(now.getDate(),2));
+    	}else if(3==flag){
+    		now.setDate(now.getDate() - 1);
+    		$("#starttime").val(now.getFullYear() + "-" + padleft((now.getMonth() + 1),2) + "-" + padleft(now.getDate(),2));
+    		$("#endtime").val(now.getFullYear() + "-" + padleft((now.getMonth() + 1),2) + "-" + padleft(now.getDate(),2));
+    	}else if(4==flag){
+    		now.setDate(now.getDate() + 1);
+    		$("#starttime").val(now.getFullYear() + "-" + padleft((now.getMonth() + 1),2) + "-" + padleft(now.getDate(),2));
+    		$("#endtime").val(now.getFullYear() + "-" + padleft((now.getMonth() + 1),2) + "-" + padleft(now.getDate(),2));
+    	}else if(5==flag){
+    		now = new Date();
+    		now.setDate(now.getDate() - nowDayOfWeek);
+    		$("#starttime").val(now.getFullYear() + "-" + padleft((now.getMonth() + 1),2) + "-" + padleft(now.getDate(),2));
+    		now.setDate(now.getDate() + 6);
+    		$("#endtime").val(now.getFullYear() + "-" + padleft((now.getMonth() + 1),2) + "-" + padleft(now.getDate(),2));
+    	}else if(6==flag){
+    		now = new Date();
+    		now.setDate(now.getDate() - nowDay + 1);
+    		$("#starttime").val(now.getFullYear() + "-" + padleft((now.getMonth() + 1),2) + "-" + padleft(now.getDate(),2));
+    		now.setMonth(now.getMonth() + 1);
+    		now.setDate(now.getDate() - 1);
+    		$("#endtime").val(now.getFullYear() + "-" + padleft((now.getMonth() + 1),2) + "-" + padleft(now.getDate(),2));
+    	}else if(7==flag){
+    		now = new Date();
+    		$("#starttime").val(now.getFullYear() + "-01-01");
+    		$("#endtime").val(now.getFullYear() + "-" + padleft((now.getMonth() + 1),2) + "-" + padleft(now.getDate(),2));
+    	}
+    	$.ajax({
+			 type: "post",
+			 async: false,
+			 url: "${CTX}/admin/order/ordersource",
+			 data:{starttime:$("#starttime").val(),endtime:$("#endtime").val()},
+			 dataType: "json",
+			 success: function (result) {
+				 if (result) { 
+					myChart.setOption([]);
+	                option.xAxis[0].data = result.category;
+	                option.series[0].data = result.data1;
+	                option.series[1].data = result.data2;
+	                option.legend.data = result.legend;
+	                myChart.setOption(option);
+	              }else{
+	              	 alert("不好意思，大爷，图表请求数据失败啦!");
+	              }
+			 },
+			 error: function (errorMsg) {
+	             alert("不好意思，大爷，图表请求数据失败啦!");
+	         }
+		})
+    }
+    var time = 60;
+    $().ready(function() {
+    	$("#starttime").val(nowYear + "-" + padleft((nowMonth + 1),2) + "-" + padleft(nowDay,2));
+		$("#endtime").val(nowYear + "-" + padleft((nowMonth + 1),2) + "-" + padleft(nowDay,2));
+		do_timer();
+	});
+    function do_timer(){
+		$("#time").html("<font size='100' color='red'><strong>" + time +"</strong></font>");
+		if(0==time){
+			refresh();
+		}
+		time--;
+		setTimeout('do_timer()',1000);
+	}
+    function refresh(){
+    	$('#myform').submit();
+		$('#myform').action = "";
+		$('#myform').target = "_self";
+    }
+    function padleft(s,l){
+    	s = '' + s; 
+    	if(s.length < l){
+    	  return padleft('0'+s,l);
+    	}
+    	return s;
+    }
+    </script>
+     <form id="myform" name="myform" method="post" action="">
+     </form>
+  </body>
+</html>

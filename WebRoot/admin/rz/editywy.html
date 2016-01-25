@@ -1,0 +1,427 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<link rel="stylesheet" type="text/css"
+	href="${CTX}/res/js/uploadify/uploadify.css" />
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<script type="text/javascript"
+	src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+<script type="text/javascript"
+	src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+<script type="text/javascript">
+		$(document).ready(function(){
+			// 表单验证
+			$("#myform").validate({
+				rules: {
+					tb_mc: {required:true},
+					tb_zhlx:{required:true},
+					tb_loginid: {required:true,mobile:true,
+						remote:{
+							type:"POST",
+							url:"${CTX}/common/checkloginid",
+			               	dataType:"json",
+			                data: {
+			                    id: function() { return $("#tb_id").val();},
+			                    loginid: function() { return $("#tb_loginid").val();}
+			                }
+						}
+					},
+					tb_loginpwd: {required:true,stringMinLength:6,rangelength:[6,32]},
+					tb_city_id: {required:true},
+					tb_area_id: {required:true},
+					tb_email:{email:true}
+				},
+				messages:{
+					tb_mc:{required:"名称不能为空！"},
+					tb_loginid:{required:"登录号不能为空！",remote:"该手机号已经被注册，请重新选择！"},
+					tb_loginpwd:{required:"密码不能为空！"},
+					tb_city_id:{required:"请选择城市！"},
+					tb_area_id:{required:"请选择商圈！"}
+				}
+	        });
+			
+			$('#jz').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_jz").attr('value',data);
+					$('#img_jz').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+			
+/* 			$('#ct').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_ct").attr('value',data);
+					$('#img_ct').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+			
+			$('#cs').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_cs").attr('value',data);
+					$('#img_cs').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+ */			
+			$('#xsz').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_xsz").attr('value',data);
+					$('#img_xsz').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+			
+			$('#sfz').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_sfz").attr('value',data);
+					$('#img_sfz').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+			$('#dtz').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_dtz").attr('value',data);
+					$('#img_dtz').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+			
+			
+			$("#tb_city_id").change(function () {
+                //清除二级下拉列表
+                $("#tb_area_id").empty();
+                //$("#mer_area_id").append($("<option/>").text("--请选择--").attr("value","-1"));
+                //将选中的一级下拉列表项的id传过去
+                $.getJSON("${CTX}/common/subarea", {p_id:$("#tb_city_id").find("option:selected").val()},function (data) {
+                    //对请求返回的JSON格式进行分解加载
+                    $(data).each(function () {
+                        $("#tb_area_id").append($("<option/>").text(this.mc).attr("value",this.id));
+                    });
+                });
+                //所属群组
+                $("#tb_groupid").empty();
+                $.getJSON("${CTX}/admin/order/getGroupByCityId",{cityid:$("#tb_city_id").find("option:selected").val()},function(data){
+                	 //对请求返回的JSON格式进行分解加载
+                    $(data).each(function () {
+                        $("#tb_groupid").append($("<option/>").text(this.groupname).attr("value",this.id));
+                    });
+                });
+            });
+			
+			var info = {};
+			var currcity = "${(currcity.mc)!}";
+			var map = new BMap.Map("container");
+			//map.centerAndZoom(currcity, 13);
+			var localSearch = new BMap.LocalSearch(map);
+			var ac = new BMap.Autocomplete(
+				//建立一个自动完成的对象
+		    	{"input" : "new_xxdz","location" : map}
+		    );
+			ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+			    //计算距离
+			    var _value = e.item.value;
+				$("#tb_mapbusiness").attr('value',_value.business);
+				$("#tb_xxdz").attr('value',$("#new_xxdz").val());
+				
+			    localSearch.search(_value.business);
+			    localSearch.setSearchCompleteCallback(function (searchResult) {
+			　　　　var poi = searchResult.getPoi(0);
+				  $("#tb_lng").attr('value', poi.point.lng);
+				  $("#tb_lat").attr('value', poi.point.lat);
+			　　});
+			});
+		});
+	</script>
+</head>
+<body>
+	<form id="myform" name="myform" action="${CTX}/ab/reg/saveywyrz"
+		method="post">
+		<input type="hidden" id="tb_role_id" name="tb_role_id" value="106">
+		<input type="hidden" id="tb_role_name" name="tb_role_name" value="业务员">
+		<input type="hidden" id="tb_id" name="tb_id" value="${(vo.id)!}">
+		<input type="hidden" id="tb_jz" name="tb_jz" value="${(vo.jz)!}">
+		<input type="hidden" id="tb_ct" name="tb_ct" value="${(vo.ct)!}">
+		<input type="hidden" id="tb_cs" name="tb_cs" value="${(vo.cs)!}">
+		<input type="hidden" id="tb_xsz" name="tb_xsz" value="${(vo.xsz)!}">
+		<input type="hidden" id="tb_sfz" name="tb_sfz" value="${(vo.sfz)!}">
+		<input type="hidden" id="tb_dtz" name="tb_dtz" value="${(vo.dtz)!}">
+		<input type="hidden" id="tb_lng" name="tb_lng" value="${(vo.lng)!}">
+		<input type="hidden" id="tb_lat" name="tb_lat" value="${(vo.lat)!}">
+		<input type="hidden" id="tb_xxdz" name="tb_xxdz" value="${(vo.xxdz)!}">
+		<input type="hidden" id="oldpwd" name="oldpwd"
+			value="${(vo.loginpwd)!}"> <input type="hidden"
+			id="tb_mapbusiness" name="tb_mapbusiness"
+			value="${(vo.mapbusiness)!}">
+		<table class="input">
+			<tr>
+				<th align="right">用户名(手机号)：</th>
+				<td><input type="text" name="tb_loginid" id="tb_loginid"
+					class="text" value="${(vo.loginid)!}"></td>
+				<th align="right">密码：</th>
+				<td><input type="password" name="tb_loginpwd" id="tb_loginpwd"
+					class="text" value="${(vo.loginpwd)!}"></td>
+			</tr>
+			<tr>
+				<th align="right">姓名：</th>
+				<td><input type="text" name="tb_mc" id="tb_mc" class="text"
+					value="${(vo.mc)!}"></td>
+				<!-- <th align="right">群组：</th>
+				<td><select id="tb_groupid" name="tb_groupid"
+					style="width: 150px;"> <#if (vo.groupid)??>
+						<option value="${(vo.groupid)!}">${(sug.groupname)!}</option>
+						<#else>
+						<option value="">请选择</option> </#if>
+				</select></td> -->
+				<th></th>
+				<td></td>
+			</tr>
+			<!-- <tr>
+			<th align="right">所属城市：</th>
+			<td>
+				<input class="text" id="tb_city_name" name="tb_city_name" type="hidden" value="${(vo.city_name)!}"/>
+				<select name="tb_city_id" id="tb_city_id" style="width: 205px;" >
+					<option value="">请选择...</option>
+					<@_cityarea_list p_id='ROOT'>
+		      			<#list list as t>
+			      			<#if t.hassub==0>
+			      				<option value="${(t.id)!}" <#if strkit((vo.city_id)!,t.id)>selected</#if>>${(t.mc)!}</option>
+			      			<#else>
+				      			<optgroup label="${(t.mc)!}">
+				      				<@_cityarea_list p_id=t.id>
+						      			<#list list as sub>
+						      			<option value="${(sub.id)!}" <#if strkit((vo.city_id)!,sub.id)>selected</#if>>${(sub.mc)!}</option>
+						      			</#list>
+									</@_cityarea_list>
+				      			</optgroup>
+			      			</#if>
+		      			</#list>
+					</@_cityarea_list>
+				</select>
+			</td>
+			<th align="right">所属商圈：</th>
+			<td>
+				<input class="text" id="tb_area_name" name="tb_area_name" type="hidden" value="${(vo.area_name)!}"/>
+				<select name="tb_area_id" id="tb_area_id" style="width: 205px;" >
+					<#if (vo.area_id)??>
+					<option value="${(vo.area_id)!}">${(vo.area_name)!}</option>
+					<#else>
+					<option value="">请选择</option>
+					</#if>
+				</select>
+			</td>
+		</tr> -->
+			<!-- <tr>
+			<th align="right">详细地址：</th>
+			<td colspan="2">
+			<#if (vo.xxdz)??>
+			已输入地址：${(vo.xxdz)!}<br/>
+			新地址：
+			</#if>
+			<input type="text" name="new_xxdz" id="new_xxdz" class="text" style="width: 400px;" value="${(vo.xxdz)!}">
+			</td>
+			<td>
+				<select name="tb_zhlx" id="tb_zhlx">
+				<option value="">请选择</option>
+				<optgroup label="司机">
+					<#list subject_list as x>
+				    	<option value="${(x.id)!''}" <#if strkit((x.id)!'',(vo.zhlx)!)>selected</#if>>${(x.mc)!''}</option>
+					</#list>
+				</optgroup>
+			</td>
+		</tr> -->
+			<!-- <tr>
+			<th align="right">邮箱：</th>
+			<td><input type="text" name="tb_email" id="tb_email" class="text" value="${(vo.email)!}"></td>
+			<th align="right">账户余额：</th>
+			<td><input type="text" name="tb_zhye" id="tb_zhye" class="text" value="${(vo.zhye)!}"></td>
+		</tr> -->
+
+			<tr>
+				<th align="right">身份证号：</th>
+				<td><input type="text" name="tb_idcard" id="tb_idcard"
+					class="text" value="${(vo.idcard)!}"></td>
+				<th align="right">车牌号：</th>
+				<td><input type="text" name="tb_cph" id="tb_cph" class="text"
+					value="${(vo.cph)!}"></td>
+			</tr>
+
+			<tr>
+				<th align="right">车长：</th>
+				<td><select name="tb_cc" class="form-control" id="tb_cc">
+						<option value="">请选择车长</option>
+						<option value="1.8米"<#if
+							strkit('1.8米',(vo.cc)!)>selected</#if> >1.8米</option>
+						<option value="2.6米"<#if
+							strkit('2.6米',(vo.cc)!)>selected</#if> >2.6米</option>
+						<option value="3.2米"<#if
+							strkit('3.2米',(vo.cc)!)>selected</#if> >3.2米</option>
+						<option value="4.2米"<#if
+							strkit('4.2米',(vo.cc)!)>selected</#if> >4.2米</option>
+						<option value="5.2米"<#if
+							strkit('5.2米',(vo.cc)!)>selected</#if> >5.2米</option>
+						<option value="5.8米"<#if
+							strkit('5.8米',(vo.cc)!)>selected</#if> >5.8米</option>
+						<option value="6.2米"<#if
+							strkit('6.2米',(vo.cc)!)>selected</#if> >6.2米</option>
+						<option value="6.5米"<#if
+							strkit('6.5米',(vo.cc)!)>selected</#if> >6.5米</option>
+						<option value="6.8米"<#if
+							strkit('6.8米',(vo.cc)!)>selected</#if> >6.8米</option>
+						<option value="7.2米"<#if
+							strkit('7.2米',(vo.cc)!)>selected</#if> >7.2米</option>
+						<option value="8米"<#if
+							strkit('8米',(vo.cc)!)>selected</#if> >8米</option>
+						<option value="9.6米"<#if
+							strkit('9.6米',(vo.cc)!)>selected</#if> >9.6米</option>
+						<option value="13米"<#if
+							strkit('13米',(vo.cc)!)>selected</#if> >13米</option>
+						<option value="15米"<#if
+							strkit('15米',(vo.cc)!)>selected</#if> >15米</option>
+						<option value="16.5米"<#if
+							strkit('16.5米',(vo.cc)!)>selected</#if> >16.5米</option>
+						<option value="17.5米"<#if
+							strkit('17.5米',(vo.cc)!)>selected</#if> >17.5米</option>
+						<option value="18.5米"<#if
+							strkit('18.5米',(vo.cc)!)>selected</#if> >18.5米</option>
+						<option value="20米"<#if
+							strkit('20米',(vo.cc)!)>selected</#if> >20米</option>
+						<option value="22米"<#if
+							strkit('22米',(vo.cc)!)>selected</#if> >22米</option>
+						<option value="24米"<#if
+							strkit('24米',(vo.cc)!)>selected</#if> >24米</option>
+				</select></td>
+				<th align="right">车型：</th>
+				<td><select name="tb_cx" class="form-control" id="tb_cx">
+						<option value="">请选择车型</option>
+						<option value="三轮车"<#if
+							strkit('三轮车',(vo.cx)!)>selected</#if> >三轮车</option>
+						<option value="面包车"<#if
+							strkit('面包车',(vo.cx)!)>selected</#if> >面包车</option>
+						<option value="厢车"<#if
+							strkit('厢车',(vo.cx)!)>selected</#if> >厢车</option>
+						<option value="平板车"<#if
+							strkit('平板车',(vo.cx)!)>selected</#if> >平板车</option>
+						<option value="高低板车"<#if
+							strkit('高低板车',(vo.cx)!)>selected</#if> >高低板车</option>
+						<option value="高栏车"<#if
+							strkit('高栏车',(vo.cx)!)>selected</#if> >高栏车</option>
+						<option value="冷藏车"<#if
+							strkit('冷藏车',(vo.cx)!)>selected</#if> >冷藏车</option>
+						<option value="危险品车"<#if
+							strkit('危险品车',(vo.cx)!)>selected</#if> >危险品车</option>
+						<option value="大件车"<#if
+							strkit('大件车',(vo.cx)!)>selected</#if> >大件车</option>
+				</select></td>
+			</tr>
+
+
+<tr>
+				<th align="right">体积（立方）：</th>
+				<td><input type="text" class="rz_from" name="tb_ctj"
+							id="tb_ctj" value="<#if (vo.ctj)??>${vo.ctj}</#if>" /></td>
+				<th align="right">常跑城市（多个城市使用‘,’号分割）：</th>
+				<td><input type="text" class="rz_from" name="tb_cpcs"
+							id="tb_ctj" value="<#if (vo.cpcs)??>${vo.cpcs}</#if>" /></td>
+			</tr>
+
+			<tr>
+				<td class="td1">1、驾照
+					<p class="carms">请清楚摄到数字</p>
+				</td>
+				<td><#if (vo.jz)??> <img src="${CTX}/upload/${(vo.jz)!}"
+					id="img_jz" style="width: 160px; height: 120px;" /> <#else> <img
+					src="${CTX}/res/css/ab/images/car1.png" id="img_jz"
+					style="width: 160px; height: 120px;" /> </#if> <input type="file"
+					name="jz" id="jz" multiple="false" />
+				</td>
+				<td class="td1">4、行驶证
+					<p class="carms">请清楚拍摄到数字</p>
+				</td>
+				<td><#if (vo.xsz)??> <img src="${CTX}/upload/${(vo.xsz)!}"
+					id="img_xsz" style="width: 160px; height: 120px;" /> <#else> <img
+					src="${CTX}/res/css/ab/images/car4.png" id="img_xsz"
+					style="width: 160px; height: 120px;" /> </#if> <input type="file"
+					name="xsz" id="xsz" multiple="false" />
+				</td>
+			</tr>
+			<!-- 		<tr>
+			<td class="td1">
+				3、车身<p class="carms">请清楚拍摄到车身</p>
+			</td>
+			<td>
+				<#if (vo.cs)??>
+					<img src="${CTX}/upload/${(vo.cs)!}"  id="img_cs" style="width: 160px;height:120px;"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/car3.png" id="img_cs" style="width: 160px;height:120px;"/>
+				</#if>
+				<input type="file" name="cs" id="cs" multiple="false"/> 
+			</td>
+			
+			<td class="td1">
+				2、车头和车牌号码<p class="carms">请清楚拍摄到车头和车牌号码</p>
+			</td>
+			<td>
+				<#if (vo.ct)??>
+					<img src="${CTX}/upload/${(vo.ct)!}"  id="img_ct" style="width: 160px;height:120px;"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/car2.png" id="img_ct" style="width: 160px;height:120px;"/>
+				</#if>
+				<input type="file" name="ct" id="ct" multiple="false"/> 
+			</td>
+		</tr>
+ -->
+			<tr>
+				<td class="td1">5、身份证</td>
+				<td><#if (vo.sfz)??> <img src="${CTX}/upload/${(vo.sfz)!}"
+					id="img_sfz" style="width: 160px; height: 120px;" /> <#else> <img
+					src="${CTX}/res/css/ab/images/car5.png" id="img_sfz"
+					style="width: 160px; height: 120px;" /> </#if> <input type="file"
+					name="sfz" id="sfz" multiple="false" />
+				</td>
+				<!-- <td class="td1">6、大头照<p class="carms">请清楚拍摄到脸</p></td>
+			<td>
+				<#if (vo.dtz)??>
+					<img src="${CTX}/upload/${(vo.dtz)!}"  id="img_dtz" style="width: 160px;height:120px;"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/car6.png" id="img_dtz" style="width: 160px;height:120px;"/>
+				</#if>
+				<input type="file" name="dtz" id="dtz" multiple="false"/> 
+			</td> -->
+			</tr>
+		</table>
+</body>
+</html>
+

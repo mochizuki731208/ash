@@ -1,0 +1,54 @@
+﻿@charset "utf-8";
+/*公用样式*/
+*{ margin:0; padding:0;font-family:Arial,"微软雅黑";}
+a {text-decoration:none;}
+a:hover {outline: 0;}
+img{ border:0; vertical-align:middle;}
+li{ list-style:none; }
+h1,h2,h3,h4{ font-weight:normal; font-size:14px; color:#585858; line-height:30px; }
+strong{ font-weight:normal;}
+em{ font-style:normal;}
+img {border:none;}
+body{ font-size:14px; color:#585858;font-family:Arial,"微软雅黑";margin:0 auto;background-color:#fff;}
+.left{float:left;}
+.right{float:right;}
+table {border-collapse: collapse;border-spacing: 0;}
+tbody {display: table-row-group;vertical-align: middle;border-color: inherit;}
+tr {display: table-row;vertical-align: inherit;border-color: inherit;}
+input[type="radio"] {box-sizing: border-box;padding: 0;}
+input, textarea, select {font-family: inherit;font-size: inherit;font-weight: inherit;}
+.icon {background: url(../images/icon.png) no-repeat 0 0;}
+.clear:after {content: '\20';display: block;height: 0;clear: both;}
+.clear {*zoom: 1;}
+/*内容*/
+.content {width: 100%;background-color: #fff;}
+.content .percenter{width: 1000px;margin: 0 auto;overflow: hidden;padding-top: 35px;}
+.content .percenter .perc_c{width:99%;border: 1px solid #e0e0e0;border-radius: 5px;float: right;position: relative;}
+.content .percenter .perc_c .perc_right{position: absolute;right: 20px;line-height: 40px;top: 0;}
+.content .percenter .perc_c .perc_right span em, .content .percenter .perc_c .perc_right span a {color: #3d91e7;padding: 0 3px;}
+.content .percenter .perc_c .perc_right a.btn {margin-left: 6px;display: inline-block;text-align: center;line-height: 24px;height: 24px;border: 1px solid #3d91e7;color: #3d91e7;font-size: 12px;border-radius: 5px;padding: 0 10px;}
+.content .percenter .perc_c h2{font-size: 14px;padding-left: 30px;border-radius: 5px 5px 0 0;height: 40px;line-height: 40px;border-bottom: 1px solid #dedede;background-color: #f7f7f7;}
+.content .percenter .perc_c .invoice {padding: 20px 0 30px;}
+.content .percenter .perc_c .invoice table tbody {padding: 10px 0;}
+.content .percenter .perc_c .invoice table th {padding-right: 10px;border: none;padding: 6px 0;width: 140px;text-align: right;vertical-align: top;font-style: normal;font-weight: normal;}
+.content .percenter .perc_c .coupon table th {border-bottom: 1px solid #f4f4f4;line-height: 24px;padding: 10px 0;text-align: right;font-size: 12px;padding-right: 10px;}
+.content .percenter .perc_c .coupon table td {border-bottom: 1px solid #f4f4f4;line-height: 24px;padding: 10px 0;text-align: left;font-size: 12px;padding: 6px 0;}
+.content .percenter .perc_c .invoice table td .f-14 {font-size: 14px;}
+.content .percenter .perc_c .invoice table .border-b {border-bottom: 2px dotted #eee;}
+.content .percenter .perc_c .invoice table td .money-inp {width: 100px;height: 24px;line-height: 24px;}
+.content .percenter .perc_c .invoice table td .money-inp {width: 28px;height: 22px;display: inline-block;border: 1px solid #686868;border-radius: 2px;color: #686868;text-align: center;line-height: 22px;}
+.content .percenter .perc_c .invoice table td .invoiceError {padding-left: 10px;}
+.content .percenter .perc_c .invoice table td .invoiceError em {width: 16px;height: 17px;display: inline-block;background: url(../images/percenter-icon.png) no-repeat -18px -124px;}
+.content .percenter .perc_c .invoice table td .tip {color: #ee4136;}
+.content .percenter .perc_c .invoice table td label.company {margin-left: 10px;}
+.content .percenter .perc_c .invoice table td label input {margin-right: 5px;}
+.content .percenter .perc_c .invoice table td .companyName {width: 200px;height: 24px;line-height: 24px;border: 1px solid #c8c8c8;padding: 0 8px;margin-left: 3px;border-radius: 2px;}
+.content .percenter .perc_c .invoice table td .invoice-con {height: 24px;line-height: 24px;border: 1px solid #c8c8c8;border-radius: 2px;width: 200px;}
+.content .percenter .perc_c .invoice table td .address-defalut {position: relative;}
+.content .percenter .perc_c .invoice table td .address-defalut label {display: block;width: 100%;}
+.content .percenter .perc_c .invoice table td label input {margin-right: 5px;}
+.content .percenter .perc_c .invoice table .address-add p {padding: 8px 0;}
+.content .percenter .perc_c .invoice table .address-add span.t {width: 70px;display: inline-block;}
+.content .percenter .perc_c .invoice table .address-add .inp {width: 150px;height: 24px;border: 1px solid #c8c8c8;line-height: 24px;border-radius: 2px;padding: 0 8px;}
+.content .percenter .perc_c .invoice table .address-add .myself {display: inline-block;width: 35px;text-align: center;line-height: 22px;height: 22px;border: 1px solid #3d91e7;color: #3d91e7;margin-left: 8px;border-radius: 2px;font-size: 12px;}
+.content .percenter .perc_c .invoice table td .confirm-btn {width: 200px;height: 30px;line-height: 30px;background-color: #3d91e7;color: #fff;display: inline-block;text-align: center;border-radius: 2px;font-size: 12px;}

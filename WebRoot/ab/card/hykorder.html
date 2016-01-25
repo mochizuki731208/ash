@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<script type="text/javascript"
+	src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+		<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/dd.css" />
+<script type="text/javascript">
+
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules: {
+					purchase_cnt:{required:true, min:1}
+				}
+			});
+			
+		});
+
+
+		function uf_gm(userid){
+			if(userid==''){
+				alert("请登录后进行购买VIP卡！");
+				window.location.href="${CTX}/ab/login";
+				return false;
+			}else{
+				if((document.all.czzk.checked) && (document.all.zfb.checked)){
+					$.dialog.alert("两种方式只能选择一种支付方式！");
+					return false;
+				}
+			
+				if(!(document.all.czzk.checked) && !(document.all.zfb.checked)){
+					$.dialog.alert("必须选择一种支付方式！");
+					return false;
+				}
+				$('#myform').submit();
+				/* var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					//根据用户的支付方式选择付款
+					var str="";
+					$("[name='p_way'][checked]").each(function(){
+						str+=$(this).val();
+					})
+					if(str=='1'){
+						//检查帐户余额是否充足
+						$.ajax({  
+					          type : "post",  
+					          url : "${CTX}/ab/card/checkCardType",  
+					          data : {	purchase_cnt:$('#purchase_cnt').val(),
+					        	  		cardtypeid:$('#cardtypeid').val(),
+					        	  		total_ddzje:$('#purchase_cnt').val()*$('#cardprice').val()
+					        	  	},
+					          async : false,  
+					          success : function(data){
+						          	if("1" == data){ 
+							            $.dialog.alert("帐户余额不足，请选择其他支付方式！");
+									}else if("2" == data){
+										 $.dialog.alert("会员卡已售完！");
+									}else{
+										$('#myform').submit();
+									}
+					          } 
+				         }); 
+					}else{
+						$('#myform').submit();
+					}
+				} */
+			}
+		}
+		
+		function check(obj) {
+			$("input[name='p_way']").each(function () {
+		        if (this != obj)
+		            $(this).attr("checked", false);
+		        else {
+		            if ($(this).prop("checked"))
+		                $(this).attr("checked", true);
+		            else
+		                $(this).attr("checked", false);
+		        }
+		    });
+		}
+		
+		function calculateprice(){
+			var cnt = $('#purchase_cnt').val();
+			var pe = $('#cardprice').val()*cnt;
+			$('#price').html("￥"+pe);
+		}
+	</script>
+</head>
+<body>
+	<#include '../inc/top.html'>
+	<!-- 搜索栏 -->
+	<#include '../inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+	<#include '../inc/nav.html'>
+	<div class="blank10"></div>
+	<form id="myform" name="myform" action="${CTX}/ab/card/savehykgm"
+		method="post">
+		<input type="hidden" name="cardtypeid" name="cardtypeid"
+			value="${(vo.id)!}" />
+		<input type="hidden" name="cardprice" id="cardprice"
+			value="${(vo.price)!}" />
+		<div align="center">
+			<h3>卡名称：${(vo.name)!}</h3>
+			<#if vo.type != '1'>
+			<h3>卡面额：${(vo.money)?string("currency")}</h3>
+			</#if> 
+			
+			 <#if vo.img_url??>
+				<#if vo.img_url?substring(0,4) == 'res/'>
+					<img src="${CTX}/${(vo.img_url)!''}">
+				<#else>
+					<img src="${CTX}/upload/${(vo.img_url)!''}">
+				</#if>
+			</#if>
+			
+		</div>
+		<table class="input" style="margin: 0px auto; width: 600px; height: 200px;">
+			<tr>
+				<th align="right">购买张数：</th>
+				<td><input type="number" name="purchase_cnt" id="purchase_cnt" value="1" onchange="calculateprice();"/>
+				价格：<span class="cd48543" id="price">￥${(vo.price)}</span>
+					</td>
+			</tr>
+			<tr>
+				<th align="right">支付方式：</th>
+				<td><input type="checkbox" value="0" name="p_way" id="czzk"
+					onclick="check(this);" checked="checked"/>充值直扣 
+					<input type="checkbox" value="1"
+					name="p_way" id="zfb" onclick="check(this);" />支付宝
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" align="center"><input type="button" value="购买"
+					id="btn_gm" onclick="uf_gm('${(userid)!}');" /></td>
+			</tr>
+		</table>
+	</form>
+	<div class="blank10"></div>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+</body>
+</html>

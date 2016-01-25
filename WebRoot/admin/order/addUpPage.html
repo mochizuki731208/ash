@@ -1,0 +1,1351 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>后台管理系统</title>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/easySlider1.5.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/tc_order.js"></script>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_style.css">
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/admin.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/tab/style.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<style type="text/css">	
+/* Easy Slider */
+	#container{	
+		margin:0 auto;
+		position:relative;
+		text-align:left;
+		width:999px;
+		background:#fff;		
+		margin-bottom:2em;
+	}	
+	#content{
+		margin: 10px auto;
+		position:relative;
+	}	
+	#slider{}	
+	#slider ul.sul, #slider li.sli{
+		margin:0;
+		padding:0;
+		list-style:none;
+	}
+	#slider li.sli{ 
+		/* 
+			define width and height of list item (slide)
+			entire slider area will adjust according to the parameters provided here
+		*/ 
+		width:999px;
+		height:500px;
+		overflow:hidden; 
+	}	
+	#prevBtn, #nextBtn{ 
+		display:block;
+		width:30px;
+		height:77px;
+		position:absolute;
+		left:-30px;
+		top:210px;
+	}	
+	#nextBtn{ 
+		left:1001px;
+	}														
+	#prevBtn a, #nextBtn a{  
+		display:block;
+		width:30px;
+		height:77px;
+		background:url(${CTX}/res/images/slider/btn_prev.gif) no-repeat 0 0;	
+	}	
+	#nextBtn a{ 
+		background:url(${CTX}/res/images/slider/btn_next.gif) no-repeat 0 0;	
+	}												
+/* // Easy Slider */
+</style>	
+	<script type="text/javascript">
+	var map;          // 创建地图实例    
+	var point;// 创建点坐标    
+	var productArr = new Array();
+	var merchantArr = new Array();
+	var shouhuoArr = new Array();
+	var paotuiArr = new Array();
+	var carArr = new Array();
+	var shdzjd = '';
+	var shdzwd = '';//收获人经纬度
+	var shdz = '';
+	var sjjd = '';
+	var sjwd = '';//商家经纬度
+	var sjdz = '';
+	var jdrjd = '';
+	var jdrwd = '';//接单人经纬度
+	var jdrdz = '';
+	var opts = {
+		width : 200,     // 信息窗口宽度
+		height: 100,     // 信息窗口高度
+		title : "信息窗口" , // 信息窗口标题
+		enableMessage:true//设置允许信息窗发送短息
+    };
+	var time = 60;
+	var myValue;
+	var geoc = new BMap.Geocoder();
+	var sjjdwd = {};
+	var shdzjdwd={};
+	var currLoc = "${(currcity.mc)!}";
+	$().ready(function() {
+		shiftNavTag(1);
+		map = new BMap.Map("MblogMap");          // 创建地图实例    
+		point = new BMap.Point(113.67311, 34.716755);  // 创建点坐标    
+		map.centerAndZoom(point, 13); 
+		var myCity = new BMap.LocalCity();
+	 	myCity.get(myFun);
+		//校验方法
+		validate();
+		
+		$("#xxdz").bind("keyup",function(){
+			var local = new BMap.LocalSearch(map, {
+				renderOptions:{map: map},
+				onInfoHtmlSet:function(poi, html)
+				{
+				  var button = "<p class='button'><input value='选为起点' type='button' onclick='choosestart(1);' /></p>";
+				  html.innerHTML = html.innerHTML + button;
+				  sjjdwd["sjjd"] = poi.point.lng;
+				  sjjdwd["sjwd"] = poi.point.lat;
+				  sjjdwd["xxdz"] = poi.address;
+				}
+			});
+			local.search(this.value);
+		});
+		$("#shdz").bind("keyup",function(){
+			var local = new BMap.LocalSearch(map, {
+				renderOptions:{map: map},
+				onInfoHtmlSet:function(poi, html)
+				{
+				  var button = "<p class='button'><input value='选为终点' type='button' onclick='chooseend(1);' /></p>";
+				  html.innerHTML = html.innerHTML + button;
+				  shdzjdwd["shdz"] = poi.address;
+				  shdzjdwd["shdzjd_shdzwd"] = "(" + poi.point.lng + "," +  poi.point.lat + ")";
+				  shdzjdwd["shdzjd"] = poi.point.lng;
+				  shdzjdwd["shdzwd"] = poi.point.lat;
+				}
+			});
+			local.search(this.value);
+		});
+		 map.addControl(new BMap.NavigationControl());    
+		 map.addControl(new BMap.ScaleControl());    
+		 map.addControl(new BMap.OverviewMapControl());  
+		 map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+	});
+	function setPlace(){
+		map.clearOverlays();//清除地图上所有覆盖物
+		function myFun(){
+			var pp = local.getResults().getPoi(0).point;//获取第一个智能搜索的结果
+		}
+		var local = new BMap.LocalSearch(map, {onSearchComplete: myFun});
+		local.search(myValue);
+	}
+	function myFun(result){
+		var cityName = result.name;
+	    map.setCenter(cityName);
+	}
+	function shiftNavTag(which) 
+	{
+		var t0 = document.getElementById("MapContainer");
+		var t1 = document.getElementById("MemberCustomerListContainer");
+		var NavTag0 = document.getElementById("NavTag0"); // Map
+		var NavTag1 = document.getElementById("NavTag1");
+
+		if (which==0)
+		{ // Map
+			t0.style.display="";
+			t1.style.display="none";
+			NavTag0.className="currentLabel";
+			NavTag1.className="normalLabel";
+		} 
+
+		if (which==1) // 货物
+		{
+			t0.style.display="none";
+			t1.style.display="";
+			NavTag0.className="normalLabel";
+			NavTag1.className="currentLabel";
+		}
+	}
+	function getMerchant(){
+		var area_id = $("#area_id").val();
+		var select = $("#merchant_id");
+		select.empty();
+		$.ajax({
+			url: "${CTX}/admin/order/initMerchant",
+			type: "POST",
+			data: {area_id:area_id},
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				$("<option>").attr("value", "").html("请选择").appendTo(select);
+				$.each(data.list_merchant, function(index, objVal) {
+	                 $("<option>").attr("value", objVal["id"]).html(objVal["mc"]).appendTo(select);  
+	             }); 
+			}
+		});
+	}
+	function initproduct(subject_id){
+		var ul = $("#tright");
+		ul.empty();
+		$.ajax({
+			url: "${CTX}/admin/order/initProduct",
+			type: "POST",
+			data: {subject_id:subject_id},
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				var a = "<a href='javascript:void(0)' onclick='initrightproduct(\"" + subject_id + "\",\"" + "\")'>" + "所有" + "</a>";
+				$("<li>").html(a).appendTo(ul);  
+				$.each(data.list_product, function(index, objVal) {
+					a = "<a href='javascript:void(0)' onclick='initrightproduct(\"" + subject_id + "\",\"" + objVal["id"] + "\")'>" + objVal["mc"] + "</a>";
+	                $("<li>").html(a).appendTo(ul);  
+	            }); 
+			}
+		});
+	}
+	function initrightproduct(subject_id,id){
+		var area_id = $("#area_id").val();
+		var sname = $("#sname").val();
+		var sprice = $("#sprice").val();
+		var productlist = $("#productlist");
+		productlist.empty();
+		$.ajax({
+			url: "${CTX}/admin/order/initProduct",
+			type: "POST",
+			data: {id:id,subject_id:subject_id,area_id:area_id,sname:sname,sprice:sprice},
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				var tr = $("<tr>");
+				 $("<th>").html("编号").appendTo(tr); 
+				 $("<th>").html("品名").appendTo(tr); 
+				 $("<th>").html("单价").appendTo(tr); 
+				 $("<th>").html("单位").appendTo(tr); 
+				 $("<th>").html("操作").appendTo(tr); 
+				 tr.appendTo(productlist);
+				$.each(data.list_product, function(index, objVal) {
+					var tr = $("<tr>");
+	                $("<td align='left'>").html(index + 1).appendTo(tr); 
+	                $("<td align='left'>").html(objVal["mc"]).appendTo(tr);  
+	                $("<td align='left'>").html(objVal["price"]).appendTo(tr);  
+	                $("<td align='left'>").html("元").appendTo(tr); 
+	                $("<td align='left'>").html("<a href='javascript:void(0)' onclick='addProduct(\"" + objVal["id"] +"\")'>添加</a>").appendTo(tr); 
+	                tr.appendTo(productlist);
+	            }); 
+			}
+		});
+	}
+	function addProduct(id){
+		$("#msg").html('');
+		$.ajax({
+			url: "${CTX}/admin/order/getOneProduct",
+			type: "POST",
+			data: {id:id},
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				if(!hasAdded(data)){
+					var rows = selectProducts.rows.length - 1;
+					var tr = $("<tr>");
+	                $("<td align='left'>").html(rows + 1).appendTo(tr); 
+	                $("<td align='left'>").html(data["mc"]).appendTo(tr);  
+	                $("<td align='left'>").html(data["price"]).appendTo(tr);
+	                $("<td align='left'>").html("<input type='text' class='text' name='addnum' id='adnum' style='height: 24px;width: 30px;text-align: center'/><input type='hidden' name='addid' id='addid' value='" +  data["id"] +"'/>").appendTo(tr); 
+	                $("<td align='left'>").html("元").appendTo(tr); 
+	                $("<td align='left'>").html("<a href='javascript:void(0)' onclick='removeProduct(\"" + data["id"] +"\")'>删除</a>").appendTo(tr); 
+	                tr.appendTo(selectProducts);
+	                productArr.push(data);
+				}else{
+					$.dialog.alert("该商品已添加！",function () {}).title('3秒后关闭').time(3);
+				}
+			}
+		});
+	}
+	
+	function removeProduct(id){
+		for(var i = 0; i < productArr.length;i++){
+			var temp  = productArr[i];
+			if(id==temp.id){
+				productArr.splice(i,1);
+				break;
+			}
+		}
+		$("#selectProducts").empty();
+		var tr = $("<tr>");
+		 $("<th>").html("编号").appendTo(tr); 
+		 $("<th>").html("品名").appendTo(tr); 
+		 $("<th>").html("单价").appendTo(tr); 
+		 $("<th>").html("数量").appendTo(tr); 
+		 $("<th>").html("单位").appendTo(tr); 
+		 $("<th>").html("操作").appendTo(tr); 
+		 tr.appendTo(selectProducts);
+		 $.each(productArr,function(index,temp){
+			tr = $("<tr>");
+			var rows = selectProducts.rows.length - 1;
+	        $("<td align='left'>").html(rows + 1).appendTo(tr); 
+	        $("<td align='left'>").html(temp["mc"]).appendTo(tr);  
+	        $("<td align='left'>").html(temp["price"]).appendTo(tr);
+	        $("<td align='left'>").html("<input type='text' class='text' re style='height: 24px;width: 30px;text-align: center'/>").appendTo(tr); 
+	        $("<td align='left'>").html("元").appendTo(tr); 
+	        $("<td align='left'>").html("<a href='javascript:void(0)' onclick='removeProduct(\"" + temp["id"] +"\")'>删除</a>").appendTo(tr); 
+	        tr.appendTo(selectProducts);
+		 });
+	}
+	//判断是否已经添加
+	function hasAdded(obj){
+		for(var i = 0; i < productArr.length;i++){
+			var temp  = productArr[i];
+			if(obj.id==temp.id){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+		function MblogDotccMap(){
+			map.clearOverlays();// 初始化地图，设置中心点坐标和地图级别    
+			var flag = false;
+			
+			//商家或者起始地点
+			$.each(merchantArr,function(i,obj){
+				if(obj.lng && obj.lat){
+					var marker1;
+					if(obj.lng == sjjd && obj.lat == sjwd){
+						flag = true;
+						point = new BMap.Point(sjjd,sjwd);
+						var myIcon = new BMap.Icon("${CTX}/res/images/q.png", new BMap.Size(40,80));
+						marker1 = new BMap.Marker(point,{icon:myIcon});  // 创建标注
+						map.addOverlay(marker1);
+						marker1.enableDragging();
+						marker1.addEventListener("dragend", function (e) {  
+							sjjd = e.point.lng;
+							sjwd = e.point.lat;
+							geoc.getLocation(e.point, function(rs){
+								var addComp = rs.addressComponents;
+								var address = addComp.province + ", " + addComp.city + ", " + addComp.district + ", " + addComp.street + ", " + addComp.streetNumber;
+								$("#xxdz").val(address);
+								$("#xxdz_msg").html(address + "(" + sjjd + "," + sjwd + ")");
+								$("#sjjd").val(sjjd);
+								$("#sjwd").val(sjwd);
+								jisuanjuli();
+							});       
+							searchPaoTui();
+						}); 
+					}else{
+						var myIcon = new BMap.Icon("${CTX}/res/images/sj.png", new BMap.Size(40,80));
+						marker1 = new BMap.Marker(new BMap.Point(obj.lng,obj.lat),{icon:myIcon});
+						map.addOverlay(marker1);
+					}
+					var content = "商家 ：" + obj.mc + "<br>地点:" + obj.xxdz + "<br><input type='button' class='button' value='选为起点' onclick='choosestart1(" + i + ")'>";
+					addClickHandler(content,marker1);
+				 }
+			});
+			if(!flag&&sjjd&&sjwd){
+				point = new BMap.Point(sjjd,sjwd);
+				var myIcon = new BMap.Icon("${CTX}/res/images/q.png", new BMap.Size(40,80));
+				var maker = new BMap.Marker(point,{icon:myIcon});  // 创建标注
+				map.addOverlay(maker);
+				maker.enableDragging();
+				maker.addEventListener("dragend", function (e) {  
+					sjjd = e.point.lng;
+					sjwd = e.point.lat;
+					geoc.getLocation(e.point, function(rs){
+						var addComp = rs.addressComponents;
+						var address = addComp.province + ", " + addComp.city + ", " + addComp.district + ", " + addComp.street + ", " + addComp.streetNumber;
+						$("#xxdz").val(address);
+						$("#xxdz_msg").html(address + "(" + sjjd + "," + sjwd + ")");
+						$("#sjjd").val(sjjd);
+						$("#sjwd").val(sjwd);
+						jisuanjuli();
+					});       
+					searchPaoTui();
+				}); 
+			 }
+			 
+			 //目的地的展示
+			 var endflag = false;
+			 $.each(shouhuoArr,function(i,p){
+				 var obj = p.point;
+				 if(obj.lng && obj.lat){
+					var marker1;
+					if(obj.lng==shdzjd && obj.lat==shdzwd){
+						endflag = true;
+						point = new BMap.Point(obj.lng,obj.lat);
+						var myIcon = new BMap.Icon("${CTX}/res/images/z.png", new BMap.Size(40,70));
+						marker1 = new BMap.Marker(point,{icon:myIcon});  // 创建标注
+						map.addOverlay(marker1);
+					}else{
+						point = new BMap.Point(obj.lng,obj.lat);
+						marker1 = new BMap.Marker(point);
+						map.addOverlay(marker1);
+					}
+				  var content = "地点:" + p.address + "<br><input type='button' class='button' value='选为终点' onclick='chooseend(" + i + ")'>";
+				  addClickHandler(content,marker1);
+			   }
+			 });
+			if(!endflag && shdzjd && shdzwd){
+				point = new BMap.Point(shdzjd,shdzwd);
+				var myIcon = new BMap.Icon("${CTX}/res/images/z.png", new BMap.Size(40,70));
+				var maker = new BMap.Marker(point,{icon:myIcon});  // 创建标注
+				map.addOverlay(maker);
+				maker.enableDragging();
+				maker.addEventListener("dragend", function (e) {  
+					shdzjd = e.point.lng;shdzwd = e.point.lat;
+					geoc.getLocation(e.point, function(rs){
+						var addComp = rs.addressComponents;
+						var address = addComp.province + ", " + addComp.city + ", " + addComp.district + ", " + addComp.street + ", " + addComp.streetNumber;
+						$("#shdz").val(address);
+						$("#shdzjd_shdzwd").html(address + "(" + shdzjd + "," + shdzwd + ")");
+						$("#shdzjd").val(shdzjd);$("#shdzwd").val(shdzwd);
+						jisuanjuli();
+					});       
+				}); 
+			}
+		
+			//司机的位置
+			var paoflag = false;
+			$.each(paotuiArr,function(i,obj){
+				 if(obj.lng && obj.lat){
+					var marker1;
+					if(obj.lng==jdrjd && obj.lat==jdrwd){
+						paoflag = true;
+						point = new BMap.Point(obj.lng,obj.lat);
+						var myIcon = new BMap.Icon("${CTX}/res/images/s.png", new BMap.Size(40,70));
+						marker1 = new BMap.Marker(point,{icon:myIcon});  // 创建标注
+						map.addOverlay(marker1);
+					}else{
+						//判断战士什么样的图片  车
+						var carname = carArr[i].type;
+						var url = "";
+						if(carname=="面包车"){url = "che_mianbao.png";}
+						if(carname=="大件车"){url = "che_dajian.png";}
+						if(carname=="高低板车"){url = "che_gaodiban.png";}
+						if(carname=="高栏车"){url = "che_gaolan.png";}
+						if(carname=="冷藏车"){url = "che_lengcang.png";}
+						if(carname=="平板车"){url = "che_pingban.png";}
+						if(carname=="面包车"){url = "che_tongyong.png";}
+						if(carname=="危险品车"){url = "che_weixianpin.png";}
+						if(carname=="厢车"){url = "che_xiang.png";}
+						var myIcon = new BMap.Icon("${CTX}/res/images/ordercar/" +url, new BMap.Size(80,90));
+						var point = new BMap.Point(obj.lng,obj.lat);
+						var marker1;
+						if(url==""){
+							marker1 = new BMap.Marker(point);
+						}else{
+							marker1 = new BMap.Marker(point,{icon:myIcon});  // 创建标注
+						}
+						map.addOverlay(marker1);
+						var label = new BMap.Label(obj.mc,{position:point,offset:new BMap.Size(20,-20)});
+						var color = "";
+						if(obj.remark && obj.remark=='0'){
+							color = "rgba(108, 113, 105, 1)";
+						}
+						if(obj.remark && obj.remark=='1'){
+							color = "rgba(95, 134, 193, 1)";
+						}
+						if(obj.remark && obj.remark=='2'){
+							color = "rgba(85, 157, 63, 1)";
+						}
+						if(obj.remark && obj.remark=='3'){
+							color = "rgba(227, 106, 9, 1)";
+						}
+						if(obj.remark && obj.remark=='4'){
+							color = "rgba(187, 13, 173, 1)";
+						}
+						label.setStyle({
+							backgroundColor : color, 
+						    color : "white",
+						    fontSize : "12px",
+						    height : "20px",
+						    lineHeight : "20px",
+						    fontFamily:"微软雅黑"
+						 });
+						 marker1.setLabel(label);
+					}
+					var content;
+					if(obj.remark && obj.remark=='2'){
+						content = "姓名:" + obj.mc + "<br>电话：" + obj.mobile + "<br><input type='button' class='button' value='选为接单人' onclick='choosejiedan(" + i + ")'>";
+					}else{
+						content = "姓名:" + obj.mc + "<br>电话：" + obj.mobile + "<br>";
+					}
+					addClickHandler(content,marker1);
+				}
+			});
+			if(!paoflag&&jdrjd&&jdrwd){
+				point = new BMap.Point(jdrjd,jdrwd);
+				var myIcon = new BMap.Icon("${CTX}/res/images/s.png", new BMap.Size(40,70));
+				var maker = new BMap.Marker(point,{icon:myIcon});  // 创建标注
+				map.addOverlay(maker);
+			}      
+		}
+		
+	function addClickHandler(content,marker){
+		marker.addEventListener("click",function(e){
+			openInfo(content,e)}
+		);
+	}
+		
+	function openInfo(content,e){
+		var p = e.target;
+		var point = new BMap.Point(p.point.lng, p.point.lat);
+		var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
+		map.openInfoWindow(infoWindow,point); //开启信息窗口
+	}
+		
+	function save(){
+		var r = $("#inputForm").valid();
+		if(!r){return false;}
+		if(selectProducts.rows.length  < 2){
+			$("#msg").html("请从右侧选购商品！");return false;
+		}
+		$.ajax({
+			url: "${CTX}/admin/order/save",
+			data:$("#inputForm").serialize(),
+			type: "POST",
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				if(data){
+					alert("操作成功！");closepanel();
+				}
+			}
+		});
+	}
+	function closepanel(){
+		frameElement.api.close();   
+	}
+	//跑退人员的搜索工作
+	function searchPaoTui(){
+		var msg_paotui = $("#msg_paotui").val();
+		var paotuitable = $("#paotuitable");
+		paotuitable.empty();
+		var tr = $("<tr>");
+		 $("<th width='2px'>").html("序号").appendTo(tr); 
+		 $("<th width='20px'>").html("工号").appendTo(tr); 
+		 $("<th width='20px'>").html("姓名").appendTo(tr); 
+		 $("<th width='20px'>").html("电话").appendTo(tr); 
+		 $("<th width='20px'>").html("距离").appendTo(tr); 
+		 $("<th width='20px'>").html("余额").appendTo(tr); 
+		 $("<th width='20px'>").html("本月").appendTo(tr); 
+		 $("<th width='20px'>").html("今日").appendTo(tr); 
+		 $("<th width='20px'>").html("状态").appendTo(tr); 
+		 tr.appendTo(paotuitable);
+		 var pointStart = new BMap.Point(sjjd,sjwd);//将起点的经纬度传到后台
+		$.ajax({
+			url: "${CTX}/admin/order/getPaoTui",
+			type: "POST",
+			dataType: "json",
+			data:{sjjd: sjjd,sjwd: sjwd},
+			cache: false,
+			success: function(data) {
+				paotuiArr = data.paotui_list;//跑腿人员信息
+				carArr = data.car_list;
+				MblogDotccMap();
+				$.each(data.paotui_list, function(index, objVal) {
+					var tr = $("<tr onclick='choosejiedan(" + index + ")' style='cursor:pointer'>");
+					$("<td align='left'>").html(index + 1).appendTo(tr);  
+	                $("<td align='left'>").html(objVal["loginid"]).appendTo(tr);  
+	                $("<td align='left'>").html(objVal["mc"]).appendTo(tr);  
+	                $("<td align='left'>").html(objVal["mobile"]).appendTo(tr); 
+	                var pointEnd = new BMap.Point(objVal["lng"],objVal["lat"]);
+	                $("<td align='left'>").html((map.getDistance(pointStart,pointEnd)/1000).toFixed(1) + "公里").appendTo(tr);
+	                $("<td align='left'>").html(objVal["zhye"]).appendTo(tr);  
+	                $("<td align='left'>").html(0).appendTo(tr);  
+	                $("<td align='left'>").html(0).appendTo(tr);
+	                if(0==objVal["remark"]){
+	                	$("<td align='left'>").html("离线").appendTo(tr);
+	                }else if(1==objVal["remark"]){
+	                	$("<td align='left'>").html("在线").appendTo(tr);
+	                }else if(2==objVal["remark"]){
+	                	$("<td align='left'>").html("空闲").appendTo(tr);
+	                }else if(3==objVal["remark"]){
+	                	$("<td align='left'>").html("忙碌").appendTo(tr);
+	                }else if(4==objVal["remark"]){
+	                	$("<td align='left'>").html("收工回家").appendTo(tr);
+	                }else{
+			            $("<td align='left'>").html("").appendTo(tr);
+	                }
+	                if(!msg_paotui){
+	                	tr.appendTo(paotuitable);
+	                }else{
+	                	if(objVal["mc"].indexOf(msg_paotui) > -1 ||
+	                	   objVal["loginid"].indexOf(msg_paotui) > -1||
+	                	   objVal["mobile"].indexOf(msg_paotui) > -1){
+	                		tr.appendTo(paotuitable);
+	                	}
+	                }
+				})
+			}
+		});
+	}
+	
+	function cal(p2,p3){
+		var driving3 = new BMap.DrivingRoute(map);    //驾车实例
+		driving3.search(p2, p3);
+		driving3.setSearchCompleteCallback(function(){
+			var pts = driving3.getResults().getPlan(0).getDistance(0);
+			if(pts.indexOf("公里") > -1){
+				$("#jl").val(parseFloat(pts.substring(0,pts.length - 2)));
+			}else if(pts.indexOf("里") > -1){
+				$("#jl").val(parseFloat(pts.substring(0,pts.length - 1))/2);
+			}else{
+				$("#jl").val(parseFloat(pts.substring(0,pts.length - 1))/1000);
+			}
+		});
+	}
+	
+	//计算跑腿距离
+	function jisuanjuli(){
+		var point2;
+		var f2 = false;
+		if(sjjd&&sjwd){
+			point2 =  new BMap.Point(sjjd,sjwd);//七点
+			f2 = true;
+		}
+		
+		var point3;
+		var f3 = false;
+		if(shdzjd&&shdzwd){
+			point3 =  new BMap.Point(shdzjd,shdzwd);//终点
+			f3 = true;
+		}
+		if(f2&&f3){
+			cal(point2,point3);
+		}else{
+			$("#jl").val('');
+		}
+	}
+	
+	//选择起始点
+	function choosestart(i){
+		sjjd=sjjdwd["sjjd"];
+		sjwd=sjjdwd["sjwd"];
+		$("#xxdz").val(sjjdwd["xxdz"]);
+		$("#sjjd").val(sjjd);
+		$("#sjwd").val(sjwd);
+		$("#xxdz_msg").html($("#xxdz").val() +"(" + sjjd +"," + sjwd + ")");
+		searchPaoTui();//选完起点，开始查询司机的位置，查询附近20公里内的司机人员
+		jisuanjuli();
+	}
+	function choosestart1(i){
+		var point = merchantArr[i];
+		sjjd = point.lng;
+		sjwd = point.lat;
+		$("#xxdz").val(point.xxdz)
+		$("#sjjd").val(sjjd);
+		$("#sjwd").val(sjwd);
+		$("#xxdz_msg").html($("#xxdz").val() +"(" + sjjd +"," + sjwd + ")");
+		MblogDotccMap();
+		jisuanjuli();
+	}
+	//选择终点
+	function chooseend(i){
+		shdzjd = shdzjdwd["shdzjd"];//shdzjd
+		shdzwd = shdzjdwd["shdzwd"];
+		$("#shdzjd").val(shdzjd);//目的地即收货人地理位置
+		$("#shdzwd").val(shdzwd);
+		$("#shdz").val(shdzjdwd["shdz"]);
+		$("#shdzjd_shdzwd").html(shdzjdwd["shdzjd_shdzwd"]);
+		jisuanjuli();
+		$.ajax({
+			url: "${CTX}/admin/order/initMerchant",
+			type: "POST",
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				merchantArr=data.list_merchant;
+				MblogDotccMap();
+			}
+		});
+	}
+	//jdrjd,jdrwd
+	function choosejiedan(i){
+		var obj = paotuiArr[i];
+		jdrjd = obj.lng;
+		jdrwd = obj.lat;
+		jdrdz = obj.xxdz;
+		
+		//将选中的跑腿人员的信息添加到左侧的from表单中
+		$("#qdrname").val(obj.mc);//接单人，姓名
+		$("#qdrid").val(obj.id);//接单人ID
+		$("#jdrjd_jdrwd").html("坐标：" + jdrjd + "," + jdrwd);//显示帮助信息
+		$("#jdrjd").val(jdrjd);//接单人所在的经纬度
+		$("#jdrwd").val(jdrwd);
+		$("#startdz").val(obj.xxdz);
+		MblogDotccMap();
+		jisuanjuli();
+	}
+	function validate(){
+		$("#inputForm").validate({
+			rules:{
+				is_type:{required:true},
+				yt:{required:true},
+				area_id:{required:true},//merchant_id
+				merchant_id:{required:true},
+				yzbm:{required:true,stringMaxLength:6},
+				lxr:{required:true,stringMaxLength:50},
+				xdrmc:{required:true,stringMaxLength:50},
+				xdrdh:{required:true,stringMaxLength:50},
+				xxdz:{required:true,stringMaxLength:100},
+				addnum:{required:true,min:1},
+				yhje:{required:true,min:0},
+				shdz:{required:true}
+			}
+		});
+	}
+	function TAB_SHOW(which){
+		var TAB_DP = document.getElementById("TAB_DP");
+		var TAB_TC = document.getElementById("TAB_TC");
+		var TAB_DP_CONTENT = $("#TAB_DP_CONTENT");
+		var TAB_TC_CONTENT = $("#TAB_TC_CONTENT");
+		if(0==which){
+			TAB_DP.className="currentLabel";
+			TAB_TC.className="normalLabel";
+			TAB_DP_CONTENT.show();
+			TAB_TC_CONTENT.hide();
+		}else{
+			TAB_DP.className="normalLabel";
+			TAB_TC.className="currentLabel";
+			TAB_DP_CONTENT.hide();
+			TAB_TC_CONTENT.show();
+		}
+	}
+	
+	var zb = '${(zb)!}';
+	var carsLen = ${cars.size()};
+	var selIndex = -1;
+	var carNames = [<#list cars as c>"${(c['name'])!}",</#list>""];
+	var basePrice = [<#list cars as c>"${(c['起步价'])!}",</#list>""];
+	var overPrice = [<#list cars as c>"${(c['超公里费'])!}",</#list>""];
+	var baseKilo = [<#list cars as c>"${(c['起步公里'])!}",</#list>""];
+	var nightPrice = [<#list cars as c>"${(c['夜间服务'])!}",</#list>""];
+	var carLong = [<#list cars as c>"${(c['车长'])!}",</#list>""];
+	var currKilo = -1;	//当前正在计算的路段, 0:from-to, 1:to-to2, 2:to2-to3...
+	var maxKilo = 100; //当大于100公里，则另外输入一个悬赏金额
+	
+	var info = {};
+	$(function() {
+		if(carsLen > 4){
+			$("#slider").easySlider({
+				auto: false,
+				continuous: false 
+			});
+		}
+		$(".carImg").click(function(){
+			selIndex = $(".carImg").index(this);
+			$(".carImg .icon").css("background-position","1px 1px");
+			$(".carImg .icon").eq(selIndex).css("background-position","1px -41px");
+			calcCar();		
+		});
+		$("input[name='orderStyle']").eq(0).attr("checked", true);
+		$("input[name='orderStyle']").change(chooseStyle);
+		$("input[name='moreMoney']").change(calcTotal);
+		if(zb == 'Y'){
+			$("#zb_div1").show();
+			$("#xs_div").hide();
+		}
+	});
+	function calcTotal(){
+		if(zb == 'Y' && $("#isXS:checked").length>0){//物流专线或超过100公里的物流，悬赏模式
+			info['sum'] = parseFloat($("#xsMoney").val());
+			$("#total").html(info['sum']);
+			if(info['kilo']){
+				$("#kiloRst").html(info['kilo']);
+			}
+			return;
+		}else if(zb == 'Y' && $("#isXS:checked").length==0){//物流专线或超过100公里的物流，招标模式
+			info['sum'] = 0;
+			$("#total").html($("#min_price").val() + " - " + $("#max_price").val());
+			if(info['kilo']){
+				$("#kiloRst").html(info['kilo']);
+			}
+			return;
+		}
+		if(selIndex<0) return;
+		var sum = 0;
+		if(info['basePrice']){
+			sum += info['basePrice'];
+		}
+		if(info['kilo'] && info['overPrice']){
+			sum += (info['kilo']<=10?0:info['kilo']-10) * info['overPrice'];
+		}
+		if(info['kilo']){
+			$("#kiloRst").html(info['kilo']);
+		}
+		info['sum'] = sum;
+		if($("#isXS:checked").length>0 && $("input[name='moreMoney']:checked").length>0){
+			var more = $("input[name='moreMoney']:checked").val();
+			info['sum'] += parseInt(more);
+		}
+		$("#total").html(info['sum']);
+	}
+	function chooseStyle(){
+		var val = $("input[name='orderStyle']:checked").val();
+		if(val == 1){
+			$("#zb_div2").hide();
+			$("#xs_div").show();
+			$("#minPrice").val("");
+			$("#maxPrice").val("");
+			$("#someInfo").show();
+			if(zb == 'Y'){
+				$("#zb_div1").show();
+				$("#xs_div").hide();
+			}
+		}else if(val == 2){
+			$("input[name='moreMoney']").attr("checked",false);
+			$("#zb_div2").show();
+			$("#xs_div").hide();
+			$("#someInfo").hide();
+			if(zb == 'Y'){
+				$("#zb_div1").hide();
+				$("#zb_div1").val('');
+			}
+		}
+	}
+	$(function(){
+		$(".vname").blur(function(){
+			if(!/^\S{2,10}$/.test($(this).val().trim()))
+				addPmt(this, null, '名称为长度为2-10的非空字符');
+			else
+				addPmt(this, null);
+		});	
+		$(".vphone").blur(function(){
+			if(!/^\d{11}$/.test($(this).val().trim()))
+				addPmt(this, null, '电话为长度为11的数字');
+			else
+				addPmt(this, null);
+		});
+		$(".vmoney").blur(function(){
+			if(!/^\d+(\.\d{1,2})?$/.test($(this).val().trim()))
+				addPmt(this, $(this).next(".pmt"), '金额为整型或小数点后2位的浮点型');
+			else
+				addPmt(this, $(this).next(".pmt"));
+		});
+	});
+	function addPmt(o, p, msg){
+		if(!msg){
+			if(p)
+				$(p).html('');
+			else{
+				$(o).next().remove();
+				$(o).parent().append('<span style="color:red; font-size:14px; padding-left: 15px;"><img src="${CTX}/res/images/gou.jpg" width="25" height="25"/></span>');
+			}
+		}else if($(o).parent().html().indexOf(msg)<0){
+			if(p)
+				$(p).html('<span style="color:red; font-size:14px; padding-left: 15px;">'+msg+'</span>');
+			else{
+				$(o).parent().append('<span style="color:red; font-size:14px; padding-left: 15px;">'+msg+'</span>');
+			}
+		}
+	}
+	function addRcv(){
+		var arr = $(".more_rcv");
+		for(var i=0;i<arr.length;i++){
+			if($(arr[i]).css("display") == 'none'){
+				$(arr[i]).show();
+				return;
+			}
+		}
+	}
+	function removeRcv(a){
+		info['to' + a] = undefined;
+		var i = a - 2;
+		$("#rcvAddr"+a).val("");
+		$("#rcvName"+a).val("");
+		$("#rcvPhone"+a).val("");
+		$(".more_rcv").eq(i).hide();
+		tryDrive();
+	}
+	function calcCar(){
+		if(selIndex < 0) return;
+		info['carType'] = carNames[selIndex];
+		info['basePrice'] = parseInt(basePrice[selIndex]);
+		info['overPrice'] = parseInt(overPrice[selIndex]);
+		info['nightPrice'] = parseInt(nightPrice[selIndex]);
+		$("#carRst").html(info['carType']);
+		//选择车长
+		if(carLong[selIndex] != ''){
+			$.dialog({
+				title:'选择车长',
+				content: "url:${CTX}/admin/order/carLong?ccArr="+carLong[selIndex] + "&cc=" + info['cc'],
+			    lock:true,
+			    resize: false,
+			    width : 300,
+				height : 100,
+				cover:true,
+				max:false,
+				min:false,
+				cancel:true,
+				button: [{
+	            	name: '确定',
+		            callback: function(){
+		            	if(this.content.$("input[name='cc']:checked").length == 0){
+		            		alert("请选择车长!");
+		            		return false;
+		            	}
+		            	info['cc'] = this.content.$("input[name='cc']:checked").val();
+		            	$(".carImg").eq(selIndex).find("li:last").html("车长：&nbsp;"+info['cc']+"米");
+		            	
+		            	//直接走物流专线的流程
+		            	zb = 'Y';
+		            	$("#zb_div1").show();
+						$("#xs_div").hide();
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}else{
+			zb = '${(zb)!}';
+		}
+		tryDrive();
+	}
+	function next(){
+		if(selIndex < 0){
+			alert("请选择车型！");
+			return;
+		}
+		if(!info['from']){
+			//alert('请通过联想提示选入发货地址！');
+			//return;
+			info['from'] = $("#sendAddr").val();
+		}
+		if(!info['to']){
+			//alert('请通过联想提示选入收货地址！');
+			//return;
+			info['to'] = $("#rcvAddr").val();
+		}
+		if(!info['kilo']){
+			manKilo();
+			return;
+		}
+		calcTotal();
+		info['sendName'] = $("#sendName").val();
+		info['sendPhone'] = $("#sendPhone").val();
+		info['rcvName'] = $("#rcvName").val();
+		info['rcvPhone'] = $("#rcvPhone").val();
+		info['orderStyle'] = $("input[name='orderStyle']:checked").val();
+		//console.log(info['sendPhone']);
+		info['minPrice'] = $("#minPrice").val();
+		info['maxPrice'] = $("#maxPrice").val();
+		for(var i=2;i<=5;i++){
+			info['rcvName'+i] = $("#rcvName"+i).val();
+			info['rcvPhone'+i] = $("#rcvPhone"+i).val();	
+			info['rcvAddr'+i] = $("#rcvAddr"+i).val();	
+		}
+		if(!/^\d{11}$/.test(info['sendPhone'])){
+			alert("请填写正确的11位发货人电话号码");
+			return;
+		}
+		if(!/^\d{11}$/.test(info['rcvPhone'])){
+			alert("请填写正确的11位收货人电话号码");
+			return;
+		}
+		if(!/^\d{11}$/.test($("#tel").val())){
+			alert("请填写正确的11位下单人电话号码");
+			return;
+		}else{
+			info['tel']=$("#tel").val();//下单人电话号码
+		}
+		$.post('saveStep1',info,function(data){
+			if(data && data.success){
+				//self.location.href="${CTX}/admin/order/initProduct";
+				self.location.href = 'prepare?zb=${(zb)!}';
+			}else{
+				alert("操作失败，请稍后再试");
+			}
+		});
+	}
+	function tryDrive(){
+		if(info['from'] && info['to']){
+			info['kilo'] = 0;
+			currKilo = 0;
+			try{
+				driving.search(new BMap.Point(info['from_lng'], info['from_lat']), new BMap.Point(info['to_lng'], info['to_lat']));
+			}catch(e){
+				manKilo();
+			}
+		}else{
+			calcTotal();
+		}			
+	}
+	function manKilo(){//手动录入公里数
+		alert('由于您的地址无法自动识别，请手动录入大约的公里数');
+		$.dialog({
+			title:'大约的公里数',
+			content: 'url:${CTX}/admin/order/reCalJuLi',
+		    lock:true,
+		    resize: false,
+		    width : 300,
+			height : 100,
+			cover:true,
+			max:false,
+			min:false,
+			cancel:true,
+			button: [{
+            	name: '确定',
+	            callback: function(){
+	            	if(!/^\d+$/.test(this.content.$("#dkilo").val().trim())){
+	            		alert("请输入正整数的公里数！");
+	            		return false;
+	            	}
+	            	info['kilo'] = this.content.$("#dkilo").val().trim();
+	            	calcTotal();
+	            },
+       			focus: true
+	        }],
+	        cancelVal:'关 闭'
+		});//弹出框
+	}
+	function set100Kilo(){
+		if(info['kilo'] >= maxKilo){
+			zb = 'Y';
+			$("#zb_div1").show();
+			$("#xs_div").hide();
+			//alert("您的行驶里程超过"+maxKilo+"公里，请直接输入一个悬赏价格作为订单价格！");
+			
+		}
+		calcTotal();
+	}
+	</script>
+	<style>
+		.more_rcv{
+			display: none;
+		}
+	</style>
+	<style>
+    .address-common {
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px #cac9c9;
+    left: 135;
+    position: absolute;
+    top: 76px;
+    width: 500px;
+    z-index: 2;
+}
+.address-common .address-common-list-wrap {
+    border-bottom: 1px solid #e5e5e5;
+}
+.address-common .address-common-list-wrap .address-common-list {
+    cursor: pointer;
+    font-size: 12px;
+    min-height: 50px;
+    position: relative;
+}
+.address-common .address-common-list-wrap .address-common-list-selected {
+    background-color: #f3f3f3;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-icon {
+    background: url("${CTX}/res/images/tc_icon.png") no-repeat scroll -320px 0 rgba(0, 0, 0, 0);
+    display: block;
+    height: 28px;
+    left: 20px;
+    position: absolute;
+    top: 12px;
+    width: 28px;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-address {
+    line-height: 20px;
+    padding-left: 62px;
+    padding-top: 5px;
+    width: 380px;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-address span {
+    display: block;
+    word-break: normal;
+    word-wrap: break-word;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-address span.address-common-detail-address {
+    color: #a3a6ab;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-name, .address-common .address-common-list-wrap .address-common-list .address-common-phone {
+    line-height: 50px;
+    position: absolute;
+    text-align: center;
+    top: 0;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-name {
+    left: 450px;
+    width: 150px;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-phone {
+    left: 600px;
+    width: 150px;
+}
+.address-common .address-common-type {
+    background-color: #f3f3f3;
+    height: 40px;
+    line-height: 40px;
+    overflow: hidden;
+    text-align: center;
+}
+.address-common .address-common-type .address-common-type-list {
+    cursor: pointer;
+    position: relative;
+    width: 50%;
+}
+.address-common .address-common-type .address-common-type-list-left {
+    float: left;
+}
+.address-common .address-common-type .address-common-type-list-right {
+    float: right;
+}
+.address-common .address-common-type .address-common-type-list-left p {
+    border-right: 1px solid #e5e5e5;
+}
+.address-common .address-common-type .address-common-type-list a {
+    display: none;
+}
+.address-common .address-common-type .address-common-type-list-selected {
+    background-color: #fff;
+}
+.address-common .address-common-type .address-common-type-list-selected .left, .address-common .address-common-type .address-common-type-list-selected .right {
+    cursor: pointer;
+    display: block;
+    height: 17px;
+    position: absolute;
+    top: 10px;
+    width: 10px;
+}
+
+    </style>
+</head>
+
+  <body onload="TAB_SHOW(0);">
+  <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1" class="zidingyi"bgcolor="#96CAE7" >
+	  <tr>
+	    <td colspan="5" align="center"><span style="font-weight: 700;font-size: 20px">呼叫中心，代客下单</span></td>
+	  </tr>
+</table>
+  <div id="tablist">
+	 <div id="NavTagContainer">
+		<label onClick="TAB_SHOW(0)" id="TAB_DP" class="currentLabel">店铺订单</label>
+		<label onClick="TAB_SHOW(1)" id="TAB_TC" class="normalLabel">物流订单</label>
+	</div>
+	<div id="NavTagContent">
+		<div id="TAB_DP_CONTENT" style="display: none;">
+			<#include 'TAB_DP.html'>
+		</div>
+		<div id="TAB_TC_CONTENT" style="display: none;">
+			<#include 'TAB_TC.html'>
+		</div>
+	</div>
+  </div>
+   <script type="text/javascript" src="${CTX}/res/js/tc_address.js"></script>
+    <script>
+ // 百度地图API功能
+	var allmap = new BMap.Map("allmap");
+	allmap.centerAndZoom(currLoc, 11);
+	var optionsAll = {
+		onSearchComplete: function(results){
+			if (driving.getStatus() == BMAP_STATUS_SUCCESS){
+				// 获取第一条方案
+				var plan = results.getPlan(0);
+				// 获取方案的驾车线路
+				var route = plan.getRoute(0);
+				//var meter = route.vf;
+				var meter = route.getDistance(false);
+				//alert(meter + "米" + (Math.floor(meter/1000) + 1) + "公里");	
+				var k = 	(Math.floor(meter/1000) + 1);
+				info['kilo'] += k;
+				//alert(k);
+				
+				currKilo++;
+				if(currKilo == 1 && info['rcvAddr2'] && info['rcvAddr2']!=''){
+					//driving.search(info['to'], info['rcvAddr2']);
+					driving.search(new BMap.Point(info['to_lng'], info['to_lat']), new BMap.Point(info['rcvAddr2_lng'], info['rcvAddr2_lat']));
+					return;
+				}else if(currKilo >= 2 && info['rcvAddr'+(currKilo+1)] && info['rcvAddr'+(currKilo+1)]!=''){
+					//driving.search(info['to' + currKilo], info['to'+(currKilo+1)]);
+					driving.search(new BMap.Point(info['rcvAddr'+currKilo+'_lng'], info['rcvAddr'+currKilo+'_lat']), 
+						new BMap.Point(info['rcvAddr'+(currKilo+1)+'_lng'], info['rcvAddr'+(currKilo+1)+'_lat']));
+					return;
+				}
+				currKilo = -1;
+				set100Kilo();		
+			}else{
+				manKilo();
+			}
+		}
+	};
+		var driving = new BMap.DrivingRoute(allmap, optionsAll);
+    
+    	address_interval = null;
+    	 var clear_interval = function(){
+	        if (address_interval) window.clearInterval(address_interval);
+	    };
+	    var myCityMap = new BMap.LocalCity();
+		myCityMap.get(myFunMap);
+	    function myFunMap(result){
+			var cityName = result.name;
+			currLoc = cityName;
+			allmap.setCenter(currLoc);
+    	    addressSearch0 = new AddressSearch(currLoc,5, function(search_data){
+			        if (!search_data) {
+			            // 查询结果为空
+			            return;
+			        }
+			        if (search_keyword != search_data.keyword) {
+			            // 查询关键词与当前查询不匹配
+			            return;
+			        }
+			        select_data = search_data['data'];
+			        var html =  '<div class="address-common">'+
+			                    '   <div class="address-common-list-wrap">';
+			        for (var i = 0; i < search_data['data'].length; i++) {
+			            var item = search_data['data'][i];
+			            html += '       <div class="address-common-list" index="'+i+'">' +
+			                    '           <span class="address-common-icon"></span>' +
+			                    '           <p class="address-common-address">' +
+			                    '               <span class="address-common-title">'+item['title']+'</span>' +
+			                    '               <span class="address-common-detail-address"> 详细地址：<em>'+item['address']+'</em></span>' +
+			                    '               <span style="display:none;" class="lng">'+item['lng']+'</span>' +
+			                    '               <span style="display:none;" class="lat">'+item['lat']+'</span>' +
+			                    '           </p>' +
+			                    '       </div>';
+			        }
+			        html +=     '   </div>' +
+			                    '</div>';
+			        $("#sendAddr_panel").html(html);
+			        $("#sendAddr_panel .address-common-list").click(function(){
+			        	$("#sendAddr").val($(this).find("em").html());
+			        	$("#sendAddr_panel").html('');
+			        	info['from'] = $(this).find("em").html();
+			        	info['from_lng'] = $(this).find(".lng").html();
+			        	info['from_lat'] = $(this).find(".lat").html();
+			        	tryDrive();
+			        });
+			    });    	
+    		 $("#sendAddr").on('focus', function(){
+		        var that = $(this);
+		        var last_val = that.val();
+		        clear_interval();
+		        address_interval = window.setInterval(function(){
+		            search_keyword = that.val();
+		            if (search_keyword && (search_keyword != last_val)) {
+		                addressSearch0.search(search_keyword);
+		                last_val = search_keyword;
+		            }
+		        }, 100);		        
+		    }).on('blur', function(){
+		        clear_interval();
+		    });
+		    
+		    
+		    addressSearch1 = new AddressSearch(currLoc,5, function(search_data){
+			        if (!search_data) {
+			            // 查询结果为空
+			            return;
+			        }
+			        if (search_keyword != search_data.keyword) {
+			            // 查询关键词与当前查询不匹配
+			            return;
+			        }
+			        select_data = search_data['data'];
+			        var html =  '<div class="address-common">'+
+			                    '   <div class="address-common-list-wrap">';
+			        for (var i = 0; i < search_data['data'].length; i++) {
+			            var item = search_data['data'][i];
+			            html += '       <div class="address-common-list" index="'+i+'">' +
+			                    '           <span class="address-common-icon"></span>' +
+			                    '           <p class="address-common-address">' +
+			                    '               <span class="address-common-title">'+item['title']+'</span>' +
+			                    '               <span class="address-common-detail-address"> 详细地址：<em>'+item['address']+'</em></span>' +
+			                    '               <span style="display:none;" class="lng">'+item['lng']+'</span>' +
+			                    '               <span style="display:none;" class="lat">'+item['lat']+'</span>' +
+			                    '           </p>' +
+			                    '       </div>';
+			        }
+			        html +=     '   </div>' +
+			                    '</div>';
+			        $("#rcvAddr_panel").html(html);
+			        $("#rcvAddr_panel .address-common-list").click(function(){
+			        	$("#rcvAddr").val($(this).find("em").html());
+			        	$("#rcvAddr_panel").html('');
+			        	info['to'] = $(this).find("em").html();
+			        	info['to_lng'] = $(this).find(".lng").html();
+			        	info['to_lat'] = $(this).find(".lat").html();
+			        	tryDrive();
+			        });
+			    });    	
+    		 $("#rcvAddr").on('focus', function(){
+		        var that = $(this);
+		        var last_val = that.val();
+		        clear_interval();
+		        address_interval = window.setInterval(function(){
+		            search_keyword = that.val();
+		            if (search_keyword && (search_keyword != last_val)) {
+		                addressSearch1.search(search_keyword);
+		                last_val = search_keyword;
+		            }
+		        }, 100);		        
+		    }).on('blur', function(){
+		        clear_interval();
+		    });
+		    
+		    
+		    
+		    <#list 2..5 as a>
+		    addressSearch${a} = new AddressSearch(currLoc,5, function(search_data){
+			        if (!search_data) {
+			            // 查询结果为空
+			            return;
+			        }
+			        if (search_keyword != search_data.keyword) {
+			            // 查询关键词与当前查询不匹配
+			            return;
+			        }
+			        select_data = search_data['data'];
+			        var html =  '<div class="address-common" style="top:'+(280 + (${a}-2)*200)+'px">'+
+			                    '   <div class="address-common-list-wrap">';
+			        for (var i = 0; i < search_data['data'].length; i++) {
+			            var item = search_data['data'][i];
+			            html += '       <div class="address-common-list" index="'+i+'">' +
+			                    '           <span class="address-common-icon"></span>' +
+			                    '           <p class="address-common-address">' +
+			                    '               <span class="address-common-title">'+item['title']+'</span>' +
+			                    '               <span class="address-common-detail-address"> 详细地址：<em>'+item['address']+'</em></span>' +
+			                    '               <span style="display:none;" class="lng">'+item['lng']+'</span>' +
+			                    '               <span style="display:none;" class="lat">'+item['lat']+'</span>' +
+			                    '           </p>' +
+			                    '       </div>';
+			        }
+			        html +=     '   </div>' +
+			                    '</div>';
+			        $("#rcvAddr${a}_panel").html(html);
+			        $("#rcvAddr${a}_panel .address-common-list").click(function(){
+			        	$("#rcvAddr${a}").val($(this).find("em").html());
+			        	$("#rcvAddr${a}_panel").html('');
+			        	info['rcvAddr${a}'] = $(this).find("em").html();
+			        	info['rcvAddr${a}_lng'] = $(this).find(".lng").html();
+			        	info['rcvAddr${a}_lat'] = $(this).find(".lat").html();
+			        	tryDrive();
+			        });
+			    });    	
+    		 $("#rcvAddr${a}").on('focus', function(){
+		        var that = $(this);
+		        var last_val = that.val();
+		        clear_interval();
+		        address_interval = window.setInterval(function(){
+		            search_keyword = that.val();
+		            if (search_keyword && (search_keyword != last_val)) {
+		                addressSearch${a}.search(search_keyword);
+		                last_val = search_keyword;
+		            }
+		        }, 100);		        
+		    }).on('blur', function(){
+		        clear_interval();
+		    });
+		    </#list>
+		}
+    	</script>
+  </body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			 $("#myform").validate({
+				rules: {
+					config_c1: {required:true,stringMaxLength:100},
+					config_c2: {required:true,stringMaxLength:200},
+					config_c3: {required:true,stringMaxLength:400}
+				},
+				messages:{
+					config_c1:"标题",
+					config_c2:"关键词",
+					config_c3:"描述"
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				if($("#myform").valid()){
+				    $.post("${CTX}/admin/config/saveconfig",$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("首页关键词配置成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("首页关键词配置失败！");
+						}
+					});
+				}
+			});
+		});
+		
+		function refresh(){
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+			$('#myform').submit();
+		}
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" method="post">
+	<input type="hidden" name="config_id" id="config_id" value="${(vo.id)!}"/>
+	<div class="path">
+		<a href="javascript:void(0);">首页</a> &raquo; 首页关键词设置
+	</div>
+	<table class="input">
+		<tr>
+			<th align="right">标题：</th>
+			<td><input type="text" name="config_c1" id="config_c1" class="text" value="${(vo.c1)!}" style="width: 400px;"></td>
+		</tr>
+		<tr>
+			<th align="right">关键词：</th>
+			<td><input type="text" id="config_c2" name="config_c2" class="text" value="${(vo.c2)!}" style="width: 400px;"></td>
+		</tr>
+		<tr>
+			<th align="right">描述：</th>
+			<td><textarea id="config_c3" name="config_c3" class="text" style="width: 400px;">${(vo.c3)!}</textarea></td>
+		</tr>
+		<tr>
+		<td>&nbsp;</td>
+		<td>
+			<input type="button" id="btn_save" class="button" value="保 存" />
+			<input type="button" id="btn_return" class="button" value="刷 新" onclick="javascript:window.location.href='${CTX}/admin/config/editfwf'"/>
+		</td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

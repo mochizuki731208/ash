@@ -1,0 +1,97 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/otree/otree.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/otree/otree.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/otree/common.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function initYuanGong(subjectid,cityid){
+			$.dialog({
+				title:'类型员工授权',
+				content: 'url:${CTX}/admin/subject/initYuanGong?subjectid=' + subjectid + "&cityid=" + cityid,
+			    lock:true,
+			    resize: true,
+			    width : 600,
+				height : 300,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭',
+		        button: [{
+		        	name: '授权',
+		        	callback: function(){
+		        			var userid = this.content.$("#selectedID").val();
+		        			if(null==userid || ""==userid){
+		        				$.dialog.alert("请选择一位员工进行授权！")
+		        				return false;
+		        			}
+		        			
+		            		$.post("${CTX}/admin/subject/doAuthToYuanGong",{userid: userid,subjectid: subjectid,cityid: cityid},function(data){
+		        	            if(data){
+		        	            	$.dialog.alert("操作成功！",function () {
+										refresh();
+							        }).time(0.8);
+		        				}else{
+		        					$.dialog.alert("操作失败，请刷新页面重新操作！");
+		        				}
+		        			});
+		        	},
+		        	focus: true
+		        }]
+			});//
+		}
+	</script>
+</head>
+  <body>
+	  <form id="myform" name="myform" action="" method="post">
+		  	<input type="hidden" id="cityid" name="cityid" value="${(cityid)!}"/>
+		  	<input type="hidden" id="subids" name="subids" value=""/>
+			<input type="button" id="btn_add" class="button" value="授 权" onclick="uf_save();"/>
+			<input type="button" id="btn_query" class="button" value="刷 新" onclick="refresh();" />
+			<div id="tleft" class="tleft" style="overflow: auto;"/>
+			<script type="text/javascript">
+				var TreeData=${str_Script};
+				var otree = new OTree({
+					panel 	: document.getElementById("tleft"),
+					data	: TreeData,
+					isAutoCheckParent:false,
+					isAutoCheckSub:true
+				});
+				otree.paint();
+				//otree.expandAll();
+				function ClickEvent(node){
+				       //document.all.p_id.value=node.attributes.id;
+				       //document.all.myform.target="dlist";
+				       //document.all.myform.action="${CTX}/admin/role/listrole";
+				       //document.all.myform.submit();
+				       if(node.checked == '1'){
+				    	   initYuanGong(node.attributes.id,$("#cityid").val());
+				       }
+				}
+				otree.addListener('click',ClickEvent);
+				
+				function uf_save(){
+					document.all.subids.value = otree.getCheckeds('id');
+					$.post("${CTX}/admin/subject/savesubjectarea",$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("城市分类分配成功！",function () {
+								refresh();
+					        }).title('1秒后关闭本提示框').time(1);
+						}else{
+							$.dialog.alert("城市分类分配失败，请检查操作是否正确！");
+						}
+					});
+				}
+			</script>
+		</form>
+  </body>
+</html>

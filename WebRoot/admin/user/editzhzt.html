@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					user_zhzt:{required:true}
+				}
+			});
+			
+			$("#user_zhzt").focus();
+		});
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" action="${CTX}${NAME_SPACE}/savezhzt" method="post" >
+	<input type="hidden" name="user_id" id="user_id" value="${(vo.id)!}"/>
+	<table class="input">
+		<tr>
+			<th align="right">帐号状态：</th>
+			<td>
+				<select name="user_zhzt" id="user_zhzt">
+	                  <option value="1" <#if strkit('1',(vo.zhzt)!)>selected</#if>>正常</option>
+	                  <option value="0" <#if strkit('0',(vo.zhzt)!)>selected</#if>>永久禁用</option>
+	                  <option value="2" <#if strkit('2',(vo.zhzt)!)>selected</#if>>分时禁用</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right" width="20%;">禁用开始时间：</th>
+			<td><input type="text" name="user_jykssj" id="user_jykssj" class="text Wdate" value="${(vo.jykssj)!}" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-dd-MM HH:mm:ss'})" ></td>
+		</tr>
+		<tr>
+			<th align="right" width="20%;">禁用截止时间：</th>
+			<td><input type="text" name="user_jyjzsj" id="user_jyjzsj" class="text Wdate" value="${(vo.jyjzsj)!}" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-dd-MM HH:mm:ss'})" ></td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

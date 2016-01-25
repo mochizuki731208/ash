@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/umeditor/themes/default/css/umeditor.min.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/umeditor/umeditor.config.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/umeditor/umeditor.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/umeditor/lang/zh-cn/zh-cn.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			var um = UM.getEditor('tb_txt');
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					lbmc:{required:true,stringMaxLength:100},
+					tb_seo_keyword:{required:true,stringMaxLength:100},
+					tb_seo_desc:{required:true,stringMaxLength:200}
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				if($("#myform").valid()){
+				    $("#myform").submit();
+				}
+			});
+			$("#btn_exit").click(function(){
+				window.location.href="${CTX}${NAME_SPACE}/listfl";
+			});
+			
+			$("#tb_title").focus();
+		});
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" action="${CTX}${NAME_SPACE}/savenrfl" method="post" >
+	<input type="hidden" name="tb_id" id="tb_id" value="${(vo.id)!}"/>
+	<table class="input">
+		<tr>
+			<th align="right" width="20%;">类别名称：</th>
+			<td><input type="text" name="tb_lbmc" id="tb_lbmc" class="text" value="${(vo.lbmc)!}"> <font color="red">*</font> </td>
+		</tr>
+		<tr>
+			<th align="right">SEO 关键字：</th>
+			<td><input type="text" name="tb_seo_keyword" id="tb_seo_keyword" class="text" value="${(vo.seo_keyword)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">SEO描述：</th>
+			<td><textarea id="tb_seo_desc" name="tb_seo_desc" class="text">${(vo.seo_desc)!}</textarea></td>
+		</tr>
+		<tr>
+			<th align="right">上级分类：</th>
+			<td>
+				<select id="tb_sjfl" name="tb_sjfl" style="width:150px;" class="required">
+					<#list list_sj as lst>
+				  	  <option value="${(lst.id)!}" <#if strkit((lst.id)!'',(vo.lbid)!)>selected</#if>>${(lst.lbmc)!''}</option>
+					</#list>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">顺序号：</th>
+			<td><input type="text" name="tb_sxh" id="tb_sxh" class="text" value="${(vo.sxh)!}"></td>
+		</tr>
+		<tr>
+			<th></th>
+			<td>
+				<input type="button" id="btn_save" value="保 存"/>
+				<input type="button" id="btn_exit" value="取 消"/>
+			</td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

@@ -1,0 +1,39 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<#include '../ab/inc/meta.html'>
+<title>主页-${(vo.mc)!'物流企业'}</title>
+<link href="${CTX}/res/trans/css/mystyle.css" type="text/css" rel="stylesheet" />
+<link href="${CTX}/res/trans/css/jqhdp.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+<#include '../ab/inc/top.html'>
+<div class="top_2">
+	<div class="title"><span>${(vo.mc)!}</span></div>
+</div>
+<#include 'inc/nav.html'>
+<!-- 幻灯片开始-->
+<#include 'inc/slider.html'>
+<!--幻灯片结束-->
+<div class="container">
+   <#include 'inc/left.html'>
+   
+   <div class="body_content">
+    <div class="body_content1">
+    <ul>
+    		<li>联系我们</li>
+    	</ul>
+    	<p><strong>收货地址：</strong></p>
+    		<p>${(lo.recaddress)!}</p>
+    		<p><strong>卸货地址：</strong></p>
+    		<p>${(lo.disaddress)!}</p>
+    </div>
+   </div>
+
+	<div class="bottom"></div>    
+</div>
+
+<#include 'inc/footer.html'>
+</body>
+</html>

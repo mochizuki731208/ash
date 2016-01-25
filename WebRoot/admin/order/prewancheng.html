@@ -1,0 +1,237 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>后台管理系统</title>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/admin.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/tab/style.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+		});
+		function closepanel(){
+			frameElement.api.reload(frameElement.lhgDG);
+		}
+		function calTime(){
+			if(!$("#xdsj").val()){
+				return;
+			}
+			if(!$("#sdsj").val()){
+				return;
+			}
+			var start = new Date($("#xdsj").val().replace(/-/g,"/"));
+			var end = new Date($("#sdsj").val().replace(/-/g,"/"));
+			$("#count").val( parseInt((end - start) / (1000*60)))
+		}
+		
+		function cal(){
+			var total = 0;
+			var fe1 = $("#fe1").val();
+			if(fe1){
+				total +=parseFloat(fe1);
+			}
+			var fe2 = $("#fe2").val();
+			if(fe2){
+				total +=parseFloat(fe2);
+			}
+			var fe3 = $("#fe3").val();
+			if(fe3){
+				total +=parseFloat(fe3);
+			}
+			var fe4 = $("#fe4").val();
+			if(fe4){
+				total +=parseFloat(fe4);
+			}
+			var fe5 = $("#fe5").val();
+			if(fe5){
+				total +=parseFloat(fe5);
+			}
+			var fe6 = $("#fe6").val();
+			if(fe6){
+				total +=parseFloat(fe6);
+			}
+			$("#ys").html(total);
+			var fe7 = $("#fe7").val();
+			if(!fe6){
+				fe6 = 0;
+			}
+			$("#yh").html(fe7);
+			$("#sh").html(total -fe7);
+			if(total -fe7 < 2)
+			{
+				$("#gs").html(2);
+				$("#pd").html(total -fe7 - gs);
+			}
+			else if(total -fe7 <4 && total -fe7 > 1)
+			{
+				$("#gs").html(total -fe7);
+				$("#pd").html(0);
+			}else
+			{
+				var gs = 3 + parseInt((total -fe7-fe6-3)/5);
+				$("#gs").html(gs);
+				$("#pd").html(total -fe7 - gs);
+			}
+			$("#fc").html(total-fe6);
+			var gsf = parseInt((total -fe7)/5)
+			$("#gsf").html();
+		}
+		
+		//订单完成-相关信息入库
+		function doOver(){
+			$.ajax({
+				url: "${CTX}/admin/order/doWanCheng",
+				data:$("#myForm").serialize(),
+				type: "POST",
+				dataType: "json",
+				cache: false,
+				success: function(data) {
+					if(data){
+						alert("操作成功！");
+						closepanel();
+					}
+				}
+			});
+		}
+	</script>
+</head>
+
+ <body onload="calTime()">
+ <form action="" id="myForm">
+  <input type="hidden" name="id" id="id" value="${(order.id)!''}"/>
+  <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1" class="zidingyi" bgcolor="#96CAE7" >
+	  <tr>
+	    <td colspan="5" align="center"><span class="titlebiaoti">&nbsp;</span></td>
+	  </tr>
+  </table>
+  <table border="1"  class="input">
+  	<tr>
+  		<th width="15%">订单号</th><td width="35%">${(order.sn)!''}</td>
+  		<th  width="15%">来电时间</th><td width="35%">&nbsp;</td>
+  	</tr>
+  	<tr>
+  		<th>商家名称</th><td>${(order.mname)!''}</td>
+  		<th>用途</th><td><#if strkit('0',(order.yt)!)>犒劳自己</#if><#if strkit('1',(order.yt)!)>赠送他人</#if></td>
+  	</tr>
+  	<tr>
+  		<th>类型</th>
+  		<td>
+  			<#if list_subject??>
+  				<#list list_subject as x>
+  					<label><input name="subject_id" value="${(x.id)!''}" id ="subject_id" type="radio" <#if strkit((order.subject_id)!,(x.id)!)>checked="checked"</#if>/>${(x.mc)!''}</label>&nbsp;
+  				</#list>
+  			</#if>
+  		</td>
+  		<th>商品类型</th><td><#if strkit('0',(order.is_type)!)>货物类</#if><#if strkit('1',(order.is_type)!)>服务类</#if></td>
+  	</tr>
+  	<tr>
+  		<th>订单来源</th><td>App</td>
+  		<th>派单人</th><td>${(order.xdrmc)!} (${(order.xdrdh)!})</td>
+  	</tr>
+  	<tr>
+  		<th>下单人名称</th>
+  		<td>
+  			<input type="text" id="xdrmc" name="xdrmc" class="text" value="${(order.xdrmc)!}">
+			<input type="hidden" id="xdrid" name="xdrid" class="text" value="${(order.xdrid)!}">
+  		</td>
+  		<th>下单人电话</th>
+  		<td>
+  			<input type="text" id="xdrdh" name="xdrdh" class="text" value="${(order.xdrdh)!}">
+  		</td>
+  	</tr>
+  	<tr>
+  		<th>收货联系人</th>
+  		<td>
+  			<input type="text" id="lxr" name="lxr" class="text" value="${(order.lxr)!}">
+  		</td>
+  		<th>收货联系人电话</th>
+  		<td>
+  			<input type="text" id="lxrdh" name="lxrdh" class="text" value="${(order.lxrdh)!}">
+  		</td>
+  	</tr>
+  	<tr>
+  		<th>收货人邮政编码</th>
+  		<td>
+  			<input type="text" id="yzbm" name="yzbm" class="text" value="${(order.yzbm)!}">
+  		</td>
+  		<th>收货人地址</th>
+  		<td>
+  			<input type="text" id="shdz" name="shdz" class="text" value="${(order.shdz)!}"/>
+  		</td>
+  	</tr>
+  	<tr>
+  		<th>出发时间</th>
+  		<td>
+  			<input type="text" id="xdsj" name="xdsj" class="Wdate" value="${(order.xdsj)!}" 
+  			onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss'}),calTime()"/>
+  		</td>
+  		<th>到达时间</th>
+  		<td>
+  			<input type="text" id="sdsj" name="sdsj" class="Wdate" value="${(order.sdsj)!}" 
+  			onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss'}),calTime()"/>
+  		</td>
+  	</tr>
+  	<tr>
+  		<th>公里数</th><td><input type="text" id="jl" name="jl" class="text" value="${(order.jl)!}"></td>
+  		<th>用时</th><td><input type="text" id="count" name="count" class="text"></td>
+  	</tr>
+  	<tr>
+  		<th>结算方式</th>
+  		<td>
+  			<label><input name="zffs" id ="zffs" value="0" type="radio" <#if strkit('0',(order.zffs)!)>checked="checked"</#if>/>充值直扣</label>&nbsp;
+  			<label><input name="zffs" id ="zffs"  value="1" type="radio" <#if strkit('1',(order.zffs)!)>checked="checked"</#if>/>支付宝</label>&nbsp;
+  			<label><input name="zffs" id ="zffs" value="2" type="radio" <#if strkit('2',(order.zffs)!)>checked="checked"</#if>/>货到付款</label>&nbsp;
+  			<label><input name="zffs" id ="zffs" value="3" type="radio" <#if strkit('3',(order.zffs)!)>checked="checked"</#if>/>无支付</label>&nbsp;
+  			
+  		</td>
+  		<th>出发地点</th><td><input type="text" id="startdz" name="startdz" class="text" value="${(su.xxdz)!''}"></td>
+  	</tr>
+  	<tr>
+  		<td>收费金额</td>
+  		<td>
+  			<ul>
+  				<li>参与分成</li>
+  				<li>基础价<input id="fe1" name="fe1"  onkeyup="cal()"></li>
+  				<li>公里价 <input id="fe2" name="fe2"  onkeyup="cal()"></li>
+  				<li>等候费<input id="fe3" name="fe3"  onkeyup="cal()"></li>
+  				<li>中途等候费<input id="fe4" name="fe4"  onkeyup="cal()"></li>
+  				<li>区域费 <input id="fe5" name="fe5"  onkeyup="cal()"></li>
+  				<li>不参与分成</li>
+  				<li>返程费 <input id="fe6" name="fe6" onkeyup="cal()"></li>
+  				<li>优　惠 <input id="fe7" name="fe7" onkeyup="cal()"></li>
+  				<li>&nbsp;</li>
+  				<li>
+  					应收：<span id="ys">&nbsp;</span>
+  					优惠：<span id="yh">&nbsp;</span>
+  					实收：<span id="sh">&nbsp;</span>
+  					【派单员：<span id="pd">&nbsp;</span>公司：<span id="gs">&nbsp;</span>】
+  				</li>
+  				<li>
+  					分成：<span id="fc">&nbsp;</span>
+  					比例：80%
+  					信息费：2
+  					派单员：<span id="pdy">&nbsp;</span>公司：<span id="gsf">&nbsp;</span>
+  				</li>
+  			</ul>
+  		</td>
+  		<th>结算人备注</th>
+  		<td>
+  			<textarea rows="10" cols="30" name="accountremark"></textarea>
+  		</td>
+  	</tr>
+  </table>
+   <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1" class="zidingyi" bgcolor="#96CAE7" >
+	  <tr>
+	    <td colspan="5" align="center" style="height: 50px">
+	    	<input value="完成订单" type="button" class="button" onclick="doOver()"/>
+	    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	    	<input value="关闭窗口" type="button" class="button" onclick="closepanel()"/>
+	    </td>
+	  </tr>
+  </table>
+  </form>
+</body>
+</html>
+

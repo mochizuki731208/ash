@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/page.css" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/admin.css"/>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+<script type="text/javascript">
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+<body>
+	<#include '../inc/top.html'> 
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl"><#include '../inc/leftmenu.html'></div>
+		<div class="rightcon fr">
+			<h2 class="box_title">积分兑换记录</h2>
+			<div style="height: 40px; line-height: 40px;" />
+			<table class="list">
+			<tr>
+				<th width="3%">序号</th>
+				<th width="10%">商品标题信息</th>
+				<th width="8%">商品图片</th>
+				<th width="4%">积分</th>
+				<th width="5%">收件人姓名</th>
+				<th width="5%">收件人电话</th>
+				<th width="10%">详细地址</th>
+				<th width="4%">支付方式</th>
+				<th width="8%">备注</th>
+				<th width="10%">兑换时间</th>
+				<th width="4%">发货状态</th>
+				<th width="10%">发货时间</th>
+				<th width="6%">快递名称</th>
+				<th width="6%">快递单号</th>
+			</tr>
+			<#if listpage ??> <#list listpage.list as lst>
+			<tr>
+				<td>${(lst_index+1)!''}</td>
+				<td>${(lst.title)!''}</td>
+				<td><img src="${CTX}/upload/${(lst.img_url)!''}"
+					style="width: 80px; height: 60px;"></td>
+				<td>${(lst.score)!''}</td>
+				<td>${(lst.rect)!''}</td>
+				<td>${(lst.rect_mobile)!''}</td>
+				<td>${(lst.rect_adrs)!''}</td>
+				<td>
+					<#if strkit('1',(lst.pay_type)!)>充值直扣</#if>
+					<#if strkit('2',(lst.pay_type)!)>支付宝</#if>
+					<#if strkit('3',(lst.pay_type)!)>货到付款</#if>
+					<#if strkit('4',(lst.pay_type)!)>无需支付</#if>
+				</td>
+				<td>${(lst.remark)!''}</td>
+				<td>${(lst.datetime)!''}</td>
+				<td><#if strkit('0',(lst.send_status)!)>未发货</#if><#if strkit('1',(lst.lst.send_status)!)>发货</#if></td>
+				<td>${(lst.send_time)!''}</td>
+				<td>${(lst.send_type)!''}</td>
+				<td>${(lst.send_number)!''}</td>
+			</tr>
+			</#list> </#if>
+			<tr>
+				<td colspan="14"><#include '../../common/_paginate.html'></td>
+			</tr>
+		</table>
+		</div>
+	</div>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+</body>
+</html>

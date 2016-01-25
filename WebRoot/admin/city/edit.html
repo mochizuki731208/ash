@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					city_mc: {required:true,stringMaxLength:50},
+					city_type_id: {required:true},
+					city_seq_num: {required:true,integer:true,min:1},
+					city_is_display: {required:true},
+					city_remark: {stringMaxLength:200}
+				}
+			});
+		});
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" action="${CTX}${NAME_SPACE}/save" method="post" >
+    <input type="hidden" name="m" id="m" value="${(method)!}">
+	<input type="hidden" name="city_id" id="city_id" value="${(vo.id)!}"/>
+	<input type="hidden" name="city_p_name" id="city_p_name" value="${(vo.p_name)!}"/>
+	<input type="hidden" name="city_ccm" id="city_ccm" value="${(vo.ccm)!}"/>
+	<input type="hidden" name="city_p_id" id="city_p_id" value="${(vo.p_id)!}"/>
+	<table class="input">
+		<tr>
+			<th align="right">名称：</th>
+			<td><input type="text" name="city_mc" id="city_mc" class="text" value="${(vo.mc)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">类型：</th>
+			<td>
+				<select id="city_type_id" name="city_type_id" style="width:150px;" class="required">
+						<#if (((vo.type_id)!'') == '0')><option value="0" selected="selected" >城市</option></#if>
+						<#if (((vo.type_id)!'') == '1')><option value="1" selected="selected" >商业圈</option></#if>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">是否显示：</th>
+			<td>
+				<select id="city_is_display" name="city_is_display" style="width:150px;" class="required">
+						<option value="1" <#if (((vo.is_display)!'') == '1')>selected="selected"</#if> >是</option>
+						<option value="0" <#if (((vo.is_display)!'') == '0')>selected="selected"</#if> >否</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">显示商家联盟：</th>
+			<td>
+				<select id="city_is_display_sjlm" name="city_is_display_sjlm" style="width:150px;" class="required">
+						<option value="1" <#if (((vo.is_display_sjlm)!'') == '1')>selected="selected"</#if> >是</option>
+						<option value="0" <#if (((vo.is_display_sjlm)!'') == '0')>selected="selected"</#if> >否</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">排列顺序：</th>
+			<td><input type="text" id="city_seq_num" name="city_seq_num" class="required text" value="${(vo.seq_num)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">备注：</th>
+			<td><textarea id="city_remark" name="city_remark" class="text">${(vo.remark)!}</textarea></td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

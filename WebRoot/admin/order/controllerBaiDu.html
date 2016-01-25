@@ -1,0 +1,257 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>后台管理系统</title>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/admin.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/tab/style.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<!--加载鼠标绘制工具-->
+	<script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+  	<link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+ 	<!--加载检索信息窗口-->
+ 	<script type="text/javascript" src="http://api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.js"></script>
+ 	<link rel="stylesheet" href="http://api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.css" />
+ 	<script src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js" type="text/javascript"></script>
+ 	<style type="text/css">
+ 	dl,dt,dd,ul,li{
+		margin:0;
+		padding:0;
+		list-style:none;
+	}
+	p{font-size:12px;}
+	dt{
+		font-size:14px;
+		font-family:"微软雅黑";
+		font-weight:bold;
+		border-bottom:1px dotted #000;
+		padding:5px 0 5px 5px;
+		margin:5px 0;
+	}
+	dd{
+		padding:5px 0 0 5px;
+	}
+	li{
+		line-height:28px;
+	}
+ 	</style>
+	<script type="text/javascript">
+	var map;
+	var myDis;
+	var pdys = new Array();
+	var content = '';
+	var opts = {
+		width : 300,     // 信息窗口宽度
+		height: 150,     // 信息窗口高度
+		title : "派单员信息" , // 信息窗口标题
+		enableMessage:true//设置允许信息窗发送短息
+	};
+	var selectStr = '';
+	var time = 60;
+	$().ready(function() {
+		time = 60;
+		map = new BMap.Map("MblogMap");  
+		point = new BMap.Point(113.67311,34.716755);  // 创建点坐标    
+		map.centerAndZoom(point, 14); // 初始化地图，设置中心点坐标和地图级别    
+	 	var myCity = new BMap.LocalCity();
+	 	myCity.get(myFun);
+	 	
+		myDis = new BMapLib.DistanceTool(map); 
+		myDis.close();
+			 
+		//添加缩放控件  
+		map.addControl(new BMap.NavigationControl());    
+		map.addControl(new BMap.ScaleControl());    
+		map.addControl(new BMap.OverviewMapControl());   
+		map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+		map.addEventListener("dragend", function(){
+			getPdys();
+		});
+		map.addEventListener("zoomend", function(){
+			getPdys();
+		});
+		//do_timer();
+	});
+	function myFun(result){
+	  var cityName = result.name;
+      map.setCenter(cityName);
+      do_timerQueryPaoTui();
+    }
+	var ci = 1;
+	function do_timerQueryPaoTui(){
+		if(0==ci){
+			getPdys();
+			ci=60;
+		}
+		ci--;
+		setTimeout('do_timerQueryPaoTui()',1000);
+	}
+	
+	function getPdys(){
+		map.clearOverlays();
+		var msg = $("#msg").val();
+		var bs = map.getBounds();   //获取可视区域
+		var bssw = bs.getSouthWest();   //可视区域左下角
+		var bsne = bs.getNorthEast();   //可视区域右上角
+		var lngMinMax = bssw.lng + "," +bsne.lng;
+		var latMinMax = bssw.lat + "," +bsne.lat;
+		$.ajax({//getPaoTui
+			url: "${CTX}/admin/order/controllerBaiDu",
+			type: "POST",
+			data: {
+				msg:msg,
+				id:1,
+				lngMinMax:lngMinMax,
+				latMinMax:latMinMax,
+				selectStr:selectStr
+			},
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				$.each(data, function(index, objVal){
+					var point = new BMap.Point(objVal.lng,objVal.lat);
+					var marker = new BMap.Marker(point);  // 创建标注
+					map.addOverlay(marker);
+					var label = new BMap.Label(objVal.mc,{position:point,offset:new BMap.Size(20,-10)});
+					var color = "";
+					if(objVal.zt && objVal.zt=='0'){
+						color = "rgba(108, 113, 105, 1)";
+					}
+					if(objVal.zt && objVal.zt=='1'){
+						color = "rgba(95, 134, 193, 1)";
+					}
+					if(objVal.zt && objVal.zt=='2'){
+						color = "rgba(85, 157, 63, 1)";
+					}
+					if(objVal.zt && objVal.zt=='3'){
+						color = "rgba(227, 106, 9, 1)";
+					}
+					if(objVal.zt && objVal.zt=='4'){
+						color = "rgba(187, 13, 173, 1)";
+					}
+					label.setStyle({
+						  backgroundColor : color, 
+				          color : "white",
+				          fontSize : "12px",
+				          height : "20px",
+				          lineHeight : "20px",
+				          fontFamily:"微软雅黑"
+				        });
+					//map.addOverlay(label);
+					marker.setLabel(label);
+ 					content = "<table border='1'><tr><th>姓名</th><td>" + objVal.mc + "(" + objVal.mobile + ")</td>";
+					content += "<th>今日/本月派单次数</th><td>0/0</td></tr>";
+					content += "<tr><th>编号</th><td>" + objVal.loginid + " 余额：" + objVal.zhye + ")</td>";
+					content += "<th>位置</th><td>"+objVal.lng + "," + objVal.lat + "</td></tr>";
+					content += "</table>";
+					addClickHandler(content,marker);
+		        }); 
+			}
+		});
+	}
+	function addClickHandler(content,marker){
+		marker.addEventListener("click",function(e){
+			openInfo(content,e)}
+		);
+	}
+	
+	function openInfo(content,e){
+		var p = e.target;
+		var point = new BMap.Point(p.point.lng, p.point.lat);
+		var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
+		map.openInfoWindow(infoWindow,point); //开启信息窗口
+	}
+	function refresh(){
+		$('#myform').submit();
+		$('#myform').action = "";
+		$('#myform').target = "_self";
+	}
+		
+	var overlays = [];
+		
+	var styleOptions = {
+		 strokeColor:"red", //边线颜色。
+		 fillColor:"red",//填充颜色。当参数为空时，圆形将没有填充效果。
+		 strokeWeight: 3,//边线的宽度，以像素为单位。
+		 strokeOpacity: 0.8,//边线透明度，取值范围0 - 1。
+		 fillOpacity: 0.6,//填充的透明度，取值范围0 - 1。
+		 strokeStyle: 'solid' //边线的样式，solid或dashed。
+	}
+	 var overlaycomplete = function(e){
+	    overlays.push(e.overlay);
+	 };
+		    
+	 //实例化鼠标绘制工具
+	 var drawingManager = new BMapLib.DrawingManager(map, {
+	      isOpen: true, //是否开启绘制模式
+	        enableDrawingTool: true, //是否显示工具栏
+	        drawingToolOptions: {
+	            anchor: BMAP_ANCHOR_TOP_RIGHT, //位置
+	            offset: new BMap.Size(5, 5), //偏离值
+	        },
+	        circleOptions: styleOptions, //圆的样式
+	        polylineOptions: styleOptions, //线的样式
+	        polygonOptions: styleOptions, //多边形的样式
+	        rectangleOptions: styleOptions //矩形的样式
+	  });  
+		 //添加鼠标绘制工具监听事件，用于获取绘制结果
+	  drawingManager.addEventListener('overlaycomplete', overlaycomplete);
+	  function clearAll() {
+		for(var i = 0; i < overlays.length; i++){
+	       map.removeOverlay(overlays[i]);
+	    }
+	       overlays.length = 0   
+	  }
+	  function refreshZt(){
+		  var inputs = document.getElementsByTagName('input');//获取所有的input标签对象。
+		  var selected = new Array();
+		  for(var i=0;i<inputs.length;i++){
+			  var obj = inputs[i];
+			  if(obj.type=='checkbox'){
+			   	if(obj.checked==true){
+			    	selected.push(obj.value);
+			    }
+			} 
+		 }
+		 selectStr = selected.join(",");
+		 getPdys();
+	  }
+	</script>
+</head>
+  <body>
+  <form action="" id="myform">
+  	<input name="isQiu" value="1" id="isQiu" type="hidden"/>
+  	<input name="id" value="${(order.id)!''}" id="id" type="hidden"/>
+  </form>
+  <div id="MapContainer" style="margin: 3px 0px 3px 0px; display: block;height:100%;">
+	<div style="width:85%;height:560px;border:1px solid gray; float:left" id="MblogMap"></div> 
+	<hr style=""/>
+	<ul>
+		<li><label onclick="refreshZt()"><input type="checkbox"  value="0"><span style="background-color: rgba(108, 113, 105, 1)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>离线</label></li>
+		<li><label onclick="refreshZt()"><input type="checkbox"  value="1"><span style="background-color: rgba(95, 134, 193, 1)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>在线</label></li>
+		<li><label onclick="refreshZt()"><input type="checkbox"  value="2"><span style="background-color: rgba(85, 157, 63, 1)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>空闲</label></li>
+		<li><label onclick="refreshZt()"><input type="checkbox"  value="3"><span style="background-color: rgba(227, 106, 9, 1)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>忙碌</label></li>
+		<li><label onclick="refreshZt()"><input type="checkbox"  value="4"><span style="background-color: rgba(187, 13, 173, 1)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>收工回家</label></li>
+	</ul>
+ </div>
+ <hr style=""/>
+ <div>
+ 	<input type="button" value="开启测距" onclick="myDis.open()"  class="button"/>
+ 	<input type="button" value="关闭测距"  class="button" onclick="myDis.close()"/>
+ </div>
+ <div>
+	 <hr style=""/>
+	 <H3>搜索(账号,姓名,电话):</H3>
+	 <hr style=""/>
+	 <form action="" id="inputForm">
+		 <input name="msg" id="msg"/><br>
+		 <input type="button" value="搜索" class="button" onclick="getPdys()"/>
+		 <input type="reset" class="button"/>
+	 </form>
+ </div>
+ </body>
+</html>
+

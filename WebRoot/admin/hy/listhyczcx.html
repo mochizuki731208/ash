@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+	<#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+	
+		function uf_delete(id){
+			if(confirm("确认要删除当前选择的数据吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/user/delete",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除用户数据成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("删除用户数据失败！");
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		function uf_edit(id){
+			$.dialog({
+				title:'用户信息编辑',
+				content: 'url:${CTX}/admin/user/edit?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 600,
+				height : 400,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							this.content.$("#user_role_name").attr('value',this.content.$("#user_role_id").find("option:selected").text());
+							$.post("${CTX}/admin/user/save",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+			                    	$.dialog.alert("保存用户数据成功！",function () {
+										refresh();
+							        }).title('3秒后关闭').time(3);
+								}else{
+									$.dialog.alert("保存用户数据失败！");
+								}
+							});
+						}
+			            return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function doSure(id){
+			if(window.confirm("确认给该会员入账？")){
+				$.ajax({
+					url: "${CTX}/admin/hy/doSure",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("入账成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("入账失败！");
+						}
+					}
+				});
+			}
+		}
+	</script>	
+</head>
+  <body>
+	<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+		登录号：<input type="text" name="loginid" id="loginid" class="text" value="${(loginid)!}" style="width: 80px;"/>
+		姓名：<input type="text" name="mc" id="mc" class="text" value="${(mc)!}" style="width: 80px;"/>
+		<input type="button" id="btn_add" class="button" value="新 增" onclick="uf_edit('');"/>
+		<input type="button" id="btn_query" class="button" value="查 询" onclick="refresh();"/>
+	    <table class="list">
+            <tr>
+	            <th width="30px;">序号</th>
+	            <th width="120px;">登录号</th>
+	            <th width="120px;">姓名</th>
+	            <th width="140px;">充值金额</th>
+	            <th width="100px;">充值状态</th>
+	            <th width="150px;">充值时间</th>
+	            <th width="*">备注</th>
+	        </tr>
+	        <#if listpage ??>
+      				<#list listpage.list as lst>
+	                  <tr>
+	                  	<td>${(lst_index+1)!''}</td>
+	                    <td>${(lst.loginid)!''}</td>
+	                    <td>${(lst.mc)!''}</td>
+	                    <td style="color: red;font-weight: bold">${(lst.czje)?string("currency")}</td>
+	                    <td><#if strkit('0',(lst.status)!)>失败</#if><#if strkit('1',(lst.status)!)>成功</#if></td>
+	                    <td>${(lst.createtime)!}</td>
+	                    <td>${(lst.remark)!}</td>
+	                  </tr>
+					</#list>
+					<tr>
+						<th colspan="8">
+							<#include '../../common/_paginate.html'>
+						</th>
+					</tr>
+			</#if>
+         </table>
+	</form>
+  </body>
+</html>

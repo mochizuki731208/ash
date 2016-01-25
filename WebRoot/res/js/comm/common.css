@@ -1,0 +1,35 @@
+﻿@charset "utf-8";
+/*common.css start*/
+i,em,cite { font-style: normal; border:none; }
+a {outline:0 none;}
+a,a:link,a:visited {text-decoration: none; color:#4a4a4a}
+a:hover, a:active{ text-decoration: none; color:#db3138}
+a:focus,button:focus { outline: none; }
+.nolink:link,.nolink:visited,.nolink:hover,.nolink:active{ text-decoration:none; cursor:default; background-color:#ffffff;}
+/*Float&Clear*/
+.fl{ float: left; }
+.fr{ float: right; }
+.clr,.c{ clear: both;}
+.clearfix {zoom:1; }
+.clearfix:after {content: ".";display: block;visibility: hidden;clear: both;height: 0px; overflow: hidden;}
+/*show&hidden*/
+.hidden { display: none; }
+.show { display: block!important;}
+.lblock {display:inline-block}
+/*ss input*/
+.area-tab{border:1px solid #ccc; position:absolute; background-color:#fff; width:272px; z-index:9999; font:normal 13px Tahoma,Arial,"宋体",sans-serif; display:none;}
+.area-tab a{ text-decoration:none; margin:0}
+.area-tab .h{ width:272px; border-bottom:1px solid #ccc; height:30px; clear:both}
+.area-tab .s-tab-t{ float:left; width:57px; background-color:#f3f3f3; text-align:center; height:30px; line-height:30px; color:#3b3b3b; border-right:1px solid #ccc; font-size:14px;}
+.area-tab .s-tab-t span{ display:inline-block; cursor:pointer;font-size:14px; overflow:hidden;}
+.area-tab .zxbp-close-area{ display:inline; background: url(zxbp-close-area.png) no-repeat left top; margin: 2px; padding: 0px; height: 12px; width: 12px; float: left; display:block; cursor:pointer; }
+.area-tab .s-tab-b li a.current{font-weight:normal;background-color:#9cd2ff;color:#404040;text-decoration: none;}
+.area-tab .current{ background-color:#fff; font-weight:bold; color:#0066cc;}
+.area-tab .s-tab-b{ padding:8px 5px; display:none; white-space: nowrap; clear:both}
+.area-tab .s-tab-b .panel-item { color: #404040;white-space: nowrap;}
+.area-tab .s-tab-b dl.panel-category {background-color: #fff;width: 265px;}
+.area-tab .s-tab-b .panel-category dt {color: #0066cc;font-size: 14px;}
+.area-tab .s-tab-b .panel-category dd{ clear:both}
+.area-tab .s-tab-b li{ float:left;  display:inline-block;white-space: nowrap;}
+.area-tab .s-tab-b li a{ display:inline-block; text-align:center; padding:1px 12px;font-size: 12px; margin:0 0 0 0;white-space: nowrap; line-height:13px;height:13px; vertical-align:middle}
+.area-tab .s-tab-b li a:hover{background-color:#9cd2ff;color:#404040;text-decoration: none;font-size: 12px;margin:0 0 0 0}

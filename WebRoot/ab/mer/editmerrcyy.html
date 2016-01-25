@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			$("#myform").validate({
+				rules: {
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$.post("${CTX}/ab/mer/savemerrcyy",$("#myform").serializeArray(),function(data){
+	                    if(data){
+							$.dialog.alert("日常营业信息保存成功！",function () {
+								window.location.href="${CTX}/ab/mer/editmerrcyy";
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("日常营业信息保存失败！");
+						}
+					});
+				}
+			});
+		});
+	</script>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">账号信息</h2>
+			<form id="myform" name="myform" action="" method="post">
+			<input type="hidden" class="text" name="tb_id" value="${(vo.id)!}">
+			<table class="input">
+				<tr>
+					<th align="right">商家名称：</th>
+					<td>${(vo.mc)!}</td>
+				</tr>
+				<tr>
+					<th align="right">联系方式：</th>
+					<td><input type="text" class="text" name="tb_mobile" value="${(vo.mobile)!}"></td>
+				</tr>
+				<tr>
+					<th align="right">邮政编码：</th>
+					<td><input type="text" class="text" name="tb_yzbm" value="${(vo.yzbm)!}" maxlength="6"></td>
+				</tr>
+				<tr>
+				<th align="right">详细地址：</th>
+					<td><input type="text" class="text w300" name="tb_xxdz" value="${(vo.xxdz)!}" readonly="readonly"></td>
+				</tr>
+				<tr>
+					<th align="right">配送方式：<font color="red">*</font></th>
+					<td>
+						<select id="tb_sfzs" name="tb_sfzs" style="width:150px;" class="required">
+								<option value="">请选择</option>
+								<option value="1" <#if (((vo.sfzs)!) == '1')>selected="selected"</#if> >商家自己配送</option>
+								<option value="0" <#if (((vo.sfzs)!) == '0')>selected="selected"</#if> >外面团队配送</option>
+						</select> <font color="red">*</font>
+					</td>
+				</tr>
+				<tr>
+					<th>最低配送费：<font color="red">*</font></th>
+					<td><input class="text" name="tb_zdpsje" type="text" value="${(vo.zdpsje)!}" class="required"/></td>
+				</tr>
+				<tr>
+					<th align="right">非工作时间是否允许下单：<font color="red">*</font></th>
+					<td>
+						<select id="tb_chk_fgzrxd" name="tb_chk_fgzrxd" style="width:150px;" class="required">
+								<option value="">请选择</option>
+								<option value="1" <#if (((vo.chk_fgzrxd)!) == '1')>selected="selected"</#if> >允许</option>
+								<option value="0" <#if (((vo.chk_fgzrxd)!) == '0')>selected="selected"</#if> >不允许</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th align="right">营业状态：<font color="red">*</font></th>
+					<td>
+						<select id="tb_business_status" name="tb_business_status" style="width:150px;" class="required">
+								<option value="">请选择</option>
+								<option value="0" <#if (((vo.business_status)!) == '0')>selected="selected"</#if> >暂停营业</option>
+								<option value="1" <#if (((vo.business_status)!) == '1')>selected="selected"</#if> >正常营业</option>
+						</select> <font color="red">*</font>
+					</td>
+				</tr>
+				<tr>
+					<th align="right">服务承诺：</th>
+					<td>
+						<table style="border: 1px solid #FF7F24;width: 550px;">
+							<tr style="width: 50px;">
+								<th>是否提供发票：
+								</th>
+								<td>
+									<input type="radio" id="tb_chk_tgfp" name="tb_chk_tgfp" value="1" <#if strkit('1',(vo.chk_tgfp)!)>checked</#if>>提供
+									<input type="radio" id="tb_chk_tgfp" name="tb_chk_tgfp" value="0" <#if strkit('0',(vo.chk_tgfp)!)>checked</#if>>不提供
+								</td>
+							</tr>
+							<tr>
+								<th>优惠活动：</th>
+								<td>
+									<input type="radio" id="tb_chk_yhhd" name="tb_chk_yhhd" value="1" <#if strkit('1',(vo.chk_yhhd)!)>checked</#if>>有优惠
+									<input type="radio" id="tb_chk_yhhd" name="tb_chk_yhhd" value="0" <#if strkit('0',(vo.chk_yhhd)!)>checked</#if>>无优惠
+									&nbsp;&nbsp;
+									满 <input class="text" name="tb_mds" type="text" value="${(vo.mds)!}" class="required" style="width: 60px;"/>
+									减 <input class="text" name="tb_jds" type="text" value="${(vo.jds)!}" class="required" style="width: 60px;"/>
+								</td>
+							</tr>
+							<tr>
+								<th>承诺送达时间：<td>
+									<input type="radio" id="tb_chk_sdsj" name="tb_chk_sdsj" value="1" <#if strkit('1',(vo.chk_sdsj)!)>checked</#if>>有
+									<input type="radio" id="tb_chk_sdsj" name="tb_chk_sdsj" value="0" <#if strkit('0',(vo.chk_sdsj)!)>checked</#if>>无
+									&nbsp;&nbsp;
+									<input class="text" name="tb_sdsj" type="text" value="${(vo.sdsj)!}" class="required" style="width: 60px;"/>（分钟）
+									超时赔付 <input class="text" name="tb_cspf" type="text" value="${(vo.cspf)!}" class="required" style="width: 60px;"/>元
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td><input type="button" id="btn_save" name="btn_save" class="button" value="保 存"/></td>
+				</tr>
+			</table>
+			</form>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

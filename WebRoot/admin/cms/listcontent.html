@@ -1,0 +1,115 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+	<#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+	
+		function uf_delete(id){
+			if(confirm("确认要删除当前选择的数据吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/cms/delete/"+id,
+					type: "POST",
+					data: {},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除数据成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("删除数据失败！");
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		function uf_fb(id){
+			if(confirm("确认要发布当前文章吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/cms/save_fb/"+id,
+					type: "POST",
+					data: {},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("发布成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("发布失败！");
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		function uf_add(id){
+			window.location.href = "${CTX}/admin/cms/edit/"+id;
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>	
+</head>
+  <body>
+	<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+		标题：<input type="text" name="title" id="title" class="text" value="${(title)!}" style="width: 80px;"/>
+		作者：<input type="text" name="author" id="author" class="text" value="${(author)!}" style="width: 80px;"/>
+		<input type="button" id="btn_query" class="button" value="查 询" onclick="refresh();"/>
+		<input type="button" id="btn_add" class="button" value="新 建" onclick="uf_add();"/>
+	    <table class="list">
+                  <tr>
+                    <th width="4%">序号</th>
+                    <th width="*%">标题</th>
+                    <th width="10%">类别</th>
+					<th width="8%">作者</th>
+					<th width="12%">来源</th>
+					<th width="10%">是否推荐</th>
+					<th width="10%">是否发布</th>
+					<th width="12%">发布日期</th>
+					<th width="12%">操作</th>
+                  </tr>
+      		<#if listpage ??>
+      			<#list listpage.list as lst>
+                  <tr ondblclick="uf_add('${(lst.id)!}')">
+                  	<td>${(lst_index+1)!''}</td>
+                  	<td>${(lst.title)!}</td>
+                  	<td>${(lst.lbmc)!}</td>
+                    <td>${(lst.author)!}</td>
+                    <td>${(lst.origin)!}</td>
+                    <td>
+                    	<#if strkit('0',lst.is_recommend)>不推荐</#if>
+                    	<#if strkit('1',lst.is_recommend)>推荐</#if>
+                    </td>
+					<td>
+                    	<#if strkit('1',lst.is_publication)>发布</#if>
+                    	<#if strkit('0',lst.is_publication)>不发布</#if>
+                    </td>
+					<td>${(lst.release_date)!}</td>
+                    <td>
+                    	<a href="${CTX}/admin/cms/edit/${(lst.id)!}">修改</a>
+                    	<a href="javascript:void();" onclick="uf_delete('${(lst.id)!}');">删除</a>
+                    	<a href="javascript:void();" onclick="uf_fb('${(lst.id)!}');">发布</a>
+                    </td>
+                  </tr>
+				</#list>
+				<tr>
+					<td colspan="9">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+			</#if>
+            </table>
+	</form>
+  </body>
+</html>

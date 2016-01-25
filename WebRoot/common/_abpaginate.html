@@ -1,0 +1,36 @@
+					<div class="ep-pages">
+						<input type="hidden" id="curPage" name="curPage" value="${listpage.curPage}"/>
+			     	 	<span>共${listpage.totalRow}条记录 ${listpage.curPage}/${listpage.totalPage}页</span>
+				      <a href="javascript:void(0);" onclick="uf_page_setcurpage('1');">首页</a>
+				      <#if listpage.curPage==1>
+				      <a href="javascript:void(0);" onclick="uf_page_setcurpage('1');">上一页</a>
+				      <#else>
+				       <a href="javascript:void(0);" onclick="uf_page_setcurpage('${listpage.curPage-1}');">上一页</a>
+				      </#if>
+				      <#if listpage.curPage lt listpage.totalPage>
+				      
+				      <a href="javascript:void(0);" onclick="uf_page_setcurpage('${listpage.curPage+1}');">下一页</a>
+				      <#else>
+				      <a href="javascript:void(0);" onclick="uf_page_setcurpage('${listpage.totalPage}');">下一页</a>
+				      </#if>
+				      <a href="javascript:void(0);" onclick="uf_page_setcurpage('${listpage.totalPage}');">尾页</a>
+				      跳转到
+				      <select onchange="uf_goto(this.value)">
+				      	<#list 1..listpage.totalPage as i>
+				      	<option <#if i==listpage.curPage>selected</#if>>${i}</option>
+				      	</#list> 
+				      </select>
+				      页
+				      <script type="text/javascript">
+				      		function uf_page_setcurpage(page){
+				      			document.all.curPage.value = page;
+				      			refresh();
+				      		}
+				      		
+				      		function uf_goto(page){
+				      			document.all.curPage.value = page;
+				      			refresh();
+				      		}
+				      </script>
+				      </div>
+				      

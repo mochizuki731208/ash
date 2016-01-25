@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					tb_tjkssj: {required:true},
+					tb_tjjzsj: {required:true}
+				}
+			});
+		});
+	</script>
+</head>
+  <body>
+    <form id="myform" name="myform" method="post">
+	<input type="hidden" name="tb_id" id="tb_id" value="${(vo.id)!}"/>
+	<input type="hidden" name="tb_is_recommend" id="tb_is_recommend" value="1"/>
+	<table class="input">
+		<tr>
+			<th align="right">商家名称：</th>
+			<td>${(vo.mc)!}</td>
+		</tr>
+		<tr>
+			<th align="right">推荐开始时间：</th>
+			<td><input type="text" name="tb_tjkssj" id="tb_tjkssj" class="Wdate text" value="${(vo.tjkssj)!}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"/></td>
+		</tr>
+		<tr>
+			<th align="right">推荐截止时间：</th>
+			<td><input type="text" name="tb_tjjzsj" id="tb_tjjzsj" class="Wdate text" value="${(vo.tjjzsj)!}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"/></td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

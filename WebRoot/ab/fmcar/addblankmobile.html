@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base href="${CTX}/">
+<#include '../inc/meta.html'>
+<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<link rel="stylesheet" type="text/css"	href="${CTX}/res/css/admin/admin.css" />
+<script type="text/javascript">
+$().ready(function() {
+	/* 表单验证*/
+	$("#myform").validate({
+		rules:{
+			balnkMobile: {required:true},
+		}
+	});
+})
+</script>
+</head>
+
+<body><br>
+<form action="" method="post" id="myform">
+	<div style="text-align: center;">手机号：<input type="text" id="balnkMobile" class="input" name="balnkMobile"/></div>
+</form>
+</div>
+</body>
+</html>

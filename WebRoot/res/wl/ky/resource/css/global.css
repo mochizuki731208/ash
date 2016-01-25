@@ -1,0 +1,249 @@
+body,html{
+	width:100%;
+}
+.banxin{
+	width: 960px;
+	margin: 0 auto;
+	position: relative;
+}
+.banxin1{
+	width: 1008px;
+	margin: 0 auto;
+	overflow: hidden;
+	position: relative;
+}
+#top1{
+	width: 100%;
+	height: 72px;
+	background: url(../images/top_bg.gif);
+	/*opacity: 0.75;
+	filter: Alpha(opacity=75);*/
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 2;
+	float: left;
+}
+#top1 .banxin h1{
+	float: left;
+	width: 182px;
+	height: 48px;
+	background: url(../images/logo.jpg) no-repeat;
+	margin-top:12px;
+	margin-right:12px;
+}
+#top1 .banxin h1 a{
+	display: block;
+	width: 182px;
+	height: 48px;
+	text-indent: -9999px;
+}
+#top1 .banxin .dizhi{
+	font-size: 14px;
+	line-height: 73px;
+	color: #9F9F9F;
+	float: left;
+	padding-left: 24px;
+}
+#top1 .banxin ul{
+	float: right;
+}
+#top1 .banxin ul li{
+	float: left;
+}
+#top1 .banxin ul li a{
+	display: block;
+	line-height: 72px;
+	text-decoration: none;
+	color: #777777;
+	font-size: 14px;
+}
+
+#top1 .banxin ul li a.denglu0{
+	margin-right: 14px;
+}
+
+.loginSta{width:74px; height:40px; color:#FFFFFF; font-size:16px; border:none; margin-top:18px; background:url(../images/login.jpg) no-repeat;}
+.loginChange{width:74px; height:40px; color:#FFFFFF; font-size:16px; border:none; margin-top:18px; background:url(../images/login_over.jpg) no-repeat;}
+.registerSta{width:74px; height:40px; color:#EF9433; font-size:16px; border:none; margin-top:18px; background:url(../images/register.jpg) no-repeat;}
+.registerChange{width:74px; height:40px; color:#F99526; font-size:16px; border:none; margin-top:18px; background:url(../images/register.jpg) no-repeat;}
+
+#top1 .banxin ul li a:hover{
+	color: #0A63C7;
+}
+#top2{
+	width: 100%;
+	height: 48px;
+	background: url(../images/nav-bg.png) repeat-x;
+	/*background: #3A3932;
+	opacity: 0.75;
+	filter: Alpha(opacity=75);*/
+	position: absolute;
+	top: 72px;
+	left: 0;
+	z-index: 2;
+	float: left;
+}
+#top2 .banxin ul li{
+	width: 192px;
+	height: 48px;
+	float: left;
+
+}
+#top2 .banxin ul li a{
+	position: absolute;
+	width: 192px;
+	font-size: 16px;
+	color: #fff;
+	height: 48px;
+	line-height: 48px;
+	text-decoration: none;
+	text-align: center;
+	z-index: 2;
+}
+/*#top2 .banxin ul li a.zhuantai{
+	
+}
+#top2 .banxin ul li a:hover{
+	background: #191919;
+	opacity: 1;
+}*/
+
+
+
+
+
+
+
+
+
+.lianxi ul{
+	margin-top: 48px;
+}
+.lianxi ul li{
+	float: left;
+	margin-right: 20px;
+	font-size: 18px;
+	color: #777777;
+	letter-spacing: 1px;
+}
+.lianxi ul li.shugan{
+	width: 2px;
+	height: 20px;
+	background: #fff;
+	position: relative;
+	top:3px;
+}
+.lianxi p{
+	padding-top: 23px;
+	font-size: 18px;
+	color: #777777;
+	float: left;
+	letter-spacing: 1px;
+}
+.footer2 p{
+	position: absolute;
+	left: 50%;
+	bottom: 33px;
+	margin-left:-230px;
+	width: 461px;
+	height: 32px;
+	font-size: 24px;
+	color: #A0A0A0;
+	letter-spacing: 2px;
+	text-align: center;
+}
+
+.footer1{
+	margin-top: 256px;
+	border-top: 1px solid #d2d2d2;
+}
+.footer1 .fot_td{
+	width: 100%;
+	height: 377px;
+}
+.footer1 .fot_td .about{
+	width: 480px;
+	overflow: hidden;
+	padding-top: 56px;
+}
+.footer1 .fot_td .about li{
+	width: 238px;
+	overflow: hidden;
+	float: left;
+}
+.footer1 .fot_td .about li h2{
+	font-size: 24px;
+	line-height: 43px;
+	color: #a0a0a0;
+	font-weight: normal;
+	letter-spacing: 2px;
+}
+.footer1 .fot_td .about li a{
+	font-size: 18px;
+	line-height: 43px;
+	color: #787878;
+	text-decoration: none;
+	letter-spacing: 2px;
+}
+.footer1 .fot_td .about li a:hover{
+	color: #0A63C7;
+}
+
+.footer1 .fot_td .er0{
+	position: absolute;
+	top:45px;
+	width: 150px;
+	height: 150px;
+}
+.footer1 .fot_td .er1{
+	background: url(../images/icons.png) no-repeat -777px -467px;
+	right: 234px;
+}
+.footer1 .fot_td .er2{
+	background: url(../images/icons.png) no-repeat -972px -467px;
+	right: 0;
+}
+.footer1 .fot_td .er0 span{
+	position: absolute;
+	top: 163px;
+	color: #a0a0a0;
+	width: 100px;
+	font-size: 18px;
+	letter-spacing: 2px;
+}
+.footer1 .fot_td .er1 span{
+	right: 24px;
+}
+.footer1 .fot_td .er2 span{
+	right: 14px;
+}
+
+.footer1 .fot_td .lianxi ul{
+	margin-top: 48px;
+}
+.footer1 .fot_td .lianxi ul li{
+	float: left;
+	margin-right: 20px;
+	font-size: 18px;
+	color: #a0a0a0;
+	letter-spacing: 1px;
+}
+.footer1 .fot_td .lianxi ul li.shugan{
+	width: 2px;
+	height: 20px;
+	background: #a0a0a0;
+	position: relative;
+	top:3px;
+}
+.footer1 .fot_td .lianxi p{
+	padding-top: 23px;
+	font-size: 18px;
+	color: #a0a0a0;
+	float: left;
+	letter-spacing: 1px;
+}
+/*修改过的样式*/
+.Validform_wrong{
+	color: #ea68a2 !important;
+}

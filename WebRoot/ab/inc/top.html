@@ -1,0 +1,216 @@
+	<style type="text/css">
+        a {color: #3b5998;outline: 0;}
+        .citypop {position: absolute;top: 28px;left: -12px;padding: 2px;z-index: 1000;font-size: 12px;line-height: 26px;display: none;}
+        .citypop a:link, .citypop a:visited {text-decoration: none;}
+        .citypop a:hover {color: #d60000;}
+        .citypop .citypop-content {width: 485px;position: relative;z-index: 1;border: 1px solid #ccd3e4;background-color: #fff;}
+        .citypop-close i{background: url(${CTX}/res/images/topbar-bg_20140915.png) no-repeat;}
+        .citypop .citypop-content .citypop-close {display: inline-block;width: 29px;height: 29px;overflow: hidden;position: absolute;right: 0;_right: -1px;top: 0;background-color: #fafbfc;border-left: solid 1px #cfd5e5;}
+        .citypop .citypop-content .citypop-content-top {height: 29px;line-height: 29px;padding-left: 8px;position: relative;background-color: #fcfcfc;border-bottom: solid 1px #ccd3e4;}
+        .citypop .citypop-content a.citypop-close:hover i {background-position: 1px -365px;}
+        .citypop .citypop-content .citypop-close i {display: inline-block;width: 16px;height: 16px;background-position: -19px -365px;margin: 6px;cursor: pointer;line-height: 16px;}
+        .citypop .citypop-content a.citypop-close:hover {background-color: #3b5998;}
+        .citypop .citypop-content a.citypop-close:hover i {background-position: 1px -365px;}
+        .citypop .citypop-arrow {overflow: hidden;position: absolute;z-index: 2;font-family: "\5b8b\4f53";}
+        .citypop .citypop-arrow .citypop-arrow-shadow {filter: alpha(opacity=10);-moz-opacity: .1;opacity: .1;}
+        .citypop .citypop-arrow .citypop-arrow-shadow, .citypop .citypop-arrow .citypop-arrow-border, .citypop .citypop-arrow .citypop-arrow-background {overflow: hidden;position: absolute;font-size: 12pt;}
+        .citypop-bottom .citypop-arrow {width: 16px;height: 14px;top: -11px;left: 23px;}
+        .citypop-bottom .citypop-arrow .citypop-arrow-shadow, .citypop-bottom .citypop-arrow .citypop-arrow-border, .citypop-bottom .citypop-arrow .citypop-arrow-background {height: 11px;}
+        .citypop-bottom .citypop-arrow .citypop-arrow-border {top: 3px;color: #d0d0e8;}
+        .citypop-bottom .citypop-arrow .citypop-arrow-background {top: 4px;color: #f8fcff;}
+        .citypop-search, .citypop-ct .zdicon, .citypop-ct .ntextdicon {background: url(${CTX}/res/images/topbar-bg_20140915.png) no-repeat;}
+        .citypop-search {width: 140px;height: 22px;float: left;margin-top: 3px;background-position: -36px -182px;border: solid 1px #ccd3e4;background-color: #fff;position: relative;}
+        .citypop-search input {outline: 0;height: 22px;line-height: 22px;width: 118px;position: absolute;left: 22px;top: 0;border: 0;background-color: #fff;color: #b8bbc1;padding: 0;}
+        .citypop-search input.focus {width: 132px;padding: 0 4px;left: 0;color: #000;}
+        .citypop-hotcity {float: left;padding-left: 5px;}
+        .citypop-hotcity a {margin-left: 10px;display: inline-block;float: left;}
+        .citypop-nb {height: 28px;padding: 8px 6px;border-bottom: dotted 1px #cecfd3;}
+        .citypop-nb a {display: inline-block;width: 19px;height: 19px;line-height: 19px;border-radius: 2px;margin: 4px;font-family: Arial,Helvetica,sans-serif;font-size: 14px;text-align: center;border: solid 1px #cbddeb;background-color: #f0f9fe;float: left;}
+        .citypop-nb a.current:link, .citypop-nb a.current:hover, .citypop-nb a.current:visited, .citypop-nb a:hover {background-color: #3b5997;border: solid 1px #17469e;color: #fff;}
+        .citypop-scity {height: 255px;overflow-y: scroll;overflow-x: hidden;}
+        .citypop-scity dl {border-top: dotted 1px #cecfd3;margin: 0;overflow: hidden;padding: 6px 0;padding: 8px 0;}
+        .citypop-scity .dlbg {background-color: #f9f9f9;}
+        .citypop-scity dl.dlbg-top {border-top: 0;}
+        .citypop-scity dl dt, .citypop-scity dl dd {float: left;margin: 0;}
+        .citypop-scity dl dt {width: 78px;color: #333;text-align: right;font-weight: bold;padding-top: 2px;}
+        .citypop-scity dl dt .tx, .citypop-scity dl dt .nu {height: 20px;line-height: 20px;display: inline-block;float: right;padding: 0;}
+        .citypop-scity dl dt .nu {float: left;font-family: Arial,Helvetica,sans-serif;font-size: 18px;color: #d0d0d0;font-weight: 100;padding-left: 10px;}
+        .citypop-scity dl dd {width: 380px;}
+        .citypop-scity dl dd a:link, .citypop-scity dl dd a:active, .citypop-scity dl dd a:visited {height: 20px;line-height: 20px;display: block;float: left;padding: 0 5px;margin: 2px;white-space: nowrap;}
+        .citypop-scity dl dd a:hover {height: 20px;line-height: 20px;color: #fff;background-color: #ff9410;_color: #d60000;_background-color: none;}
+        .citypop-scity a.current:link, .citypop-scity a.current:hover, .citypop-scity a.current:visited {background-color: #ff600f;color: #fff;}
+        .citypop-scity dl:after, .citypop-scity dl dd:after, .citypop-ct ul li a:after {visibility: hidden;display: block;font-size: 0;content: " ";clear: both;height: 0;line-height: 0;}
+        .citypop-scity dl, .citypop-scity dl dd, .citypop-ct ul li a {zoom: 1;}
+        .citypop-ct {width: 195px;position: absolute;left: -1px;top: 24px;border: solid 1px #ccd3e4;background-color: #fff;}
+        .citypop-ct .zdicon, .citypop-ct .ntextdicon {height: 14px;line-height: 14px;padding: 2px 0 2px 15px;color: #b8bbc1;margin-left: 5px;}
+        .citypop-ct .zdicon {background-position: -279px -161px;}
+        .citypop-ct .ntextdicon {background-position: -280px -182px;}
+        .citypop-ct ul {list-style: none;padding: 0;margin: 0;}
+        .citypop-ct ul li {float: none;height: 26px;line-height: 26px;overflow: hidden;clear: both;border-top: dotted 1px #ccd3e4;}
+        .citypop-ct ul li a {display: block;height: 26px;line-height: 26px;overflow: hidden;padding: 0 12px;}
+        .citypop-ct ul li a:hover, .citypop-ct ul li.selected {background-color: #f9f9f9;}
+        .citypop-ct ul li span {float: left;display: inline-block;}
+        .citypop-ct ul li b {display: inline-block;font-weight: 100;color: #b8bbc1;float: right;}
+    </style>
+	<script type="text/javascript">
+        $(document).ready(function () {
+            //切换事件
+            $("#changecity").click(function () {
+            	$("#auto-header-citypop").css("left",$("#changecity").offset().left).css("top",$("#changecity").offset().top+25);
+                $("#auto-header-citypop").show();
+            });
+            //关闭事件
+            $("#auto-header-citypop-hide").click(function () {
+                $("#auto-header-citypop").hide();
+            });
+            //$("dd").find("a").click(function () {
+            //    $("#citytxt").text($(this).text());
+            //    $("#auto-header-citypop").hide();
+            //});
+            //获取当前所在城市
+            //Get_CurrentCity();
+        });
+        //获取当前所在城市
+        function Get_CurrentCity() {
+        
+            jQuery.getScript("http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js", function () {
+                //var province = remote_ip_info["province"];
+                var city = remote_ip_info["city"];
+                $("#citytxt").text(city);
+            });
+        }
+        
+        function uf_selarea(id){
+			$.post("${CTX}/ab/setcurrcity",{cityid: id},function(data){
+                if(data){
+                	$("#auto-header-citypop").hide();
+					window.location.href="${CTX}/";
+				}else{
+					$.dialog.alert("城市切换失败！");
+				}
+			});
+		}
+    </script>
+    <script type="text/javascript"> 
+	// 设置为主页 
+	function SetHome(obj,vrl){ 
+		try{ 
+			obj.style.behavior='url(#default#homepage)';obj.setHomePage(vrl); 
+		} 
+		catch(e){ 
+		if(window.netscape) { 
+		try { 
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect"); 
+		} 
+		catch (e) { 
+		alert("此操作被浏览器拒绝！\n请在浏览器地址栏输入“about:config”并回车\n然后将 [signed.applets.codebase_principal_support]的值设置为'true',双击即可。"); 
+		} 
+		var prefs = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch); 
+		prefs.setCharPref('browser.startup.homepage',vrl); 
+		}else{ 
+		alert("您的浏览器不支持，请按照下面步骤操作：1.打开浏览器设置。2.点击设置网页。3.输入："+vrl+"点击确定。"); 
+		} 
+		} 
+	} 
+	// 加入收藏 兼容360和IE6 
+	function shoucang(sTitle,sURL) 
+	{ 
+		try 
+		{ 
+		window.external.addFavorite(sURL, sTitle); 
+		} 
+		catch (e) 
+		{ 
+		try 
+		{ 
+		window.sidebar.addPanel(sTitle, sURL, ""); 
+		} 
+		catch (e) 
+		{ 
+		alert("加入收藏失败，请使用Ctrl+D进行添加"); 
+		} 
+		} 
+	} 
+	</script>
+    
+	<!-- 最顶层的内容 -->
+	<div class="site-nav">
+		  <div class="site-nav-bd">
+			    <ul class="site-nav-bd-l"  style="border: 0px solid #ccc;width: 50%;float: left">
+					<li>
+						<#if currcity?? >当前城市：${(currcity.mc)!}</#if>
+						<!-- 
+						 <span>当前城市：</span><span id="citytxt">暂无...</span>
+						  -->
+	   					<a href="javascript:void(0);" id="changecity">[切换城市]</a> 
+						<#if abuser?? >
+							 <#if strkit('105',(abuser.role_id)!)>
+							 	 欢迎您，[${(abuser.mc)!}]<a href="${CTX}/ab/mainmer" target="_top">${abuser.loginid}</a>|<a href="${CTX}/ab/loginout">退出系统</a>
+							 	 <a href="${CTX}/ab/mainmessage" target="_top">消息(${(notmescount)!})</a>
+							 <#elseif strkit('106',(abuser.role_id)!)>
+							 欢迎您，[${(abuser.mc)!}]<a href="${CTX}/ab/mainywy" target="_top">${abuser.loginid}</a>|<a href="${CTX}/ab/loginout">退出系统</a>
+							     <a href="${CTX}/ab/mainmessage" target="_top">消息(${(notmescount)!})</a>
+							 <#elseif strkit('107',(abuser.role_id)!)>
+							 欢迎您，[${(abuser.mc)!}]<a href="${CTX}/ab/mainuser" target="_top">${abuser.loginid}</a>|<a href="${CTX}/ab/loginout">退出系统</a>
+							     <a href="${CTX}/ab/mainmessage" target="_top">消息(${(notmescount)!})</a>
+							 </#if>
+						<#else>
+							<!--<a href="${CTX}/ab/reg/reguser" target="_top">下单用户注册</a> -->
+							<a href="${CTX}/ab/reg/reg" target="_top">注册</a>
+							<a href="${CTX}/ab/login" target="_top" >登录</a>
+							<!--<a href="#" target="_top">手机版</a> -->
+							<a href="${CTX}/ab/login" target="_top">消息</a>
+						</#if>
+					</li>
+				</ul>
+				
+			    <ul class="site-nav-bd-r">
+					<li>
+							<a href="/${CTX}" target="_top">dd首页</a>|
+							<a href="#" target="_top" onclick="SetHome(this,window.location)">设为首页</a>|
+							<a href="/ab/inc/kjzm.jsp" target="_top">快捷桌面</a>|
+							<a href="#" target="_top" onclick="shoucang(document.title,window.location)">加入收藏</a>|
+<!-- 							<a href="${CTX}/ab/order/ddjs" target="_top" class="h">我的购物车(${(cntcart)!'0'})</a> -->
+							<!--<a href="${CTX}/ab/reg/regmer" target="_top" class="h">供应商注册</a> -->
+							<!--<a href="${CTX}/ab/login" target="_top" >供应商登录</a> -->
+							<!--<a href="${CTX}/ab/reg/regywy" target="_top" class="h">司机注册</a> -->
+							<!-- <a href="${CTX}/ab/login" target="_top" >司机登录</a> -->
+					</li>
+			   </ul>
+		 </div>
+	</div>
+	
+	
+	
+	<div id="auto-header-citypop" class="citypop citypop-bottom" style="display: none;">
+        <div class="citypop-content">
+             <div class="citypop-content-top">
+                <a id="auto-header-citypop-hide" class="citypop-close" href="javascript:void(0)" target="_self" title="关闭"><i>&nbsp;</i></a>
+            </div>
+            <div class="citypop-content-info">
+                <div id="auto-header-citypop-citylist" class="citypop-scity">
+					<@_cityarea_list p_id='ROOT' is_display='1'>
+   							<#list list as lst>
+   								<dl class="dlbg dlbg-top">
+			                        <dt><span class="tx">${(lst.mc)!}：</span></dt>
+			                        <#if strkit('1',(lst.hassub)!)>
+			                        <dd>
+			                        	<@_cityarea_list p_id=lst.id is_display='1'>
+				                        	<#list list as sub>
+				                            <a href="javascript:void(0);" onclick="uf_selarea('${(sub.id)!}');" <#if strkit(sub.id,(currcity.id)!)>class="current"<#else>class=""</#if>>${(sub.mc)!}</a>
+				                            </#list>
+										</@_cityarea_list>
+			                        </dd>
+			                        </#if>
+			                    </dl>
+   							</#list>
+					</@_cityarea_list>
+                </div>
+            </div>
+        </div>
+        <span class="citypop-arrow">
+            <span class="citypop-arrow-shadow">◆</span>
+            <span class="citypop-arrow-border">◆</span>
+            <span class="citypop-arrow-background">◆</span>
+        </span>
+    </div>

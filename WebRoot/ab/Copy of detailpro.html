@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta name="description" content="易生活网是一个具有国内商户特色，提供各类商户活动，集商户开店，商户搜索，支付预订为一体的综合性门户网站。" />
+	<meta name="keywords" content="商户，服务，开店" />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width = device-width, user-scalable=yes minimum-scale=1.0" />
+	<meta name="apple-touch-fullscreen" content="YES" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="white" />
+	<meta name="MobileOptimized" content="width" />
+	<meta name="HandheldFriendly" content="true" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/main.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+<script type="text/javascript">
+	function uf_sc(fkid){
+		if($('#userid').val()==''){
+			$.dialog.alert("请登录后进行选择！",function(){
+				window.location.href="${CTX}/ab/login";
+			});
+			return false;
+		}
+		
+		$.post("${CTX}/ab/mer/save_sc",{lx:'1',fkid:fkid},function(data){
+                  if(data){
+				$.dialog.alert("收藏成功！").time(0.5);
+			}else{
+				$.dialog.alert("收藏失败，请重新登录系统后进行收藏！");
+			}
+		});
+	}
+</script>
+</head>
+<body>
+	<#if abuser?? >
+		<input type="hidden" id="userid" value="${(abuser.id)!}"/>
+	<#else>
+		<input type="hidden" id="userid" value=""/>
+	</#if>
+	<div class="header">
+	  	<div class="header_cen">
+		    <div class="logo"> <img src="${CTX}/res/css/ab/images/logo.png" width="182" height="48"></div>
+		    <a href="${CTX}/ab"><div class="button_zhu">注册</div></a> 
+		    <a href="${CTX}/ab/login"><div class="button_deng">登陆</div></a>
+	    </div>
+	</div>
+	<!--header-->
+	<div class="header_down">
+	    <div class="header_down_cen">
+	        <div class="shop"> <img src="${CTX}/upload/${(vo.img_url)!}" width="190" height="195"></div>
+	        <div class="xinxi">
+	            <p class="shop_title">${(vo.mc)!} 
+	            	<#if sfsc==true>
+	            		<a href="javascript:void(0);">已收藏</a>
+	            	<#else>
+	            		<a href="javascript:void(0);" onclick="uf_sc('${(vo.id)!}');">收藏</a>
+	            	</#if>
+	            </p>
+	            <p class="shop_font_01">${(vo.productinfo)!}</p>
+	            <br>
+	            <p class="shop_font_04">&nbsp;</p>
+	            <div class="bshare-custom icon-medium"><a title="分享到QQ空间" class="bshare-qzone"></a><a title="分享到微信" class="bshare-weixin"></a><a title="分享到开心网" class="bshare-kaixin001"></a><a title="分享到新浪微博" class="bshare-sinaminiblog"></a><a title="分享到人人网" class="bshare-renren"></a><a title="分享到腾讯微博" class="bshare-qqmb"></a><a title="分享到网易微博" class="bshare-neteasemb"></a><a title="更多平台" class="bshare-more bshare-more-icon more-style-addthis"></a><span class="BSHARE_COUNT bshare-share-count">0</span></div><script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/buttonLite.js#style=-1&amp;uuid=&amp;pophcol=2&amp;lang=zh"></script><script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/bshareC0.js"></script>
+	        </div>
+	    </div>
+	</div>
+		<!--shop news-->
+		<div id="center" class="tab-content active" tab-name="food">
+		    <div class="classify canpinByimg">
+		     	<div class="classify_title" id="${(lst.id)!}">${(lst.mc)!}</div>
+				    <div class="classify_content">
+				      <ul>
+				      	<#if list_img ??>
+							<#list list_img as lst>
+				                <li>
+				                    <div class="image"> <img src="${CTX}/upload/${(lst.lager)!}" ></div>
+				                </li>
+				   			</#list>
+						</#if>
+				      </ul>
+					</div>
+		    </div>
+		    
+		</div>
+<!-- foot页 -->
+<#include 'inc/foot.html'>
+</body>
+</html>

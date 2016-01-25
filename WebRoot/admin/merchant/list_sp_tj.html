@@ -1,0 +1,135 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/highcharts-4.0.3/js/highcharts.js"></script>
+    <script type="text/javascript">
+    	function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		
+		function uf_currDate(){
+			$('#currDate').attr('value','yes');
+			$('#lastDate').attr('value','');
+			$('#myform').attr('action',"");
+			$('#myform').attr('target',"_self");
+			$('#myform').submit();
+		}
+		
+		function uf_lastDate(){
+			$('#currDate').attr('value','');
+			$('#lastDate').attr('value','yes');
+			$('#myform').attr('action',"");
+			$('#myform').attr('target',"_self");
+			$('#myform').submit();
+		}
+    </script>
+ </head>
+  <body>
+  <form id="myform" name="myform" method="post" action="">
+  	<input type="hidden" id="currDate" name="currDate"/>
+  	<input type="hidden" id="lastDate" name="lastDate"/>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="rightcon fr">
+			<div style="height: 40px;line-height: 40px;">
+			&nbsp;开始时间:<input type="text" class="text Wdate" name="kssj" id="kssj" value="${(kssj)!}" onFocus="WdatePicker({})" style="width: 100px;">
+			&nbsp;截止时间:<input type="text" class="text Wdate" name="jzsj" id="jzsj" value="${(jzsj)!}" onFocus="WdatePicker({})" style="width: 100px;">
+			<input type="button" class="button" value="查 询" onclick="refresh();"/>
+			<input type="button" class="button" value="昨 天" onclick="uf_lastDate();"/>
+			<input type="button" class="button" value="今 天" onclick="uf_currDate();"/>
+			</div>
+			<table class="list">
+            <tr>
+	            <th width="40px;">序号</th>
+	            <th width="*%">名称</th>
+	            <th width="25%">销量</th>
+				<th width="25%">金额</th>
+	        </tr>
+	        <#if list_pro??>
+      			<#list list_pro as s>
+                  <tr>
+                  	<td>${(s_index+1)!}</td>
+                  	<td>${(s.itemname)!}</td>
+                    <td>${(s.quantity)}</td>
+                    <td><!-- <div style="background-image: url('${CTX}/');width: 60px;">&nbsp;</div> -->${(s.totalmoney)?string("currency")}</td>
+                  </tr>
+				</#list>
+			</#if>
+			 	<tr>
+                  	<td colspan="4" align="left" class="bold red">总订单金额：${(r.totalmoney)?string("currency")} ，总订单数：${(r.totleorder)!}</td>
+                  </tr>
+            </table>
+            <div id="container" style="width: 96%;"></div>
+            <script type="text/javascript">
+				$(function () {
+					Highcharts.setOptions({colors: ['#058DC7', '#FF8C00']}); 
+			        $('#container').highcharts({
+			            title: {
+			                text: '商品销售统计',
+			                x: -20 //center
+			            },
+			            subtitle: {
+			                text: '',
+			                x: -20
+			            },
+			            xAxis: {
+			                categories: [
+			                    <#if list_pro??>
+					      			<#list list_pro as s>
+					      			'${(s.itemname)!}',
+					                </#list>
+				                </#if>
+			                    ]
+			            },
+			            yAxis: {
+			                title: {
+			                    text: ''
+			                },
+			                plotLines: [{
+			                    value: 0,
+			                    width: 1,
+			                    color: '#808080'
+			                }]
+			            },
+			            tooltip: {
+			                valueSuffix: ''
+			            },
+			            legend: {
+			                layout: 'vertical',
+			                align: 'right',
+			                verticalAlign: 'middle',
+			                borderWidth: 0
+			            },
+			            series: [{
+			                name: '销量',
+			                data: [
+			                		<#if list_pro??>
+						      			<#list list_pro as s>
+						      			${(s.quantity)!},
+						                </#list>
+									</#if>
+			                ]
+			            }, {
+			                name: '金额',
+			                data: [<#if list_pro??>
+						      			<#list list_pro as s>
+						      			${(s.totalmoney)!},
+						                </#list>
+									</#if>]
+			            }]
+			        });
+			    });
+    
+
+		</script>
+            
+		</div>
+	</div>
+	</form>
+	</body>
+</html>

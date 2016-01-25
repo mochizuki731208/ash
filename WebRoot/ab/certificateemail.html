@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			$("#btn_send").click(function(){
+				$("#btn_send").attr('disabled',true);
+				$("#btn_send").val("发送中...")
+				$.ajax({
+					url: "${CTX}/ab/certiEmailSend",
+					type: "POST",
+					data: {id:$('#userid').val(),email:$('#email').val()},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("操作成功！");
+							refresh();
+						}else{
+							alert("操作失败！");
+							$("#btn_send").attr('disabled',false);
+							$("#btn_send").val("发送")
+							return false;
+						}
+					}
+				});
+			});
+		});
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>	
+ </head>
+  <body>
+  	<#include 'inc/top.html'>
+	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+	<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+	<input type="hidden" id="userid" name="userid" class="text" value="${(vo.id)!''}">
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include 'inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">账号信息</h2>
+			<div class="editinfo">
+				<table class="input">
+						<tr>
+							<th align="right">姓 名：</th>
+							<td><input type="text" class="text" disabled="disabled" value="${(vo.mc)!''}"></td>
+						</tr>
+						<tr>
+							<th align="right">用户名：</th>
+							<td><input type="text" class="text" disabled="disabled" value="${(vo.loginid)!''}"></td>
+						</tr>
+						<tr>
+							<th align="right">邮 箱：</th>
+							<td><input type="text" id="email" class="text" <#if vo.certificateemail=='1'>disabled="disabled"</#if> value="${(vo.email)!''}"></td>
+						</tr>
+						<tr>
+							<th align="right">认证状态邮箱：</th>
+							<td>
+								<#if vo.certificateemail=='0'>
+									未认证 <input type="button" id="btn_send" class="button" value="发 送" />
+								<#elseif vo.certificateemail=='1'>
+									认证通过
+								<#elseif vo.certificateemail=='2'>
+									认证中
+								</#if>
+							</td>
+						</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	</form>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</body>
+</html>

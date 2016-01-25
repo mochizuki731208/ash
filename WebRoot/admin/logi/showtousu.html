@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+</head>
+  <body>
+	<table class="input">
+		<tr>
+			<th align="right">联系人：</th>
+			<td>${(ts.contact)!}</td>
+			<th align="right">联系方式：</th>
+			<td>${(ts.phone)!}</td>
+		</tr>
+		<tr>
+			<th align="right">阅读次数：</th>
+			<td>${(ts.bread)!}</td>
+			<th align="right">审核状态：</th>
+			<td>
+				<#if (((ts.check_status)!) == '0')>待审核</#if>
+				<#if (((ts.check_status)!) == '1')>通过</#if>
+				<#if (((ts.check_status)!) == '2')>不通过</#if>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">创建时间：</th>
+			<td colspan="3">${(ts.scsj)!}</td>
+		</tr>
+		<tr>
+			<th align="right">内容：</th>
+			<td colspan="3">${(ts.common)!}</td>
+		</tr>
+	</table>
+  </body>
+</html>
+

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base href="${CTX}/">
+<title>后台管理系统</title>
+<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<link rel="stylesheet" type="text/css"	href="${CTX}/res/css/admin/admin.css" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/bootstrapValidator.min.css" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/common.css" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/my-trucks.css" />
+<script type="text/javascript"	src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+<script type="text/javascript">
+var map;// 创建地图实例    
+var point;// 创建点坐标    
+var opts = {
+	width : 200,     // 信息窗口宽度
+	height: 100,     // 信息窗口高度
+	title : "信息窗口" , // 信息窗口标题
+	enableMessage:true//设置允许信息窗发送短息
+};
+$().ready(function() {
+	map = new BMap.Map("MblogMap");          // 创建地图实例    
+	point = new BMap.Point(113.67311, 34.716755);  // 创建点坐标    
+	map.centerAndZoom(point, 11);
+	map.addControl(new BMap.NavigationControl());    
+	map.addControl(new BMap.ScaleControl());    
+	map.addControl(new BMap.OverviewMapControl());  
+	map.enableScrollWheelZoom(true);     //开启鼠标滚
+	map.addEventListener("dragend", function(){
+		searchMyFmCar();
+	});
+	map.addEventListener("zoomend", function(){
+		searchMyFmCar();
+	});
+	map.addEventListener("click", function(e){    
+		alert(e.point.lng + ", " + e.point.lat);    
+	});
+	var myCity = new BMap.LocalCity();
+ 	myCity.get(myFun);
+ 	initHt();
+})
+function searchMyFmCar(){
+	var ismyfr = "";
+	var inputs = document.getElementsByTagName('input');//获取所有的input标签对象。
+	$.each(inputs, function(index, objVal){
+		 if(objVal.type=='checkbox'){
+			if(objVal.checked==true){
+				ismyfr=objVal.value;
+			}
+		 }
+	})
+	//获取地图可视范围
+	var bs = map.getBounds();   //获取可视区域
+	var bssw = bs.getSouthWest();   //可视区域左下角
+	var bsne = bs.getNorthEast();   //可视区域右上角
+	var lngMinMax = bssw.lng + "," +bsne.lng;
+	var latMinMax = bssw.lat + "," +bsne.lat;
+	var cartable = $("#cartable");
+	cartable.empty();
+	map.clearOverlays(); 
+	$.ajax({
+		url: "${CTX}/admin/order/searchMyFmCar",
+		type: "POST",
+		dataType: "json",
+		data:
+		{
+			ismyfr:ismyfr,
+			carLength:$("#carLength").val(),
+			carType:$("#carType").val(),
+			lngMinMax:lngMinMax,
+			latMinMax:latMinMax,
+			runcity:$("#runcity").val(),
+			mobile:$("#mobile").val()
+		},
+		cache: false,
+		success: function(data) {
+			$.each(data, function(index, objVal){
+				var tr = $("<tr height='20px'>");
+	            $("<td align='left' width='10%'>").html(index + 1).appendTo(tr); 
+	            $("<td align='left' width='50%'>").html(objVal["car_no"]).appendTo(tr);  
+	            $("<td align='left' width='40%'>").html(objVal["length"]+"  "+objVal["type"]).appendTo(tr);  
+	            tr.appendTo(cartable);
+	            var point = new BMap.Point(objVal["jd"],objVal["wd"]);
+				
+	            var carname = objVal.type;
+				var url = "";
+				if(carname=="面包车"){url = "che_mianbao.png";}
+				if(carname=="大件车"){url = "che_dajian.png";}
+				if(carname=="高低板车"){url = "che_gaodiban.png";}
+				if(carname=="高栏车"){url = "che_gaolan.png";}
+				if(carname=="冷藏车"){url = "che_lengcang.png";}
+				if(carname=="平板车"){url = "che_pingban.png";}
+				if(carname=="面包车"){url = "che_tongyong.png";}
+				if(carname=="危险品车"){url = "che_weixianpin.png";}
+				if(carname=="厢车"){url = "che_xiang.png";}
+				var myIcon = new BMap.Icon("${CTX}/res/images/ordercar/" +url, new BMap.Size(80,90));
+				var marker1;
+				if(url==""){
+					marker1 = new BMap.Marker(point);
+				}else{
+					marker1 = new BMap.Marker(point,{icon:myIcon});  // 创建标注
+				}
+				map.addOverlay(marker1);
+				var label = new BMap.Label(objVal.driver,{position:point,offset:new BMap.Size(20,-20)});
+				var color = "";
+				if(objVal.zt && objVal.zt=='0'){
+					color = "rgba(108, 113, 105, 1)";
+				}
+				if(objVal.zt && objVal.zt=='1'){
+					color = "rgba(95, 134, 193, 1)";
+				}
+				if(objVal.zt && objVal.zt=='2'){
+					color = "rgba(85, 157, 63, 1)";
+				}
+				if(objVal.zt && objVal.zt=='3'){
+					color = "rgba(227, 106, 9, 1)";
+				}
+				if(objVal.zt && objVal.zt=='4'){
+					color = "rgba(187, 13, 173, 1)";
+				}
+				label.setStyle({
+					  backgroundColor : color, 
+			          color : "white",
+			          fontSize : "12px",
+			          height : "20px",
+			          lineHeight : "20px",
+			          fontFamily:"微软雅黑"
+			     });
+				marker1.setLabel(label);
+				var content = "司机：" + objVal.driver + "<br>电话：" + objVal.mobile + "<br>";
+				content += "车牌：" + objVal.car_no + "<br>"; 
+				content += "车辆类型：" + objVal["length"]+"  "+objVal["type"];
+				addClickHandler(content,marker1);
+			})
+		}
+	});
+}
+function addClickHandler(content,marker){
+	marker.addEventListener("click",function(e){
+		openInfo(content,e)}
+	);
+}
+function openInfo(content,e){
+	var p = e.target;
+	var point = new BMap.Point(p.point.lng, p.point.lat);
+	var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
+	map.openInfoWindow(infoWindow,point); //开启信息窗口
+}
+function myFun(result){
+	var cityName = result.name;
+	map.setCenter(cityName);
+}
+function initHt(){
+	$("#MblogMap").height($("body").height()-$("#searcharea").height()-20);
+}
+window.onresize=initHt; 
+</script>
+</head>
+
+<body onload="searchMyFmCar();">
+<div id="myModalAddKnow" tabindex="-1" role="dialog">
+			<div class="modal-dialog" style="width: 100%;text-align: center;" id="searcharea">
+                <form class="form-inline" action="" id="searchFmcarFormMore" method="post">
+                	<div class="form-group">
+                		<label>
+                			<input onclick="searchMyFmCar()" style="margin: 0px 2px; vertical-align: middle;" type="checkbox" 
+                			checked="checked" value="2">我的熟车
+                		</label>
+                	</div>
+                    <div class="form-group pd-r-10">
+                        <label for="carLength">车长：</label>
+                        <select name="car_length" class="form-control" id="carLength" onchange="searchMyFmCar()">
+                            <option value="">全部</option>
+                            <option value="1.8米">1.8米</option>
+                            <option value="2.6米">2.6米</option>
+                            <option value="3.2米">3.2米</option>
+                            <option value="4.2米">4.2米</option>
+                            <option value="5.2米">5.2米</option>
+                            <option value="5.8米">5.8米</option>
+                            <option value="6.2米">6.2米</option>
+                            <option value="6.5米">6.5米</option>
+                            <option value="6.8米">6.8米</option>
+                            <option value="7.2米">7.2米</option>
+                            <option value="8米">8米</option>
+                            <option value="9.6米">9.6米</option>
+                            <option value="13米">13米</option>
+                            <option value="15米">15米</option>
+                            <option value="16.5米">16.5米</option>
+                            <option value="17.5米">17.5米</option>
+                            <option value="18.5米">18.5米</option>
+                            <option value="20米">20米</option>
+                            <option value="22米">22米</option>
+                            <option value="24米">24米</option>
+                        </select>
+                    </div>
+                    <div class="form-group pd-r-10">
+                        <label for="carClass">车型：</label>
+                        <select name="car_type" class="form-control" id="carType" onchange="searchMyFmCar()">
+                            <option value="">全部</option>
+                            <option value="三轮车">三轮车</option>
+                            <option value="面包车">面包车</option>
+                            <option value="厢车">厢车</option>
+                            <option value="平板车">平板车</option>
+                            <option value="高低板车">高低板车</option>
+                            <option value="高栏车">高栏车</option>
+                            <option value="冷藏车">冷藏车</option>
+                            <option value="危险品车">危险品车</option>
+                            <option value="大件车">大件车</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">常跑城市：</label>
+                        <input type="text" id="runcity" class="form-control select2-offscreen" style="width: 170px" tabindex="-1" name="runcity">
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">手机号码：</label>
+                        <input type="text" class="form-control" value="" name="mobile" id="mobile" style="width: 170px" placeholder="全部" />
+                    </div>
+                    <button type="button" class="btn btn-primary" id="addKnowYes" onclick="searchMyFmCar()">查询</button>
+                </form>
+		</div>
+	</div>
+
+
+		<div style="display: none">
+			<table id="cartable" class="input"></table>
+		</div>
+	<div style="height:500px;width:100%;border:1px solid gray;" id="MblogMap"></div>
+
+<script type="text/javascript" src="${CTX}/res/js/fmcar/plugins/require.js"></script>
+<script>
+    require(['./res/js/fmcar/boot'], function () {
+        require(['mapTrucks']);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_del(id){
+			if(confirm("确定要删除吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/rz/deleteywy",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							$.dialog.alert("删除成功！",function(){
+								refresh();
+							});
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		function uf_sptg(id){
+			if(confirm("是否将此会员审核通过吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/rz/ywyrzshtg",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							$.dialog.alert("此会员认证信息审核通过成功！",function(){
+								refresh();
+							});
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		
+		function uf_spbtg(id){
+			if(confirm("是否将此会员审核不通过吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/rz/ywyrzshbtg",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							$.dialog.alert("此会员认证信息审核不通过！",function(){
+								refresh();
+							});
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		function uf_showsj(id){
+	    	$.dialog({
+				title:'详细信息',
+				content: 'url:${CTX}/admin/rz/showywy_sj/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 500,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});
+	    }
+	    
+	    function uf_showgr(id){
+	    	$.dialog({
+				title:'详细信息',
+				content: 'url:${CTX}/admin/rz/showywy_gr/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 500,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});
+	    }
+	    
+	    function uf_edit_gr(id){
+			$.dialog({
+				title:'个人会员信息编辑',
+				content: 'url:${CTX}/admin/rz/edit_hy_gr/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1024,
+				height : 500,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+		            	var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							this.content.$("#tb_city_name").attr('value',this.content.$("#tb_city_id").find("option:selected").text());
+							this.content.$("#tb_area_name").attr('value',this.content.$("#tb_area_id").find("option:selected").text());
+							$.post("${CTX}/admin/rz/saveywy",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+									$.dialog.alert("保存数据成功！",function () {
+										refresh();
+							        }).time(0.8);
+								}else{
+									$.dialog.alert("保存数据成功！");
+								}
+							});
+				            return false;
+				         }
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function uf_edit_qy(id){
+			$.dialog({
+				title:'企业会员信息编辑',
+				content: 'url:${CTX}/admin/rz/edit_hy_qy/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1024,
+				height : 500,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+			            var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+			            	this.content.$("#tb_city_name").attr('value',this.content.$("#tb_city_id").find("option:selected").text());
+							this.content.$("#tb_area_name").attr('value',this.content.$("#tb_area_id").find("option:selected").text());
+							$.post("${CTX}/admin/rz/saveywy",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+									$.dialog.alert("保存数据成功！",function () {
+										refresh();
+							        }).time(0.8);
+								}else{
+									$.dialog.alert("保存数据成功！");
+								}
+							});
+				            return false;
+			            }
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+	    
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		
+		$().ready(function() {
+			$("#btn_all").click(function (){
+				$("#sfrzzt").attr("value","");
+				refresh();
+			});
+			
+			$("#btn_ytg").click(function (){
+				$("#sfrzzt").attr("value","2");
+				refresh();
+			});
+			
+			$("#btn_wtg").click(function (){
+				$("#sfrzzt").attr("value","3");
+				refresh();
+			});
+			
+			$("#btn_dsh").click(function (){
+				$("#sfrzzt").attr("value","1");
+				refresh();
+			});
+			
+			$("#btn_qx").click(function(){
+				if($("#btn_qx").prop("checked")==true){
+					$("[name='ids']").prop("checked",true);//全选
+				}else{
+					$("[name='ids']").prop("checked",false);//全否 
+				}
+			});
+			
+			
+			$("#btn_pl_shtg").click(function (){
+				
+				var obj=document.getElementsByName('ids');  //选择所有name="'test'"的对象，返回数组    
+			    var s='';    
+				for(var i=0; i<obj.length; i++){    
+				    if(obj[i].checked) s+=obj[i].value+',';  //如果选中，将value添加到变量s中    
+				}
+				
+				if(s==''){
+					return false;
+					alert("你还没有选择任何内容！");
+				}
+				
+				if(confirm("是否将所选会员审核通过吗?")){
+				 	$.ajax({
+						url: "${CTX}/admin/rz/ywyrzshtg_pl",
+						type: "POST",
+						data: {ids:s},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("所选会员信息审核通过！",function(){
+									refresh();
+								});
+							}
+						}
+					});
+				}else{
+					return false;
+				} 
+			});
+			
+			$("#btn_pl_shbtg").click(function (){
+				
+				var obj=document.getElementsByName('ids');  //选择所有name="'test'"的对象，返回数组    
+			    var s='';    
+				for(var i=0; i<obj.length; i++){    
+				    if(obj[i].checked) s+=obj[i].value+',';  //如果选中，将value添加到变量s中    
+				}
+				
+				if(s==''){
+					return false;
+					alert("你还没有选择任何内容！");
+				}
+				
+				if(confirm("是否将所选会员审核不通过吗?")){
+				 	$.ajax({
+						url: "${CTX}/admin/rz/ywyrzshbtg_pl",
+						type: "POST",
+						data: {ids:s},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("所选会员信息审核不通过！",function(){
+									refresh();
+								});
+							}
+						}
+					});
+				}else{
+					return false;
+				} 
+			});
+			
+			$("#btn_pl_delete").click(function (){
+				
+				var obj=document.getElementsByName('ids');  //选择所有name="'test'"的对象，返回数组    
+			    var s='';    
+				for(var i=0; i<obj.length; i++){    
+				    if(obj[i].checked) s+=obj[i].value+',';  //如果选中，将value添加到变量s中    
+				}
+				
+				if(s==''){
+					return false;
+					alert("你还没有选择任何内容！");
+				}
+				
+				if(confirm("是否将所选会员信息删除?")){
+				 	$.ajax({
+						url: "${CTX}/admin/rz/deleteywy_pl",
+						type: "POST",
+						data: {ids:s},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("所选会员信息删除！",function(){
+									refresh();
+								});
+							}
+						}
+					});
+				}else{
+					return false;
+				} 
+			});
+		});
+		
+		function set_P_Id(id){
+			$.dialog({
+				title:'所属区管理员设置',
+				content: 'url:${CTX}/admin/user/getAllAdmin?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 600,
+				height : 80,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+	            	callback: function(){
+	            		 var r = this.content.$("#myform").valid();
+							if(!r) {
+								return false;
+							}else{
+								$.post("${CTX}/admin/user/doSetAdminForVip",this.content.$("#myform").serializeArray(),function(data){
+				                    if(data){
+				                    	$.dialog.alert("保存用户数据成功！",function () {
+											refresh();
+								        }).time(0.8);
+									}else{
+										$.dialog.alert("保存用户数据失败！");
+									}
+								});
+							}
+							return false;
+	            	},
+	            	focus: true
+				}],
+				cancelVal:'关 闭'
+			})
+		}
+		
+		
+		function uf_show_hy_qy(id){
+	    	$.dialog({
+				title:'会员（企业）信息',
+				content: 'url:${CTX}/admin/rz/show_hy_qy/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 500,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});
+	    }
+	    
+	    function uf_show_hy_gr(id){
+	    	$.dialog({
+				title:'会员（个人）信息',
+				content: 'url:${CTX}/admin/rz/show_hy_gr/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 500,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});
+	    }
+	</script>
+</head>
+  <body>
+  	  <form id="myform" name="myform" method="post" action="">
+  	  		<input type="hidden" id="sfrzzt" name="sfrzzt" value=""/>
+			会员名称：<input type="text" name="mc" id="mc" class="text" value="${(mc)!}" style="width: 120px;"/>
+  			手机号：<input type="text" name="mobile" id="mobile" class="text" value="${(mobile)!}" style="width: 120px;"/>
+  			货源类型
+				<select name="zhlx" id="zhlx">
+				<option value="">请选择</option>
+				<optgroup label="货源会员">
+					<#list subject_list as x>
+				    	<option value="${(x.id)!''}" <#if strkit((x.id)!'',(zhlx)!)>selected</#if>>${(x.mc)!''}</option>
+					</#list>
+				</optgroup>
+				</select>
+  			
+  			管理员：<select id="admin_id" name="admin_id" style="width:150px;">
+						<option value="">请选择</option>
+						<#if admin_list ??>
+							<#list admin_list as x>
+						   		<option value="${(x.id)!''}" <#if strkit((x.id)!'',(admin_id)!)>selected</#if>>${(x.mc)!''}</option>
+							</#list>
+						</#if>
+				</select>
+			<input type="button" id="btn_all" class="button" value="全部" onclick="refresh();"/>
+			<input type="button" id="btn_ytg" class="button" value="已通过" onclick="refresh();"/>
+			<input type="button" id="btn_wtg" class="button" value="未通过" onclick="refresh();"/>
+			<input type="button" id="btn_dsh" class="button" value="待审核" onclick="refresh();"/>
+			<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+<!-- 			<input type="button" id="btn_add" class="button" value="新增个人会员" style="width: 100px;" onclick="uf_edit_gr('');"/> -->
+			<input type="button" id="btn_add" class="button" value="新增货源会员" style="width: 100px;" onclick="uf_edit_qy('');"/>
+	  		<table class="list">
+	            <tr>
+		            <th width="40px;">序号</th>
+					<th width="5%">类型</th>
+		            <th width="*%">名称</th>
+		            <th width="8%">登录号</th>
+		            <th width="12%">身份证号</th>
+		            <th width="20%">详细地址</th>
+					<th width="10%">手机号</th>
+					<th width="7%">认证状态</th>
+					<th width="25%">操作</th>
+		        </tr>
+	      		<#if listpage ??>
+      				<#list listpage.list as lst>
+	                  <tr>
+	                  	<td><input type="checkbox" id="ids" name="ids" value="${(lst.id)!}"/></td>
+	                    <td>${(lst.subject_name)!}
+<!-- 	                    	<#if strkit('0',(lst.zhlx)!)>企业</#if> -->
+<!-- 	                    	<#if strkit('1',(lst.zhlx)!)>个人</#if> -->
+	                    </td>
+	                    <td>
+	                    	<a href="javascript:void(0);" onclick="uf_show_hy_qy('${(lst.id)!}')">${(lst.mc)!''}</a>
+<!-- 	                    	<#if strkit('0',(lst.zhlx)!)> -->
+<!-- 	                    	<a href="javascript:void(0);" onclick="uf_show_hy_qy('${(lst.id)!}')">${(lst.mc)!''}</a> -->
+<!-- 	                    	</#if> -->
+	                    	
+<!-- 	                    	<#if strkit('1',(lst.zhlx)!)> -->
+<!-- 	                    	<a href="javascript:void(0);" onclick="uf_show_hy_gr('${(lst.id)!}')">${(lst.mc)!''}</a> -->
+<!-- 	                    	</#if> -->
+	                    </td>
+	                    <td>${(lst.loginid)!}</td>
+	                    <td>${(lst.idcard)!}</td>
+	                    <td>${(lst.xxdz)!}</td>
+	                    <td>${(lst.mobile)!}</td>
+	                    <td>
+	                    	<#if strkit('0',(lst.sfrzzt)!)>未认证</#if>
+	                    	<#if strkit('1',(lst.sfrzzt)!)>已提交</#if>
+	                    	<#if strkit('2',(lst.sfrzzt)!)>认证通过</#if>
+	                    	<#if strkit('3',(lst.sfrzzt)!)>认证不通过</#if>
+	                    </td>
+	                    <td>
+	                    	<a href="javascript:void(0)" onclick="uf_spbtg('${(lst.id)!}')"><img src="${CTX}/res/images/btn/del.png"/>不通过</a> 
+	                    	<a href="javascript:void(0)" onclick="uf_sptg('${(lst.id)!}')"><img src="${CTX}/res/images/btn/tick.png"/>通过</a>
+	                    	
+	                    	<a href="javascript:void(0);" onclick="uf_show_hy_qy('${(lst.id)!}')"><img src="${CTX}/res/images/btn/zoom.png"/>查看</a>
+<!-- 	                    	<#if strkit('0',(lst.zhlx)!)> -->
+<!-- 	                    	<a href="javascript:void(0);" onclick="uf_show_hy_qy('${(lst.id)!}')"><img src="${CTX}/res/images/btn/zoom.png"/>查看</a> -->
+<!-- 	                    	</#if> -->
+	                    	
+<!-- 	                    	<#if strkit('1',(lst.zhlx)!)> -->
+<!-- 	                    	<a href="javascript:void(0);" onclick="uf_show_hy_gr('${(lst.id)!}')"><img src="${CTX}/res/images/btn/zoom.png"/>查看</a> -->
+<!-- 	                    	</#if> -->
+	                    	<a href="javascript:void(0)" onclick="uf_edit_qy('${(lst.id)!}')"><img src="${CTX}/res/images/btn/edit.png"/>编辑</a>
+<!-- 	                    	<#if strkit('0',(lst.zhlx)!)> -->
+<!-- 	                    		<a href="javascript:void(0)" onclick="uf_edit_qy('${(lst.id)!}')"><img src="${CTX}/res/images/btn/edit.png"/>编辑</a> -->
+<!-- 	                    	</#if> -->
+<!-- 	                    	<#if strkit('1',(lst.zhlx)!)> -->
+<!-- 	                    		<a href="javascript:void(0)" onclick="uf_edit_gr('${(lst.id)!}')"><img src="${CTX}/res/images/btn/edit.png"/>编辑</a> -->
+<!-- 	                    	</#if> -->
+	                    	<a href="javascript:void(0)" onclick="uf_del('${(lst.id)!}')"><img src="${CTX}/res/images/btn/del.png"/>删除</a> 
+	                    </td>
+	                  </tr>
+					</#list>
+				</#if>
+				<tr>
+					<td colspan="9" style="text-align: left">&nbsp;
+					<input type="checkbox" id="btn_qx">全选
+					<input type="button" id="btn_pl_shtg" class="button" value="批量通过" />
+					<input type="button" id="btn_pl_shbtg" class="button" value="批量不通过"/>
+					<input type="button" id="btn_pl_delete" class="button" value="批量删除"/>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="9">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+            </table>
+   
+			</form>
+  </body>
+</html>

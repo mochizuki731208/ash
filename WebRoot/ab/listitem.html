@@ -1,0 +1,240 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+	<script type="text/javascript">
+    	function get_onclick(obj){  
+            var chk = document.getElementsByName("orderby");  
+            for(var i=0;i<chk.length;i++){  
+                chk[i].checked = false;  
+            }
+            obj.checked = true;  
+            refresh();
+        } 
+        
+        function getareaall(){  
+            var chk = document.getElementsByName("area_id");  
+            for(var i=0;i<chk.length;i++){  
+                chk[i].checked = false;  
+            }
+            refresh();
+        }
+        
+        function getsuball(){  
+            var chk = document.getElementsByName("sub_id");  
+            for(var i=0;i<chk.length;i++){  
+                chk[i].checked = false;  
+            }
+            refresh();
+        }
+    	
+		function refresh(){
+			$('#myform').target = "_self";
+			$('#myform').submit();
+		}
+	</script>	
+</head>
+  <body>
+  	
+  	<#include 'inc/top.html'>
+	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+	<div class="blank10"></div>
+	<form id="myform" name="myform" method="post" action="${CTX}/ab/listitem/${(currcity.id)!}-${(subject_id)!}">
+	<!-- 商圈 -->
+	<div class="sq">
+		<div class="title">所属商圈</div>
+		<div class="main">
+			<ul>
+				<li><a href="javascript:void(0);" onclick="getareaall();">全部</a></li>
+				<@_cityarea_list p_id=city_id is_display='1'>
+   							<#list list as sub>
+   								<li><a href="javascript:void(0);" class="area">${(sub.mc)!''}<input type="checkbox" name="area_id" <#if area_ids?contains(sub.id)>checked</#if> onclick="refresh();" value="${(sub.id)!}"></a></li>
+   							</#list>
+				</@_cityarea_list>
+			</ul>
+		</div>
+	</div>
+	<div class="blank5"></div>
+	<!-- 分类 -->
+	<div class="fwfl">
+		<div class="title">服务分类</div>
+		<div class="main">
+			<ul>
+				<li><a href="javascript:void(0);" onclick="getsuball();">全部</a></li>
+				<#if list_xfl??>
+ 					<#list list_xfl as sub>
+ 								<li><a href="javascript:void(0);">${(sub.mc)!}<input type="checkbox" name="sub_id" <#if sub_ids?contains(sub.id)>checked</#if> onclick="refresh();" value="${(sub.id)!}"></a></li>
+ 					</#list>
+				</#if>
+			</ul>
+		</div>
+	</div>
+	<div class="blank5"></div>
+	<!-- 排序方式 -->
+	<div class="fwfl">
+		<div class="title">排序方式</div>
+		<div class="main">
+			<ul>
+   				<li>默认排序<input type="checkbox" name="orderby" <#if strkit('',(orderby)!)>checked</#if> value="" onclick="get_onclick(this);">&nbsp;&nbsp;</li>
+   				<li>按销量[<input type="checkbox" name="orderby" <#if strkit('zxl asc',(orderby)!)>checked</#if> value="zxl asc" onclick="get_onclick(this);">升<input type="checkbox" name="orderby"  <#if strkit('zxl desc',(orderby)!)>checked</#if> value="zxl desc" onclick="get_onclick(this);">降]&nbsp;&nbsp;</li>
+   				<li>按价格[<input type="checkbox" name="orderby" <#if strkit('avgprice asc',(orderby)!)>checked</#if> value="avgprice asc" onclick="get_onclick(this);">升<input type="checkbox" name="orderby"  <#if strkit('avgprice desc',(orderby)!)>checked</#if> value="avgprice desc" onclick="get_onclick(this);">降]&nbsp;&nbsp;</li>
+   				<li>按好评[<input type="checkbox" name="orderby" <#if strkit('hps asc',(orderby)!)>checked</#if> value="hps asc" onclick="get_onclick(this);">升<input type="checkbox" name="orderby"  <#if strkit('hps desc',(orderby)!)>checked</#if> value="hps desc" onclick="get_onclick(this);">降]&nbsp;&nbsp;</li>
+			</ul>
+		</div>
+	</div>
+	<div class="blank10"></div>
+	<div class="fwfl">
+		<div class="title">查询条件</div>
+		<div class="main">
+			<ul>
+   				<li>
+   				<input type="hidden" name="mname" id="mname" class="text" value="${(mname)!}" style="width: 80px;">
+   				营业状态
+   				<select name="yyzt" id="yyzz" style="width:150px;">
+						<option value="">全部</option>
+						<option value="zzyy" <#if strkit('zzyy',(yyzt)!)>selected</#if> >正常营业</option>
+						<option value="gzz" <#if strkit('gzz',(yyzt)!)>selected</#if> >工作中</option>
+						<option value="kyd" <#if strkit('kyd',(yyzt)!)>selected</#if> >可预订</option>
+						<option value="ztyy" <#if strkit('ztyy',(yyzt)!)>selected</#if> >暂停营业</option>
+						<option value="ydy" <#if strkit('ydy',(yyzt)!)>selected</#if> >已打烊</option>
+				</select>
+   				<input type="button" class="button" value="查 询" onclick="refresh();">
+   				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="blank10"></div>
+	<div class="c">
+	<table class="sjxx">
+	<!-- 栏目页 -->
+     <#if listpage ??>
+      	<#list listpage.list as lst>
+     	<tr>
+     		<td class="limg">
+     			<a href="${CTX}/ab/detail/${lst.id}"><#if lst.img_url??><img src="${CTX}/upload/${(lst.img_url)!}"/></#if></a>
+     		</td>
+     		<td class="cinfo">
+     			<div class="mc">商家名称：<a href="${CTX}/ab/detail/${lst.id}">${(lst.mc)!}</a>&nbsp;
+     				<#if strkit('1',(lst.is_recommend)!)><span class="tooltip" title="推荐开始时间：${(lst.tjkssj)!}-截止时间：${(lst.tjjzsj)!}" style="padding:4px 4px 4px 4px;background-color:#EE2C2C;color: white;">荐</span></#if>
+     				<#if strkit('1',(lst.chk_tgfp)!)><span class="tooltip" title="提供发票" style="padding:4px 4px 4px 4px;background-color:#FF7F24;color: white;" title="提供发票">票</span></#if>
+     				<#if strkit('1',(lst.chk_sdsj)!)><span class="tooltip" title="超过${(lst.sdsj)!}分钟，赔偿${(lst.cspf)!}元" style="padding:4px 4px 4px 4px;background-color:#1E90FF;color: white;">赔</span></#if>
+     				<#if strkit('1',(lst.chk_yhhd)!)><span class="tooltip" title="买${(lst.mds)!}、送${(lst.jds)!}" style="padding:4px 4px 4px 4px;background-color:#458B00;color: white;">惠</span></#if>
+     			</div>
+     			<div class="dh">详细地址：${(lst.xxdz)!''}</div>
+     			<div class="dh">
+     				状态：
+     				<span 
+	  					<#if strkit('zzyy',(lst.iswork)!)>
+	  						class="status"
+	  					<#elseif strkit('gzz',(lst.iswork)!)>
+	  						class="status"
+	  					<#elseif strkit('kyd',(lst.iswork)!)>
+	  						class="status"
+	  					<#elseif strkit('ztyy',(lst.iswork)!)>
+	  						class="statusno"
+	  					<#elseif strkit('ydy',(lst.iswork)!)>
+	  						class="statusno"
+	  					</#if>
+	  					>
+	  					
+	  					<#if strkit('zzyy',(lst.iswork)!)>
+	  						正常营业
+	  					<#elseif strkit('gzz',(lst.iswork)!)>
+	  						工作中
+	  					<#elseif strkit('kyd',(lst.iswork)!)>
+	  						可预订
+	  					<#elseif strkit('ztyy',(lst.iswork)!)>
+	  						暂停营业
+	  					<#elseif strkit('ydy',(lst.iswork)!)>
+	  						已打烊
+	  					</#if>
+	  					</span>
+     			</div>
+     			<div class="bq">客户评价：
+     				<#if (lst.rate?number>=0 && lst.rate?number<1)> ☆☆☆☆☆ </#if> 
+					<#if (lst.rate?number>=1 && lst.rate?number<2)> ★☆☆☆☆ </#if> 
+			        <#if (lst.rate?number>=2 && lst.rate?number<3)> ★★☆☆☆ </#if>
+			        <#if (lst.rate?number>=3 && lst.rate?number<4)> ★★★☆☆ </#if> 
+			        <#if (lst.rate?number>=4 && lst.rate?number<5)> ★★★★☆ </#if> 
+			        <#if (lst.rate?number>=5 && lst.rate?number<6)> ★★★★★ </#if> 
+     			</div>
+     		</td>
+     		<td class="rinfo">
+     			<div class="mc">信用等级：
+     				<#if strkit('1',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('2',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('3',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('4',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('5',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('6',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('7',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('8',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('9',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('10',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('11',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if> <#if
+						strkit('12',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if> <#if
+						strkit('13',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if> <#if
+						strkit('14',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if> <#if
+						strkit('15',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if>
+     			</div>
+     			<div class="dh">最低配送金额：￥<span class="mc">${(lst.zdpsje)!}</span>元</div>
+     			<div class="dh">评价分数：${(lst.rate)!}</div>
+     		</td>
+     	</tr>
+		</#list>
+	</#if>
+	</table>
+	<div class="pageinfo"><#include '../../../common/_abpaginate.html'></div>
+	</div>
+	</form>
+	<div class="blank10"></div>
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</body>
+</html>

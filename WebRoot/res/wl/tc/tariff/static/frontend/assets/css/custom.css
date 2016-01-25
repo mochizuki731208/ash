@@ -1,0 +1,180 @@
+/* here you can put your own css to customize and override the theme */
+.register-ok{
+	text-align:center;
+	min-height:300px;
+	margin: 100px 0 100px 0;
+}
+
+#main_wraper{height:600px;background: #c5c4c0 url("../img/banner-home.jpg") top no-repeat;}
+#main_wraper .home_banner{position: relative;height:600px;}
+#main_wraper .home_banner .home_banner_inner{
+	background: url(../img/tagline-bg.svg) right center no-repeat;
+	background-position: 30% 0;	
+	position:absolute;
+	top: 170px;
+	text-align:center;
+	right: 70px;
+	width: 550px;
+	height: 200px;
+	color:#ffffff;	
+	background-size: cover;
+	-webkit-transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+	-moz-transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+	transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+#main_wraper .home_banner .home_banner_inner h1{
+	margin-bottom:30px;
+}
+#main_wraper .home_banner .home_banner_inner h1 .small{
+	color:#ffffff;
+}
+#main_wraper .home_banner .home_banner_inner .vehicles-icon{
+	width: 300px;
+	margin-left: 40px;
+	height: 33px;
+	background-size: auto 33px;
+	border-bottom: 2px solid #ffffff;
+	position:relative;
+	background: url(../img/icon-vehicles.svg) center bottom no-repeat;
+}
+#main_wraper .home_banner .home_banner_inner .vehicles-icon:before{
+	height: 6px;
+	width: 6px;
+	left:-3px;
+	bottom: -4px;
+	content: '';
+	display: block;
+	position: absolute;
+	border-radius: 50%;
+	background: #ffffff;
+}
+#main_wraper .home_banner .home_banner_inner .vehicles-icon:after{
+	width: 13px;
+	height: 22px;
+	right: -9px;
+	bottom: -4px;
+	content: '';
+	display: block;
+	position: absolute;
+	border-radius: 50%;
+	background: url(../img/pin-white.svg) no-repeat;
+	background-size: contain;
+}
+
+.banner-button {
+	background: #f47c00;
+	box-shadow: 0 4px 0 0 #b35c14,0 7px 0 0 rgba(51, 51, 51, 0.4);
+	font-size:22px;
+	float: right;
+	padding-left: 1.25rem;
+	padding-right: 1.25rem;
+	top: -30px;
+	left: -20px;
+	position:relative;
+	min-height: 2.772rem;
+	padding-top: 10px;
+	padding-left:30px;
+	padding-right:30px;
+	padding-bottom: 10px;
+	border-radius: 5px;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	display: inline-block;
+	border-color: #0075b0;
+	color: #ffffff;
+	-webkit-transition: background-color 300ms ease-out;
+	-webkit-appearance: none;
+	font-weight: bold !important;
+	white-space: nowrap;
+}
+
+#main_wraper a:hover,
+#main_wraper a:focus {
+  color: #ffffff;
+  cursor: default;
+  background-color: #ffb848;
+  border-bottom-color: transparent;
+}
+
+.border3px-green {
+  border: 3px solid #35aa47;
+  border-radius: 5px;
+}
+.border1px {
+  border: 1px solid #ffb848;
+  border-radius: 5px;
+}
+.border1px-yellow {
+  border: 1px solid #ffb848;
+  border-radius: 5px;
+}
+.border3px-yellow {
+  border: 3px solid #ffb848;
+  border-radius: 5px;
+}
+a.task-action{
+	font-size:13px;	
+	margin-left:10px;
+	cursor:hand;
+}
+
+.pannel-divider{
+	border-bottom: 1px solid #ddd;
+	height:1px;
+}
+.flag{
+	color:red;
+}
+.bd-map{
+	min-height:400px;
+}
+.mini-height{
+	min-height:400px;
+}
+
+#from_address_list{
+	display:none;
+}
+#to_address_list{
+	display:none;
+}
+
+
+.mobile_banner{
+	background-color:#0084c9;
+	padding:30px;
+	text-align:center;
+	background-size: cover;
+	-webkit-transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+	-moz-transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+	transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.mobile_banner .header{
+	background-color:#0084c9;
+	font-size: 42px;
+	font-weight: 300;
+	color:#fff;
+}
+
+
+.bdshare-button-style1-32 a {
+    background-image: url("../img/icons_1_32.png");
+    background-repeat: no-repeat;
+    color: #3A8CEB;
+    cursor: pointer;
+    float: left;
+    height: 32px;
+    line-height: 32px;
+    margin: 6px 6px 6px 0;
+    overflow: hidden;
+    text-indent: -100em;
+    width: 32px;
+}
+
+.bdshare-button-style1-32 .bds_tsina {
+    background-position: 0 -104px;
+}
+.bdshare-button-style1-32 .bds_weixin {
+    background-position: 0 -1612px;
+}
+.container{overflow: hidden;}

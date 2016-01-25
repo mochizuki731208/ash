@@ -1,0 +1,211 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_delete(id){
+			$.dialog.confirm('确认要删除当前选择的数据吗？', function(){
+			 	$.ajax({
+					url: "${CTX}/admin/city/delete",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除数据成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("删除数据失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_edit(id,pid){
+			if(!pid || pid == 0){
+				$.dialog.alert("请先从左侧选中区域，如无区域可选，表示您无此权限，请及时联系管理员",function () {}).title('3秒后关闭').time(3);
+				return;
+			}
+			var url = "";
+			if(id==''){
+				url = "${CTX}/admin/city/edit?id="+id+"&p_id="+pid+"&m=add";
+			}else{
+				url = "${CTX}/admin/city/edit?id="+id+"&p_id="+pid+"&m=edit";
+			}
+			$.dialog({
+				title:'信息编辑',
+				content: 'url:'+url,
+			    lock:true,
+			    resize: false,
+			    width : 600,
+				height :240,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							$.post("${CTX}/admin/city/save",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+			                    	$.dialog.alert("保存数据成功！",function () {
+										refresh();
+							        }).title('3秒后关闭').time(3);
+								}else{
+									$.dialog.alert("保存数据失败！");
+								}
+							});
+						}
+			            return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function uf_admin(id){
+			$.dialog({
+				title:'选择管理员',
+				content: 'url:${CTX}/admin/city/selectcityadmin?cityid='+id,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height :480,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        var user_id = this.content.$("input[type='radio']:checked").val();
+						if(user_id==undefined){
+							$.dialog.alert("请选择管理人员！");
+						}else{
+							$.post("${CTX}/admin/city/savecityadmin",{'user_id':user_id,'city_id':id},function(data){
+			                    if(data){
+			                    	$.dialog.alert("保存数据成功！",function () {
+										refresh();
+							        }).title('3秒后关闭').time(3);
+								}else{
+									$.dialog.alert("保存数据失败！");
+								}
+							});
+						}
+			            return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function uf_tcshenhe(id, s){
+			$.dialog.confirm('确认继续吗？', function(){
+			 	$.ajax({
+					url: "${CTX}/admin/city/tcshenhe?shenhe="+s,
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("操作成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("操作失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function refresh(){
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+			$('#myform').submit();
+		}
+	</script>	
+</head>
+  <body>
+	<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+	  <input type="hidden" name="p_id" id="p_id" value="${(p_id)!}"/>
+	  <input type="button" id="btn_add" class="button" value="添 加" onclick="uf_edit('','${(p_id)!}');"/>
+	  <input type="button" id="btn_query" class="button" value="刷 新" onclick="refresh();" />
+	  <table class="list">
+                  <tr>
+                    <th width="6%">序号</th>
+                    <th width="*%">城市名称</th>
+					<th width="10%">城市类型</th>
+					<th width="10%">层次</th>
+					<th width="10%">排列顺序</th>
+					<th width="12%">管理员</th>
+					<th width="5%">是否显示</th>
+					<th width="5%">显示商家联盟</th>
+					<th width="12%">物流订单审核</th>
+					<th width="">操作</th>
+                  </tr>
+      		<#if list ?? && (list.size()>0)>
+      			<#list list as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!''}</td>
+                    <td>${(lst.mc)!}</td>
+					<td>
+						<#if lst.type_id="0">
+						城市
+						<#elseif lst.type_id="1">
+						商业圈
+						</#if>
+					</td>
+					<td>${(lst.ccm)!}</td>
+                    <td>${(lst.seq_num)!}</td>
+                    <td>${(lst.user_mc)!}</td>
+                    <td>
+                    	<#if lst.is_display="0">
+						否
+						<#elseif lst.is_display="1">
+						是
+						</#if>
+					</td>
+                    <td>
+                    	<#if strkit('1',(lst.is_display_sjlm)!)>
+						是
+						<#else>
+						否
+						</#if>
+					</td>
+					<td>
+                    	<#if lst.tc_shenhe?exists && lst.tc_shenhe=="1">
+						<font color="red">需要审核</font>
+						<a href="javascript:;" onclick="uf_tcshenhe('${(lst.id)!}','0')">(无需审核)</a>
+						<#else>
+						无需审核
+						<a href="javascript:;" onclick="uf_tcshenhe('${(lst.id)!}','1')">(需要审核)</a>
+						</#if>
+					</td>
+                    <td>
+	                    <a href="javascript:void(0);" onclick="uf_edit('${(lst.id)!}','${(lst.p_id)!}')">修 改</a>
+	                    <a href="javascript:void(0);" onclick="uf_delete('${(lst.id)!}')">删 除</a>
+	                    <a href="javascript:void(0);" onclick="uf_admin('${(lst.id)!}')">设置管理员</a>
+	                </td>
+                  </tr>
+				</#list>
+			</#if>
+            </table>
+	</form>
+  </body>
+</html>

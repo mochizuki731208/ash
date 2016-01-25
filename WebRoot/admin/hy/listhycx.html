@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+	<#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+	
+		function uf_delete(id){
+			if(confirm("确认要删除当前选择的数据吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/user/delete",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除用户数据成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("删除用户数据失败！");
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		function uf_showywy_jd(id){
+			$.dialog({
+				title:'接单信息统计',
+				content: 'url:${CTX}/admin/rz/showywy_jd/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 520,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>	
+</head>
+  <body>
+	<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+		用户名：<input type="text" name="loginid" id="loginid" class="text" value="${(loginid)!}" style="width: 80px;"/>
+		姓名：<input type="text" name="mc" id="mc" class="text" value="${(mc)!}" style="width: 80px;"/>
+		手机号：<input type="text" name="mobile" id="mobile" class="text" value="${(mobile)!}" style="width: 80px;"/>
+		住址：<input type="text" name="xxdz" id="xxdz" class="text" value="${(xxdz)!}" style="width: 80px;"/>
+		<input type="button" id="btn_query" class="button" value="查 询" onclick="refresh();"/>
+	    <table class="list">
+                  <tr>
+                    <th width="4%">序号</th>
+                    <th width="10%">用户名</th>
+					<th width="7%">姓名</th>
+					<th width="12%">身份证号</th>
+					<th width="8%">手机号</th>
+					<th width="*%">详细地址</th>
+					<th width="8%">帐号余额</th>
+					<th width="12%">创建时间</th>
+					<th width="12%">最后登录时间</th>
+                  </tr>
+      		<#if listpage ??>
+      			<#list listpage.list as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!''}</td>
+                  	<td>${(lst.loginid)!}</td>
+                    <td>${(lst.mc)!}</td>
+					<td>${(lst.idcard)!}</td>
+                    <td>${(lst.mobile)!}</td>
+					<td>${(lst.xxdz)!}</td>
+                    <td style="color: red;"><#if lst.zhye ??>${(lst.zhye)?string("currency")}</#if></td>
+                    <td>${(lst.create_date)!}</td>
+                    <td>${(lst.login_date)!}</td>
+                  </tr>
+				</#list>
+				<tr>
+					<td colspan="9">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+			</#if>
+            </table>
+	</form>
+  </body>
+</html>

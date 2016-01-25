@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					goods_title:{required:true,stringMaxLength:50},
+					goods_score:{required:true, min: 1},
+					goods_money:{required:true, min: 0},
+					goods_limit:{required:true},
+					goods_count:{required:true},
+					goods_status:{required:true},
+					goods_starttime:{required:true},
+					goods_endtime:{required:true},
+					goods_status:{required:true},
+					goods_description:{required:true}
+				}
+			});
+			$('#goodsimg').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='goods_image' value='"+data+"'/>");
+					$('#imga').html("<img src='${CTX}/upload/"+data+"' width=80px height=60px/>");
+	             }
+			});
+			
+			$("#goods_title").focus();
+			
+			$("#btn_save").click(function(){
+				if($("#myform").valid()){
+				    $("#myform").submit();
+				}
+			});
+		});
+		
+	
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" method="post" >
+	<input type="hidden" name="goods_id" id="goods_id" value="${(vo.id)!}"/>
+	<table class="input">
+		<tr>
+			<th align="right" width="20%;">商品标题信息：</th>
+			<td><input type="text" name="goods_title" id="goods_title" class="text" value="${(vo.title)!}"> <font color="red">*</font> </td>
+		</tr>
+		<tr>
+			<th align="right">商品图片：</th>
+			<td colspan="3">
+			<div id="imga"><#if vo.img_url??><img src="${CTX}/upload/${(vo.img_url)!''}" style="width: 80px;height: 60px;"></#if></div>
+				<input type="file" name="goodsimg" id="goodsimg" multiple="false"/> </td>
+		</tr>
+		<tr>
+			<th align="right">积分：</th>
+			<td><input type="number" name="goods_score" id="goods_score" class="text" value="${(vo.score)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">金额：</th>
+			<td><input type="number" name="goods_money" id="goods_money" class="text" value="${(vo.money)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">每人限制兑换数量：</th>
+			<td><input type="number" name="goods_limit" id="goods_limit" class="text" value="${(vo.limit)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">商品数量：</th>
+			<td><input type="number" name="goods_count" id="goods_count" class="text" value="${(vo.count)!}"><font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">兑换开始时间：</th>
+			<td><input class="Wdate" id="goods_starttime" name="goods_starttime" value="${(vo.starttime)!}" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'%y-%M-{%d}',maxDate:'#F{$dp.$D(\'goods_endtime\')}'})" /><font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">兑换结束时间：</th>
+			<td><input class="Wdate" id="goods_endtime" name="goods_endtime" value="${(vo.endtime)!}" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'goods_starttime\')}'})" /><font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">状态：</th>
+			<td>
+			<select id="goods_status" name="goods_status" style="width:150px;" class="required">
+								<option value="">请选择</option>
+								<option value="1" <#if (((vo.status)!) == "1")>selected="selected"</#if> >有效</option>
+								<option value="0" <#if (((vo.status)!) == "0")>selected="selected"</#if> >无效</option>
+						</select>
+			<font color="red">*</font>
+		</td>
+		</tr>
+		<tr>
+			<th align="right">商品详情：</th>
+			<td><textarea id="goods_description" name="goods_description" class="text">${(vo.description)!}</textarea><font color="red">*</font></td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

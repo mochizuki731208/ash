@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					xxdz:{required:true}
+				}
+			});
+			$("#batchadd").bind("click",function(){
+				var r = $("#myform").valid();
+				if(!r){return false;}
+				$.ajax({
+					url: "${CTX}/admin/user/doAddAddress",
+					data:$("#myform").serialize(),
+					type: "POST",
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							alert("操作成功！");
+							self.location.reload(true);
+						}else{
+							alert("操作失败！");
+						}
+					}
+				});
+			});
+			var map = new BMap.Map("container");          // 创建地图实例    
+			var point = new BMap.Point(113.67311, 34.716755);  // 创建点坐标    
+			map.centerAndZoom(point, 13); 
+			var myCity = new BMap.LocalCity();
+		 	myCity.get(myFun);
+		 	function myFun(result){
+		 		var cityName = result.name;
+			    map.setCenter(cityName);
+			 	var localSearch = new BMap.LocalSearch(map);
+				var ac = new BMap.Autocomplete(
+			    	{"input" : "xxdz","location" : map,location: cityName}
+			    );
+				ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+				    var _value = e.item.value;
+				    localSearch.search(_value.business);
+				    localSearch.setSearchCompleteCallback(function (searchResult) {
+				　　　　var poi = searchResult.getPoi(0);
+					  $("#lng").attr('value', poi.point.lng);
+					  $("#lat").attr('value', poi.point.lat);
+				　　});
+				});
+			}
+		});
+		
+		function delAddress(id){
+			$.ajax({
+				url: "${CTX}/admin/user/doDelAddress",
+				data:{id:id},
+				type: "POST",
+				dataType: "json",
+				cache: false,
+				success: function(data) {
+					if(data){
+						alert("操作成功！");
+						self.location.reload(true);
+					}else{
+						alert("操作失败！");
+					}
+				}
+			});
+		}
+	</script>
+</head>
+
+  <body>
+  <div id="container" style="display: none;"></div>
+    <form id="myform" name="myform" method="post" >
+	    <div style="width: 250px;height:30px;text-align: center;background-color: rgb(237,200,58);">
+		  	 <font color="#e66629" style="font-size: 20px;">地址生成</font>
+		 </div>
+		 <input type="hidden" id="lng" name="lng" value=""/>
+		 <input type="hidden" id="lat" name="lat" value=""/>
+		<table class="input">
+			<tr>
+				<th>详细地址：</th>
+				<td><input class="text" id="xxdz" name="xxdz" type="text" style="width: 400px;" value="" maxlength="100" tabindex="5"/></td>
+			</tr>
+			<tr>
+				<td colspan="2" align="center">
+					<input type="button" value="添加" class="button" id="batchadd">
+				</td>
+			</tr>
+		</table>
+	</form>
+	<div>
+		<table class="list">
+			<thead>
+				<th>序号</th>
+				<th>地址</th>
+				<th>经度</th>
+				<th>纬度</th>
+				<th>操作</th>
+			</thead>
+			<#if list ??>
+      			<#list list as lst>
+      				<tr>
+                  	<td>${(lst_index+1)!''}</td>
+                  	<td>${(lst.address)!}</td>
+                    <td>${(lst.jd)!}</td>
+					<td>${(lst.wd)!}</td>
+                    <td><a href="javascript:void(0)" onclick="delAddress('${(lst.id)!}')">删除</a></td>
+      			</#list>
+      		</#if>
+		</table>
+	</div>
+  </body>
+</html>
+

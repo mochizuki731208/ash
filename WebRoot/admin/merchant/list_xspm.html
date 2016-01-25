@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+  <body>
+  	  <form id="myform" name="myform" method="post" action="">
+  	  		<div style="height: 40px;line-height: 40px;">
+			&nbsp;开始时间:<input type="text" class="text Wdate" name="kssj" id="kssj" value="${(kssj)!}" onFocus="WdatePicker({})" style="width: 100px;">
+			&nbsp;截止时间:<input type="text" class="text Wdate" name="jzsj" id="jzsj" value="${(jzsj)!}" onFocus="WdatePicker({})" style="width: 100px;">
+			<input type="button" class="button" value="查 询" onclick="refresh();"/>
+			</div>
+			
+	  		<table class="list">
+	            <tr>
+		            <th width="4%">序号</th>
+		            <th width="35%">名称</th>
+		            <th width="*%" style="text-align: left">总金额</th>
+		        </tr>
+	      		<#if list ??>
+      				<#list list as lst>
+	                  <tr>
+	                  	<td>${(lst_index+1)!''}</td>
+	                    <td>${(lst.mname)!''}</td>
+	                    <td style="text-align: left;">${(lst.sumval)!''}</td>
+	                  </tr>
+					</#list>
+				</#if>
+            </table>
+   
+			</form>
+  </body>
+</html>

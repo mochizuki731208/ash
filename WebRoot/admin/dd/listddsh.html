@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_edit(id){
+			$.dialog({
+				title:'商户信息编辑',
+				content: 'url:${CTX}/admin/merchant/editsj?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							this.content.$("#product_sub_name").attr('value',this.content.$("#product_sub_id").find("option:selected").text());
+							$.post("${CTX}/admin/merchant/saveproduct",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+									$.dialog.alert("保存数据成功！",function () {
+										refresh();
+							        }).title('3秒后关闭').time(3);
+								}else{
+									$.dialog.alert("删除数据失败！");
+								}
+							});
+						}
+			            return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+  <body>
+  	  <form id="myform" name="myform" method="post" action="">
+			订单号：<input type="text" name="sn" id="sn" class="text" value="${(sn)!}" style="width: 120px;"/>
+			商家名称：<input type="text" name="mname" id="mname" class="text" value="${(mname)!}" style="width: 120px;"/>
+			分类
+			<select name="subjectid" id="subjectid">
+					<option value="">全部...</option>
+				<#list list_subject as x>
+				    <option value="${(x.id)!''}" <#if strkit((x.id)!'',(subjectid)!)>selected</#if>>${(x.mc)!''}</option>
+				</#list>
+			</select>
+			用途
+  			<select name="yt" id="yt">
+					<option value="">全部</option>
+					<option value="0" <#if (((yt)!) == '0')>selected="selected"</#if> >犒劳自己</option>
+					<option value="1" <#if (((yt)!) == '1')>selected="selected"</#if> >赠送他人</option>
+			</select>
+			<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+	  		<table class="list">
+	            <tr>
+		            <th width="4%">序号</th>
+		            <th width="12%">订单编号</th>
+		            <th width="6%">用途</th>
+		            <th width="6%">类型</th>
+		            <th width="12%">商家</th>
+		            <th width="8%">订单金额</th>
+		            <th width="6%">会员</th>
+		            <th width="6%">收货人</th>
+		            <th width="8%">支付方式</th>
+					<th width="6%">订单状态</th>
+					<th width="12%">下单日期</th>
+					<th width="*%">操作</th>
+		        </tr>
+	      		<#if listpage ??>
+      				<#list listpage.list as lst>
+	                  <tr>
+	                  	<td>${(lst_index+1)!''}</td>
+	                    <td><a href="javascript:void(0);" onclick="uf_show('${(lst.id)!''}')">${(lst.sn)!''}</a></td>
+	                    <td><#if strkit('0',(lst.yt)!)>犒劳自己</#if><#if strkit('1',(lst.yt)!)>赠送他人</#if></td>
+	                    <td><#if strkit('0',(lst.is_type)!)>货物类</#if><#if strkit('1',(lst.is_type)!)>货物类</#if></td>
+	                    <td>${(lst.mname)!''}</td>
+	                    <td style="color: red;">${(lst.ddzje)?string("currency")}</td>
+	                    <td>${(lst.xdrmc)!''}</td>
+	                    <td>${(lst.lxr)!''}</td>
+	                    <td>${(lst.zffs)!''}</td>
+	                    <td><#if strkit('1',(lst.ddzt)!)>已提交</#if><#if strkit('2',(lst.ddzt)!)>已撤单</#if></td>
+	                    <td>${(lst.xdsj)!''}</td>
+	                    <td>
+	                    	<a href="${CTX}/admin/merchant/listproduct?mid=${(lst.id)!}">查看</a>
+	                    	<a href="javascript:void(0)" onclick="uf_edit('${(lst.id)!}')">修改</a>
+                    	</td>
+	                  </tr>
+					</#list>
+				</#if>
+				<tr>
+					<td colspan="12">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+            </table>
+   
+			</form>
+  </body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		$(function(){
+			$("#refresh").click("click",function(){
+				refresh();
+			})
+			$("#add").bind("click",function(){
+				addOrUpdateSug("添加群组",'');
+			});
+		})
+		function sug_edit(id){
+			addOrUpdateSug("修改群组",id);
+		}
+		
+		function addOrUpdateSug(title,id){
+			$.dialog({
+				title:title,
+				content: 'url:${CTX}/admin/order/initAddUpdatePage?id=' + id,
+			    lock:true,
+			    resize: true,
+			    width : 340,
+				height : 80,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭',
+		        button: [{
+		        	name: '确定',
+		        	callback: function(){
+		        		if(!this.content.$("#myform").valid()){
+		            		return false;
+		            	}else{
+		            		$.post("${CTX}/admin/order/addOrUpdateGroup",this.content.$("#myform").serialize(),function(data){
+		        	            if(data){
+		        	            	$.dialog.alert("操作成功！",function () {
+		        	            		refresh();
+							        }).time(0.8);
+		        				}else{
+		        					$.dialog.alert("操作失败，该群组名称已存在！");
+		        				}
+		        			});
+		            	}
+		        	},
+		        	focus: true
+		        }]
+			})
+		}
+		
+		function sug_del(id){
+			$.post("${CTX}/admin/order/delGroup",{id : id},function(data){
+	            if(data){
+	            	$.dialog.alert("操作成功！",function () {
+	            		refresh();
+			        }).time(0.8);
+				}else{
+					$.dialog.alert("操作失败，该群组被引用或者其他原因！");
+				}
+			});
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+<body>
+	<form id="myform" name="myform" method="post" >
+	    <div style="width: 250px;height:30px;text-align: center;background-color: rgb(237,200,58);">
+		  	 <font color="#e66629" style="font-size: 20px;">分组管理</font>
+		 </div>
+		<table class="input">
+			<tr>
+				<th align="right">组名：</th>
+				<td>
+					<input type="text" name="groupname" id="groupname" class="text" value="${(groupname)!''}">
+				</td>
+				<th align="right">城市：</th>
+				<td>
+					<select name="tb_city_id" id="tb_city_id" style="width: 190px;" <#if user.id!='admin'>disabled="disabled"</#if>>
+						<option value="">请选择...</option>
+						<@_cityarea_list p_id='ROOT'>
+					      	<#list list as t>
+						      	<#if t.hassub==0>
+						      		<option value="${(t.id)!}" <#if strkit((city_id)!,t.id)>selected</#if>>${(t.mc)!}</option>
+						      	<#else>
+							      	<optgroup label="${(t.mc)!}">
+							      		<@_cityarea_list p_id=t.id>
+									      	<#list list as sub>
+									      	<option value="${(sub.id)!}" <#if strkit((city_id)!,sub.id)>selected</#if>>${(sub.mc)!}</option>
+									      	</#list>
+										</@_cityarea_list>
+							      	</optgroup>
+						      	</#if>
+					      	</#list>
+						</@_cityarea_list>
+					</select>
+				</td>
+				<td align="left" width="50%">
+					<input type="button" value="查询" class="button" id="refresh">
+					<input type="button" value="添加" class="button" id="add">
+				</td>
+			</tr>
+		</table>
+	</form>
+	<table class="list">
+		<thead>
+			<th>序号</th>
+			<th>群组名称</th>
+			<th>所属城市</th>
+			<th>操作</th>
+		</thead>
+		<#list grouplist as o>
+			<tr>
+				<td>${(o_index + 1)!''}</td>
+				<td>${(o.groupname)!''}</td>
+				<td>${(o.cityid)!''}</td>
+				<td>
+					<a class="button" href="javascript:void(0)" onclick="sug_edit('${(o.id)!''}')">修改</a>
+					<a class="button" href="javascript:void(0)" onclick="sug_del('${(o.id)!''}')">删除</a>
+				</td>
+			</tr>
+		</#list>
+	</table>
+</body>
+</html>
+

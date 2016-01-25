@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta name="description"
+	content="易生活网是一个具有国内商户特色，提供各类商户活动，集商户开店，商户搜索，支付预订为一体的综合性门户网站。" />
+<meta name="keywords" content="商户，服务，开店" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport"
+	content="width = device-width, user-scalable=yes minimum-scale=1.0" />
+<meta name="apple-touch-fullscreen" content="YES" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="white" />
+<meta name="MobileOptimized" content="width" />
+<meta name="HandheldFriendly" content="true" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/main.css" />
+<link rel="stylesheet" type="text/css"
+	href="${CTX}/res/css/ab/styles.css" />
+<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/custom.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/common.js"></script>
+<script type="text/javascript"
+	src="${CTX}/res/js/jquery.leanModal.min.js"></script>
+<script type="text/javascript"
+	src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+
+</head><body>
+	<div class="classify canpinByimg">
+		<div class="classify_title"></div>
+		<div class="classify_content">
+			<ul>
+				<li>
+					<div class="image">
+						<a href="${CTX}/ab/prodetail/${(t.id)!}"><img
+							src="${CTX}/upload/${(t.img_url)!}"></a>
+					</div>
+					<div class="classify_font">
+						<p class="name">
+							<a href="javascript:void(0)">${(t.mc)!}</a> <a
+								href="javascript:void(0)" target="_blank">详细...</a>
+						</p>
+						<span class="price"><s>${(t.mdprice)!}¥</s><span
+							style="margin:0 5px">现价：<i class="nowprice">${(t.price)!}¥</i></span></span>
+						<div class="fr">
+							<input type="hidden" class="buyProId" value="${(t.id)!}" /> <input
+								type="button" class="subNum" value="-" style="width: 20px;">
+							<input type="text" class="buyNum" value="${(t.procnt)!'0'}"
+								id="add_num_${(t.id)!}" name="add_num_${(t.id)!}"
+								style="width: 30px;"> <input type="button"
+								class="addNum" value="+" style="width: 20px;"> &nbsp;
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+</html>

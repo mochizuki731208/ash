@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>报价</title>
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+  </head>
+  
+  <body>
+  	<form action="" style="text-align: center;" name="myform" id="myform">
+  		<input type="hidden" id="id" name="id" value="${(afobj.id)!''}">
+  		<input type="hidden" id="orderid" name="orderid" value="${(afobj.orderid)!''}">
+  		<input id="showprice" name="showprice" type="number" min="1" value="${(afobj.price)!''}">
+  	</form>
+  </body>
+</html>

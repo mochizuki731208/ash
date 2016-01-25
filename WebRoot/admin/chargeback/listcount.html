@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<script type="text/javascript"
+	src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+<script type="text/javascript">
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+<body>
+	<form id="myform" name="myform" method="post" action="">
+		维权次数大于：<input type="text" name="cnt" id="cnt" class="text" value="${(cnt)!}"
+			style="width: 100px;" /> 
+		 维权用户名称：<input type="text" name="mname" id="mname" class="text"
+			value="${(mname)!}" style="width: 100px;" /> <input type="button"
+			id="btn_return" class="button" value="查 询" onclick="refresh();" />
+		<table class="list">
+			<tr>
+				<th width="3%">序号</th>
+				<th width="20%">维权用户名称</th>
+				<th width="*%">维权次数</th>
+			</tr>
+			<#if listpage ??> <#list listpage.list as lst>
+			<tr>
+				<td>${(lst_index+1)!''}</td>
+				<td>${(lst.mc)!''}</td>
+				<td>${(lst.times)!''}</td>
+			</tr>
+			</#list> </#if>
+			<tr>
+				<td colspan="18"><#include '../../common/_paginate.html'></td>
+			</tr>
+		</table>
+
+	</form>
+</body>
+</html>

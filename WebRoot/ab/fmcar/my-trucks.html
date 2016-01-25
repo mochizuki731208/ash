@@ -1,0 +1,563 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<base href="${CTX}/">
+	<#include '../inc/meta.html'>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+       <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+<!--       <link href="${CTX}/res/js/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet">-->
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/bootstrapValidator.min.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/common.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/my-trucks.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+    
+   <!--<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>-->
+   <!--<script src="${CTX}/res/js/jquery-1.11.0.js"></script>-->
+   
+   <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+   
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
+	  <script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+	  <script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+</head>
+<body>
+		<#include '../inc/top.html'>
+		<#include '../inc/header.html'>
+	  	<!-- 搜索栏 -->
+		<!-- 导航 -->
+		<#include '../inc/nav.html'>
+		<div class="blank5"></div>
+		<div class="cm">
+			<div class="leftmenu fl">
+				<#include '../inc/leftmenu.html'>
+			</div>
+			<div class="rightcon fr">
+		
+<div class="container" style="height: 750px;width:100%">
+	<div class="row mg-tb-20">
+        <div class="col-xs-2"><h3 class="title-h3 mg-0">我的熟车</h3></div>
+        <div class="col-xs-10">
+            <div class="navbar-collapse collapse">
+                <form class="navbar-form navbar-right mg-0" action="${CTX}/ab/fmcar/searchFmcar" id="searchFmcarForm" method="post">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="搜索姓名或手机..." name="nameOrMobile" value="${(nameOrMobile)!''}"/>
+                          <span class="input-group-btn">
+                          	<button class="btn btn-default" type="button" id="searchFmcar">
+                            	<span class="glyphicon glyphicon-search" aria-hidden="true"></span>&nbsp;
+                            </button>
+                          </span>
+                    </div>
+                    <button type="button" class="btn btn-warning" id="orderCar">
+                    	<span class="glyphicon glyphicon-barcode" aria-hidden="true"></span> 我要用车
+                    </button>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModalFilter">
+                    	<span class="glyphicon glyphicon-filter" aria-hidden="true"></span> 筛选条件
+                    </button>
+                    <button type="button" id="myModalAddKnowBtn" class="btn btn-success" data-toggle="modal" data-target="#myModalAddKnow">
+<!--                     <button type="button" id="myModalAddKnowBtn" class="btn btn-success" > -->
+                   		<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> 添加熟车
+                    </button>
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModalKnow"><span
+                            class="glyphicon glyphicon-import"
+                            aria-hidden="true"></span> 导入熟车
+                    </button>
+                    <#if usertype??>
+                      <a href="${CTX}/admin/order/mapTrucks" target="_self" class="btn btn-primary">地图查看</a>
+                    <#else>
+                    	<a href="${CTX}/ab/order/mapTrucks" target="_self" class="btn btn-primary">地图查看</a>
+                    </#if>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                <div class="panel panel-default">
+                
+                    <table class="table table-hover mg-0">
+                        <thead>
+                        <tr>
+                            <th>车牌</th>
+                            <th>车主</th>
+                            <th>车辆信息</th>
+                            <th>车体积(立方米)</th>
+                            <th>随车电话</th>
+                            <th>位置</th>
+                            <th>定位时间</th>
+                            <th>短信定位</th>
+                        </tr>
+                        </thead>
+                        <tbody id="myCarTbody">
+							<#if carlist??>
+	                        	<#list carlist as lst>
+	                        		<tr>
+	                        			<td style="display: none">${(lst.id)!''}</td>
+			                            <th scope="row">
+			                            <img src="${CTX}/res/images/fmcar/${lst.car_no?substring(0,1)}.png" alt="" /> <a href="javascript:;" class="showCarDetail">${(lst.car_no)!''}</a>
+			                            
+			                            </th>
+			                            <td>${(lst.driver)!''}</td>
+			                            <td>${(lst.length)!''} ${(lst.type)!''}</td>
+			                            <td>${(lst.vv)!''}</td>
+			                            <td><span class="glyphicon glyphicon-phone" aria-hidden="true"></span> ${(lst.mobile)!''}</td>
+			                            <td><#if (lst.location)?? && lst.location?trim != ''>${lst.location}<#else>位置不明</#if></td>
+			                            <td><span class="glyphicon glyphicon-time" aria-hidden="true"></span> ${(lst.location_time)!''}</td>
+			                            <td>
+			                                        	<a href="javascript:;" class="delThisCar" id="${(lst.id)!''}">
+			                                        		<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 删除
+			                                        	</a>
+			                                        	<a href="${CTX}/ab/tc/?zb=F&carid=${(lst.id)!''}&way=3" class="orderThisCar">
+			                                       			<span class="glyphicon glyphicon-circle-arrow-down" aria-hidden="true"></span>下单给他
+			                                       		</a>
+			                            
+<!-- 			                                <div class="btn-group"> -->
+<!-- 			                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false"> -->
+<!-- 			                                        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> 操作 <span class="caret"></span> -->
+<!-- 			                                    </button> -->
+<!-- 			                                    <ul class="dropdown-menu" role="menu"> -->
+<!-- 			                                        <li> -->
+<!-- 			                                        	<a href="${CTX}/ab/fmcarorders/carid-${(lst.id)!''}" class="orderThisCar"> -->
+<!-- 			                                       			<span class="glyphicon glyphicon-circle-arrow-down" aria-hidden="true"></span>下单给他 -->
+<!-- 			                                       		</a> -->
+<!-- 			                                       	</li> -->
+<!-- 			                                       	
+<!-- 			                                        <li> -->
+<!-- 			                                        	<a href="javascript:;" class="openLocation"> -->
+<!-- 			                                        		<span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> 免费开通短信定位 -->
+<!-- 			                                        	</a> -->
+<!-- 			                                        </li> -->
+<!-- 			                                         --> 
+<!-- 			                                        <li class="divider"></li> -->
+<!-- 			                                        <li> -->
+<!-- 			                                        	<a href="javascript:;" class="delThisCar"> -->
+<!-- 			                                        		<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 删除专属车 -->
+<!-- 			                                        	</a> -->
+<!-- 			                                        </li> -->
+<!-- 			                                    </ul> -->
+<!-- 			                                </div> -->
+			                            </td>
+			                        </tr>
+	                        	</#list> 
+	                        <#else>
+	                        <tr>
+	                        	<th scope="row">
+	                        	暂无数据
+			                    </th>
+	                        </tr>
+	                        </#if>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<!-- 筛选条件 弹窗 -->
+<div class="modal fade" id="myModalFilter" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+               	</button>
+                <h4 class="modal-title" id="myModalLabel1">筛选条件</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-inline" action="${CTX}/ab/fmcar/searchFmcar" id="searchFmcarFormMore" method="post">
+                    <div class="form-group pd-r-10">
+                        <label for="carLength">车长：</label>
+                        <select name="car_length" class="form-control" id="carLength">
+                            <option value="">全部</option>
+                            <option value="1.8米">1.8米</option>
+                            <option value="2.6米">2.6米</option>
+                            <option value="3.2米">3.2米</option>
+                            <option value="4.2米">4.2米</option>
+                            <option value="5.2米">5.2米</option>
+                            <option value="5.8米">5.8米</option>
+                            <option value="6.2米">6.2米</option>
+                            <option value="6.5米">6.5米</option>
+                            <option value="6.8米">6.8米</option>
+                            <option value="7.2米">7.2米</option>
+                            <option value="8米">8米</option>
+                            <option value="9.6米">9.6米</option>
+                            <option value="13米">13米</option>
+                            <option value="15米">15米</option>
+                            <option value="16.5米">16.5米</option>
+                            <option value="17.5米">17.5米</option>
+                            <option value="18.5米">18.5米</option>
+                            <option value="20米">20米</option>
+                            <option value="22米">22米</option>
+                            <option value="24米">24米</option>
+                        </select>
+                    </div>
+                    <div class="form-group pd-r-10">
+                        <label for="carClass">车型：</label>
+                        <select name="car_type" class="form-control" id="carClass">
+                            <option value="">全部</option>
+                            <option value="三轮车">三轮车</option>
+                            <option value="面包车">面包车</option>
+                            <option value="厢车">厢车</option>
+                            <option value="平板车">平板车</option>
+                            <option value="高低板车">高低板车</option>
+                            <option value="高栏车">高栏车</option>
+                            <option value="冷藏车">冷藏车</option>
+                            <option value="危险品车">危险品车</option>
+                            <option value="大件车">大件车</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="carCity">常跑城市：</label>
+                        <input type="text" class="form-control" value="" name="carCitys" id="carCity" style="width: 170px" placeholder="全部" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+                <button type="button" class="btn btn-primary" id="carSearchYes">查 询</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 点下一步弹窗 -->
+<div class="modal fade" id="myModalAddKnowNextStep" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+         	<div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel3">添加熟车</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="formImportCarS1">
+                    <div class="form-group">
+                        <label for="carMobilePhone" class="col-sm-2 control-label">电话号码</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="carMobilePhone" placeholder="请输入手机号码" name="mobile" />
+                            <div id="errormsg"  style="color: red;display: none;" ></div>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="addKnowStep1">下一步</button>
+            </div>
+  
+ 
+       
+ 		</div>
+    </div>
+</div>
+
+
+<!-- 添加熟车 弹窗 -->
+<div class="modal fade" id="myModalAddKnow" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        
+        			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel3">添加熟车</h4>
+			</div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="formImportCarS2" method="post">
+                	<input type="hidden" value="${(car.id)!''}"  name="abFmcar_id" id="carid"/>
+                    <div class="form-group">
+                        <label for="carPhone" class="col-sm-2 control-label">手机号码</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="carPhone" placeholder="电话号码"  name="abFmcar_mobile" value="${(mobile)!''}"/>
+                            <label id="mobile_msg"></label>
+                        </div>
+                    </div>
+                     <div class="form-group">
+                        <label for="carGroup" class="col-sm-2 control-label">分组</label>
+                        <div class="col-sm-10">
+                            <select name="groupid" class="form-control" id="carGroup">
+                                <option value="">请选择分组</option>
+                                <#if grouplist??>
+	                        		<#list grouplist as grouplst>
+	                        			<option value="${(grouplst.id)!''}">${(grouplst.groupname)!''}</option>
+	                        		</#list>
+	                        	</#if>
+                             </select>
+                        </div>
+                    </div>
+                    
+                	
+                    <div class="form-group">
+                        <label for="carNo" class="col-sm-2 control-label">车牌号</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="carNo" placeholder="车牌号" name="abFmcar_car_no" maxlength="7" value="${(car.car_no)!''}"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="driver" class="col-sm-2 control-label">司机姓名</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="driver" placeholder="司机姓名" name="abFmcar_driver" value="${(car.driver)!''}"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="carLengthAdd" class="col-sm-2 control-label">车长</label>
+                        <div class="col-sm-10">
+                            <select name="abFmcar_length" class="form-control" id="carLengthAdd">
+                                <option value="">请选择车长</option>
+                            	<option value="1.8米" <#if strkit('1.8米',(car.length)!)>selected</#if> >1.8米</option>
+	                        	<option value="2.6米" <#if strkit('2.6米',(car.length)!)>selected</#if> >2.6米</option>
+	                           	<option value="3.2米" <#if strkit('3.2米',(car.length)!)>selected</#if> >3.2米</option>
+	                        	<option value="4.2米" <#if strkit('4.2米',(car.length)!)>selected</#if> >4.2米</option>
+	                       		<option value="5.2米" <#if strkit('5.2米',(car.length)!)>selected</#if> >5.2米</option>
+	                            <option value="5.8米" <#if strkit('5.8米',(car.length)!)>selected</#if> >5.8米</option>
+	                            <option value="6.2米" <#if strkit('6.2米',(car.length)!)>selected</#if> >6.2米</option>
+	                       		<option value="6.5米" <#if strkit('6.5米',(car.length)!)>selected</#if> >6.5米</option>
+	                      		<option value="6.8米" <#if strkit('6.8米',(car.length)!)>selected</#if> >6.8米</option>
+	                        	<option value="7.2米" <#if strkit('7.2米',(car.length)!)>selected</#if> >7.2米</option>
+	                          	<option value="8米" <#if strkit('8米',(car.length)!)>selected</#if> >8米</option>
+	                         	<option value="9.6米" <#if strkit('9.6米',(car.length)!)>selected</#if> >9.6米</option>
+	                        	<option value="13米" <#if strkit('13米',(car.length)!)>selected</#if> >13米</option>
+	                    		<option value="15米" <#if strkit('15米',(car.length)!)>selected</#if> >15米</option>
+	                         	<option value="16.5米" <#if strkit('16.5米',(car.length)!)>selected</#if> >16.5米</option>
+	                          	<option value="17.5米" <#if strkit('17.5米',(car.length)!)>selected</#if> >17.5米</option>
+	                          	<option value="18.5米" <#if strkit('18.5米',(car.length)!)>selected</#if> >18.5米</option>
+	                        	<option value="20米" <#if strkit('20米',(car.length)!)>selected</#if> >20米</option>
+	                     		<option value="22米" <#if strkit('22米',(car.length)!)>selected</#if> >22米</option>
+	                         	<option value="24米" <#if strkit('24米',(car.length)!)>selected</#if> >24米</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="carClassAdd" class="col-sm-2 control-label">车型</label>
+                        <div class="col-sm-10">
+                            <select name="abFmcar_type" class="form-control" id="carClassAdd">
+                                <option value="">请选择车型</option>
+                                 <option value="三轮车" <#if strkit('三轮车',(car.type)!)>selected</#if> >三轮车</option>
+	                             <option value="面包车" <#if strkit('面包车',(car.type)!)>selected</#if> >面包车</option>
+	                             <option value="厢车" <#if strkit('厢车',(car.type)!)>selected</#if> >厢车</option>
+	                             <option value="平板车" <#if strkit('平板车',(car.type)!)>selected</#if> >平板车</option>
+	                             <option value="高低板车" <#if strkit('高低板车',(car.type)!)>selected</#if> >高低板车</option>
+	                             <option value="高栏车" <#if strkit('高栏车',(car.type)!)>selected</#if> >高栏车</option>
+	                             <option value="冷藏车" <#if strkit('冷藏车',(car.type)!)>selected</#if> >冷藏车</option>
+	                             <option value="危险品车" <#if strkit('危险品车',(car.type)!)>selected</#if> >危险品车</option>
+	                             <option value="大件车" <#if strkit('大件车',(car.type)!)>selected</#if> >大件车</option>
+                            </select>
+                        </div>
+                    </div>
+<!--                     <div class="form-group">
+                        <label for="carTuijianhao" class="col-sm-2 control-label">推荐号</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="carTuijianhao" placeholder="如果有推荐号，请输入" name="abFmcar_recommend_no" value="${(car.recommend_no)!''}" />
+                        </div>
+                    </div>
+ -->                     <div class="form-group">
+                        <label for="carVV" class="col-sm-2 control-label">车体积</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="carVV" placeholder="车体积，默认40立方米" name="abFmcar_vv" value="${(car.vv)!''}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="carChangpao" class="col-sm-2 control-label">常跑城市</label>
+                        <div class="col-sm-10">
+                            <input type="hidden" id="s2id_FromName" class="form-control select2-offscreen" tabindex="-1" name="runcity" value="${(carcity)!''}">
+                        </div>
+                    </div>
+<!--                     <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"  id="is_protect" /> 熟车保护
+                                    <input type="hidden" value="${(car.is_protect)!''}" name="abFmcar_is_protect" id="abFmcar_is_protect"/>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+ -->                    <!--  
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" checked="checked" id="is_locate"/> 立即开通车辆定位
+                                    <input type="hidden" value="1" name="abFmcar_is_locate" />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="addKnowYes">加为熟车</button>
+            </div>
+        
+        </div>
+    </div>
+</div>
+
+
+<!-- 查看熟车 弹窗 -->
+<div class="modal fade" id="myModalCarDetail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+<!-- 导入熟车 弹窗 -->
+<div class="modal fade" id="myModalKnow" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel2">导入熟车</h4>
+            </div>
+            <div class="modal-body">
+                <form action="" method="post" role="form" id="formAddtforexcel" novalidate="novalidate">
+                    <div class="form-group" >
+                        <label> 导入Excel： </label>
+                        <div class="input-group" >
+<!--                         	<span class="input-group-btn" > -->
+                        		<input type="file" name="uploadExcel" id="uploadExcel" multiple="false" />
+<!--                            	</span> -->
+                            <div id="fileQueue"></div>
+                        </div>
+                        <input type="hidden" class="form-control" id="truckList" name="truckList" readonly="readonly">
+                    </div>
+
+                    <div class="form-group">
+<!--                         <label> -->
+<!--                             <a href="javascript:;" id="btnshowMarket">我有推荐号</a> -->
+<!--                         </label> -->
+                        <input type="text" class="form-control" name="marketCode" id="marketCode" style="display: none">
+                    </div>
+                    <div class="form-group">
+                    	请<a href="ab/fmcar/dowloadTempletFile"  style="COLOR: #ff0000" >下载模板</a>，填入内容，然后上传。
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="importCarYes">确 定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 删除 弹窗 -->
+<div class="modal fade" id="myModalDel" tabindex="-1" role="dialog" aria-labelledby="myModalLabelDel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabelDel">删除专属车</h4>
+            </div>
+            <div class="modal-body">
+                <p>确定删除此专属车吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                <button type="button" class="btn btn-primary" id="myModalLabelDelYes">确 定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 短信 弹窗 -->
+<div class="modal fade" id="myModalMsg" tabindex="-1" role="dialog" aria-labelledby="myModalLabelMsg"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabelMsg"> 免费开通短信定位</h4>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确 定</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- 栏目页 -->
+</div>
+</div>
+<div class="blank10"></div>
+<#include '../inc/foot.html'>
+<script type="text/javascript">
+$("#searchFmcar").off("click").on("click", function () {
+    	$("#searchFmcarForm").submit();
+    });
+    
+    $("#carSearchYes").off("click").on("click",function(){
+    	$("#searchFmcarFormMore").submit();
+    });
+    
+    $("#orderCar").off("click").on("click",function(){
+    	window.location.href = "/ab/tc?zb=F&way=4";
+    });
+    
+</script>    
+<script type="text/javascript" src="${CTX}/res/js/fmcar/plugins/require.js"></script>
+<!-- <script type="text/javascript" src="${CTX}/res/js/fmcar/page/my-trucks1.js"></script> -->
+
+<script>
+    require(['./res/js/fmcar/boot'], function () {
+        require(['my-trucks']);
+    });
+</script>
+	<script type="text/javascript">
+	window.onload=function() {
+		var uploadExcel = $("#uploadExcel");
+		uploadExcel.uploadify({
+			swf:'${CTX}/res/js/uploadify/uploadify.swf?var='+(new Date()).getTime(),
+			uploader:'${CTX}/ab/fmcar/uploadCars',
+			auto: false, //是否自动上传 
+			multi: false,
+			buttonText :'选择文件',
+			width: '75', //按钮宽度  
+			height: '24', //按钮高度
+			fileExt:'*.xls;*.xlsx;',
+			queueID: 'fileQueue',//队列id,用来展示上传进度的
+			fileObjName: 'uploadExcel', //<input type="file"/>的name  
+			method: 'post',
+			removeCompleted: true,//上传完成后自动删除队列  
+			onUploadSuccess:function(file,data,response){
+				var result = eval("(" + data + ")");
+				if(result.totalNum != null){
+					alert("操作成功，共"+result.totalNum+"辆，成功"+result.successNum+"辆.\r\n"+"失败的手机号是:"+result.errorMobile+",\r\n" + "具体原因:"+ result.errorMsg);
+					window.location.reload();
+				}else{
+					alert(data);
+				}
+	         }
+		});
+		
+		$("#importCarYes").off("click").on("click",function(){
+			var recommendNo = $("#marketCode").val();
+			uploadExcel.uploadify('settings', 'uploader','${CTX}/ab/fmcar/uploadCars?recommendNo='+recommendNo);
+			uploadExcel.uploadify('upload', '*');
+		});
+	};
+
+	
+	</script>
+
+</body>
+</html>

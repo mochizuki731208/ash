@@ -1,0 +1,679 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta name="description" content="易生活网是一个具有国内商户特色，提供各类商户活动，集商户开店，商户搜索，支付预订为一体的综合性门户网站。" />
+<meta name="keywords" content="商户，服务，开店" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width = device-width, user-scalable=yes minimum-scale=1.0" />
+<meta name="apple-touch-fullscreen" content="YES" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="white" />
+<meta name="MobileOptimized" content="width" />
+<meta name="HandheldFriendly" content="true" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/main.css"/>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css"/>
+<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/custom.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/common.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/jquery.leanModal.min.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+			function uf_addtocart(mid,proid,addnumobj,userid){
+				if(userid==''){
+					$.dialog.alert("请登录后进行选择！",function(){
+						window.location.href="${CTX}/ab/login";
+					});
+					return false;
+				}
+				
+				if('0'=='${(vo.business_status)!}'){
+					$.dialog.alert("所选商家暂停营业，不能进行相关下单操作！");
+					return false;
+				}
+				<#if vo.iswork==false>
+					$.dialog.alert("所选商家正处于休息中，不能进行相关下单操作！");
+					return false;
+				</#if>
+				
+				$.post("${CTX}/ab/order/addtocart",{mid:mid,proid:proid,addnum:$('#'+addnumobj).val()},function(data){
+	                   if(data){
+						$.dialog.alert("添加购物车成功！",function () {
+							refresh();
+				        }).time(0.5);
+					}else{
+						$.dialog.alert("添加购物车失败！");
+					}
+				});
+			}
+			
+			function uf_sc(fkid,userid){
+				if(userid==''){
+					$.dialog.alert("请登录后进行选择！",function(){
+						window.location.href="${CTX}/ab/login";
+					});
+					return false;
+				}
+				
+				$.post("${CTX}/ab/mer/save_sc",{lx:'0',fkid:mid},function(data){
+	                   if(data){
+						$.dialog.alert("收藏成功！").time(0.5);
+					}else{
+						$.dialog.alert("收藏失败，请重新登录系统后进行收藏！");
+					}
+				});
+			}
+			
+			function uf_addnum(orderid,itemid,buynum,userid){
+				if(userid==''){
+					$.dialog.alert("请登录后进行选择！",function(){
+						window.location.href="${CTX}/ab/login";
+					});
+					return false;
+				}
+				
+				//对数值进行修改
+				$.ajax({
+					url: "${CTX}/ab/order/updateorderitemnum",
+					type: "POST",
+					data: {orderid:orderid,proid:itemid,pronum:parseInt(buynum)+1},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							refresh();
+						}else{
+							$.dialog.alert("修改数量失败，请刷新页面重新操作！");
+						}
+					}
+				});
+			}
+			
+			function uf_reduce(orderid,itemid,buynum,userid){
+				if(userid==''){
+					$.dialog.alert("请登录后进行选择！",function(){
+						window.location.href="${CTX}/ab/login";
+					});
+					return false;
+				}
+				
+				if(parseInt(buynum)>1){
+					//对数值进行修改
+					$.ajax({
+						url: "${CTX}/ab/order/updateorderitemnum",
+						type: "POST",
+						data: {orderid:orderid,proid:itemid,pronum:parseInt(buynum)-1},
+						dataType: "json",
+						cache: false,
+						success: function(data) {
+							if(data){
+								refresh();
+							}else{
+								$.dialog.alert("修改数量失败，请刷新页面重新操作！");
+							}
+						}
+					});
+				}
+			}
+			function uf_delpro(itemid){
+				$.ajax({
+					url: "${CTX}/ab/order/delproduct",
+					type: "POST",
+					data: {id:itemid},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除所选商品数据成功！",function(){
+								refresh();
+							});
+						}else{
+							$.dialog.alert("删除所选商品数据失败！");
+						}
+					}
+				});
+			}
+			function uf_klzj(userid){
+				if(userid==''){
+					$.dialog.alert("请登录后进行操作！",function(){
+						window.location.href="${CTX}/ab/login";
+					});
+					return false;
+				}
+				if('${(r.procnt)!}'=='0'){
+					$.dialog.alert("请添加商品后再进行操作！");
+					return false;
+				}
+				window.location.href="${CTX}/ab/order/ddjs/0";
+			}
+			
+			function uf_zstr(userid){
+				if(userid==''){
+					$.dialog.alert("请登录后进行操作！",function(){
+						window.location.href="${CTX}/ab/login";
+					});
+					return false;
+				}
+				if('${(r.procnt)!}'=='0'){
+					$.dialog.alert("请添加商品后再进行操作！");
+					return false;
+				}
+				window.location.href="${CTX}/ab/order/ddjs/1";
+			}
+			
+			function fliterappraisetype(obj, mid){
+				var currentclass = $(obj).attr("class");
+				var currentname = $(obj).attr("id");
+				if("typeall" == currentname){
+					$(obj).attr("class", "radio_w radio_sel");
+					$('#typeone').attr("class", "radio_w");
+					$('#typetwo').attr("class", "radio_w");
+					$('#typethree').attr("class", "radio_w");
+				}
+				if("typeone" == currentname){
+					$(obj).attr("class", "radio_w radio_sel");
+					$('#typeall').attr("class", "radio_w");
+					$('#typetwo').attr("class", "radio_w");
+					$('#typethree').attr("class", "radio_w");
+				}
+				if("typetwo" == currentname){
+					$(obj).attr("class", "radio_w radio_sel");
+					$('#typeone').attr("class", "radio_w");
+					$('#typeall').attr("class", "radio_w");
+					$('#typethree').attr("class", "radio_w");
+				}
+				if("typethree" == currentname){
+					$(obj).attr("class", "radio_w radio_sel");
+					$('#typeone').attr("class", "radio_w");
+					$('#typetwo').attr("class", "radio_w");
+					$('#typeall').attr("class", "radio_w");
+				}
+				refreshappraise(mid);
+			}
+			
+			function fliterimagetype(obj, mid){
+				var currentclass = $(obj).attr("class");
+				if(currentclass.indexOf("checkbox_sel")>0){
+					$(obj).attr("class", "checkbox_w");
+				}else{
+					$(obj).attr("class", "checkbox_w checkbox_sel");
+				}
+				refreshappraise(mid);
+			}
+			
+			function refreshappraise(mid){
+				var $appraisemsglist = $("#appraisemsglist");
+				var imgchecked = "1";
+				if($('#imgtype').attr("class").indexOf("checkbox_sel")<0){
+					imgchecked = "0";
+				}
+				var type = "0";
+				if($('#typeone').attr("class").indexOf("radio_sel")>=0){
+					type="1";
+				}else if($('#typetwo').attr("class").indexOf("radio_sel")>=0){
+					type="2";
+				}else if($('#typethree').attr("class").indexOf("radio_sel")>=0){
+					type="3";
+				}
+				$.ajax(  
+	            	{  
+	               		url:'${CTX}/ab/appraise/findappraise',  
+	                    type:"post",  
+	                    async:true,  
+	                    data:{'mid':mid, 'type':type, 'imgchecked': imgchecked},  
+	                    dataType:"html",  
+	                    timeout:"3000",  
+	                    error:function(data)
+	                    {
+	                    	alert("error-"+data);
+	                    },  
+	                    success:function(data)  
+	                    {  
+	                    	$appraisemsglist.html(data);
+	                    }  
+	                }  
+	            ); 
+			}
+			
+			function refreshSafecode(){
+				var d = new Date();
+				document.getElementById("safecode").src="${CTX}/25console/imgcode?t="+d.toString(40);
+			}
+			
+			function refresh(){
+				$('#myform').submit();
+				$('#myform').action = "";
+				$('#myform').target = "_self";
+			}
+	</script>
+</head>
+<body>
+<form id="myform" name="myform" method="post">
+<input type="hidden" id="mid" value="${(vo.id)!}"/>
+<input type="hidden" id="userid" value="${(userid)!}"/>
+<div class="header">
+  	<div class="header_cen">
+	    <div class="logo"> <img src="${CTX}/res/css/ab/images/logo.png" width="182" height="48"></div>
+	    <#if abuser?? >
+			 <#if strkit('105',(abuser.role_id)!)>
+			 <a>欢迎您，[商家:${(abuser.mc)!}]</a>
+			 <#elseif strkit('106',(abuser.role_id)!)>
+			 <a>欢迎您，[业务员:${(abuser.mc)!}]</a>
+			 <#elseif strkit('107',(abuser.role_id)!)>
+			 <a>欢迎您，[会员:${(abuser.mc)!}]</a>
+			 </#if>
+			 <a href="${CTX}/"><div class="button_zhu">首页</div></a> 
+		<#else>
+		    <a href="${CTX}/ab"><div class="button_zhu">注册</div></a> 
+		    <a href="${CTX}/ab/login"><div class="button_deng">登陆</div></a>
+	    </#if>
+    </div>
+</div>
+<!--header-->
+<div class="header_down">
+    <div class="header_down_cen">
+        <div class="shop"> <img src="${CTX}/upload/${(vo.img_url)!}" width="190" height="195"></div>
+        <div class="xinxi">
+            <p class="shop_title">${(vo.mc)!}
+            <span class="color_01">
+            	<#if (vo.rate?number>=0 && vo.rate?number<1)> ☆☆☆☆☆ </#if> 
+				<#if (vo.rate?number>=1 && vo.rate?number<2)> ★☆☆☆☆ </#if> 
+			    <#if (vo.rate?number>=2 && vo.rate?number<3)> ★★☆☆☆ </#if>
+			    <#if (vo.rate?number>=3 && vo.rate?number<4)> ★★★☆☆ </#if> 
+			    <#if (vo.rate?number>=4 && vo.rate?number<5)> ★★★★☆ </#if> 
+			    <#if (vo.rate?number>=5 && vo.rate?number<6)> ★★★★★ </#if> 
+            </span>
+            
+            <p class="shop_font_01">地 址：${(vo.xxdz)!}</p>
+            <div class="button_framework">
+                <div class="button_yingye"> <span class="shop_font_02">营业状态</span> </div>
+                <p class="shop_font_03">
+                	<#if strkit('1',vo.business_status)>
+                		<#if vo.iswork==true>
+                			营业中
+                		<#else>
+                			<#if strkit('1',(vo.chk_fgzrxd)!)>
+	  							可预订
+	  						<#else>
+	  							已打烊
+	  						</#if>
+                		</#if>
+                	<#else>
+                		已打烊
+                	</#if>
+                </p>
+            </div>
+            <br>
+            <p class="shop_font_04">工作时间：${(vo.worktime)!}</p>
+            <ul>
+                <li> <a class="main-tab" tab-name="food">餐品</a></li>
+                <li> <a class="main-tab" tab-name="comment">评论</a></li>
+                <li> <a class="main-tab" tab-name="about">简介</a></li>
+                <li> <a class="main-tab" tab-name="activity">留言</a></li>
+                <li> <a>分享</a></li>
+            </ul>
+        </div>
+        <div class="header_down_right">
+            <ul class="right_font">
+            	<li> 
+            		
+            		<#if sfsc==true>
+	            		<strong><a href="javascript:void(0);"><img src="${CTX}/res/css/ab/images/shoucang.png"/></a></strong><span>已收藏</span>
+	            	<#else>
+	            		<strong><a href="javascript:void(0);" onclick="uf_sc('${(vo.id)!}','${(userid)!}');"><img src="${CTX}/res/css/ab/images/shoucang.png"/></a></strong><span>收藏</span>
+	            	</#if>
+            		
+            	</li>
+                <li> <strong>￥ <em class="psfee_">${(vo.avgptf?string("#.#"))!}</em>元</strong><span>配送费</span> </li>
+                <li> <strong>￥ <em>${(vo.avgprice?string("#"))!}</em>元</strong> <span>人均消费</span> </li>
+                <li> <strong><em>${(vo.avghour?string("#"))!}</em>分钟</strong> <span>送达时间</span> </li>
+            </ul>
+            <p class="font_fan"> <a href="${CTX}/">>>返回</a></p>
+        </div>
+    </div>
+</div>
+<!--shop news-->
+<div id="center" class="tab-content active" tab-name="food">
+    <div class="cen_canpin">
+        <ul>
+            <li>餐品分类：</li>
+            <#if list_sub ??>
+				<#list list_sub as lst>
+		     	<li><a href="#${(lst.id)!}">${(lst.mc)!}</a></li>
+				</#list>
+			</#if>
+            <li>
+                <input type="checkbox" name="bike" id="chk-jjxs" />
+                <span class=".shop_font_01" >精简显示</span> <br>
+            </li>
+        </ul>
+        <div class="seachBox">
+            <div class="field-bg"> <span><i class="seach"> <img src="${CTX}/res/css/ab/images/seach.png" width="31" height="33" onclick="refresh()"></i></span>
+                 <input type="text" name="proname" value="${(proname)!}" placeholder="搜索本店餐品" class="input-field" />
+            </div>
+        </div>
+        <!--seachBox end--> 
+    </div>
+    <div class="classify canpinByimg">
+    	<#if list_sub ??>
+			<#list list_sub as lst>
+	     	<div class="classify_title" id="${(lst.id)!}">${(lst.mc)!}</div>
+			    <div class="classify_content">
+			      <ul>
+			      	<#if lst.list_pro ??>
+			   			<#list lst.list_pro as t>
+			                <li>
+			                    <div class="image"><a href="${CTX}/ab/detailpro/${(t.id)!}"><img src="${CTX}/upload/${(t.img_url)!}" ></a></div>
+			                    <div class="classify_font">
+			                        <p class="name"><a href="${CTX}/ab/detailpro/${(t.id)!}">${(t.mc)!}</a></p>
+			                        <span class="price"><s>${(t.mdprice)!}¥</s><span style="margin:0 5px">现价：<i class="nowprice">${(t.price)!}¥</i></span></span>
+									<div class="fr">
+										<input type="hidden" class="buyProId" value="${(t.id)!}"/>
+										<input type="button" class="subNum" value="-" style="width: 20px;">
+										<input type="text" class="buyNum" value="${(t.procnt)!'0'}" id="add_num_${(t.id)!}" name="add_num_${(t.id)!}" style="width: 30px;">
+										<input type="button" class="addNum" value="+" style="width: 20px;">
+										<a href="${CTX}/ab/detailpro/${(t.id)!}" target="_blank">详细信息...</a>
+									</div>
+			                    </div>
+			                </li>
+			   			</#list>
+					</#if>
+			      </ul>
+				</div>
+			</#list>
+		</#if>
+    </div>
+    
+</div>
+
+<div id="myordercart" style="width:252px;height:280px;border: 0px solid #c0c0c0;background-color: #F4F4F4;z-index: 10;">
+	<div style="height: 28px;background-color: #EE7621;width: 250px;line-height: 28px;color: white;border-left: 1px solid #EE7621;border-right: 1px solid #EE7621">&nbsp;&nbsp;我的购物车(${(r.procnt)})</div>
+	<div style="height: 150px;width: 250px;border-left: 1px solid #EE7621;border-right: 1px solid #EE7621;">
+		<table style="width: 250px;margin-left: 2px;">
+			<tr>
+				<td width="*" align="center">商品</td>
+				<td width="40px;" align="center">数量</td>
+				<td width="60px;" align="center">价格</td>
+				<td width="60px;" align="center">操作</td>
+			</tr>
+			<#if list_order ??>
+		      	<#list list_order as lst>
+		     	<tr>
+	                            <td><span>${(lst.itemname)!}</span></td>
+	                            <td align="center">
+	                                <a class="subtract" href="javascript:void(0);" onclick="uf_reduce('${(lst.orderid)!}','${(lst.itemid)!}','${(lst.quantity)}','${(userid)!}')">-</a>
+	                                <span>${(lst.quantity)}</span>
+	                                <a class="plus" href="javascript:void(0);" onclick="uf_addnum('${(lst.orderid)!}','${(lst.itemid)!}','${(lst.quantity)}','${(userid)!}')">+</a>
+	                            </td>
+	                            <td align="center">
+	                                <span class="cd48543">${(lst.price)?string("currency")}</span>
+	                            </td>
+	                            <td  align="center">
+	                           	 	<a href="javascript:void(0);" onclick="uf_delpro('${(lst.id)!}','${(userid)!}');">删除</a>
+	                            </td>
+	                        </tr>
+				</#list>
+			</#if>
+		</table>
+	</div>
+	<div style="line-height: 18px;border-left: 1px solid #EE7621;border-right: 1px solid #EE7621;padding-left: 5px;">
+		餐品总价：<#if r ??>${(r.spzj)?string("currency")}<#else>0.00</#if><br/>
+		跑腿费：<#if r ??>${(r.ptf)?string("currency")}<#else>0.00</#if><br/>
+		优惠金额：<#if r ??>${(r.yhje)?string("currency")}<#else>0.00</#if><br/>
+		订单总金额：<#if r ??>${(r.ddzje)?string("currency")}<#else>0.00</#if>
+	</div>
+	<div style="height: 32px;line-height: 32px;padding-left: 5px;border-left: 1px solid #EE7621;border-right: 1px solid #EE7621;border-bottom: 1px solid #EE7621;">
+		<a href="javascript:void();" onclick="uf_klzj('${(userid)!}')" style="padding:4px 10px 4px 10px;background-color:#FF7F24;text-decoration:none;color: white;">结算</a>
+	</div>
+</div>
+<!-- 评价 -->
+<script type="text/javascript">
+ function scroll(p){
+     var d = document,w = window,o = d.getElementById(p.id),ie6 = /msie 6/i.test(navigator.userAgent);
+     if(o){
+	      o.style.cssText +=";position:"+(p.f&&!ie6?'fixed':'absolute')+";"+(p.r?'left':"right")+":0;"+(p.t!=undefined?'top:'+p.t+'px':'bottom:20;right: 10px;');
+	      if(!p.f||ie6){
+	       -function(){
+	           var t = 500,st = d.documentElement.scrollTop||d.body.scrollTop,c;
+	                 c = st  - o.offsetTop + (p.t!=undefined?p.t:(w.innerHeight||d.documentElement.clientHeight)-o.offsetHeight);//如果你是html 4.01请改成d.body,这里不处理以减少代码
+	              c!=0&&(o.style.top = o.offsetTop + Math.ceil(Math.abs(c)/10)*(c<0?-1:1) + 'px',t=10);
+	              setTimeout(arguments.callee,t)
+	          }() 
+	      }
+	     }  
+ }
+$().ready(function(){
+	uf_leave_close();
+	scroll({id:'myordercart'});
+	
+	
+	$(".subNum").click(function(){
+		if($('#userid').val()==''){
+			$.dialog.alert("请登录后进行选择！",function(){
+				window.location.href="${CTX}/ab/login";
+			});
+			return false;
+		}
+		var buyNum = $(this).siblings(".buyNum").val();
+		if(buyNum>0){
+			buyNum--;
+			//$(this).siblings(".buyNum").val(buyNum);
+			
+			$.post("${CTX}/ab/order/addtocart",{mid:$('#mid').val(),proid:$(this).siblings(".buyProId").val(),addnum:buyNum},function(data){
+                   if(data){
+					$.dialog.alert("添加购物车成功！",function () {
+						refresh();
+			        }).time(0.5);
+				}else{
+					$.dialog.alert("添加购物车失败！");
+				}
+			});
+			
+		}
+	});
+	$(".addNum").click(function(){
+		if($('#userid').val()==''){
+			$.dialog.alert("请登录后进行选择！",function(){
+				window.location.href="${CTX}/ab/login";
+			});
+			return false;
+		}
+		var buyNum = $(this).siblings(".buyNum").val();
+		if(buyNum<100){
+			buyNum++;
+			//$(this).siblings(".buyNum").val(buyNum);
+			$.post("${CTX}/ab/order/addtocart",{mid:$('#mid').val(),proid:$(this).siblings(".buyProId").val(),addnum:buyNum},function(data){
+                   if(data){
+					$.dialog.alert("添加购物车成功！",function () {
+						refresh();
+			        }).time(0.5);
+				}else{
+					$.dialog.alert("添加购物车失败！");
+				}
+			});
+		}
+		
+	});
+})
+</script>
+
+
+<div id="center" class="tab-content" tab-name="comment">
+			<div class="cen_canping">
+				<div class="canping_title">
+					<ul>
+						<li class="canping_radio">
+							<div id="typeall" class="radio_w radio_sel"
+								onclick="fliterappraisetype(this, '${(vo.id)!}')"></div> <input type="radio"
+							name="appraisetype" value="0" /><span class="sel_canping">全部评价<b>(${(count_appall)!})</b></span>
+						</li>
+						<li class="canping_radio">
+							<div id="typeone" class="radio_w"
+								onclick="fliterappraisetype(this, '${(vo.id)!}')"></div> <input type="radio"
+							name="appraisetype" value="1" /><span>好评<b>(${(count_appone)!})</b></span>
+						</li>
+						<li class="canping_radio">
+							<div id="typetwo" class="radio_w"
+								onclick="fliterappraisetype(this, '${(vo.id)!}')"></div> <input type="radio"
+							name="appraisetype" value="2" /><span>中评<b>(${(count_apptwo)!})</b></span>
+						</li>
+						<li class="canping_radio" style="border: none;">
+							<div id="typethree" class="radio_w"
+								onclick="fliterappraisetype(this, '${(vo.id)!}')"></div> <input type="radio"
+							name="appraisetype" value="3" /><span>差评<b>(${(count_appthree)!})</b></span>
+						</li>
+					</ul>
+					<div class="canping_img">
+						<div id="imgtype" class="checkbox_w checkbox_sel"
+							onclick="fliterimagetype(this, '${(vo.id)!}')"></div>
+						<input type="checkbox" checked="checked" /><span>有图片的评价</span>
+					</div>
+				</div>
+			</div>
+			<div id="appraisemsglist" class="cen_pj">
+				<ul>
+					<#if list_comm ??> <#list list_comm as lst>
+					<li class="clearfix">
+						<div class="img cmtimg">
+							<img src="${CTX}/res/css/ab/images/user_superman.png" width="60"
+								height="60">
+						</div>
+						<div class="comment-cont">
+							<div class="comment-Title">
+								<div class="comment-TitleC">
+									<span><#if strkit('1',(lst.private)!)>${(lst.mc)!}</#if><#if strkit('2',(lst.private)!)>匿名</#if></span> <i>点评了 </i> <span><a href="#">${(lst.mmc)!}</a></span>
+								</div>
+								<!--点评时间-->
+								<p class="time">
+									${(lst.datetime)!} <span class="font_color"> <#if
+										strkit('1',(lst.type)!)><img
+										src="${CTX}/res/css/ab/images/img2.png" />好评</#if> <#if
+										strkit('2',(lst.type)!)><img
+										src="${CTX}/res/css/ab/images/img3.png" />中评</#if> <#if
+										strkit('3',(lst.type)!)><img
+										src="${CTX}/res/css/ab/images/img4.png" />差评</#if> 
+										<#if (lst.dync_val>=0 && lst.dync_val<1)> ☆☆☆☆☆ </#if> 
+										<#if (lst.dync_val>=1 && lst.dync_val<2)> ★☆☆☆☆ </#if> 
+							            <#if (lst.dync_val>=2 && lst.dync_val<3)> ★★☆☆☆ </#if>
+							            <#if (lst.dync_val>=3 && lst.dync_val<4)> ★★★☆☆ </#if> 
+							            <#if (lst.dync_val>=4 && lst.dync_val<5)> ★★★★☆ </#if> 
+							            <#if (lst.dync_val>=5 && lst.dync_val<6)> ★★★★★ </#if> 
+									</span>
+								</p>
+							</div>
+							<div class="comment-contents">
+								<p>${(lst.content)!}</p>
+							</div>
+							<div>
+								<#if lst.appsImgs ??> <#list lst.appsImgs as imgs> <img
+									src="${CTX}/upload/${(imgs.img_url)!}" width=80px height=60px />
+								</#list> </#if>
+							</div>
+						</div>
+					</li> </#list> </#if>
+				</ul>
+			</div>
+		</div>
+		<div id="center" class="tab-content" tab-name="about">
+			<div class="shop_summary">${(vo.brief)!}</div>
+			<div class="shop_image">
+				<img src="${CTX}/upload/${(vo.img_url)!}" width="700" height="521" />
+				<#if list_img ??> <#list list_img as lst> <img
+					src="${CTX}/upload/${(lst.lager)!}" width="700" height="521" />
+				</#list> </#if>
+			</div>
+		</div>
+
+		<div id="center" class="tab-content" tab-name="activity">
+			<div id="fixed_msg_box">
+				<div>
+					<p class="allmsg">
+						<a href="javascript:;">全部留言</a>
+					</p>
+					<p class="leavemsg">
+						<#if leaveflag == "1" > <a id="leaveMsgBtn" href="#msgDiv"
+							onclick="uf_leave_show('${(vo.id)!}', '')"><span>+</span>发表留言</a> </#if>
+					</p>
+				</div>
+			</div>
+
+			<div class="msglist">
+				<section class="rst_msg_wrap">
+					<div id="leavemsglist" class="rst-comment-wrapper">
+						<#if list_leave ??> <#list list_leave as lst>
+						<div class="rst-comment">
+							<img alt="guest" src="${CTX}/res/css/ab/images/user_superman.png"
+								class="user-avatar"> <#if leaveflag == "2" >
+							<div style="float: right">
+								<a id="replyMsgBtn" href="#replyDiv"
+									onclick="uf_leave_show('${(vo.id)!}', '${(lst.id)!}')">回复留言</a>
+							</div>
+							</#if>
+
+							<div class="user-comment">
+								<p class="rst-comment-info">
+									<span class="name">${(lst.mc)!}</span>${(lst.datetime)!}
+								</p>
+								<p class="rst-comment-content">${(lst.content)!}</p>
+							</div>
+							<span class="clear"></span>
+						</div>
+						<div class="rst-reply-wrapper">
+							<#list lst.replys as rs>
+							<div class="rst-reply ">
+								<img src="${CTX}/res/css/ab/images/shangjia.jpeg"
+									class="manager-avatar">
+								<div class="manager-comment">
+									<p class="rst-comment-info">
+										<span class="name">餐厅回复</span>${(rs.datetime)!}
+									</p>
+									<p class="rst-comment-content">${(rs.content)!}</p>
+								</div>
+								<span class="clear"></span>
+							</div>
+							</#list>
+						</div>
+						</#list> </#if>
+					</div>
+				</section>
+			</div>
+		</div>
+		<input type="hidden" name="leave_id" id="leave_id" />
+		<input type="hidden" name="mid" id="mid"/>
+		<div id="msgDiv"
+			style="left: 50%; top: 191px; margin-left: -270px; display: block; position: fixed; z-index: 11000; opacity: 1;">
+			<div class="divTop">
+				<h3><#if leaveflag == "1" > 发表留言 </#if> <#if leaveflag == "2" >
+					回复留言 </#if></h3>
+				<a href="javascript:;" class="closebtn" alt="关闭"
+					onclick="uf_leave_close()"></a>
+			</div>
+			<div class="msg_cont clear">
+				<textarea placeholder="请输入内容" name="content" id="content"></textarea>
+			</div>
+			<div class="msg_op">
+				<input id="captchaCode" name="captchaCode" class="fl" type="text"
+					placeholder="请输入验证码" size="20" /> <img class="fl" class="msgcode"
+					src="${CTX}/25console/imgcode" id="safecode" alt="点击刷新"
+					onclick="refreshSafecode()" /> <a href="javascript:;"
+					class="fr msgbtn"<#if leaveflag ==
+					"1">onclick="uf_addleave('1','${CTX}')"</#if> <#if leaveflag ==
+					"2">onclick="uf_addreply('1','${CTX}')"</#if>> <#if leaveflag ==
+					"1" > 发表留言 </#if> <#if leaveflag == "2" > 回复留言 </#if> </a>
+			</div>
+			<div id="leaveMsg" class="message" />
+		</div>
+
+		</div>
+		<div class="blank10"></div>
+		<div id="lean_overlay" style="display: none; opacity: 0.45;"></div>
+	</form>
+<!--classify--> 
+<!-- foot页 -->
+<div class="foot clear">
+    <div class="flink"> <a href="/ab/channel/">关于本地生活</a>| <a href="/ab/channel/">本地生活招聘</a>| <a href="/ab/channel/">联系我们</a>| <a href="/ab/channel/">免责声明</a>| <a href="/ab/channel/">建议意见</a>| <a href="/ab/channel/">本地生活推广</a>| <a href="/ab/channel/">商户登录</a>| <a href="/ab/channel/">友情链接</a>| </div>
+    <div class="flink"> <a href="http://www.cdyou.net/yujiale/" target="_blank">长岛渔家乐</a> <a href="http://www.medved-put.com/" target="_blank">车险计算器</a> <a href="http://bj.offcn.com/" target="_blank">北京人事考试网</a> <a href="http://bj.jxedt.com/" target="_blank">北京驾校一点通</a> <a href="http://www.iqingren.com/" target="_blank">爱情人</a> <a href="http://www.7940.com/" target="_blank">违章查询</a> <a href="http://beijing.kuyiso.com/" target="_blank">北京分类信息</a> <a href="http://www.globevisa.com.cn/beijing.html" target="_blank">北京移民公司</a> <a href="http://www.xiaoma.com/chuguoyingyu/ " target="_blank">出国英语考试</a> <a href="http://bj.cn2che.com/" target="_blank">北京二手车市场</a> <a href="http://www.aikuaidi.cn/" target="_blank" >快递单号查询</a> </div>
+    <div class="flink"> 2007-2014 Aibang?<a class="icp" href="http://www.miibeian.gov.cn" target="_blank" onmousedown="sendHtmlReqForlog('in_home_foot_link');"  >京ICP备07008439号</a>?京公网安备110105005729号 </div>
+</div>
+<div class="blank10"></div>
+</body>
+</html>

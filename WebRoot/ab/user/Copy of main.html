@@ -1,0 +1,147 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/user.css"/>
+	
+	<script type="text/javascript">
+		$().ready(function() {
+			var $inputForm = $("#myform");
+			// 表单验证
+			$inputForm.validate({
+				rules: {
+					user_mobile: {required:true,stringMaxLength:11},
+					smsCodeRand: {required:true,stringMaxLength:6},
+					user_password: {required:true,stringMaxLength:11},
+					user_rpassword: {required:true,equalTo:"#user_password"},
+					jiaoyanma: {required:true,stringMaxLength:4}
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				$("#btn_save").attr('disabled',true);
+				$("#btn_save").val("更新中...");
+				$.ajax({
+					url: "${CTX}/ab/certiEmailSend",
+					type: "POST",
+					data: $("#myform").serialize(),
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("操作成功！");
+							refresh();
+						}else{
+							alert("操作失败!原因:" + msg);
+							$("#btn_send").attr('disabled',false);
+							$("#btn_send").val("发送")
+							return false;
+						}
+					}
+				});
+			});
+		});
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>	
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<div class="user_main">
+	<#include '../inc/leftmenu.html'>
+	<div class="user_right">
+		<div class="title">
+			<span>个人中心</span>
+		</div>
+		<div class="content">
+				<div class="info_head">
+					<form>
+					<table class="user_table">
+						<tr>
+							<td colspan="2" class="user_td">
+								<div class="user_pic"><img src="${CTX}/res/css/ab/images/user.png"  /></div>
+								<div class="user_name">
+									<h3>昵称</h3>
+									<p>安全等级：<a href="javascript:;" class="user_right_aq">低</a></p>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="user_td2" colspan="2">基本资料</td>
+						</tr>
+						<tr>
+							<td class="user_td3" >昵称：</td>
+							<td><input type="text" class="info_from" value="${(vo.mc)!}"></td>
+						</tr>
+						<tr>
+							<td class="user_td3" >年龄：</td>
+							<td><input type="text" name="info_old" class="info_from" /></td>
+						</tr>
+						<tr>
+							<td class="user_td3" >星座：</td>
+							<td><input type="text" name="info_xinzuo" class="info_from" /></td>
+						</tr>
+						<tr>
+							<td class="user_td3" >身高：</td>
+							<td><input type="text" name="info_height" class="info_from" /></td>
+						</tr>
+						<tr>
+							<td class="user_td2" colspan="2">详细资料</td>
+						</tr>
+						<tr>
+							<td class="user_td3" >签名：</td>
+							<td><input type="text" name="info_qname" class="info_from" /></td>
+						</tr>
+						<tr>
+							<td class="user_td3" >月薪：</td>
+							<td><input type="text" name="info_money" class="info_from" /></td>
+						</tr>
+						<tr>
+							<td class="user_td3" >地区：</td>
+							<td><input type="text" name="info_area" class="info_from" /></td>
+						</tr>
+						<tr>
+							<td class="user_td3" >职业：</td>
+							<td><input type="text" name="info_ziye" class="info_from" /></td>
+						</tr>
+						<tr>
+							<td class="user_td3" >情感：</td>
+							<td><input type="text" name="info_hun" class="info_from" /></td>
+						</tr>
+						<tr>
+							<td class="user_td3" >抽烟：</td>
+							<td><input type="text" name="info_yan" class="info_from" /></td>
+						</tr>
+						<tr>
+							<td class="user_td3" >喝酒：</td>
+							<td><input type="text" name="info_jiu" class="info_from" /></td>
+						</tr>
+						<tr>
+							<td colspan="2" ><input type="button" name="info_submit" value="确认" class="info_submit" />&nbsp;<input type="button" name="info_submit" value="取消" class="info_submit" /></td>
+							
+							
+						</tr>
+					</table>
+					</form>
+				</div>
+				
+				
+		</div>
+	</div>
+	<div class="clear"></div>
+	
+</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

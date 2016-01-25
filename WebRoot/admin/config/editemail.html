@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			 $("#myform").validate({
+				rules: {
+					config_yt: {required:true,stringMaxLength:50},
+					config_c1: {required:true,stringMaxLength:50},
+					config_c2: {required:true,stringMaxLength:50},
+					config_c3: {required:true,stringMaxLength:50},
+					config_c4: {required:true,stringMaxLength:50},
+					config_c5: {stringMaxLength:100}
+				},
+				messages:{
+					config_yt:"名称",
+					config_c1:"服务器网关",
+					config_c2:"服务器端口号",
+					config_c3:"邮箱帐号",
+					config_c4:"邮箱密码",
+					config_c5:"备注！"
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				if($("#myform").valid()){
+				    $.post("${CTX}/admin/config/saveconfig",$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("电子邮箱服务配置成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("电子邮箱服务配置失败！");
+						}
+					});
+				}
+			});
+		});
+		
+		function refresh(){
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+			$('#myform').submit();
+		}
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" method="post">
+	<input type="hidden" name="config_id" id="config_id" value="${(vo.id)!}"/>
+	<div class="path">
+		<a href="javascript:void(0);">首页</a> &raquo; 邮箱配置
+	</div>
+	<table class="input">
+		<tr>
+			<th align="right">名称：</th>
+			<td><input type="text" name="config_yt" id="config_yt" class="text" value="${(vo.yt)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">服务器网关：</th>
+			<td><input type="text" id="config_c1" name="config_c1" class="text" value="${(vo.c1)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">端口号：</th>
+			<td><input type="text" id="config_c2" name="config_c2" class="text" value="${(vo.c2)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">用户名：</th>
+			<td><input type="text" id="config_c3" name="config_c3" class="text" value="${(vo.c3)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">密码：</th>
+			<td><input type="text" id="config_c4" name="config_c4" class="text" value="${(vo.c4)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">备注：</th>
+			<td><textarea id="config_c5" name="config_c5" class="text" style="width: 400px;">${(vo.c5)!}</textarea></td>
+		</tr>
+		<tr>
+		<td>&nbsp;</td>
+		<td>
+			<input type="button" id="btn_save" class="button" value="保 存" />
+			<input type="button" id="btn_return" class="button" value="刷 新" onclick="javascript:window.location.href='${CTX}/admin/config/editemail'"/>
+		</td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

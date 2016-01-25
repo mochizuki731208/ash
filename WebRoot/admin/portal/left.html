@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>${SYSNAME}</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link href="${CTX}/res/css/admin/mainhome.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript">
+		function clickFirst(){
+			$("ul li:first-child a").each(function(){
+				//this.click();
+			});
+		}
+	</script>
+</head>
+
+<body onload="clickFirst()">
+	<div class="topmenu">系统配置管理</div>
+	<ul class="menu">
+		<#list list_sub as vo>
+		     <li><a href="${CTX}${(vo.menu_url)!''}"  target="content"> ${(vo.mc)!''}</a></li>
+		</#list>
+		<!-- 
+		<li><a href="${CTX}/admin/fmcar"  target="content"> 我的熟车</a></li>
+		 -->
+	</ul>
+</body>
+</html>

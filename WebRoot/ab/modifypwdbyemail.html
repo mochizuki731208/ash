@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					pwd: {required:true,stringMaxLength:50},
+					cfpwd: {required:true,equalTo:'#pwd', stringMaxLength:50}
+				}
+			});
+			
+			$("#btn_send").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$("#btn_send").attr('disabled',true);
+					$("#btn_send").val("修改中...");
+					$.ajax({
+						url: "${CTX}/ab/savemodifyemail",
+						type: "POST",
+						data: {id:$('#id').val(),pwd:$('#pwd').val()},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("密码修改成功，请使用新密码登录系统！",function(){
+									window.location.href="${CTX}/";
+								});
+							}else{
+								$.dialog.alert("密码修改失败，请刷新页面后重新操作！",function(){
+									$("#btn_send").attr('disabled',false);
+									$("#btn_send").val("发送")
+								});
+							}
+						}
+					});
+				}
+			});
+		});
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>	
+ </head>
+  <body>
+  	<#include 'inc/top.html'>
+	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include 'inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">重置密码</h2>
+			<div class="editinfo">
+			<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+				<input type="hidden" id="id" name="id" value="${(vo.id)!''}">
+				<table class="input">
+						<tr>
+							<th align="right">名称：</th>
+							<td><input type="text" class="text" disabled="disabled" value="${(vo.mc)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">邮箱：</th>
+							<td><input type="text" class="text" disabled="disabled" value="${(vo.email)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">输入新密码：</th>
+							<td><input type="password" id="pwd" name="pwd" class="text" value=""></td>
+						</tr>
+						<tr>
+							<th align="right">重新输入新密码：</th>
+							<td><input type="password" id="cfpwd" name="cfpwd" class="text" value=""></td>
+						</tr>
+						<tr>
+							<th align="right"></th>
+							<td>
+								<input type="button" id="btn_send" class="button" value="修改密码" />
+							</td>
+						</tr>
+				</table>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</body>
+</html>

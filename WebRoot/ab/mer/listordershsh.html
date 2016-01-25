@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_showorder(orderid){
+			$.dialog({
+				title:'订单明细',
+				content: 'url:${CTX}/admin/dd/showdd?id='+orderid,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function uf_shtg(id,mid){
+			$.dialog.confirm('确定要将该订单审核通过吗？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/order/saveordershtg",
+					type: "POST",
+					data: {id:id,mid:mid},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("数据操作成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("数据操作失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_updateorderzf(id){
+			$.dialog.confirm('是否要撤销所选订单信息？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/order/saveorderzf",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("订单撤销成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("订单撤销失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_jd(id){
+			$.dialog.confirm('是否要拒绝接收所选订单信息？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/order/saveorderjd",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("拒绝接收操作成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("拒绝接收操作失败！");
+						}
+					}
+				});
+			});
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function uf_baojia(id,mid){
+		  $.dialog({
+			  title:'输入报价金额',
+			  content: 'url:${CTX}/ab/order/initBaoJia?id=' + id,//订单id
+			  lock:true,
+			  resize: true,
+			  width : 300,
+			  height : 80,
+			  cover:true,
+			  max:true,
+			  min:true,
+			  button:[{
+				  name: '保 存',
+				  callback:function(){
+						  $.post("${CTX}/ab/order/saveBaoJia",this.content.$("#myform").serializeArray(),function(data){
+							  if(data){
+								  $.dialog.alert("报价成功，请等待下单人选择是否中标！");
+								  refresh();
+							  }
+						  });
+					  return false;
+				  },
+				  focus: true
+			  }],
+			  cancelVal:'关 闭'
+		  });//
+    }
+
+	</script>	
+ </head>
+  <body>
+  	<form id="myform" name="myform">
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">客户订单确认</h2>
+			<table class="list">
+            <tr>
+	            <th width="30px;">序号</th>
+	            <th width="100px;">订单号</th>
+	            <th width="60px;">总金额</th>
+	            <th width="80px;">客户名称</th>
+	            <th width="90px;">联系电话</th>
+	            <th width="*;">送货地址</th>
+				<th width="125px;">下单时间</th>
+	            <th width="8%;">支付方式</th>
+	            <th width="8%;">支付状态</th>
+				<th width="100px;">操作</th>
+	        </tr>
+	        <#if listpage ??>
+      				<#list listpage.list  as lst>
+	                  <tr>
+	                  	<td>${(lst_index+1)!''}</td>
+	                    <td class="bold"><a href="javascript:void(0);" onclick="uf_showorder('${(lst.id)!}')">${(lst.sn)!''}</a></td>
+	                    <td class="red bold">${(lst.ddzje)?string("currency")}</td>
+	                    <td><#if strkit('1',(lst.ddzt)!)>XXXX<#else>${(lst.xdrmc)!}</#if></td>
+	                    <td><#if strkit('1',(lst.ddzt)!)>XXXX<#else>${(lst.lxrdh)!}</#if></td>
+	                    <td><#if strkit('1',(lst.ddzt)!)>XXXX<#else>${(lst.shdz)!}</#if></td>
+	                    <td>${(lst.xdsj)!''}</td>
+	                    <td>
+	                    	<#if strkit('1',(lst.zffs)!)><span class="red">充值直扣</span></#if>
+	                    	<#if strkit('2',(lst.zffs)!)><span class="red">支付宝</span></#if>
+	                    	<#if strkit('3',(lst.zffs)!)><span class="red">货到付款</span></#if>
+	                    	<#if strkit('4',(lst.zffs)!)><span class="red">无支付</span></#if>
+	                    </td>
+	                    <td><#if strkit('0',(lst.zfzt)!)>未支付</#if><#if strkit('1',(lst.zfzt)!)>已支付</#if></td>
+	                    <td>
+	                    	<a href="javascript:void(0);" onclick="uf_jd('${(lst.id)}','${(lst.mid)!}')">拒单</a>
+	                    	<a href="javascript:void(0);" onclick="uf_shtg('${(lst.id)}','${(lst.mid)!}')">接单</a>
+	                    	<a href="javascript:void(0);" onclick="uf_baojia('${(lst.id)}','${(lst.mid)!}')">报价</a>
+	                    </td>
+	                  </tr>
+				</#list>
+			</#if>
+			<tr>
+					<td colspan="10">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+            </table>
+		</div>
+	</div>
+	</form>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<#include '/ab/inc/meta.html'>  	
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/fmcar/plugins/require.js"></script>
+<script type="text/javascript"
+	src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="${CTX}/res/css/fmcar/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="${CTX}/res/css/fmcar/bootstrapValidator.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="${CTX}/res/css/fmcar/common.css" />
+<link rel="stylesheet" type="text/css"
+	href="${CTX}/res/css/fmcar/my-trucks.css" />
+<link rel="stylesheet" type="text/css"
+	href="${CTX}/res/js/uploadify/uploadify.css" />
+<script type="text/javascript">
+	$(function() {
+		var uploadExcel = $("#uploadExcel");
+		uploadExcel.uploadify({
+			swf:'${CTX}/res/js/uploadify/uploadify.swf',
+			uploader:'${CTX}/ab/fmcar/uploadCars',
+			auto: false, //是否自动上传 
+			multi: false,
+			buttonText :'选择文件',
+			width: '75', //按钮宽度  
+			height: '24', //按钮高度
+			fileExt:'*.xls;*.xlsx;',
+			queueID: 'fileQueue',//队列id,用来展示上传进度的
+			fileObjName: 'uploadExcel', //<input type="file"/>的name  
+			method: 'post',
+			removeCompleted: true,//上传完成后自动删除队列  
+			onUploadSuccess:function(file,data,response){
+				var result = eval("(" + data + ")");
+				if(result.totalNum != null){
+					alert("操作成功，共"+result.totalNum+"辆，成功"+result.successNum+"辆.\r\n"+"失败的手机号是:"+result.errorMobile+",\r\n" + "具体原因:"+ result.errorMsg);
+					window.location.reload();
+				}else{
+					alert(data);
+				}
+	         }
+		});
+		
+		$("#importCarYes").off("click").on("click",function(){
+			var recommendNo = $("#marketCode").val();
+			uploadExcel.uploadify('settings', 'uploader','${CTX}/ab/fmcar/uploadCars?recommendNo='+recommendNo);
+			uploadExcel.uploadify('upload', '*');
+		});
+	});
+
+    require(['./res/js/fmcar/boot'], function () {
+        require(['my-trucks']);
+    });
+   
+    function refresh(){
+		$('#myform').submit();
+		$('#myform').action = "";
+		$('#myform').target = "_self";
+	}
+   
+    function updateStatus(applyInfor)
+    {
+    	$.post('${CTX}/ab/invoice/updateStatus?applyInfor='+applyInfor,function(data)
+    	{
+			if(data && data.msg=="success")
+			{
+				alert("发票签收成功");
+				refresh();
+			}
+			else
+			{
+				alert("发票签收失败，请稍后再试");
+			}
+		});
+    }
+    
+    function reApply(applyInfor)
+    {
+    	$.post('${CTX}/ab/invoice/reApplyInvoice?applyInfor='+applyInfor,function(data)
+    	{
+			if(data && data.msg=="success")
+			{
+				window.opener.location.reload();
+				window.opener=null;
+				window.close();
+			}
+			else{
+				alert("打开页面失败");
+			}
+		});
+    }
+</script>
+</head>
+<body>
+<#if abuser?? && !user??> <#include '/ab/inc/top.html'>
+	<!-- 搜索栏 -->
+	<!-- 导航 -->
+	</#if>
+			<div class="container" style="height: 750px; width: 80%">
+				<form id ="myform" name="myform" action="">
+				<div class="row mg-tb-20">
+					<div class="col-xs-2">
+						<h3 class="title-h3 mg-0">发票</h3>
+					</div>
+					<div class="col-xs-10">
+						<div class="navbar-collapse collapse">
+							<form class="navbar-form navbar-right mg-0"
+								action="${CTX}/ab/fmcar/searchFmcar" id="searchFmcarForm"
+								method="post">
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="panel panel-default">
+							<div class="panel-body">
+								<table class="table table-hover mg-0">
+									<thead>
+										<tr>
+											<th>订单号(金额)</th>
+											<th>发票金额</th>
+											<th>发票抬头</th>
+											<th>发票状态</th>
+											<th>发票详情</th>
+											<th>收件人号码</th>
+											<th>收件人</th>
+											<th>收件人地址</th>
+											<th>操作</th>
+										</tr>
+									</thead>
+									<tbody id="myCarTbody">
+										<#if resultList??> <#list resultList as lst>
+										<tr>
+
+											<td style="display: none">${(lst.applyInfor)!''}</td>
+											<td>${(lst.order_sn)!''}</td>
+											<td>${(lst.money)!''}</td>
+											<td>${(lst.type)!''}</td>
+											<td>${(lst.have_done)!''}</td>
+											<td>${(lst.content)!''}</td>
+											<td>${(lst.mobile)!''}</td>
+											<td>${(lst.name)!''}</td>
+											<td>${(lst.address)!''}</td>
+											<td>
+												<#if (((lst.status)!) == 2)>
+													<a javascript="void(0)" onclick="updateStatus('${(lst.applyInfor)}')">签收</a>
+												</#if>
+												<#if (((lst.status)!) == 1)>
+													<a javascript="void(0)" onclick="reApply('${(lst.applyInfor)}')">重新申请</a>
+												</#if>
+											</td>
+										</tr>
+										</#list> <#else>
+										<tr>
+											<th scope="row">暂无数据</th>
+										</tr>
+										</#if>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<!-- 筛选条件 弹窗 -->
+				<div class="modal fade" id="myModalFilter" tabindex="-1"
+					role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal"
+									aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+
+
+			<!-- 栏目页 -->
+			<#if abuser?? && !user??> 
+			</form>
+		</div>
+	</div>
+	<div class="blank10"></div>
+<#include '/ab/inc/foot.html'> </#if> 
+	
+</body>
+</html>

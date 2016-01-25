@@ -1,0 +1,283 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_sptg(id){
+			if(confirm("是否将此物流企业图片审核通过吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/logi/imgchecktg",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							$.dialog.alert("此物流企业图片审核通过成功！",function(){
+								refresh();
+							});
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		
+		function uf_spbtg(id){
+			if(confirm("是否将此物流企业图片审核不通过吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/logi/imgcheckbtg",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							$.dialog.alert("此物流企业图片审核不通过！",function(){
+								refresh();
+							});
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		function uf_show(img){
+	    	$.dialog({
+				title:'企业图片',
+				content: '<img src="${CTX}/upload/'+img+'">',
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 560,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});
+	    }
+		
+		function uf_del(id){
+			if(confirm("是否将此物流企业图片删除?")){
+			 	$.ajax({
+					url: "${CTX}/admin/logi/imgdelete",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("此物流企业图片已删除！");
+							refresh();
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+	    
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		$().ready(function() {
+			$("#btn_all").click(function (){
+				$("#sfrzzt").attr("value","");
+				refresh();
+			});
+			
+			$("#btn_ytg").click(function (){
+				$("#sfrzzt").attr("value","1");
+				refresh();
+			});
+			
+			$("#btn_wtg").click(function (){
+				$("#sfrzzt").attr("value","2");
+				refresh();
+			});
+			
+			$("#btn_dsh").click(function (){
+				$("#sfrzzt").attr("value","0");
+				refresh();
+			});
+			
+			$("#btn_qx").click(function(){
+				if($("#btn_qx").prop("checked")==true){
+					$("[name='ids']").prop("checked",true);//全选
+				}else{
+					$("[name='ids']").prop("checked",false);//全否 
+				}
+			});
+			
+			
+			$("#btn_pl_shtg").click(function (){
+				
+				var obj=document.getElementsByName('ids');  //选择所有name="'test'"的对象，返回数组    
+			    var s='';    
+				for(var i=0; i<obj.length; i++){    
+				    if(obj[i].checked) s+=obj[i].value+',';  //如果选中，将value添加到变量s中    
+				}
+				
+				if(s==''){
+					return false;
+					alert("你还没有选择任何内容！");
+				}
+				
+				if(confirm("是否将所选物流企业图片审核通过吗?")){
+				 	$.ajax({
+						url: "${CTX}/admin/logi/imgchecktg_pl",
+						type: "POST",
+						data: {ids:s},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("所选物流企业图片审核通过！",function(){
+									refresh();
+								});
+							}
+						}
+					});
+				}else{
+					return false;
+				} 
+			});
+			
+			$("#btn_pl_shbtg").click(function (){
+				
+				var obj=document.getElementsByName('ids');  //选择所有name="'test'"的对象，返回数组    
+			    var s='';    
+				for(var i=0; i<obj.length; i++){    
+				    if(obj[i].checked) s+=obj[i].value+',';  //如果选中，将value添加到变量s中    
+				}
+				
+				if(s==''){
+					return false;
+					alert("你还没有选择任何内容！");
+				}
+				
+				if(confirm("是否将所选物流企业图片审核不通过吗?")){
+				 	$.ajax({
+						url: "${CTX}/admin/logi/imgcheckbtg_pl",
+						type: "POST",
+						data: {ids:s},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("所选物流企业图片审核不通过！",function(){
+									refresh();
+								});
+							}
+						}
+					});
+				}else{
+					return false;
+				} 
+			});
+			
+			$("#btn_pl_delete").click(function (){
+				
+				var obj=document.getElementsByName('ids');  //选择所有name="'test'"的对象，返回数组    
+			    var s='';    
+				for(var i=0; i<obj.length; i++){    
+				    if(obj[i].checked) s+=obj[i].value+',';  //如果选中，将value添加到变量s中    
+				}
+				
+				if(s==''){
+					return false;
+					alert("你还没有选择任何内容！");
+				}
+				
+				if(confirm("是否将所选物流企业图片删除?")){
+				 	$.ajax({
+						url: "${CTX}/admin/logi/imgdelete_pl",
+						type: "POST",
+						data: {ids:s},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("所选物流企业图片删除！",function(){
+									refresh();
+								});
+							}
+						}
+					});
+				}else{
+					return false;
+				} 
+			});
+		});
+	</script>
+</head>
+  <body>
+  	  <form id="myform" name="myform" method="post" action="">
+			<input type="hidden" id="sfrzzt" name="sfrzzt" value=""/>
+			<input type="button" id="btn_all" class="button" value="全部" onclick="refresh();"/>
+			<input type="button" id="btn_ytg" class="button" value="已通过" onclick="refresh();"/>
+			<input type="button" id="btn_wtg" class="button" value="未通过" onclick="refresh();"/>
+			<input type="button" id="btn_dsh" class="button" value="待审核" onclick="refresh();"/>
+			<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+	  		<table class="list">
+	            <tr>
+		            <th width="40px;">序号</th>
+		            <th width="*%">类型</th>
+					<th width="16%">创建时间</th>
+					<th width="30%">图片</th>
+					<th width="8%">审核状态</th>
+					<th width="18%">操作</th>
+		        </tr>
+	      		<#if listpage ??>
+      				<#list listpage.list as lst>
+	                  <tr>
+	                  	<td><input type="checkbox" id="ids" name="ids" value="${(lst.id)!}"/></td>
+						<td>
+	                    	<#if strkit('scene',(lst.description)!)>公司场景</#if>
+	                    	<#if strkit('honor',(lst.description)!)>公司荣誉</#if>
+							<#if strkit('faith',(lst.description)!)>诚信档案</#if>
+	                    </td>
+	                    <td>${(lst.scsj)!''}</td>
+						<td>
+	                   	 	<a href="javascript:void(0);" onclick="uf_show('${(lst.lager)!''}')">
+							<img src="${CTX}/upload/${(lst.lager)!''}" style="width: 80px;height: 60px;"></a>
+	                    </td>
+	                    <td>
+	                    	<#if strkit('0',(lst.check_status)!)>未审核</#if>
+	                    	<#if strkit('1',(lst.check_status)!)>通过</#if>
+							<#if strkit('2',(lst.check_status)!)>未通过</#if>
+	                    </td>
+	                    <td>
+							<a href="javascript:void(0);" onclick="uf_show('${(lst.lager)!''}')">查看</a>
+	                    	<#if strkit('0',(lst.check_status)!)><a href="javascript:void(0)" onclick="uf_sptg('${(lst.id)!}')"><img src="${CTX}/res/images/btn/tick.png"/>通过</a> </#if>
+	                    	<#if strkit('1',(lst.check_status)!)><a href="javascript:void(0)" onclick="uf_spbtg('${(lst.id)!}')"><img src="${CTX}/res/images/btn/del.png"/>未通过</a> </#if>
+							<#if strkit('2',(lst.check_status)!)><a href="javascript:void(0)" onclick="uf_sptg('${(lst.id)!}')"><img src="${CTX}/res/images/btn/tick.png"/>通过</a> </#if>
+	                    </td>
+	                  </tr>
+					</#list>
+				</#if>
+				<tr>
+					<td colspan="6" style="text-align: left">&nbsp;
+					<input type="checkbox" id="btn_qx">全选
+					<input type="button" id="btn_pl_shtg" class="button" value="批量通过" />
+					<input type="button" id="btn_pl_shbtg" class="button" value="批量不通过"/>
+					<input type="button" id="btn_pl_delete" class="button" value="批量删除"/>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="7">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+            </table>
+   
+			</form>
+  </body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					admin_id:{required:true}
+				}
+			});
+			
+			$("#admin_id").focus();
+		});
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" action="${CTX}${NAME_SPACE}/doSetAdminForVip" method="post" >
+	<input type="hidden" name="id" id="id" value="${(vo.id)!}"/>
+	<table class="input">
+		<tr>
+			<th align="right">管理员：</th>
+			<td>
+				<select name="admin_id" id="admin_id">
+	               <option value="">请选择</option>
+	               <#if adminList??>
+				   <#list adminList as x>
+						<option value="${(x.id)!''}" <#if strkit((x.id)!'',(vo.p_id)!)>selected</#if>>${(x.role_name)!''}__${(x.mc)!''}__${(x.xxdz)!''}</option>
+				   </#list>
+				   </#if>
+				</select> 
+			</td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

@@ -1,0 +1,158 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>易生活网</title>
+    <#include '../inc/meta.html'>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			$("#myform").validate({
+				rules: {
+					product_mc: {required:true,stringMaxLength:50},
+					product_price: {required:true,number:true,min:0},
+					product_mdprice: {required:true,number:true,min:0},
+					product_ptf: {number:true,min:0},
+					product_seq_num: {required:true,digits:true,min:0},
+					product_productinfo: {stringMaxLength:200}
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				if($("#myform").valid()){
+				    $("#myform").submit();
+				}
+			});
+			
+			$('#titleimg').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' id='product_img_url' name='product_img_url' value='"+data+"'/>");
+					$('#imga').append("<img src='${CTX}/upload/"+data+"' width=80px height=60px/>");
+                 }
+			});
+			
+			$("#product_sub_id").change(function () {
+                //清除二级下拉列表
+                $("#product_thr_id").empty();
+                //将选中的一级下拉列表项的id传过去
+                $.getJSON("${CTX}/common/subsubject", {p_id:$("#product_sub_id").find("option:selected").val()},function (data) {
+                    //对请求返回的JSON格式进行分解加载
+                    $(data).each(function () {
+                        $("#product_thr_id").append($("<option/>").text(this.mc).attr("value",this.id));
+                    });
+                });
+            });
+			
+			$('#file_upload').uploadify({
+				swf: '${CTX}/res/js/uploadify/uploadify.swf',
+				uploader: '${CTX}/common/upload',
+				debug:false,
+				multi: true,
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+                onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='imgurl' value='"+data+"'/>");
+					$('#myform').append("<input type='hidden' name='imgsize' value='"+file.size+"'/>");
+					$('#myform').append("<input type='hidden' name='imgtype' value='"+file.type+"'/>");
+					$('#myform').append("<input type='hidden' name='imgname' value='"+file.name+"'/>");
+					$('#imgb').append("<img src='${CTX}/upload/"+data+"' width=80px height=60px/>");
+                 }
+			});
+		});
+	</script>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">账号信息</h2>
+			<div class="editinfo">
+				<form id="myform" name="myform" action="${CTX}/ab/mer/saveproduct" method="post">
+					<input type="hidden" name="product_id" id="product_id" value="${(vo.id)!}"/>
+					<table class="input">
+						<tr>
+							<th align="right">商品名称：</th>
+							<td><input type="text" name="product_mc" id="product_mc" class="text" value="${(vo.mc)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">商品价格：</th>
+							<td><input type="text" name="product_price" id="product_price" class="text" value="${(vo.price)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">门店价格：</th>
+							<td><input type="text" name="product_mdprice" id="product_mdprice" class="text" value="${(vo.mdprice)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">状态：</th>
+							<td>
+								<select name="product_sfsj" id="product_sfsj">
+								<option value="1" <#if strkit('1',(vo.sfsj)!)>selected</#if>>上架</option>
+								<option value="0" <#if strkit('0',(vo.sfsj)!)>selected</#if>>下架</option>
+								</select>
+							</td>
+						</tr>
+						<#if m??>
+							<#if strkit('1',(m.sfzs)!)>
+						<tr>
+							<th align="right">跑腿费：</th>
+							<td><input type="text" name="product_ptf" id="product_ptf" class="text" value="${(vo.ptf)!}"></td>
+						</tr>
+							</#if>
+						</#if>
+						<tr>
+							<th align="right">排列顺序：</th>
+							<td><input type="text" id="product_seq_num" name="product_seq_num" class="text" value="${(vo.seq_num)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">商品描述：</th>
+							<td><textarea id="product_productinfo" name="product_productinfo" class="text">${(vo.productinfo)!}</textarea></td>
+						</tr>
+						<tr>
+							<th align="right">首页展示图：</th>
+							<td>
+								<div id="imga"><#if vo.img_url?exists><img src="${CTX}/upload/${(vo.img_url)!''}" style="width: 80px;height: 60px;"></#if></div>
+								<input type="file" name="titleimg" id="titleimg" multiple="false"/>
+							</td>
+						</tr>
+						<tr>
+							<th align="right">商品图片：</th>
+							<td>
+								<div id="imgb">
+									<#list list_img as x>
+									    <img src="${CTX}/upload/${(x.lager)!''}" style="width: 80px;height: 60px;"><br/>
+									</#list>
+								</div>
+								<input id="file_upload" name="file_upload" type="file" multiple="true"></td>
+						</tr>
+						<tr>
+						<td>&nbsp;</td>
+						<td>
+							<input type="button" id="btn_save" class="button" value="保 存" />
+							<input type="button" id="btn_return" class="button" value="返 回" onclick="javascript:window.location.href='${CTX}/ab/mer/listproduct?mid=${(vo.mid)!}'"/>
+						</td>
+						</tr>
+					</table>
+					</form>
+			</div>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

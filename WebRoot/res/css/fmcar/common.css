@@ -1,0 +1,80 @@
+.container {
+    margin: 0 auto;
+    font-family: 'Microsoft YaHei',Tahoma,"\5b8b\4f53",Arial,Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+    color: #333;
+    background-color: white;
+}
+
+/*reset bootstrap style*/
+.navbar-default{
+    background-color: #ffffff;
+}
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    vertical-align: middle;
+}
+@media (min-width: 768px){
+    .navbar-nav>li>a {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+}
+
+/*end reset bootstrap style*/
+
+.title-h3{
+    line-height: 34px;
+    color: #337ab7;
+}
+.menu-head{
+    width: 35px;
+    height: 35px;
+}
+
+/*地图*/
+.mapContainer{
+    min-height: 422px;
+}
+.map-result-container{
+    position: relative;
+}
+.map-result{
+    height:205px;
+    background-color:#fff;
+    border:1px solid #ccc;
+    line-height:15px;
+    overflow:hidden;
+    position: absolute;
+    left: 15px;
+    top: 33px;
+    display: none;
+    z-index: 100;
+}
+
+/* reset margin and padding and float*/
+.mg-0{
+    margin: 0;
+}
+.mg-b-20{
+    margin-bottom: 20px;
+}
+.mg-tb-20{ margin:20px 0}
+
+.mg-tb-5{ margin:5px 0}
+
+.float-r{
+    float: right;
+}
+.pd-r-10{
+    padding-right: 10px;
+}
+.pd-t-10{
+    padding-top: 10px;
+}
+.green{
+    color: green;
+}
+.blue{
+    color: #337ab7;
+}

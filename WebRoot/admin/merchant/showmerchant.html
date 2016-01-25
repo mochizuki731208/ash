@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+</head>
+  <body>
+	<table class="input">
+		<tr>
+			<th align="right">头像：</th>
+			<td colspan="3">
+				<#if strkit('',(vo.logo)!)>
+					<img src="${CTX}/upload/${(vo.logo)!}" style="max-width: 60px;max-height: 60px;">
+				<#else>无
+				</#if>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">企业名称：</th>
+			<td>${(vo.mc)!}</td>
+			<th align="right">登录号：</th>
+			<td>${(u.loginid)!}</td>
+		</tr>
+		<tr>
+			<th width="15%;" align="right">企业分类：</th>
+			<td width="35%;">${(vo.subject_name)!}</td>
+			<th width="15%;" align="right">企业类型：</th>
+			<td width="35%;"><#if vo.is_type=='0'>货物</#if><#if vo.is_type=='1'>服务</#if></td>
+		</tr>
+		<tr>
+			<th align="right">所属城市：</th>
+			<td>${(vo.city_name)!}</td>
+			<th align="right">区域名称：</th>
+			<td>${(vo.area_name)!}</td>
+		</tr>
+		<tr>
+			<th align="right">地址：</th>
+			<td>${(vo.xxdz)!}</td>
+			<th align="right">手机号：</th>
+			<td>${(vo.mobile)!}</td>
+		</tr>
+		<tr>
+			<th align="right">电话：</th>
+			<td>${(vo.tel)!}</td>
+			<th align="right">QQ号码：</th>
+			<td>${(vo.qq)!}</td>
+		</tr>
+		<tr>
+			<th align="right">微信：</th>
+			<td>${(vo.weixin)!}</td>
+			<th align="right">微博：</th>
+			<td>${(vo.weibo)!}</td>
+		</tr>
+		<tr>
+			<th align="right">首页展示图：</th>
+			<td colspan="3"><img src="${CTX}/upload/${(vo.img_url)!''}" style="width: 160px;height:120px;"></td>
+		</tr>
+		<tr>
+			<th align="right">营业状态：</th>
+			<td>
+				<#if (((vo.business_status)!) == '0')>已关门</#if>
+				<#if (((vo.business_status)!) == '1')>营业中</#if>
+				<#if (((vo.business_status)!) == '2')>休息中</#if>
+			</td>
+			<th align="right">是否自送：</th>
+			<td><#if (((vo.sfzs)!) == '1')>是</#if><#if (((vo.sfzs)!) == '0')>否</#if></td>
+		</tr>
+		<tr>
+			<th align="right">企业描述：</th>
+			<td colspan="3">${(vo.brief)!}</td>
+		</tr>
+	</table>
+  </body>
+</html>
+

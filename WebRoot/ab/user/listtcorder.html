@@ -1,0 +1,887 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+  	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/dd.css"/>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_reset.css">
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/main.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/liuyan.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/page.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+    <link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/common.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-1.8.17.custom.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-zh-CN.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/highcharts-4.0.3/js/highcharts.js"></script>
+	<script type="text/javascript">
+		function uf_addprice(id){
+			$.dialog({
+				title:'加价',
+				content: 'url:${CTX}/admin/dd/to_updateprice?id='+id,
+			    lock:true,
+			    resize: false,
+			   
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭',
+		        close: function(event, ui) {
+		         location.reload();
+		        } 
+			});//弹出框
+		}
+		
+			function uf_addbzj(id){
+			$.dialog({
+				title:'保证金',
+				content: 'url:${CTX}/admin/dd/to_updatebzj?id='+id,
+			    lock:true,
+			    resize: false,
+			   
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭',
+		        close: function(event, ui) {
+		        location.reload();
+		        } 
+			});//弹出框
+		}
+		
+			function uf_showdd(id){
+			$.dialog({
+				title:'订单明细',
+				content: 'url:${CTX}/admin/dd/showdd?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function uf_showddgz(id){
+			$.dialog({
+				title:'订单轨迹-原始',
+				content: 'url:${CTX}/admin/order/guiji?id=' + id,
+			    lock:true,
+			    resize: true,
+			    width : 1440,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true
+			}).max();//
+		}
+		//签收
+		function uf_qsorder(id){
+			$.dialog.confirm('如确定货物没问题，确定签收，3天内发现问题也可维权，是否继续？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/order/qsorder",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("签收成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("签收失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_delorder(id){
+			$.dialog.confirm('是否要删除所选订单信息？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/order/delorder",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除数据成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("删除数据失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_paytcorder(id){
+			$.dialog.confirm('是否要支付该订单？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/tc/payorder",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data == '1'){
+							$.dialog.alert("支付成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else if(data == '0'){
+							self.location.href = '${CTX}/ab/card/zhyefail';
+						}else{
+							$.dialog.alert("支付失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_updateorderzf(id){
+			$.dialog.confirm('是否要撤销所选订单信息？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/order/saveorderzf",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("订单撤销成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("订单撤销失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function refreshSafecode() {
+			var d = new Date();
+			document.getElementById("safecode").src = "${CTX}/25console/imgcode?t="
+					+ d.toString(40);
+		}
+		
+		function refreshBackSafecode() {
+			var d = new Date();
+			document.getElementById("backSafecode").src = "${CTX}/25console/imgcode?t="
+					+ d.toString(40);
+		}
+		
+		function refresh(){
+			$('#queryType').val("");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function refresh_day(){
+			$('#queryType').val("day");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function refresh_week(){
+			$('#queryType').val("week");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function refresh_month(){
+			$('#queryType').val("month");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		
+		$().ready(function() {
+			$('#applyimage').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#apyimg').val(data);
+					$('#imga').html("<img src='${CTX}/upload/"+data+"' width=80px height=60px/>");
+	             }
+			});
+			$('#appraiseimage').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='appimage' value='"+data+"'/>");
+					$('#logopic').append("<img src='${CTX}/upload/"+data+"'/>");
+	             }
+			});
+            $('.many_business_img').bind('mouseover', function () {
+                var $self = $(this);
+                $self.removeClass('img1');
+                $self.addClass('img2');
+                $self.find('.many_business_show').show();
+            }).bind('mouseleave', function () {
+                var $self = $(this);
+                $self.removeClass('img2');
+                $self.addClass('img1');
+                $self.find('.many_business_show').hide();
+            });
+
+            $('.trends-score').each(function () {
+                $(this).bind('mouseover', function () {
+                    var score = $(this).attr('score');
+                    var $p = $(this).parent();
+                    $p.removeClass();
+                    $p.addClass('score-box'+score)
+                });
+            });
+        });
+	    function showAppraiseBox(orderId, mid) {
+	        	$('#appraise_orderid').val(orderId);
+	        	$('#appmid').val(mid);
+	            var masklayer = $('.masklayer');
+	            if (masklayer.length == 0) {
+	                masklayer = $('<div class="masklayer" style=" display:none;position:absolute;left:0;top:0; z-index:100;background-color:#000;"></div>');
+	                masklayer.css({ width: $(window).width(), height: $('body').height(), opacity:'.3' });
+	                masklayer.appendTo($('body'));
+	            }            
+	            masklayer.show();
+	            var appraiseBox = $('.appraise-box');
+	            appraiseBox.css({
+	                top: $(window).height() / 2 - appraiseBox.height() / 2,
+	                left: $(window).width() / 2 - appraiseBox.width() / 2
+	            });
+	            appraiseBox.find('.close').unbind().bind('click', function () {
+	                $(this).parent().parent().hide();
+	                $('.masklayer').hide();
+	            });
+	            appraiseBox.find('.cancel').unbind().bind('click', function () {
+	                $(this).parent().parent().hide();
+	                $('.masklayer').hide();
+	            });
+	            appraiseBox.find('.save').unbind().bind('click', function () {
+	                if(uf_addappraise()){
+		                $(this).parent().parent().hide();
+		                $('.masklayer').hide();
+		                clear_appraise();
+	                }
+	            });       
+	            appraiseBox.show();
+	        }
+		
+	    function get_score(str){
+	    	var len = str.length;
+			//score-box 长度为9
+	    	if(len <= 9){
+	    		return 0;
+	    	}else {
+	    		return str.substr(9);
+	    	}
+	    }
+	    
+		function uf_addappraise(){
+			var mah = get_score($('#dyncmah').attr('class'));
+			var ser = get_score($('#dyncser').attr('class'));
+			var spd = get_score($('#dyncspd').attr('class'));
+			$('#mah').val(mah);
+        	$('#ser').val(ser);
+        	$('#spd').val(spd);
+        	var listimgs = $("input:hidden[name='appimage']");
+        	if(listimgs.length > 5){
+        		var $msg = $("#limitMsg");
+        		$msg.html("图片删除超过限制！");
+        		return false;
+        	}else{
+        		 $("#appraiseform").submit();
+        	}
+        	return true;
+		}
+		
+		function clear_appraise(){
+			$('#mah').val('');
+        	$('#ser').val('');
+        	$('#spd').val('');
+        	$('#orderid').val('');
+        	$('#appmid').val('');
+        	$('#appraisetype').val('1');
+        	$('#private').val('1');
+		}
+		
+		$(function(){
+			$(".time_input").datetimepicker({
+	            showSecond: false,
+	            timeFormat: 'hh:mm:ss',
+	            stepHour: 1,
+	            stepMinute: 1,
+	            stepSecond: 1
+	        });
+		});
+		
+		// 下保单
+		function issued_policy(order_id) {
+			// $("<form>").attr("action","${CTX}/ab/user/issued_policy/" + order_id).submit();
+			$.dialog({
+				title:'保险单信息',
+				content: 'url:${CTX}/admin/dd/issued_policy/'+order_id,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480
+			});//弹出框
+		}
+		function initZhiPai(id){
+			$.dialog({
+				title:'调车发货(订单和车队分别至少勾选一项)',
+				content: 'url:${CTX}/ab/tc/initZhiPai?id=' + id,
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 500,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				fixed:true,
+				button:[{
+					name: '确定提交',
+					callback:function(){
+						var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							$.post("${CTX}/ab/tc/doZhiPai",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+									$.dialog.tips("操作成功！",1,'success.gif',function () {
+										refresh();
+							        });
+								}else{
+									$.dialog.alert("指派失败！");
+								}
+							});
+						}
+						return false;
+					},
+					focus: true
+					}],
+		        cancelVal:'关 闭'
+			});
+		}
+	</script>	
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<form id="myform" name="myform" method="post" action="">
+	<input type="hidden" name="mid" id="mid"/>
+	<input type="hidden" name="qdrid" id="qdrid"/>
+	<input type="hidden" name="orderid" id="orderid"/>
+	<input type="hidden" name="backorderid" id="backorderid"/>
+	<input type="hidden" name="apyimg" id="apyimg"/>
+	<input type="hidden" name="queryType" id="queryType"/>
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">我的物流配送订单</h2>
+			<div style="line-height: 40px;margin: 10px auto 20px;">
+				<table class="list" style="width: 90%; margin: 0 auto;">
+					<tr>
+						<td>支付状态</td>
+						<td>
+							<select name="zfzt" id="zfzt" style="width: 80px;">
+								<option value="">全部</option>
+								<option value="0" <#if (((zfzt)!) == '0')>selected="selected"</#if> >未支付</option>
+								<option value="1" <#if (((zfzt)!) == '1')>selected="selected"</#if> >已支付</option>
+							</select>
+						</td>
+						<td>订单状态</td>
+						<td>
+							<select name="ddzt" id="ddzt" style="width: 80px;">
+								<option value="">全部</option>
+								<option value="0" <#if (((ddzt)!) == '0')>selected="selected"</#if> >未提交</option>
+								<option value="1" <#if (((ddzt)!) == '1')>selected="selected"</#if> >已提交</option>
+								<option value="2" <#if (((ddzt)!) == '2')>selected="selected"</#if> >取货中</option>
+								<option value="3" <#if (((ddzt)!) == '3')>selected="selected"</#if> >送货中</option>
+								<option value="4" <#if (((ddzt)!) == '4')>selected="selected"</#if> >已送达</option>
+								<option value="5" <#if (((ddzt)!) == '5')>selected="selected"</#if> >已签收</option>
+								<option value="6" <#if (((ddzt)!) == '6')>selected="selected"</#if> >拒单</option>
+								<option value="7" <#if (((ddzt)!) == '7')>selected="selected"</#if> >已退单</option>
+								<option value="8" <#if (((ddzt)!) == '8')>selected="selected"</#if> >撤单</option>
+							</select>
+						</td>
+						<td>评价状态</td>
+						<td>
+							<select name="appstatus" id="appstatus" style="width: 80px;">
+									<option value="">全部</option>
+									<option value="0" <#if (((appstatus)!) == '0')>selected="selected"</#if> >未评价</option>
+									<option value="1" <#if (((appstatus)!) == '1')>selected="selected"</#if> >已评价</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>收货方</td>
+						<td>
+							<input name="p_rcvName" id="p_rcvName" value="${(p_rcvName)!}"/>
+						</td>
+						<td>产品名称</td>
+						<td>
+							<input name="p_product_name" id="p_product_name" value="${(p_product_name)!}"/>
+						</td>
+						<td>产品货号</td>
+						<td>
+							<input name="p_product_sn" id="p_product_sn" value="${(p_product_sn)!}"/>
+						</td>
+					</tr>
+					<tr>
+						<td>生产厂家</td>
+						<td>
+							<input name="p_producer" id="p_producer" value="${(p_producer)!}"/>
+						</td>
+						<td>车辆</td>
+						<td>
+							<input name="p_cheliang" id="p_cheliang" value="${(p_cheliang)!}"/>
+						</td>
+						<td>车队和物流公司</td>
+						<td>
+							<input name="p_transport" id="p_transport" value="${(p_transport)!}"/>
+						</td>
+					</tr>
+					<tr>
+						<td>仓库</td>
+						<td>
+							<input name="p_cangku" id="p_cangku" value="${(p_cangku)!}"/>
+						</td>
+						<td>操作人</td>
+						<td>
+							<input name="p_operator" id="p_operator" value="${(p_operator)!}"/>
+						</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;
+							
+						</td>
+					</tr>
+					<tr>
+						<td>起止时间</td>
+						<td colspan="3">
+							<input name="p_start_date" id="p_start_date" value="${(p_start_date)!}" class="time_input"/>
+							-
+							<input name="p_end_date" id="p_end_date" value="${(p_end_date)!}" class="time_input"/>
+						</td>
+						<td colspan="2">
+							<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+							<input type="button" id="btn_return" class="button" value="当 日" onclick="refresh_day();"/>
+							<input type="button" id="btn_return" class="button" value="本 周" onclick="refresh_week();"/>
+							<input type="button" id="btn_return" class="button" value="本 月" onclick="refresh_month();"/>
+							<!--<input type="button" id="btn_to_yc" class="button" value="调车发货" onclick="initZhiPai('')"/>-->
+						</td>
+					</tr>
+				</table>
+			</div>
+			<table class="list">
+            <tr>
+	            <th width="20px;">序号</th>
+	            <th width="50px;">订单号</th>
+	            <th width="50px;">总金额</th>
+	            <th width="50px;">保证金</th>
+	            <th width="50px;">联系人</th>
+	            <th width="70px;">联系电话</th>
+	            <th width="160px;">收货地址</th>
+	            <th width="80px;">支付状态</th>
+	            <th width="50px;">订单状态</th>
+	            <th width="50px;">收到报价</th>
+				<th width="120px;">操作</th>
+	        </tr>
+	        <#if listpage ??>
+      				<#list listpage.list as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!} </td>
+                    <td>
+                    	<#if strkit('0',(lst.ddzt)!)>
+                    		<a href="${CTX}/ab/order/ddjs">${(lst.sn)!''}</a>
+                    	<#else>
+                    	<a href="javaScript:void(0);" onclick="uf_showdd('${(lst.id)!}')">${(lst.sn)!}</a>
+                    	</#if>
+                    	
+                    </td>
+                    <td class="red">
+                   
+                    <#if lst.style?exists && lst.style==2 && lst.min_price?exists && lst.max_price?exists>                    
+                    	￥${(lst.min_price)!}元 - ￥${(lst.max_price)!}元 
+                    <#else>
+                    ${(lst.ddzje)?string("currency")}
+                    </#if>
+                    </td>
+                    
+                     <td class="red">
+                    
+                   ￥ ${(lst.bzj)!'--'}
+                    </td>
+                    
+                    <td> ${(lst.lxr)!}</td>
+                    <td>${(lst.lxrdh)!}</td>
+                    <td>  ${(lst.shdz)!}</td>
+                    <td>
+                    <#if lst.sn.substring(0,2)=='TC' && lst.pay_type?exists >
+                    <#if lst.pay_type==1>在线支付</#if>
+                    <#if lst.pay_type==2>现付</#if>
+                    <#if lst.pay_type==3>到付</#if>
+                    -
+                    </#if>
+                    <#if strkit('0',(lst.zfzt)!)><span class="red">未支付</span></#if><#if strkit('1',(lst.zfzt)!)>已支付</#if>
+                    </td>
+                    <td>
+                    	<#if strkit('0',(lst.ddzt)!)><span class="red">未提交</span></#if>
+						<#if strkit('1',(lst.ddzt)!)>已提交</#if>
+						<#if strkit('2',(lst.ddzt)!)>取货中</#if>
+						<#if strkit('3',(lst.ddzt)!)>送货中</#if>
+						<#if strkit('4',(lst.ddzt)!)>已送达</#if>
+						<#if strkit('5',(lst.ddzt)!)>已签收</#if>
+						<#if strkit('6',(lst.ddzt)!)>拒单</#if>
+						<#if strkit('7',(lst.ddzt)!)>已退单</#if>
+                    	<#if strkit('8',(lst.ddzt)!)><span class="red">已撤单</span></#if>
+                    </td> 
+                    <td>
+                    	${(lst.bjcount)!'0'}
+                    </td>                   
+                    <td> 
+                    	<#if abuser.id==lst.xdrid>
+		                    	<!-- 订单状态[0-购物车、1-已受理、2-已预定、3-配送中、4-已完成、5-已退单 -->
+		                    	<#if strkit('1',(lst.ddzt)!)><a href="javascript:void(0);" onclick="uf_delorder('${(lst.id)}')">删除</a></#if>
+		                    	<#if strkit('1',(lst.ddzt)!)><a href="javascript:void(0);" onclick="uf_updateorderzf('${(lst.id)}')">撤单</a></#if>
+                                <#if (lst.ddzt=='1')&& (lst.bjcount>0)>
+		                    	<a href="javascript:void(0);" onclick="selectCarID('${(lst.id)!}')">查看/选择报价</a>
+                                </#if>
+								<#if (lst.way!=3 && lst.way!=4)&& (lst.ddzt == '4' || lst.ddzt == '0' || lst.ddzt == '1' || lst.ddzt == '2' || lst.ddzt == '3')>
+		                    		<a href="javascript:void(0);" onclick="uf_addprice('${(lst.id)}')">加价</a>
+		                    	</#if>
+		                    	<#if (  lst.ddzt == '2'  )>
+		                    		<a href="javascript:void(0);" onclick="uf_addbzj('${(lst.id)}')">保证金</a>
+		                    	</#if>
+                                <#if lst.qdrid?? && lst.qdrid!=''>
+		                    	<a href="javascript:void(0);" onclick="uf_showddgz('${(lst.id)}')">跟踪</a>
+                                </#if>
+		                    	<#if (lst.ddzt == '5' && (lst.appid)! == '')>
+		                    		<a href="javascript:void(0);" onclick="showAppraiseBox('${(lst.id)!}','${(lst.mid)!}')">评价</a>
+		                    	</#if>
+		                    	<#if (lst.ddzt == '3' || lst.ddzt == '2' || lst.ddzt == '1')&&(lst.qdrid?exists && lst.qdrid !='')>
+		                    		<a href="javascript:void(0);" onclick="uf_leave_show('${(lst.id)!}', '', '${(lst.qdrid)!}', '')">催单</a>
+		                    	</#if>
+		                    	<#if lst.isback>
+		                    		<a href="javascript:void(0);" onclick="uf_back_show('${(lst.id)!}', '')">退单</a>
+		                    	</#if>
+		                    	
+<#if strkit('0',(lst.zfzt)!) && lst.sn.substring(0,2)=='TC' && lst.style?exists && lst.pay_type?exists   && lst.pay_type==1 && lst.style ==1>
+		                    		<a href="javascript:void(0);" onclick="uf_paytcorder('${(lst.id)!}', '')">支付</a>
+		                    	</#if>
+		                    	
+                    	<#else>
+                    			<#if (lst.ddzt == '4')>
+		                    		<a href="javascript:void(0);" onclick="uf_qsorder('${(lst.id)!}')">签收</a>
+		                    	</#if>
+		                    	
+                    	</#if>  
+                    </td>
+                  </tr>
+				</#list>
+				<tr>
+					<td colspan="11">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+			</#if>
+            </table>
+            <div style="height: 40px;line-height: 40px;">
+				<h3>系统提示：<span class="red" style="font-size: 14px;">如您的订单已受理需要进行彻底，请在左侧菜单中点击《撤单申请申诉》进行撤单相关操作！</span></h3>
+			</div>
+			<div class="bold red" style="height: 40px;line-height: 40px;font-size: 15px;">订单总金额：${(rec.totalMoney)!} ，总订单数：${(rec.totalNum)!}</div>
+            <div id="container" style="width: 96%;"></div>
+            <script type="text/javascript">
+				$(function () {
+					Highcharts.setOptions({colors: ['#058DC7', '#FF8C00']}); 
+			        $('#container').highcharts({
+			            title: {
+			                text: '订单统计',
+			                x: -20 //center
+			            },
+			            subtitle: {
+			                text: '',
+			                x: -20
+			            },
+			            xAxis: {
+			                categories: [
+								<#if orderList??>
+									<#list orderList as s>
+									 '${(s.orderDate)!}',
+								</#list>
+								</#if>
+			                    ]
+			            },
+			            yAxis: {
+			                title: {
+			                    text: ''
+			                },
+			                plotLines: [{
+			                    value: 0,
+			                    width: 1,
+			                    color: '#808080'
+			                }]
+			            },
+			            tooltip: {
+			                valueSuffix: ''
+			            },
+			            legend: {
+			                layout: 'vertical',
+			                align: 'right',
+			                verticalAlign: 'middle',
+			                borderWidth: 0
+			            },
+			            series: [{
+			                name: '订单量',
+			                data: [
+								<#if orderList??>
+									<#list orderList as s>
+										${(s.orderNum)!},
+									</#list>
+								</#if>
+			                ]
+			            }, {
+			                name: '金额',
+			                data: [<#if orderList??>
+						      			<#list orderList as s>
+						      			    ${(s.ddzje)!},
+						                </#list>
+									</#if>]
+			            }]
+			        });
+			    });
+    
+
+		</script>
+		</div>
+	</div>
+	</form>
+	
+	
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	
+	
+	<div id="msgDiv" style="left: 50%; top: 191px; margin-left: -270px; display: none; position: fixed; z-index: 11000; opacity: 1;">
+	<div class="divTop">
+    	<h3>
+    		我要催单
+    	</h3>
+    	<a href="javascript:;" class="closebtn" alt="关闭" onclick="uf_leave_close()"></a>   
+    </div>
+    <div class="msg_cont clear">
+        <textarea placeholder="请输入内容" name="content" id="content"></textarea>
+    </div>
+    <div class="msg_op">
+    	<input id="captchaCode" name="captchaCode" class="fl" type="text" placeholder="请输入验证码" size="20"/>
+        <img  class="fl" class="msgcode" src="${CTX}/25console/imgcode" id="safecode" alt="点击刷新" onclick="refreshSafecode()"/>
+        <a href="javascript:;" class="fr msgbtn" onclick="uf_addleave('0', '${CTX}')"> 催单
+        </a>  
+    </div>
+    <div id="leaveMsg" class="message"/>
+	</div>
+	</div>
+	<div class="blank10"></div>
+	<div id="lean_overlay" style="display: none; opacity: 0.45;"></div>
+	
+	<!-- 退单弹出框 -->
+	<div id="backMsgDiv" style="left: 50%; top: 191px; margin-left: -270px; display: none; position: fixed; z-index: 11000; opacity: 1;">
+	<div class="divTop">
+    	<h3>
+    		我要申请退单
+    	</h3>
+    	<a href="javascript:;" class="closebtn" alt="关闭" onclick="uf_back_close()"></a>   
+    </div>
+    <div class="msg_cont clear">
+        <textarea placeholder="请输入内容" name="applyBackContent" id="applyBackContent"></textarea>
+    </div>
+    <div id="imga">
+    </div>
+    <div class="pic">
+    	<input type="file" name="applyimage" id="applyimage"  multiple="false"/>
+    </div>
+    <div class="msg_op">
+    	<input id="backCaptchaCode" name="backCaptchaCode" class="fl" type="text" placeholder="请输入验证码" size="20"/>
+        <img  class="fl" class="msgcode" src="${CTX}/25console/imgcode" id="backSafecode" alt="点击刷新" onclick="refreshBackSafecode()"/>
+        <a href="javascript:;" class="fr msgbtn" onclick="uf_addback('${CTX}')"> 申请退单
+        </a>  
+    </div>
+    <div id="backMsg" class="message"/>
+	</div>
+	</div>
+	<div class="blank10"></div>
+	
+	<form id="appraiseform" name="appraiseform" method="post" action="${CTX}/ab/appraise/addappraise">
+	<div class="appraise-box" style="display: none">
+		<input type="hidden" id="appraise_orderid" name="appraise_orderid"> 
+		<input type="hidden" id="appmid" name="appmid">
+		<input type="hidden" id="tcflag" name="tcflag" value="2">
+		<input type="hidden" id="mah" name="mah">
+		<input type="hidden" id="ser" name="ser">
+		<input type="hidden" id="spd" name="spd">
+		<div class="appraise-box-top">
+			商品评价<a href="javascript:void(0)" class="close"><img
+				src="${CTX}/res/css/ab/images/del.png" /></a>
+		</div>
+		<div class="appraise-box-body">
+			<div class="appraise-box-body-conent">
+				<div class="appraise-box-body-conent-left">
+					<div id="logopic" class="logopic">
+					</div>
+					<div class=lh24>
+						<span></span>
+					</div>
+				</div>
+				<div class="appraise-box-body-conent-right">
+					<div class="lh24 h24 appraise-box-body-conent-right-hua">
+						<input type="radio" name="appraisetype" checked="checked" value="1"/>
+						<img src="${CTX}/res/css/ab/images/img2.png" /> 
+						<input type="radio" name="appraisetype" value="2"/>
+						<img src="${CTX}/res/css/ab/images/img3.png" /> 
+						<input type="radio" name="appraisetype" value="3"/>
+						<img src="${CTX}/res/css/ab/images/img4.png" />
+					</div>
+					<div class="appraise-box-body-conent-right-text">
+						<textarea name="appraisecontent" id="appraisecontent">
+						</textarea>
+						<div class="pic">
+						<span id="limitMsg" class="message" style="font-color:red;"></span>
+						<input type="file" name="appraiseimage" id="appraiseimage"  multiple="true"/>
+							 <span class="ca6adb3">限5张</span>
+							&nbsp;&nbsp;
+							<div class="private">
+								<input type="radio" name="private" checked="checked" value="1"/><span
+									class="c494947">公开</span><input type="radio" name="private"  value="2"/><span
+									class="c494947">匿名</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class=cl></div>
+			</div>
+			<div class="appraise-box-body-bottom">
+				<div class="appraise-box-body-bottom-left">
+					<span>店铺动态评分</span>
+				</div>
+				<div class="appraise-box-body-bottom-right">
+					<div class="item mt5">
+						<div class="c36353a service-item">宝贝与描述相符</div>
+						<div class="score-box" id="dyncmah">
+							<div class="score1 trends-score" score="1"></div>
+							<div class="score2 trends-score" score="2"></div>
+							<div class="score3 trends-score" score="3"></div>
+							<div class="score4 trends-score" score="4"></div>
+							<div class="score5 trends-score" score="5"></div>
+						</div>
+						<div class=cl></div>
+					</div>
+					<div class="item">
+						<div class="c36353a service-item">卖家的服务态度</div>
+						<div class="score-box" id="dyncser">
+							<div class="score1 trends-score" score="1"></div>
+							<div class="score2 trends-score" score="2"></div>
+							<div class="score3 trends-score" score="3"></div>
+							<div class="score4 trends-score" score="4"></div>
+							<div class="score5 trends-score" score="5"></div>
+						</div>
+						<div class=cl></div>
+					</div>
+					<div class="item">
+						<div class="c36353a service-item">卖家的发货速度</div>
+						<div class="score-box" id="dyncspd">
+							<div class="score1 trends-score" score="1"></div>
+							<div class="score2 trends-score" score="2"></div>
+							<div class="score3 trends-score" score="3"></div>
+							<div class="score4 trends-score" score="4"></div>
+							<div class="score5 trends-score" score="5"></div>
+						</div>
+						<div class=cl></div>
+					</div>
+				</div>
+				<div class=cl></div>
+			</div>
+		</div>
+		<div class="appraise-box-bottom">
+			<a href=# class="save">保 存</a> <a href=#
+				class=cancel>取 消</a>
+		</div>
+	</div>
+	</form>
+	</body>
+    <script type="text/javascript">
+	function selectCarID(id){
+	$.dialog({
+		title:'投标选择',
+		content: 'url:${CTX}/ab/order/showBaoJia?id=' + id,
+	    lock:true,
+	    resize: true,
+	    width : 300,
+		height : 80,
+		cover:true,
+		max:true,
+		min:true,
+		button:[{
+			name: '保 存',
+			callback:function(){
+					$.post("${CTX}/diaodu/acceptAddPriceForOderByOwner",{baojiaid:this.content.$("#baojiaid").val(),orderid:id},function(data){
+	                    if(data){
+	                    	$.dialog.alert("选择中标人操作成功！");
+	                    	refresh();
+						}
+					});
+				return false;
+			},
+			focus: true
+		}],
+        cancelVal:'关 闭'
+	});//
+}
+
+    </script>
+</html>

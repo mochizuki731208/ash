@@ -1,0 +1,512 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+            $('.tab_header > li').each(function () {
+                $(this).bind('click', function () {
+                    var $self = $(this);
+                    $self.siblings().removeClass('active');
+                    $self.addClass('active');
+                    var index = $self.attr('index');
+                    $('.tab_body').find('div').hide();
+                    $('.tab_body').find('div[index="' + index + '"]').show();
+                });
+            });
+		});
+		
+		function uf_showdd(id){
+			$.dialog({
+				title:'订单明细',
+				content: 'url:${CTX}/admin/dd/showdd?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		function goToChongZhi(){
+			window.location.href="${CTX}/ab/user/yhcz";
+		}
+		function uf_invoice(id){
+			/**
+			$.dialog({
+				title:'申请发票',
+				content: 'url:${CTX}/ab/invoice/invoice?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭'
+			});//弹出框
+			**/
+			console.log("hello");
+			window.open('${CTX}/ab/invoice/invoice?id='+id);
+		}
+		function uf_showddgz(id){
+			$.dialog({
+				title:'订单轨迹-原始',
+				content: 'url:${CTX}/admin/order/guiji?id=' + id,
+			    lock:true,
+			    resize: true,
+			    width : 1440,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true
+			}).max();//
+		}
+		//签收
+		function uf_qsorder(id){
+			$.dialog.confirm('如确定货物没问题，确定签收，3天内发现问题也可维权，是否继续？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/order/qsorder",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("签收成功！",function () {
+								refresh1();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("签收失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+
+		function uf_add_money(id){
+			setMoney(id);
+		}
+		function setMoney(id) {
+			var info = {};		
+			//alert('请输入价格');
+			$.dialog({
+				title : '加价',
+				content : '<input type="text" name="addMoney" id="addMoney" />元',
+				lock : true,
+				resize : false,
+				width : 300,
+				height : 100,
+				cover : true,
+				max : false,
+				min : false,
+				cancel : true,
+				button : [ {
+					name : '确定',
+					callback : function() {
+						if (!/^\d+$/.test($("#addMoney").val())) {
+							alert("请输入正整数的价格！");
+							return false;
+						}
+						info['id'] = id;
+						var addmn = parseFloat($("#mn"+id).val()) + parseFloat($("#addMoney").val());
+						info['addMoney'] = addmn;
+						$("#showMoney").html(info['addMoney']);
+						addMoney(info);
+					},
+					focus : true
+				} ],
+				cancelVal : '关 闭'
+			});//弹出框
+		}
+		function addMoney(addVal){
+			$.post('${CTX}/ab/order/addMoney', addVal, function(data) {				
+				refresh1();
+			});
+		}
+		function uf_delorder(id){
+			$.dialog.confirm('是否要删除所选订单信息？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/order/delorder",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除数据成功！",function () {
+								refresh1();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("删除数据失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_paytcorder(id){
+			$.dialog.confirm('是否要支付该订单？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/tc/payorder",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data == '1'){
+							$.dialog.alert("支付成功！",function () {
+								refresh1();
+					        }).time(0.8);
+						}else if(data == '0'){
+							self.location.href = '${CTX}/ab/card/zhyefail';
+						}else{
+							$.dialog.alert("支付失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_updateorderzf(id){
+			$.dialog.confirm('是否要撤销所选订单信息？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/order/saveorderzf",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("订单撤销成功！",function () {
+								refresh1();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("订单撤销失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		function refresh1(){
+			window.location.href="${CTX}/ab/mainuser";
+		}
+		function refresh(){
+			//$('#queryType').val("");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+	
+	<style type="text/css">
+		.content-inner{}
+		.account-status{ width:920px; height:138px; border:solid 1px #BDBDBD; background-color:#F2F2F2; padding:15px 20px; margin-left:auto; margin-right:auto}
+		.col-left{ width:284px; height:50px}
+		.col-left .avatar{position: relative;float: left;margin-right: 15px;width: 48px;height: 48px;border: 1px solid #ccc;background: url(${CTX}/res/images/sprites.png) no-repeat 0 -230px;}
+		.account-status .avatar a {display: none;position: absolute;top: 0;left: 0;width: 48px;height: 42px;padding-top: 6px;background-color: rgba(0,0,0,0.3);color: white;text-align: center;}
+		.user-safety-level.low {background-position: 0 -90px;color: #f00;}
+		.user-safety-level.center {background-position: 0 -100px;color: #f00;}
+		.user-safety-level.high {background-position: 0 -120px;color: #f00;}
+		.account-status .safety-level-wrapper {margin-left: 65px;width: 235px;}
+		.account-status .money-level-wrapper {margin-left: 300px;width: 235px;}
+		.account-status .safety-level-wrapper h5 {font-size: 18px;line-height: 1.5;margin-bottom: 5px; color:#555}
+		.account-status .money-level-wrapper h5 {font-size: 18px;line-height: 1.5;margin-bottom: 5px; color:#555}
+		.user-safety-level {display: inline-block;padding-left: 82px;height: 10px;line-height: 10px;background: url(${CTX}/res/images/sprites.png) no-repeat 0 0;}
+		.account-status .related-info {margin: 30px 0 0 0;}
+		.account-status .related-info li {float: left;width: 280px;margin: 0 20px 10px 0; line-height:18px;display: list-item;}
+		.account-status .related-info li i.icon-point {background-position: 0 -170px;vertical-align: text-top;}
+		.account-status .related-info li i.icon-order {background-position: 0 -190px;vertical-align: text-top;}
+		.account-status .related-info li i.icon-star {background-position: 0 -210px;vertical-align: text-top;}
+		.account-status .related-info li i {margin-right: 5px;width: 14px;height: 14px;background: url(${CTX}/res/images/sprites.png) no-repeat 0 0;display: inline-block;}
+		.account-status .related-info li a{color:#08c;display: inline; line-height:18px}
+		
+		.latest-orders { width:960px; margin-left:auto; margin-right:auto; margin-top:20px}
+		.tab_wrapper .tab_header {margin: 0;display:block; color:#555; height:30px; line-height:30px;}
+		.tab_wrapper .tab_header li {position: relative;float: left;display: block;margin-right: 5px;padding: 5px 15px;background: #fff;border:1px solid #bdbdbd;font-weight: bold;cursor: pointer;border-radius: 3px 3px 0 0; height:18px; line-height:18px}
+		.tab_wrapper .tab_header .active{background-color: #eee;border-bottom-color: #eee;}
+		.tab_wrapper .tab_body {background-color: #fff;}
+		.tab_body .food-orders{color: rgb(85, 85, 85);display: block;font-size: 13px;height: 58px;line-height: 18px;position: relative;word-break: break-all;}
+		.tab_body .deal-orders{color: rgb(85, 85, 85);display: block;font-size: 13px;height: 58px;line-height: 18px;position: relative;word-break: break-all;}
+		.latest-orders .empty {background-color: #eee;margin: 0;padding: 20px 0;text-align: center;}
+		.hide{display: none !important;}
+	</style>	
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+            <h2 class="box_title">个人中心</h2>
+            <div class="content-inner profile-index">
+                <div class="account-status clearfix">
+                    <div class="clearfix">
+                        <div class="col-left">
+                            <div class="avatar">
+                                <#if abuser.logo?exists>
+									<img src="${CTX}/upload/${(abuser.logo)!''}" style="max-width: 50px;max-height:50px;">
+								<#else>
+									<img src="${CTX}/res/images/tx.jpg" style="max-width: 50px;max-height: 50px;">
+								</#if>
+                            </div>
+                            <div class="safety-level-wrapper">
+                                <h5><#if abuser??>${(abuser.loginid)!}</#if></h5>
+                                <p>
+                                    <span class="text-gray">安全等级：</span> 
+                                   		<#if strkit('0',(securtynum)!)>
+                                        	<a class="user-safety-level low" href="javascript:void(0)"
+                                       			title="绑定邮箱和手机后可以进行在线支付">低 </a>
+                                        </#if>
+                                        <#if strkit('1',(securtynum)!)>
+                                        	<a class="user-safety-level center" href="javascript:void(0)"
+                                        		title="绑定邮箱和手机后可以进行在线支付">中</a>
+                                        </#if>
+                                        <#if strkit('2',(securtynum)!)>
+                                        	<a class="user-safety-level center" href="javascript:void(0)"
+                                       		    title="绑定邮箱和手机后可以进行在线支付">中 </a>
+                                        </#if>
+                                        <#if strkit('3',(securtynum)!)>
+                                        	<a class="user-safety-level high" href="javascript:void(0)"
+                                       		   title="绑定邮箱和手机后可以进行在线支付">高</a>
+                                        </#if>
+                                </p>
+                               
+                            </div>
+                             <div class="money-level-wrapper" style="margin-top: -48px;">
+                             	 <h5><#if abuser??>账户余额：<br></#if></h5>
+                             	 <#if abuser??>
+                             	 	<font style="font-size: 25px">${(abuser.zhye)!'--'}</font>元
+                             	 	<input type="button" onclick="goToChongZhi();" value="立刻充值" style="width: 129px;color:white;font-size: 18pt;cursor: pointer;vertical-align: middle;background-color: #FF7F24;margin-top: -20px;border: solid 1px #ff9c00"></input>
+                             	 </#if>
+                             </div>
+                        </div>
+                    </div>
+                    <ul class="related-info clearfix">
+                        <li><i class="icon-point"></i>积分： <#if abuser??>${(abuser.jifen)!}<#else>0</#if>点 <a href="${CTX}/ab/exc/listgoodsexchange">兑换礼品</a> </li>
+                        <li><i class="icon-order"></i>订单数： <a href="${CTX}/ab/user/listorder">${(cnt_dds)!}</a>张（一个月内完成）
+                        </li>
+                        <li><i class="icon-star"></i>收藏： <a href="${CTX}/ab/user/listuserstore/0">${(cnt_sj)}</a>个商家 <a
+                            href="${CTX}/ab/user/listuserstore/1">${(cnt_sp)}</a>份商品 </li>
+                    </ul>
+                </div>
+                <div class="latest-orders tab_wrapper">
+                    <ul class="tab_header">
+                        <li class="active" index=0>最近订单</li>
+                        <li index=1>最近在线交易 </li>
+                    </ul>
+                    <div class="tab_body">
+                        <div class="food-orders" index=0>
+                        <form id="myform" name="myform" method="post" action="">
+                        	<table class="list">
+					            <tr>
+						            <th width="30px;">序号</th>
+						            <th width="90px;">订单号</th>
+						            <th width="60px;">总金额</th>
+						            <th width="60px;">联系人</th>
+						            <th width="70px;">联系电话</th>
+						            <th width="160px;">收货地址</th>
+						            <th width="60px;">支付状态</th>
+						            <th width="60px;">订单状态</th>
+						            <th width="60px;">订单类型</th>
+									<th width="120px;">操作</th>
+						        </tr>
+						       <#if listpage ??>
+      								<#list listpage.list as lst>
+					                  <tr>
+					                  	<td>${(lst_index+1)!}</td>
+					                    <td>
+					                    	<#if strkit('0',(lst.ddzt)!)>
+					                    		<a href="${CTX}/ab/order/ddjs">${(lst.sn)!''}</a>
+					                    	<#else>
+					                    	<a href="javaScript:void(0);" onclick="uf_showdd('${(lst.id)!}')">${(lst.sn)!}</a>
+					                    	</#if>
+					                    </td>
+					                    <td class="red">${(lst.ddzje)?string("currency")}</td>
+					                    <td>${(lst.lxr)!}</td>
+					                    <td>${(lst.lxrdh)!}</td>
+					                    <td>${(lst.shdz)!}</td>
+					                    <td><#if strkit('0',(lst.zfzt)!)><span class="red">未支付</span></#if><#if strkit('1',(lst.zfzt)!)>已支付</#if></td>
+					                    <td>
+					                    	<#if strkit('0',(lst.ddzt)!)><span class="red">未提交</span></#if>
+					                    	<#if strkit('1',(lst.ddzt)!)>已提交</#if>
+					                    	<#if strkit('2',(lst.ddzt)!)>取货中</#if>
+					                    	<#if strkit('3',(lst.ddzt)!)>送货中</#if>
+					                    	<#if strkit('4',(lst.ddzt)!)>已送达</#if>
+					                    	<#if strkit('5',(lst.ddzt)!)>已签收</#if>
+					                    	<#if strkit('6',(lst.ddzt)!)>拒单</#if>
+					                    	<#if strkit('7',(lst.ddzt)!)>已退单</#if>
+					                    	<#if strkit('8',(lst.ddzt)!)>撤单</#if>
+					                    </td>
+                                        <td>
+					                    	<#if strkit('1',(lst.way)!)>同城订单</#if>
+					                    	<#if strkit('3',(lst.way)!)>熟车下单</#if>
+					                    	<#if strkit('4',(lst.way)!)>同城找车</#if>
+					                    	<#if strkit('5',(lst.way)!)>物流公司下单</#if>
+                                        </td>
+                                        
+					                    <td>
+					                    	<#if abuser.id==lst.xdrid>
+		                    	<!-- 订单状态[0-购物车、1-已受理、2-已预定、3-配送中、4-已完成、5-已退单 -->
+		                    	<#if strkit('1',(lst.ddzt)!)><a href="javascript:void(0);" onclick="uf_delorder('${(lst.id)}')">删除</a></#if>
+		                    	<#if strkit('1',(lst.ddzt)!)><a href="javascript:void(0);" onclick="uf_updateorderzf('${(lst.id)}')">撤单</a></#if>
+		                    	<a href="javascript:void(0);" onclick="uf_showdd('${(lst.id)}')">查看</a>
+                                        <#if strkit('5',(lst.ddzt)!)><a href="javascript:void(0);" onclick="uf_invoice('${(lst.id)}')">发票</a></#if>
+
+		                    	<a href="javascript:void(0);" onclick="uf_showddgz('${(lst.id)}')">跟踪</a>
+		                    	<#if (lst.ddzt == '5' && (lst.appid)! == '')>
+		                    		<a href="javascript:void(0);" onclick="showAppraiseBox('${(lst.id)!}','${(lst.mid)!}')">评价</a>
+		                    	</#if>
+		                    	<#if (lst.ddzt == '3' || lst.ddzt == '2' || lst.ddzt == '1')&&(lst.qdrid?exists && lst.qdrid !='')>
+		                    		<a href="javascript:void(0);" onclick="uf_leave_show('${(lst.id)!}', '', '${(lst.qdrid)!}', '')">催单</a>
+		                    	</#if>
+		                    	<#if lst.isback>
+		                    		<a href="javascript:void(0);" onclick="uf_back_show('${(lst.id)!}', '')">退单</a>
+		                    	</#if>
+									<a href="javascript:void(0);" onclick="uf_add_money('${(lst.id)!}', '')">加价</a>
+									<input type="text" id="mn${(lst.id)!}" style="display:none;" value="${(lst.ddzje)!}">
+		                    	<#if strkit('0',(lst.zfzt)!) && lst.sn.substring(0,2)=='TC' && lst.pay_type?? && lst.pay_type==1 && lst.style??&& lst.style ==1>
+		                    		<a href="javascript:void(0);" onclick="uf_paytcorder('${(lst.id)!}', '')">支付</a>
+		                    	</#if>
+                    	<#else>
+                    			<#if (lst.ddzt == '4')>
+		                    		<a href="javascript:void(0);" onclick="uf_qsorder('${(lst.id)!}')">签收</a>
+		                    	</#if>
+                    	</#if>
+					                    </td>
+					                  </tr>
+									</#list>
+									<tr>
+										<td colspan="10">
+										<#include '../../common/_paginate.html'>
+										</td>
+									</tr>
+								<#else>
+								 <p class="empty">你还没有下过单哦，现在就去<a href="${CTX}/ab">下单</a>吧～</p>
+								</#if>
+					            </table>
+                        	</form>
+                        	
+                        
+                           
+                        </div>
+                        <div class="deal-orders" index="1" style="display:none">
+                          <table class="list">
+					            <tr>
+						            <th width="30px;">序号</th>
+						            <th width="90px;">订单号</th>
+						            <th width="60px;">总金额</th>
+						            <th width="60px;">联系人</th>
+						            <th width="70px;">联系电话</th>
+						            <th width="160px;">收货地址</th>
+						            <th width="60px;">支付状态</th>
+						            <th width="60px;">订单状态</th>
+						            <th width="60px;">订单类型</th>
+									<th width="120px;">操作</th>
+						        </tr>
+						        <#if listpage1.list??>
+					      				<#list listpage1.list as lst>
+					                  <tr>
+					                  	<td>${(lst_index+1)!}</td>
+					                    <td>
+					                    	<#if strkit('0',(lst.ddzt)!)>
+					                    		<a href="${CTX}/ab/order/ddjs">${(lst.sn)!''}</a>
+					                    	<#else>
+					                    	<a href="javaScript:void(0);" onclick="uf_showdd('${(lst.id)!}')">${(lst.sn)!}</a>
+					                    	</#if>
+					                    </td>
+					                    <td class="red">${(lst.ddzje)?string("currency")}</td>
+					                    <td>${(lst.lxr)!}</td>
+					                    <td>${(lst.lxrdh)!}</td>
+					                    <td>${(lst.shdz)!}</td>
+					                    <td><#if strkit('0',(lst.zfzt)!)><span class="red">未支付</span></#if><#if strkit('1',(lst.zfzt)!)>已支付</#if></td>
+					                    <td>
+					                    	<#if strkit('0',(lst.ddzt)!)><span class="red">未提交</span></#if>
+					                    	<#if strkit('1',(lst.ddzt)!)>已提交</#if>
+					                    	<#if strkit('2',(lst.ddzt)!)>取货中</#if>
+					                    	<#if strkit('3',(lst.ddzt)!)>送货中</#if>
+					                    	<#if strkit('4',(lst.ddzt)!)>已送达</#if>
+					                    	<#if strkit('5',(lst.ddzt)!)>已签收</#if>
+					                    	<#if strkit('6',(lst.ddzt)!)>拒单</#if>
+					                    	<#if strkit('7',(lst.ddzt)!)>已退单</#if>
+					                    	<#if strkit('8',(lst.ddzt)!)>撤单</#if>
+					                    </td>
+                                        <td>
+					                    	<#if strkit('1',(lst.way)!)>同城订单</#if>
+					                    	<#if strkit('3',(lst.way)!)>熟车下单</#if>
+					                    	<#if strkit('4',(lst.way)!)>同城找车</#if>
+					                    	<#if strkit('5',(lst.way)!)>物流公司下单</#if>
+                                        </td>
+					                    <td>
+					                    	<#if abuser.id==lst.xdrid>
+		                    	<!-- 订单状态[0-购物车、1-已受理、2-已预定、3-配送中、4-已完成、5-已退单 -->
+		                    	<#if strkit('1',(lst.ddzt)!)><a href="javascript:void(0);" onclick="uf_delorder('${(lst.id)}')">删除</a></#if>
+		                    	<#if strkit('1',(lst.ddzt)!)><a href="javascript:void(0);" onclick="uf_updateorderzf('${(lst.id)}')">撤单</a></#if>
+		                    	<a href="javascript:void(0);" onclick="uf_showdd('${(lst.id)}')">查看</a>
+                                        <#if strkit('5',(lst.ddzt)!)><a href="javascript:void(0);" onclick="uf_invoice('${(lst.id)}')">发票</a></#if>
+
+		                    	<a href="javascript:void(0);" onclick="uf_showddgz('${(lst.id)}')">跟踪</a>
+		                    	<#if (lst.ddzt == '5' && (lst.appid)!= '')>
+		                    		<a href="javascript:void(0);" onclick="showAppraiseBox('${(lst.id)!}','${(lst.mid)!}')">评价</a>
+		                    	</#if>
+		                    	<#if (lst.ddzt == '3' || lst.ddzt == '2' || lst.ddzt == '1')&&(lst.qdrid?exists && lst.qdrid !='')>
+		                    		<a href="javascript:void(0);" onclick="uf_leave_show('${(lst.id)!}', '', '${(lst.qdrid)!}', '')">催单</a>
+		                    	</#if>
+		                    	<#if lst.isback>
+		                    		<a href="javascript:void(0);" onclick="uf_back_show('${(lst.id)!}', '')">退单</a>
+		                    	</#if>
+		                    	<#if strkit('0',(lst.zfzt)!) && lst.sn.substring(0,2)=='TC' && lst.pay_type?? && lst.pay_type==1 && lst.style??&& lst.style ==1>
+		                    		<a href="javascript:void(0);" onclick="uf_paytcorder('${(lst.id)!}', '')">支付</a>
+		                    	</#if>
+                    	<#else>
+                    			<#if (lst.ddzt == '4')>
+		                    		<a href="javascript:void(0);" onclick="uf_qsorder('${(lst.id)!}')">签收</a>
+		                    	</#if>
+                    	</#if>
+					                    </td>
+					                  </tr>
+									</#list>
+									<tr>
+										<td colspan="10">
+									    </td>
+									</tr>
+								<#else>
+									 <p class="empty">你还没有在线交易的订单哦，现在就去<a href="${CTX}/ab">下单</a>吧～</p>
+								</#if>
+					      </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

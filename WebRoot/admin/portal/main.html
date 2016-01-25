@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>${SYSNAME}</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+		<link rel="stylesheet" type="text/css" href="${CTX}/res/js/easyui/themes/default/easyui.css">
+		<link rel="stylesheet" type="text/css" href="${CTX}/res/js/easyui/themes/icon.css">
+		<link href="${CTX}/res/css/admin/mainhome.css" rel="stylesheet" type="text/css" />
+		<script type="text/javascript" src="${CTX}/res/js/easyui/jquery.min.js"></script>
+		<script type="text/javascript" src="${CTX}/res/js/easyui/jquery.easyui.min.js"></script>
+		<script type="text/javascript" src="${CTX}/res/js/easyui/locale/easyui-lang-zh_CN.js"></script>
+		<script type="text/javascript" src="${CTX}/res/js/mian.js"></script>
+		<script type="text/javascript">
+			var basePath="${CTX}";
+		</script>
+	</head>
+	
+	<body class="easyui-layout" style="overflow-y: hidden"  scroll="no">
+    <div region="north" split="true" border="false"  class="headerTops">
+       	 <ul class=headerMenus>
+       	 </ul>
+	</div>
+
+	<div region="west" hide="true" split="true" title="系统配置管理" style="width:190px;" id="west">
+		 <div id="nav" class="easyui-accordion" fit="true" border="false"> </div>
+    </div>
+    
+	<div id="mainPanle" region="center" style="background: #eee; overflow:hidden;">
+	    <div id="tabs" class="easyui-tabs"  fit="true" border="false">
+		    <div title="消息提醒" style="padding:20px;overflow:hidden;" >
+		       <iframe src="${CTX}/25console/inforeminder" style="width: 100%; height: 98%;border: 0px" scrolling="auto"></iframe>
+		    </div>
+	    </div>
+	</div>
+	
+	
+	<div id="mm" class="easyui-menu" style="width:150px;">
+      <div id="mm-tabupdate">刷新</div>
+      <div class="menu-sep"></div>
+      <div id="mm-tabclose">关闭</div>
+      <div id="mm-tabcloseall">全部关闭</div>
+      <div id="mm-tabcloseother">除此之外全部关闭</div>
+      <div class="menu-sep"></div>
+      <div id="mm-tabcloseright">当前页右侧全部关闭</div>
+      <div id="mm-tabcloseleft">当前页左侧全部关闭</div>
+    </div>
+    <input type="hidden" id="logValue" value="0">
+    <div id="callLayer" style="position: absolute; z-index: 9998;display:none;left:300px;top:110px;width:720px">
+		<iframe src="${CTX}/admin/order/recall.html" id="callIframe" name="callIframe" style="width: 700px; height: 180px;" scrolling="no"></iframe>
+	</div>
+</body>
+</html>

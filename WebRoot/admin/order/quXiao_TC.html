@@ -1,0 +1,231 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+     <style type="text/css">
+    	.back{background: #0099FF}
+    </style>
+     <script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript">
+	var time = 60;
+	var geoc = new BMap.Geocoder();
+	$(function() {
+		time = 60;
+		var tab = '${tab}';
+		searchbyday(tab);
+		do_timer();
+	});
+	function do_timer(){
+		$("#time").html("<font size='100' color='red'><strong>" + time +"</strong></font>");
+		if(0==time){
+			refresh();
+		}
+		time--;
+		setTimeout('do_timer()',1000);
+	}
+	function searchbyday(id){
+		//alert(id);
+		//$("#" + id).addClass("back");
+		for(var i = 0; i <7; i++){
+			if(id!= ("t" + i) && $("#t" + i).hasClass("back")){
+				$("#t" + i).removeClass("back");
+			}else{
+				$("#" + id).addClass("back");
+				$("#tab").val(id);
+			}
+		}
+	}
+		function refresh(){
+			if(document.getElementById("flagExport")){
+				var child=document.getElementById("flagExport");
+				child.parentNode.removeChild(child);
+			}
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function exportOrder(){///admin/order/all?orderType=0&flagExport=0
+			//self.location.href="/admin/order/all?orderType=0&flagExport=0";
+			$("#myform").append($("<input name='flagExport' id='flagExport' type='hidden' value='0'>"));
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function preeditcancel(id){
+			$.dialog({
+				title:'修改退回前操作页面',
+				content: 'url:${CTX}/admin/order/preeditcancel?id=' + id,
+			    lock:true,
+			    resize: true,
+			    width : 1440,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true
+			}).max();//
+		}
+		function uf_showddinfo(id){
+			$.dialog({
+				title:'订单明细',
+				content: 'url:${CTX}/admin/dd/showdd?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭'
+			}).max();//弹出框
+		}
+	</script>
+ </head>
+  <body>
+  	<form id="myform" name="myform" method="post" action="">
+  	 <div>
+	  	 <div style="width: 400px;height:30px;text-align: center;background-color: rgb(237,200,58);">
+	  	 	<font color="#e66629" style="font-size: 20px;font-weight: 700">已取消订单---</font>
+	  	 	<select name="orderType" id="orderType"  style="width:150px;background-color:rgb(237,200,58);border-width: 0px;font-size: 20px;font-weight: 700;color: #e66629" onchange="refresh()">
+		  		<option value="0" <#if strkit('0',(orderType)!)>selected</#if>>店铺订单</option>
+		  		<option value="1" <#if strkit('1',(orderType)!)>selected</#if>>物流订单</option>
+		  	</select>
+	  	 </div>
+	 	 <div style="margin-right: 100px;float: right;margin-top: -25px">
+	   		<span id="time">&nbsp;</span>秒后自动刷新.<input value="手动刷新" type="button" class="button" onclick="refresh()">
+	  	 </div>
+	  </div>
+  	 	<input type="hidden" name="tab" id="tab" value="${(tab)!''}"/>
+  	 	<table class="list">
+  			<tr>
+  				<td onclick="searchbyday('t0'),refresh();" id="t0" style="cursor: pointer;">今日</td>
+  				<td onclick="searchbyday('t1'),refresh();" id="t1" style="cursor: pointer;">昨日</td>
+  				<td onclick="searchbyday('t2'),refresh();" id="t2" style="cursor: pointer;">前日</td>
+  				<td onclick="searchbyday('t3'),refresh();" id="t3" style="cursor: pointer;">最近七天</td>
+  				<td onclick="searchbyday('t4'),refresh();" id="t4" style="cursor: pointer;">本月</td>
+  				<td onclick="searchbyday('t5'),refresh();" id="t5" style="cursor: pointer;">上月</td>
+  				<td onclick="searchbyday('t6'),refresh();" id="t6" style="cursor: pointer;">所有订单</td>
+  				<td></td><td></td><td></td>
+  			</tr>
+  			<tr>
+  				<th>订单编号：</th><td><input type="text" id="sn" name="sn" value="${(order.sn)!''}"/></td>
+  				<th>出发地址：</th><td><input type="text" id="startdz" name="startdz" value="${(startdz)!''}"/></td>
+  				<th>目的地址：</th><td><input type="text" id="shdz" name="shdz" value="${(order.shdz)!''}"/></td>
+  				<th>下单人：</th><td><input type="text" id="xdrmc" name="xdrmc" value="${(order.xdrmc)!''}"/></td>
+  				<th>下单人电话：</th><td><input type="text" id="xdrdh" name="xdrdh"  value="${(order.xdrdh)!''}"/></td>
+  			</tr>
+  			<tr>
+  				<th>收货人：</th><td><input type="text" id="lxr" name="lxr" value="${(order.lxr)!''}"/></td>
+  				<th>收货人电话：</th><td><input type="text" id="lxrdh" name="lxrdh" value="${(order.lxrdh)!''}"/></td>
+  				<th>订单状态：</th>
+  				<td>
+  					<select id="ddzt" name="ddzt" value="${(order.ddzt)!''}" style="width:150px;" class="required">
+						<option value="">请选择</option>
+						<option value="0" <#if strkit('0',(order.ddzt)!)>selected</#if>>购物车</option>
+						<option value="1" <#if strkit('1',(order.ddzt)!)>selected</#if>>已提交</option>
+						<option value="2" <#if strkit('2',(order.ddzt)!)>selected</#if>>取货中</option>
+						<option value="3" <#if strkit('3',(order.ddzt)!)>selected</#if>>送货中</option>
+						<option value="4" <#if strkit('4',(order.ddzt)!)>selected</#if>>已送达</option>
+						<option value="5" <#if strkit('5',(order.ddzt)!)>selected</#if>>已签收</option>
+						<option value="6" <#if strkit('6',(order.ddzt)!)>selected</#if>>拒单</option>
+						<option value="7" <#if strkit('7',(order.ddzt)!)>selected</#if>>已退单</option>
+						<option value="8" <#if strkit('8',(order.ddzt)!)>selected</#if>>撤单</option>
+					</select>
+  				</td>
+  				<th>真假单：</th>
+  				<td>
+  					<select id="istrue" name="istrue" value="${(order.istrue)!''}">
+  						<option value="1" <#if (((order.istrue)!) == '1')>selected="selected"</#if> >真订单</option>
+						<option value="0" <#if (((order.istrue)!) == '0')>selected="selected"</#if> >假订单</option>
+  					</select>
+  				</td>
+  			</tr>
+  			<tr>
+  				<th>管理员：</th>
+  				<td>
+  					<select id="admin_id" name="admin_id" style="width:150px;">
+						<option value="">请选择</option>
+						<#if admin_list ??>
+							<#list admin_list as x>
+						   		<option value="${(x.id)!''}" <#if strkit((x.id)!'',(admin_id)!)>selected</#if>>${(x.mc)!''}</option>
+							</#list>
+						</#if>
+					</select>
+  				</td>
+  				<td colspan="6">
+  					创建时间：
+  					 <input value="${(startxdsj)!''}" type="text" id="startxdsj" name="startxdsj" class="Wdate" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'endxdsj\')}'})"/>
+  					~<input value="${(endxdsj)!''}" type="text" id="endxdsj" name="endxdsj" class="Wdate" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'startxdsj\')}'})"/>
+  					<input type="button" value="查询" class="button" onclick="refresh()">
+  					<input type="button" onclick="exportOrder()" value="导出" class="button">
+  				</td>
+  				<td td colspan="2">
+  					订单总数：<font color="#e66629" style="font-size: 20px;font-weight: 700">${(totalcount)!'0'}件</font>,
+  					订单总金额：<font color="#e66629" style="font-size: 20px;font-weight: 700">${(totalmoney)!'0'}元</font>
+  				</td>
+  			</tr>
+  		</table>
+  	 <br>
+  	<table class="list">
+  		<tr>
+  			<th>序号</th>
+  			<th>订单编号</th>
+  			<th>派单员</th>
+  			<th>类型</th>
+  			<th>下单人</th>
+  			<th>下单人电话</th>
+  			<th>收货信息</th>
+  			<th>发货地点</th>
+  			<th>收货地点</th>
+  			<th>预计金额</th>
+  			<th>创建时间</th>
+  			<th>取消时间</th>
+  			<th>取消人</th>
+  			<th>体积</th>
+  			<th>操作</th>
+  		</tr>
+  		<#if listpage??>
+  			<#list listpage.list as x>
+  				<tr>
+  					<td>${(x_index+1)!''}</td>
+  					<td>
+  						<a href="javaScript:void(0);" onclick="uf_showddinfo('${(x.id)!}')">${(x.sn)!}</a>
+  					</td>
+  					<td>${(x.qdrname)!''}</td>
+  					<td><#if strkit('0',(x.is_type)!)>货物</#if><#if strkit('1',(x.is_type)!)>服务</#if></td>
+  					<td>${(x.xdrmc)!''}</td>
+  					<td>${(x.xdrdh)!''}</td>
+  					<td>
+  						${(x.lxr)!''}${(x.lxrdh)!''}${(x.shdz)!''}&nbsp;&nbsp;
+  						${(x.rcv_name2)!''}${(x.rcv_phone2)!''}${(x.rcv_addr2)!''}&nbsp;&nbsp;
+  						${(x.rcv_name3)!''}${(x.rcv_phone3)!''}${(x.rcv_addr3)!''}&nbsp;&nbsp;
+  						${(x.rcv_name4)!''}${(x.rcv_phone4)!''}${(x.rcv_addr4)!''}&nbsp;&nbsp;
+  						${(x.rcv_name5)!''}${(x.rcv_phone5)!''}${(x.rcv_addr5)!''}
+  					</td>
+  					<td>${(x.send_addr)!''}</td>
+  					<td>${(x.send_time)!'-'}</td>
+  					<td>${(x.ddzje)!''}</td>
+  					<td>${(x.xdsj)!''}</td>
+  					<td>${(x.ddcxsj)!''}</td>
+  					<td>${(x.ddcxrmc)!''}</td>
+  					<td>${(x.goods_volumn)!''}</td>
+  					<td>
+  						<a href="javascript:void(0)" onclick="preeditcancel('${(x.id)!''}')">修改/退回 </a>
+  					</td>
+  				</tr>
+			</#list>
+  		</#if>
+  		<tr>
+			<td colspan="14">
+				<#include '../../common/_paginate.html'>
+			</td>
+		</tr>
+  	</table>
+  	</form>
+  </body>
+</html>
+

@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>蓝犀牛</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" >
+    <meta name="keywords" content="蓝犀牛,金杯面包车搬家,同城物流,同城配送"/>
+    <meta name="description" content="蓝犀牛为您提供叫车最快、服务最好、价格最便宜的同城货运叫车服务，1秒分车、万人车队、24小时服务，小面拉货、小面搬家、金杯拉货与搬家就找蓝犀牛,服务热线:400-678-5966" />
+    <!--commen begin -->
+    <link rel="stylesheet" type="text/css" href="http://www.lanxiniu.com/Public/normalize/3.0.2/normalize.css">
+    <link rel="stylesheet" type="text/css" href="http://www.lanxiniu.com/Public/css/reset.css" />
+    <link rel="stylesheet" type="text/css" href="http://www.lanxiniu.com/Public/css/lanxiniu.ui.css" />
+    <link rel="stylesheet" type="text/css" href="http://www.lanxiniu.com/Public/css/lxn_pop.css" />
+    <link rel="stylesheet" type="text/css" href="http://www.lanxiniu.com/Public/css/public_new.css" />
+    <!--commen over-->
+    <script type="text/javascript" src="http://www.lanxiniu.com/Public/js/jquery.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+    <script type="text/javascript" src="http://www.lanxiniu.com/Public/js/lanxiniu.utility.js"></script>
+    <script type="text/javascript" src="http://www.lanxiniu.com/Public/js/lanxiniu.api.js"></script>
+    <script type="text/javascript" src="http://www.lanxiniu.com/Public/js/lanxiniu.ui.js"></script>
+    <script type="text/javascript" src="http://www.lanxiniu.com/Public/js/lxn_pop.js"></script>
+
+    <script type="text/javascript" src="http://www.lanxiniu.com/Public/js/public_new.js"></script>
+    <script type="text/javascript">
+        var web_app = '';
+        var web_public = '/Public';
+        var lxn_api = new API_lanxiniu(web_app);
+        var user = {
+            name: "" || '',
+            phone: "" || ''
+        };
+        var order = {
+            order_id: '' || 0
+        };
+        var login_wget;
+
+        $(function(){
+            // 选择城市
+            chooseCity();
+            /* console.log(lxn_get_cookie('locationCity')); */
+            var city_code = lxn_get_cookie('locationCity');
+            if (city_code) {
+                var city_name = lxn_api.get_city_name(city_code);
+                // 更新城市选择下拉框
+                $('#city').find('.now').find('span').text(city_name);
+            } else {
+                city_code = 'cd';
+                set_city_to_cookie(city_code);
+                var city_name = lxn_api.get_city_name(city_code);
+                // 更新城市选择下拉框
+                $('#city').find('.now').find('span').text(city_name);
+            }
+
+            if (!(document.cookie || navigator.cookieEnabled)) {
+                alert('请检查浏览器的cookie!');
+            }
+        });
+        /*=================================================== 城市选择  ===============================================*/
+        function chooseCity() {
+            var city = $('#city');
+            var cityHandle = $('#city').find('.now');
+            var cityS = $('#city').find('.cityList');
+            var cityList = $('#city').find('.have');
+
+            //城市列表显示隐藏
+            cityHandle.click(function(){
+                if (cityS.is(':visible')) {
+                    cityS.slideUp("fast");
+                    $(this).removeClass('nowChoose');
+                    city.removeClass('city-selected');
+                } else {
+                    cityS.slideDown("fast");
+                    $(this).addClass('nowChoose');
+                    city.addClass('city-selected');
+                }
+            });
+
+            //城市选择
+            cityList.click(function() {
+                var city_code = $(this).attr('city_code');
+                var city_name = lxn_api.get_city_name(city_code);
+                $(this).addClass('choose');
+                $(this).siblings('a').removeClass('choose');
+                cityHandle.find('span').text(city_name);
+                cityS.slideUp("fast");
+                cityHandle.removeClass('nowChoose');
+                city.removeClass('city-selected');
+
+                // 将城市信息写入cookie
+                set_city_to_cookie(city_code);
+                /* lxn_api.redirect("/OrderNew/orderBase"); */
+                lxn_api.refresh();
+            });
+
+            //阻止冒泡
+            $(document).click(function(){
+                cityS.slideUp("fast");
+                cityHandle.removeClass('nowChoose');
+                city.removeClass('city-selected');
+            });
+            city.click(function(event){
+                event.stopPropagation();
+            });
+        }
+
+        function set_city_to_cookie(city_code) {
+            /* console.log(city_name); */
+            lxn_del_cookie("locationCity");
+            lxn_set_cookie("locationCity", city_code, 10);
+        }
+    </script>
+    <!--[if lt IE 9]>
+        <script src="/Public/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<!--===================================== header begin =================================================-->
+    <div class="header-wrap">
+        <div class="header clear">
+            <a href="http://www.lanxiniu.com" alt="蓝犀牛,金杯面包车搬家,同城物流,同城配送" title="蓝犀牛,金杯面包车搬家,同城物流,同城配送" class="logo" style="margin-top:18px;">
+                <span class="logo" alt="蓝犀牛,金杯面包车搬家,同城物流,同城配送" title="蓝犀牛,金杯面包车搬家,同城物流,同城配送"></span>
+            </a>
+            <div class="city" id="city">
+                <span class="now"><span>...</span><b class="icon"></b></span>
+                <div class="cityList" style="display:none;">
+                                            <a href="#" city_code="bj" class="have">北京</a>
+                                            <a href="#" city_code="sh" class="have">上海</a>
+                                            <a href="#" city_code="hz" class="have">杭州</a>
+                                            <a href="#" city_code="sz" class="have">深圳</a>
+                                            <a href="#" city_code="nj" class="have">南京</a>
+                                            <a href="#" city_code="gz" class="have">广州</a>
+                                            <a href="#" city_code="cd" class="have">成都</a>
+                                    </div>
+            </div>
+            <div class="header-right">
+                <div class="header-nav">
+                    <!-- <span class="tel"></span> -->
+                    <a href="/" alt="蓝犀牛,金杯面包车搬家,同城物流,同城配送" title="蓝犀牛,金杯面包车搬家,同城物流,同城配送">首页</a>
+                    <a href="/OrderNew" alt="蓝犀牛在线下单" title="蓝犀牛在线下单">在线下单</a>
+                    <span></span>
+                                        <a target="_blank" href="/About/bookinghelp" alt="蓝犀牛使用指南" title="蓝犀牛使用指南">资费说明</a>
+                </div>
+                                <div class="header-login">
+                    <a href="javascript:void(0);" class="first" id="header_login">登录</a><a target="_blank" href="/Register">注册</a>
+                </div>
+                            </div>
+        </div>
+    </div>
+<!--============================================== header over =============================================-->
+
+<link href="http://www.lanxiniu.com/Public/css/order.css" rel="stylesheet" type="text/css" />
+<div class="order-wrap">
+    <div class="order-detail">
+        <!-- 1 begin -->
+        <div class="order-address">
+            <div class="order-icon order-icon1"></div>
+            <!-- 地址 begin -->
+            <div id="order_form_wrap" class="order-form-wrap">
+                <!-- 出发地 begin -->
+                <div class="order-form">
+                    <div class="order-form-con">
+                        <div class="order-form-address">
+                            <span class="from-icon"></span>
+                            <input type="text" class="order-form-adress-inp" placeholder="请输入出发地地址">
+                            <a href="#" class="common-btn">常用</a>
+                        </div>
+                        <div class="order-form-name">
+                            <input type="text" class="order-form-adress-inp" placeholder="联系人">
+                            <a href="#" class="self-btn">本人</a>
+                        </div>
+                        <div class="order-form-phone">
+                            <input type="text" class="order-form-adress-inp" placeholder="联系电话">
+                        </div>
+                    </div>
+                    <div class="order-form-detail" style="display:none;">
+                        <span class="order-form-detail-arrow"></span>
+                        <input type="text" class="order-form-adress-inp">
+                    </div>
+                </div>
+                <div class="order-form">
+                    <a href="#" class="order-list-edit-icon order-list-edit-add"></a>
+                    <div class="order-form-con">
+                        <div class="order-form-address">
+                            <span class="from-icon"></span>
+                            <input type="text" class="order-form-adress-inp" placeholder="请输入目的地地址">
+                            <a href="#" class="common-btn">常用</a>
+                        </div>
+                        <div class="order-form-name">
+                            <input type="text" class="order-form-adress-inp" placeholder="联系人">
+                            <a href="#" class="self-btn">本人</a>
+                        </div>
+                        <div class="order-form-phone">
+                            <input type="text" class="order-form-adress-inp" placeholder="联系电话">
+                        </div>
+                    </div>
+                    <div class="order-form-detail" style="display:none;">
+                        <span class="order-form-detail-arrow"></span>
+                        <input type="text" class="order-form-adress-inp">
+                    </div>
+                </div>
+                <!-- 目的地 over -->
+            </div>  
+            <!-- 地址 over -->        
+        </div>
+        <!-- 1 over -->
+        <!-- 2 begin -->
+        <div class="order-models">
+            <div class="order-icon"></div>
+            <div class="order-models-con">
+                                    <div class="order-models-list order-models-list-van" car_type="3">
+                        <span class="order-models-list-van-icon"><em></em></span>
+                        <div class="order-models-list-text">
+                            <p><span class="big"><em class="strong">50</em>元</span><span>起步价( 含10公里）</span></p>
+                            <p>＋</p> 
+                            <p class="big"><em class="strong">3</em>元／公里</p>
+                        </div>
+                        <div class="order-models-list-price">
+                            <p>里程：0km</p>
+                            <p>费用：0元</p>
+                        </div>
+                        <a href="javascript:void(0);" class="order-models-list-btn">选车</a>
+                    </div>
+                    <div class="order-models-list order-models-list-cup" car_type="2">
+                        <span class="order-models-list-van-icon"><em></em></span>
+                        <div class="order-models-list-text">
+                            <p><span class="big"><em class="strong">80</em>元</span><span>起步价( 含10公里）</span></p>
+                            <p>＋</p> 
+                            <p class="big"><em class="strong">4</em>元／公里</p>
+                        </div>
+                        <div class="order-models-list-price">
+                            <p>里程：0km</p>
+                            <p>费用：0元</p>
+                        </div>
+                        <a href="javascript:void(0);" class="order-models-list-btn">选车</a>
+                    </div>
+                            </div>
+        </div>
+        <!-- 2 over -->
+        <!-- 3 begin -->
+        <div class="order-times">
+            <div class="order-icon"></div>
+            <div class="order-times-options">
+                <a href="javascript:void(0);" class="order-times-now">马上用车</a>
+                <a href="javascript:void(0);" class="order-times-appoint">预约用车</a>
+            </div>
+            <div class="order-times-now-tips" style="display:none;">
+                <span class="order-times-now-tips-show">下单成功后，我们马上为您安排服务!</span>
+                <!-- <span class="order-times-now-tips-text">'马上用车' 订单预订成功后,如取消将产生起步价!</span> -->
+            </div>
+            <div class="order-times-appoint-tips" style="display:none;">
+                <span class="order-times-now-tips-show">
+                    <input id="order_timepicker">
+                </span>
+                <!-- <span class="order-times-now-tips-text" style="display:none;">
+                    您的服务时间涉及夜间服务时段（23:00-次日6:00），已产生夜间服务费，请您知晓。
+                </span> -->
+                <span class="order-times-now-tips-text"></span>
+            </div>
+        </div>
+        <!-- 3 over -->
+    </div>
+    <!-- button begin -->
+    <div class="order-submit-btn">
+        <a href="javascript:void(0);" class="submit" id="submit_btn" >下一步</a>
+        <!-- <a href="#">下一步</a> 不能点击-->
+    </div>
+    <!-- button over -->
+</div>
+
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=1c738e7908b5e8ec79742527c9796514"></script>
+<script type="text/javascript" src="http://www.lanxiniu.com/Public/wap/lanxiniu.address.js"></script>
+<script type="text/javascript" src="http://www.lanxiniu.com/Public/wap/lanxiniu.distance.js"></script>
+
+<link rel="stylesheet" type="text/css" href="http://www.lanxiniu.com/Public/css/timepick/jquery-ui.css" />
+<link rel="stylesheet" type="text/css" href="http://www.lanxiniu.com/Public/css/timepick.css" />
+<script type="text/javascript" src="http://www.lanxiniu.com/Public/js/timepick/jquery-ui.js"></script>
+<script type="text/javascript" src="http://www.lanxiniu.com/Public/js/timepick/jquery-ui-slide.min.js"></script>
+<script type="text/javascript" src="http://www.lanxiniu.com/Public/js/timepick/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript">
+    var order_time_s;
+    var order_serve_type;
+    var has_night_surcharge = false;
+    var system_timestamp_s = 1429026608;
+    var car_type;
+    var city_code = lxn_get_cookie('locationCity');
+    var city_name = lxn_api.get_city_name(city_code);
+
+    function init_sys_ts() {
+        var old_sys_timestamp_s = system_timestamp_s;
+        var old_ts = +new Date();
+        var sys_ts_interval =  setInterval(function(){
+            var now_ts = +new Date();
+            system_timestamp_s = old_sys_timestamp_s + ((now_ts - old_ts) / 1000);
+        }, 500);
+    }
+
+    $(function(){
+        init_sys_ts();
+
+        var datetime = new Date((system_timestamp_s + 480 * 60) * 1000);
+        var year     = datetime.getUTCFullYear();
+        var month    = datetime.getUTCMonth();
+        var day      = datetime.getUTCDate();
+        var hour     = datetime.getUTCHours()+2;
+        var minute   = datetime.getUTCMinutes();
+        minute       = minute < 30 ? 30 : 60;
+        var minDate         = new Date(year, month, day, hour, minute);
+        var maxDate         = new Date(year, month, day + 10, hour, minute);
+        var timepicker_inst = $("#order_timepicker");
+        timepicker_inst.datetimepicker({
+            minDate: minDate,
+            maxDate: maxDate,
+            timezone: +480,
+            controlType: 'select',
+            stepMinute: 30,
+            onClose: function (dateText, inst){
+                var selectedDateTime = minDate;
+                try {
+                    selectedDateTime = timepicker_inst.datetimepicker('getDate');
+                    if (selectedDateTime.getTime() < minDate.getTime() || selectedDateTime.getTime() > maxDate.getTime()) {
+                        selectedDateTime = minDate;
+                        timepicker_inst.datetimepicker('setDate', selectedDateTime);
+                    }
+                } catch(e) {
+                    selectedDateTime = minDate;
+                    timepicker_inst.datetimepicker('setDate', selectedDateTime);
+                }
+
+                // 预约用车
+                order_serve_type = 100;
+                order_time_s = selectedDateTime.getTime() / 1000;
+                // var has_night_surcharge = lxn_has_night_surcharge(order_time_s, 8 * 60 * 60);
+                // if (has_night_surcharge) {
+                //     $('.order-times>.order-times-appoint-tips>.order-times-now-tips-text').show();
+                // } else {
+                //     $('.order-times>.order-times-appoint-tips>.order-times-now-tips-text').hide();
+                // }
+                $.ajax({
+                    url: '/OrderApi/getNightMoney',
+                    method: 'POST',
+                    data : {
+                        orderCity : city_name,
+                        // orderType : 1,
+                        carType   : car_type,
+                        orderTime : order_time_s
+                    },
+                    dataType: 'json',
+                    success: function(res) {
+                        if (res.code == 0 && res.data && res.data.nightFreeTips) {
+                            $('.order-times>.order-times-appoint-tips>.order-times-now-tips-text').text(res.data.nightFreeTips);
+                        } else {
+                            $('.order-times>.order-times-appoint-tips>.order-times-now-tips-text').text('');
+                        }
+                    }
+                });
+            }
+        });
+
+        var t;
+        $('.order-wrap>.order-detail>.order-times').on('click', '.order-times-now', function(){
+            // 立即用车
+            order_serve_type = 200;
+            order_time_s = system_timestamp_s;
+        }).on('click', '.order-times-appoint', function(){
+            if (t) {
+                clearTimeout(t);
+            }
+            t = setTimeout(function(){
+                timepicker_inst.focus();
+            }, 80);
+        });
+    });
+</script>
+
+<script type="text/javascript">
+var address_list = [{}, {}];
+
+function init_address() {
+    var pickup_info = $.parseJSON('{"PickupAddress":"","PickupRemark":"","PickupX":"","PickupY":"","PickupProvince":"","PickupCity":""}');
+    address_list[0] = {
+        name : '',
+        phone : '',
+        lat : pickup_info.PickupX,
+        lng : pickup_info.PickupY,
+        title : pickup_info.PickupAddress,
+        address : pickup_info.PickupRemark,
+        province : pickup_info.PickupProvince,
+        city : pickup_info.PickupCity
+    };
+    var deliver_list = $.parseJSON('[{"deliverAddress":"","deliverRemark":"","deliverX":"","deliverY":"","deliverProvince":"","deliverCity":""}]');
+    for (var i = 0; i < deliver_list.length; i++) {
+        var deliver_item = deliver_list[i];
+        address_list[(i+1)] = {
+            name : '',
+            phone : '',
+            lat : deliver_item.deliverX,
+            lng : deliver_item.deliverY,
+            title : deliver_item.deliverAddress,
+            address : deliver_item.deliverRemark,
+            province : deliver_item.deliverProvince,
+            city : deliver_item.deliverCity
+        };
+    }
+}
+init_address();
+
+var common_address_cache = {};
+function get_common_address(address_type, callback) {
+    if (common_address_cache[address_type]) {
+        callback && callback(common_address_cache[address_type]);
+    } else {
+        lxn_api.get_common_address(address_type, city_code, function(res){
+            common_address_cache[address_type] = res;
+            callback && callback(res);
+        });
+    }
+}
+function update_address_list() {
+    var html = '';
+    for (var i = 0; i < address_list.length; i++) {
+        var place_holder;
+        var address_icon;
+        if (i == 0) {
+            place_holder = "请输入出发地地址";
+            address_icon = "from-icon";
+        } else if (i == (address_list.length - 1)) {
+            place_holder = "请输入目的地地址";
+            address_icon = "to-icon";
+        } else {
+            place_holder = "请输入途经地地址";
+            address_icon = "mid-icon";
+        }
+        html += '<div class="order-form">';
+        if (address_list.length > 2) {
+            html += '<a href="javascript:void(0);" class="order-list-edit-icon order-list-edit-reduction" index="'+i+'"></a>';
+        }
+        if ((address_list.length < 50) && (i == (address_list.length - 1))) {
+            html += '<a href="javascript:void(0);" class="order-list-edit-icon order-list-edit-add"></a>';
+        }
+        var address_item = address_list[i];
+        html +=     '<div class="order-form-con">' +
+                    '    <div class="order-form-address">' +
+                    '        <span class="' + address_icon + '"></span>' +
+                    '        <input type="text" class="order-form-adress-inp" placeholder="'+place_holder+'" '+
+                                'index="'+i+'" value="'+(address_item['title']||'')+'">';
+        if (user.name && user.phone) {
+            html += '        <a href="javascript:void(0);" class="common-btn" index="'+i+'">常用</a>';
+        }
+        html +=     '    </div>' +
+                    '    <div class="order-form-name">' +
+                    '        <input type="text" class="order-form-adress-inp" placeholder="联系人" ' +
+                                'index="'+i+'" value="'+(address_item['name']||'')+'" >';
+        if (user.name && user.phone) {
+            html += '        <a href="javascript:void(0);" class="self-btn" index="'+i+'">本人</a>';
+        }
+        html +=     '    </div>' +
+                    '    <div class="order-form-phone">' +
+                    '        <input type="text" class="order-form-adress-inp" placeholder="联系电话" ' +
+                                'index="'+i+'" value="'+(address_item['phone']||'')+'">' +
+                    '    </div>' +
+                    '</div>';
+        if (address_item['address']) {
+            html += '<div class="order-form-detail">' +
+                    '   <span class="order-form-detail-arrow"></span>' +
+                    '   <input type="text" class="order-form-adress-inp" ' +
+                            'index="'+i+'" value="'+(address_item['address']||'')+'">' +
+                    '</div>';
+        }
+        html += '   <div class="select_address_list_panel"></div>' +
+                '</div>';
+    };
+    $("#order_form_wrap").html(html);
+
+    update_order_price();
+}
+function init_address_panel() {
+    var address_index;
+    var search_keyword;
+    var address_interval;
+    var active_select_address_list_panel;
+    var last_select_address_list_panel;
+    var select_data;
+    var clear_interval = function(){
+        if (address_interval) window.clearInterval(address_interval);
+    };
+    $("#order_form_wrap").on('focus', '.order-form-address>input', function(){
+        var that = $(this);
+        var last_val = that.val();
+        address_index = (parseInt(that.attr('index')) || 0);
+        clear_interval();
+        address_interval = window.setInterval(function(){
+            search_keyword = that.val();
+            if (search_keyword && (search_keyword != last_val)) {
+                addressSearch.search(search_keyword);
+                last_val = search_keyword;
+            }
+        }, 100);
+        active_select_address_list_panel = that.parents('.order-form-con').siblings('.select_address_list_panel');
+    }).on('blur', '.order-form-address>input', function(){
+        clear_interval();
+    }).on('blur', '.order-form-name>input', function(){
+        var index = parseInt($(this).attr('index'));
+        address_list[index]['name'] = $(this).val();
+    }).on('blur', '.order-form-phone>input', function(){
+        var index = parseInt($(this).attr('index'));
+        address_list[index]['phone'] = $(this).val();
+    }).on('blur', '.order-form-detail>input', function(){
+        var index = parseInt($(this).attr('index'));
+        address_list[index]['address'] = $(this).val();
+    }).on('click', '.order-list-edit-add', function(){
+        address_list[address_list.length] = {};
+        update_address_list();
+    }).on('click', '.order-list-edit-reduction', function(){
+        var index = parseInt($(this).attr('index'));
+        address_list.splice(index, 1);
+        update_address_list();
+    }).on('click', '.order-form>.select_address_list_panel .address-common-list-wrap>.address-common-list', function(){
+        var selected_index = parseInt($(this).attr('index')) || 0;
+        // console.log(selected_index, select_data[selected_index]);
+        address_list[address_index]['title'] = select_data[selected_index]['title'];
+        address_list[address_index]['address'] = select_data[selected_index]['address'];
+        address_list[address_index]['lng'] = select_data[selected_index]['lng'];
+        address_list[address_index]['lat'] = select_data[selected_index]['lat'];
+        address_list[address_index]['province'] = select_data[selected_index]['province'];
+        address_list[address_index]['city'] = select_data[selected_index]['city'];
+        address_list[address_index]['name'] = select_data[selected_index]['name'] || '';
+        address_list[address_index]['phone'] = select_data[selected_index]['phone'] || '';
+        update_address_list();
+    }).on('click', '.order-form>.order-form-con .common-btn', function(){
+        var that = $(this);
+        address_index = parseInt(that.attr('index')) || 0;
+        // console.log(address_index);
+
+        if (last_select_address_list_panel) {
+            last_select_address_list_panel.html('');
+        }
+        active_select_address_list_panel = that.parents('.order-form-con').siblings('.select_address_list_panel');
+
+        common_address_page_index = 0;
+        render_active_select_address_list_panel('1');
+    }).on('click', '.order-form>.select_address_list_panel>div>div>.address-common-type-list-left>p', function(){
+        common_address_page_index = 0;
+        render_active_select_address_list_panel('1');
+    }).on('click', '.order-form>.select_address_list_panel>div>div>.address-common-type-list-left>.left', function(){
+        common_address_page_index--;
+        render_active_select_address_list_panel('1');
+    }).on('click', '.order-form>.select_address_list_panel>div>div>.address-common-type-list-left>.right', function(){
+        common_address_page_index++;
+        render_active_select_address_list_panel('1');
+    }).on('click', '.order-form>.select_address_list_panel>div>div>.address-common-type-list-right>p', function(){
+        common_address_page_index = 0;
+        render_active_select_address_list_panel('2');
+    }).on('click', '.order-form>.select_address_list_panel>div>div>.address-common-type-list-right>.left', function(){
+        common_address_page_index--;
+        render_active_select_address_list_panel('2');
+    }).on('click', '.order-form>.select_address_list_panel>div>div>.address-common-type-list-right>.right', function(){
+        common_address_page_index++;
+        render_active_select_address_list_panel('2');
+    }).on('click', '.order-form>.order-form-con .self-btn', function(){
+        var that = $(this);
+        var selected_index = parseInt(that.attr('index')) || 0;
+        address_list[selected_index]['name'] = user.name;
+        address_list[selected_index]['phone'] = user.phone;
+        update_address_list();
+    });
+
+    var common_address_page_index = 0;
+    var page_size = 5;
+    var render_active_select_address_list_panel = function(address_type){
+        get_common_address(address_type, function(list){
+            select_data = [];
+            if (common_address_page_index * page_size >= list.length) {
+                common_address_page_index--;
+            }
+            if (common_address_page_index < 0) {
+                common_address_page_index = 0;
+            }
+            var html =  '<div class="address-common">'+
+                        '   <div class="address-common-list-wrap">';
+            var offset = (common_address_page_index * page_size);
+            for (var i = offset; ((i < list.length) && (i < page_size + offset)); i++) {
+                var item = list[i];
+                select_data[i] = {
+                    title : item['address'],
+                    address : item['addressremark'],
+                    lng : item['y'],
+                    lat : item['x'],
+                    province : item['province'],
+                    city : item['city'],
+                    name : item['contractname'],
+                    phone : item['contractphone']
+                };
+                html += '       <div class="address-common-list" index="'+i+'">' +
+                        '           <span class="address-common-icon"></span>' +
+                        '           <p class="address-common-address">' +
+                        '               <span class="address-common-title">'+item['address']+'</span>' +
+                        '               <span class="address-common-detail-address"> 详细地址：<em>'+item['addressremark']+'</em></span>' +
+                        '           </p>' +
+                        '           <span class="address-common-name">'+item['contractname']+'</span>' +
+                        '           <span class="address-common-phone">'+item['contractphone']+'</span>' +
+                        '       </div>';
+            }
+            html +=     '   </div>' +
+                        '   <div class="address-common-type">';
+            if (address_type == '1') {
+                html += '       <div class="address-common-type-list address-common-type-list-selected address-common-type-list-left">';
+            } else {
+                html += '       <div class="address-common-type-list address-common-type-list-left">';
+            }
+            html +=     '           <a herf="#" class="left"></a>' +
+                        '           <a herf="#" class="right"></a>' +
+                        '           <p>发货地址</p>' +
+                        '       </div>';
+            if (address_type == '2') {
+                html += '       <div class="address-common-type-list address-common-type-list-selected address-common-type-list-right">';
+            } else {
+                html += '       <div class="address-common-type-list address-common-type-list-right">';
+            }
+            html +=     '           <a herf="#" class="left"></a>' +
+                        '           <a herf="#" class="right"></a>' +
+                        '           <p>收货地址</p>' +
+                        '       </div>' +
+                        '   </div>' +
+                        '</div>';
+            active_select_address_list_panel.html(html);
+            last_select_address_list_panel = active_select_address_list_panel;
+        });
+    };
+
+    var city_name = lxn_api.get_city_name(city_code);
+    var province_filter = lxn_api.get_province_name(city_code);
+    var addressSearch = new AddressSearch(city_name, province_filter, 5, function(search_data){
+        if (!search_data) {
+            // 查询结果为空
+            return;
+        }
+        if (search_keyword != search_data.keyword) {
+            // 查询关键词与当前查询不匹配
+            return;
+        }
+        // update_address_list();
+        if (last_select_address_list_panel) {
+            last_select_address_list_panel.html('');
+        }
+        last_select_address_list_panel = active_select_address_list_panel;
+        select_data = search_data['data'];
+        var html =  '<div class="address-common">'+
+                    '   <div class="address-common-list-wrap">';
+        for (var i = 0; i < search_data['data'].length; i++) {
+            var item = search_data['data'][i];
+            html += '       <div class="address-common-list" index="'+i+'">' +
+                    '           <span class="address-common-icon"></span>' +
+                    '           <p class="address-common-address">' +
+                    '               <span class="address-common-title">'+item['title']+'</span>' +
+                    '               <span class="address-common-detail-address"> 详细地址：<em>'+item['address']+'</em></span>' +
+                    '           </p>' +
+                    '       </div>';
+        }
+        html +=     '   </div>' +
+                    '</div>';
+        active_select_address_list_panel.html(html);
+    });
+}
+function get_point_list() {
+    if (address_list.length < 2) {
+        return false;
+    }
+    var point_list = [];
+    for (var i = 0; i < address_list.length; i++) {
+        if (address_list[i]['lng'] && address_list[i]['lat']) {
+            point_list.push(new BMap.Point(address_list[i]['lng'], address_list[i]['lat']));
+        }
+    }
+    if (point_list.length < 2) {
+        return false;
+    }
+    return point_list;
+}
+var distanceSearch  = new DistanceSearch();
+function get_distance(callback) {
+    var point_list = get_point_list();
+    if (!point_list) {
+        callback(0);
+        return;
+    }
+    var city_name = lxn_api.get_city_name(city_code);
+    distanceSearch.multi_search(city_name, point_list, function(dis) {
+        callback && callback(dis);
+    });
+}
+var order_price_cache = {};
+function update_order_price() {
+    get_distance(function(dis){
+        if (!dis) {
+            return;
+        }
+        var city_name = lxn_api.get_city_name(city_code);
+        var van_car_type = $('.order-models-list-van').attr('car_type');
+        if (order_price_cache[dis+van_car_type]) {
+            $('.order-models-list-van .order-models-list-price').html(order_price_cache[dis+van_car_type]);
+        } else {
+            $.ajax({
+                url: '/OrderApi/calculateOrderPrice',
+                method: 'POST',
+                data : {
+                    kilometer: dis,
+                    orderCity: city_name,
+                    carType: van_car_type
+                },
+                dataType: 'json',
+                beforeSend : function() {
+                    $('.order-models-list-van .order-models-list-price').html('<p>里程：'+dis+'km</p><p>费用：...</p>');
+                },
+                success: function(res){
+                    if (res.code == 0) {
+                        var pay = res.data.showPay;
+                        var html =  '<p>里程：'+dis+'km</p>' + 
+                                    '<p>费用：'+pay+'</p>';
+                        order_price_cache[dis+van_car_type] = html;
+                        $('.order-models-list-van .order-models-list-price').html(html);
+                    }
+                }
+            });
+        }
+        var cup_car_type = $('.order-models-list-cup').attr('car_type');
+        if (order_price_cache[dis+cup_car_type]) {
+            $('.order-models-list-cup .order-models-list-price').html(order_price_cache[dis+cup_car_type]);
+        } else {
+            $.ajax({
+                url: '/OrderApi/calculateOrderPrice',
+                method: 'POST',
+                data : {
+                    kilometer: dis,
+                    orderCity: city_name,
+                    carType: cup_car_type
+                },
+                dataType: 'json',
+                beforeSend : function() {
+                    $('.order-models-list-cup .order-models-list-price').html('<p>里程：'+dis+'km</p><p>费用：...</p>');
+                },
+                success: function(res){
+                    if (res.code == 0) {
+                        var pay = res.data.showPay;
+                        var html =  '<p>里程：'+dis+'km</p>' + 
+                                '<p>费用：'+pay+'</p>';
+                        order_price_cache[dis+cup_car_type] = html;
+                        $('.order-models-list-cup .order-models-list-price').html(html);
+                    }
+                }
+            });
+        }
+    });
+}
+function init_car_type_panel() {
+    var selected_van_item;
+    var unselect_van = function(){
+        if (selected_van_item) {
+            selected_van_item.removeClass('order-models-list-van-selected');
+            selected_van_item = null;
+        }
+    };
+    var selected_cup_item;
+    var unselect_cup = function(){
+        if (selected_cup_item) {
+            selected_cup_item.removeClass('order-models-list-cup-selected');
+            selected_cup_item = null;
+        }
+    };
+
+    $('.order-models-list-van .order-models-list-btn').click(function(){
+        var that = $(this).parents('.order-models-list-van');
+        // unselect_van();
+        that.addClass('order-models-list-van-selected');
+        selected_van_item = that;
+        unselect_cup();
+        car_type = that.attr('car_type');
+        update_order_price();
+        $('.order-models>.order-icon').addClass('order-icon2');
+    });
+    $('.order-models-list-cup .order-models-list-btn').click(function(){
+        var that = $(this).parents('.order-models-list-cup');
+        // unselect_cup();
+        that.addClass('order-models-list-cup-selected');
+        selected_cup_item = that;
+        unselect_van();
+        car_type = that.attr('car_type');
+        update_order_price();
+        $('.order-models>.order-icon').addClass('order-icon2');
+    });
+}
+function init_order_time_panel() {
+    var last_selected_item;
+    $('.order-wrap>.order-detail>.order-times').on('click', '.order-times-now,.order-times-appoint', function(){
+        if (last_selected_item) {
+            last_selected_item.removeClass('active');
+        }
+        last_selected_item = $(this);
+        last_selected_item.addClass('active');
+        $(this).parent().siblings('.order-icon').addClass('order-icon3');
+    }).on('click', '.order-times-now', function(){
+        $(this).parent().siblings('.order-times-now-tips').show();
+        $(this).parent().siblings('.order-times-appoint-tips').hide();
+    }).on('click', '.order-times-appoint', function(){
+        $(this).parent().siblings('.order-times-now-tips').hide();
+        $(this).parent().siblings('.order-times-appoint-tips').show();
+    });
+}
+var order_id;
+function init_order_id() {
+	order_id = "40234472";//res.data.orderId;
+//     lxn_api.create_order(function(res){
+//         if (!res || (res.code != 0)) {
+//             return false;
+//         }
+//         order_id = res.data.orderId;
+//     });
+}
+function check_address_list() {
+    if (address_list.length < 2) {
+        return false;
+    }
+
+    for (var i = 0; i < address_list.length; i++) {
+        var address_item = address_list[i];
+        // if (!address_item['name']) {
+        //     return false;
+        // }
+        if (!address_item['lat'] || !address_item['lng']) {
+            alert('请选择地址信息！');
+            return false;
+        }
+        if (!address_item['phone'] || !lxn_is_phone(address_item['phone'])) {
+            alert('请检查联系人电话！');
+            return false;
+        }
+        // if (!address_item['title']) {
+        //     return false;
+        // }
+        // if (!address_item['address']) {
+        //     return false;
+        // }
+        // if (!address_item['province']) {
+        //     return false;
+        // }
+        // if (!address_item['city']) {
+        //     return false;
+        // }
+    }
+
+    return true;
+}
+function get_pickup_info() {
+    var pickup_info = {};
+    pickup_info['name']     = address_list[0]['name'] || '';
+    pickup_info['phone']    = address_list[0]['phone'];
+    pickup_info['x']        = address_list[0]['lat'];
+    pickup_info['y']        = address_list[0]['lng'];
+    pickup_info['address']  = address_list[0]['title'];
+    pickup_info['remark']   = address_list[0]['address'];
+    pickup_info['province'] = address_list[0]['province'];
+    pickup_info['city']     = address_list[0]['city'];
+
+    return pickup_info;
+}
+function get_deliver_list() {
+    var deliver_list = [];
+    for (var i = 1; i < address_list.length; i++) {
+        var deliver_item = {};
+        deliver_item['name']     = address_list[i]['name'];
+        deliver_item['phone']    = address_list[i]['phone'];
+        deliver_item['x']        = address_list[i]['lat'];
+        deliver_item['y']        = address_list[i]['lng'];
+        deliver_item['address']  = address_list[i]['title'];
+        deliver_item['remark']   = address_list[i]['address'];
+        deliver_item['province'] = address_list[i]['province'];
+        deliver_item['city']     = address_list[i]['city'];
+
+        deliver_list.push(deliver_item);
+    }
+    return deliver_list;
+}
+function init_submit() {
+    var on_save_detail_success = function(res){
+        $("#submit_btn").addClass('submit');
+        if (String(res.code) == '300') {
+            login_wget.show(function (data){
+                $("#submit_btn").click();
+            } );
+            return false;
+        }
+        if (res.code != 0) {
+            new LXN_pop(res.code, res.msg);
+            return false;
+        }
+
+        lxn_api.redirect('/orderNew/orderDetail?orderId='+order_id);
+    };
+
+    var on_save_base_success = function(res){
+        if (res.code != 0) {
+            $("#submit_btn").addClass('submit');
+            new LXN_pop(res.code, res.msg);
+            return false;
+        }
+
+        var goods_num = 0;
+        var goods_remark = '';
+        var with_car = false;
+        lxn_api.save_order_detail(order_id, order_serve_type, order_time_s, order_time_s,
+            goods_num, goods_remark, with_car, {
+                trolley_num : 0,
+                need_receipt : false,
+                carring_type : '0',
+                collection_charges : 0
+            }, on_save_detail_success);
+    };
+
+    $("#submit_btn").click(function(){
+        var that = $(this);
+        if (!that.hasClass('submit')) {
+            return false;
+        }
+        that.removeClass('submit');
+
+        if (!order_id) {
+            // 提示：正在初始化订单信息
+            init_order_id();
+            that.addClass('submit');
+            return;
+        }
+
+        if (!check_address_list()) {
+            // 提示：地址信息不完整
+            that.addClass('submit');
+            return;
+        }
+
+        if (!car_type) {
+            alert('请选择车型!');
+            that.addClass('submit');
+            return;
+        }
+
+        get_distance(function(dis){
+            var city_name = lxn_api.get_city_name(city_code);
+            var pickup_info = get_pickup_info();
+            var deliver_list = get_deliver_list();
+            lxn_api.save_order_base(order_id, city_name, car_type, 
+                pickup_info, deliver_list, dis, on_save_base_success);
+        });
+    });
+}
+$(function(){
+    init_order_id();
+    update_address_list();
+    init_address_panel();
+    init_car_type_panel();
+    init_order_time_panel();
+    init_submit();
+});
+</script>
+
+    <!--======================================= footer begin =======================================-->
+    <div class="footer-wrap">
+        <!-- <div class="happy-new-year"></div> -->
+        <div class="footer">
+            <div class="l">
+                <img src="http://www.lanxiniu.com/Public/img/scanlife.jpg" />
+                <p>
+                    <span>服务号：lanxiniu</span>
+                    <span>扫一扫关注微信帐号</span>
+                </p>
+            </div>
+            <div class="r">
+                <div class="nav">
+                    <ul>
+                        <li><a target="_blank" href="/About/aboutus">关于我们</a></li>
+                        <li><a target="_blank" href="/About/contactus">联系我们</a></li>
+
+						<li><a target="_blank" href="/About/complainSuggest">投诉与建议</a></li>
+					</ul>
+					<ul class="ul2">
+						<li><a target="_blank" href="/About/bookinghelp">资费说明</a></li>
+						<!--
+						<li><a target="_blank" href="/About/pay">支付方式</a></li>
+						-->
+						<li><a target="_blank" href="/About/banGoods">服务协议</a></li>
+						<li><a target="_blank" href="/About/jobs">招贤纳士</a></li>
+					</ul>
+				</div>
+				<p>Copyright©2013-2015  <a href="http://www.lanxiniu.com">www.lanxiniu.com</a>   京ICP备14006783号-1</p>
+			</div>
+		</div>
+	</div>
+
+    <div style="display:none;">
+        <script  type="text/javascript">
+            var _sogou_sa_q = _sogou_sa_q || [];
+            _sogou_sa_q.push(['_sid', '215232-221318']);
+            (function() {
+            var _sogou_sa_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+            var _sogou_sa_src=_sogou_sa_protocol+"hermes.sogou.com/sa.js%3Fsid%3D215232-221318";
+            document.write(unescape("%3Cscript src='" + _sogou_sa_src + "' type='text/javascript'%3E%3C/script%3E"));
+            })();
+        </script>
+        <script type="text/javascript">
+        var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+        document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F04c3c4ee4f7d6e12920853421ec06d1d' type='text/javascript'%3E%3C/script%3E"));
+        var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+        document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fcea417114e1a5352c7643c937c3ccfee' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+        <script src='http://stat.e.tf.360.cn/search/c.js?u=1208875906' language='JavaScript' ></script>
+        <script type="text/javascript">
+        var _smq = _smq || [];
+        _smq.push(['_setAccount', '1980348', new Date()]);
+        _smq.push(['_setHeatmapEnabled', 'no']);
+        _smq.push(['_setUrlParam', 'smt_e', '_e360_uid', '_e360_campaignid', '_e360_groupid', '_e360_creativeid', '_e360_keywordid']);
+        _smq.push(['pageview']);
+
+        (function() {
+        var so = document.createElement('script'); so.type = 'text/javascript'; so.async = true;
+        so.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stat.tf.360.cn/search/c.js?u=1208875906';
+        var e = document.getElementsByTagName('script')[0]; e.parentNode.insertBefore(so, e);
+        })();
+
+        (function() {
+        var sm = document.createElement('script'); sm.type = 'text/javascript'; sm.async = true;
+        sm.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'cdnmaster.com/sitemaster/sm360.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(sm, s);
+        })();
+        </script>
+    </div>
+    <!--============================================== footer over ==================================-->
+</body>
+</html>

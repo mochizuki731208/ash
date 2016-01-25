@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_sptg(id){
+			if(confirm("是否将此企业审核通过吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/merchant/sptg",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("此企业信息审核通过成功！");
+							refresh();
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		
+		function uf_spbtg(id){
+			if(confirm("是否将此企业审核不通过吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/merchant/spbtg",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("此企业信息审核不通过成功！");
+							refresh();
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		function uf_show(id){
+	    	$.dialog({
+				title:'企业信息',
+				content: 'url:${CTX}/admin/merchant/showmerchant/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 500,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});
+	    }
+	    
+	    function uf_showsp(id){
+	    	$.dialog({
+				title:'商品信息',
+				content: 'url:${CTX}/admin/merchant/showsp/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 500,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});
+	    }
+	    
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+  <body>
+  	  <form id="myform" name="myform" method="post" action="">
+			企业名称：<input type="text" name="mname" id="mname" class="text" value="${(mname)!}" style="width: 120px;"/>
+			产品名称：<input type="text" name="mc" id="mc" class="text" value="${(mc)!}" style="width: 120px;"/>
+			分类
+			<select name="subjectid" id="subjectid">
+					<option value="">全部...</option>
+				<#list list_subject as x>
+				    <option value="${(x.id)!''}" <#if strkit((x.id)!'',(subjectid)!)>selected</#if>>${(x.mc)!''}</option>
+				</#list>
+			</select>
+			<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+	  		<table class="list">
+            <tr>
+	            <th width="4%">序号</th>
+	            <th width="12%">企业</th>
+	            <th width="*%">名称</th>
+	            <th width="10%">分类</th>
+	            <th width="8%">类型</th>
+	            <th width="8%">价格</th>
+	            <th width="8%">门店价</th>
+				<th width="8%">积分</th>
+				<th width="6%">顺序号</th>
+				<th width="15%">创建时间</th>
+				<th width="12%">审核结果</th>
+	        </tr>
+      		<#if listpage ??>
+      			  <#list listpage.list as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!''}</td>
+                  	<td><a href="javascript:void(0);" onclick="uf_show('${(lst.mid)!''}')">${(lst.mname)!''}</a></td>
+                  	<td><a href="javascript:void(0);" onclick="uf_showsp('${(lst.id)!''}')">${(lst.mc)!''}</a></td>
+                    <td>${(lst.subject_name)!''}</td>
+                    <td><#if strkit('0',(lst.is_type)!)>货物</#if><#if strkit('1',(lst.is_type)!)>服务</#if></td>
+                    <td><font color="red">${(lst.price)?string("currency")}</font></td>
+                    <td><font color="red">${(lst.mdprice)?string("currency")}</font></td>
+                    <td>${(lst.jf)!''}</td>
+                    <td>${(lst.seq_num)!''}</td>
+                    <td>${(lst.createtime)!''}</td>
+                    <td>
+                    	<#if strkit('0',(lst.zt)!)>
+                    	<font color="red">待审</font>
+                    	</#if>
+                    	<#if strkit('1',(lst.zt)!)>
+                    	<a href="javascript:void(0);" onclick="uf_showsp('${(lst.id)!''}')">查看</a>
+                    	</#if>
+                    	<#if strkit('2',(lst.zt)!)>
+                    	<font color="red">审核不通过</font>
+                    	<a href="javascript:void(0);" onclick="uf_showsp('${(lst.id)!''}')">查看</a>
+                    	</#if>
+                    </td>
+                  </tr>
+				</#list>
+				</#if>
+				<tr>
+					<td colspan="11">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+            </table>
+   
+			</form>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+{
+    "state":"Y",
+    "code":0,
+    "msg":"success",
+    "nVerAppUrl":"http://www.yijuhome.cn/versions/HUOLALASJ.apk",
+    "nVerDesc":"1.修改了注册流程和文字提示\n2.调整了目录\n3.简化了密码\n4.其他界面调整",
+    "nVerCode":"1.0"
+}

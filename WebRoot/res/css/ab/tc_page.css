@@ -1,0 +1,78 @@
+﻿
+body ,div,p,ul,li,span{  margin:0; padding:0; word-spacing:normal; white-space:normal; text-align:center; 
+                         font-family: "宋体", "Arial Narrow", HELVETICA;
+}
+ul,li{ list-style:none}
+body{ background-color-:rgb(153,153,153);font-size:12px;}
+img{ border:0 none; vertical-align:middle}
+a{ text-decoration:none}
+.cl{ height:0px; line-height:0px; font-size:0px; clear:both}
+.line{ height:1px; border-bottom: solid 1px #eee; line-height:1px}
+.mt24{ margin-top:24px}.mt18{ margin-top:18px}.mt12{ margin-top:12px}.mt25{ margin-top:25px}
+.cd48543{ color:#d48543}.c646464{ color:#646464}.c979797{ color:#979797}.c666666{ color:#666}.cff5801{ color:#ff5801}
+.l24{ line-height:24px}
+.h200{ height:200px}
+.h230{ height:230px}
+.h15{ height:15px}
+.h25{ height:25px}
+
+.f18{ font-size:18px;}.f12{ font-size:12px !important}.f14{ font-size:14px !important}
+.fb{ font-weight:bold}
+.fl{ float:left}
+.tl{ text-align:left}
+.pl25{ padding-left:25px}
+
+.site-nav{width:100%;background:#f5f5f5;border-bottom:1px solid #eee;line-height: 35px;color:#333;}
+.site-nav .site-nav-bd{margin:0 auto;width:990px;height:35px;}
+.site-nav .site-nav-bd ul{list-style:none;}
+.site-nav .site-nav-bd ul li{height:35px;line-height: 35px;}
+.site-nav .site-nav-bd .site-nav-bd-l{float:left;}
+.site-nav .site-nav-bd .site-nav-bd-r{float:right;}
+.site-nav .mobile {background:url(images/mobile.jpg) no-repeat;padding:5px 0px 10px 15px;line-height: 20px;}
+.site-nav a{ color:rgb(135,135,135)}
+
+.wrap{ width:100%; margin-left:auto; margin-right:auto;}
+.wrap .headerbox{background-color:#fff; width:100%; margin-top:0px}
+.wrap .header{ height:90px; width:1000px; background-color:#fff; position:relative; overflow:hidden; margin-left:auto; margin-right:auto; line-height:90px}
+.wrap .header .logo{ width:219px; height:73px; overflow:hidden; margin-top:10px;}
+.wrap .header .login{ width:120px; height:24px; line-height:24px; position:absolute;right:0px; top:0px}
+.wrap .header .login a{ color:rgb(127,127,127)}
+.wrap .header .nav { position:absolute; right:0px; height:28px; line-height:28px; width:360px; top:50px}
+.wrap .header .nav ul{}
+.wrap .header .nav ul li{ float:left; display:inline}
+.wrap .header .nav ul li a{ color:rgb(105,105,105); font-size:14px; font-weight:bold; }
+.wrap .header .nav ul li span{color:rgb(105,105,105); width:50px; display:block}
+
+.wrap .body { width:1000px; background-color:#fff; margin-left:auto; margin-right:auto; border:solid 1px  #ddd}
+.wrap .body .bodynav{ height:45px;}
+.wrap .body .bodynav span{ font-size:18px; color:#fff}
+.wrap .body .bodynav .one{ background-color:rgb(255,133,0); width:305px; float:left; height:45px; line-height:45px}
+.wrap .body .bodynav .two{ background:url(images/img3.png); width:50px; float:left; height:45px;line-height:45px}
+.wrap .body .bodynav .three{ background:url(images/img4.png); width:286px; float:left; height:45px;line-height:45px}
+.wrap .body .bodynav .four{ background:url(images/img5.png); width:50px; float:left; height:45px;line-height:45px}
+.wrap .body .bodynav .five{ background:url(images/img4.png); width:309px; float:left; height:45px;line-height:45px}
+
+.wrap .body .content{ width:940px; margin-left:auto; margin-right:auto}
+.wrap .body .content .title { height:40px; background:url(images/img9.png); background-repeat:repeat-x; background-position:bottom center}
+.wrap .body .content .title .word{ width:140px; height:40px; line-height:40px; background:url(images/img10.png); background-repeat:no-repeat; background-position:bottom center }
+.wrap .body .content .title .word span{ color:rgb(127,127,127)}
+.wrap .body .content .button{ width:80px; height:28px; border:0; border-bottom:solid 1px rgb(119,202,0); background-color:rgb(147,213,2); color:#Fff; margin-top:8px}
+.wrap .body .content .address{}
+.wrap .body .content .button2{ width:175px; height:36px; border:0; border-bottom:solid 1px rgb(254,162,113); font-size:14px; 
+                                        background-color:rgb(255,119,1); color:#Fff; margin-top:8px}
+.wrap .body .content .button3{ width:80px; height:28px; border:0; border-bottom:solid 1px rgb(217,217,217); font-size:14px; 
+                                        background-color:rgb(242,242,242); color:rgb(180,180,180); margin-top:8px}
+.wrap .body .content .button4{ width:84px; height:24px; border:0; line-height:24px; border-bottom:solid 1px #77ca00; font-size:14px; 
+                                        background-color:#93d502; color:#fff; display:inline-block; text-align:center; font-size:12px}
+.wrap .body .content .button5{  width:84px; height:24px;  line-height:24px; border:0; border-bottom:solid 1px #fe5900; font-size:14px; 
+                                        background-color:#ff7701; color:#fff;display:inline-block;text-align:center;font-size:12px}
+.wrap .body .content .slecttime{width:156px; height:26px; line-height:26px; border:solid 1px rgb(223,223,223); display:inline-block; color:rgb(153,153,153); padding-left:10px}
+.wrap .body .content .selectbox{width:128px; height:28px; line-height:28px; border:solid 1px rgb(222,222,222); color:rgb(153,153,153); text-align:center}
+.wrap .body .content .time_input{width:202px; height:28px; line-height:28px; border:solid 1px rgb(222,222,222); color:rgb(153,153,153); text-align:center}
+.wrap .body .content .text_input{width:202px; height:28px; line-height:28px; border:solid 1px rgb(222,222,222); color:rgb(153,153,153); text-align:center}
+.wrap .body .content textarea{width:288px; height:84px; border:solid 1px #dedede; overflow:hidden; text-align:left; color:#999999; line-height:24px}
+.wrap .foot{ height:100px; background-color:#fff; line-height:32px; margin-top:30px; border-top:solid 1px #ddd}
+.wrap .foot .footbox{ width:1000px; height:110px; margin-left:auto; margin-right:auto; color:rgb(162,162,162)}
+.wrap .foot .footbox a{color:rgb(162,162,162)}
+
+.order-t{width:990px; margin:0 auto 10px;background:url(images/t.jpg) no-repeat 0 -45px; height:45px; margin-top:20px;}

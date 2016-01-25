@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript">
+		
+	</script>	
+</head>
+  <body>
+<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+  	<table class="list">
+             <tr>
+                    <th width="4%"></th>
+                    <th width="20%">姓名</th>
+					<th width="12%">手机号</th>
+					<th width="15%">地址</th>
+                  </tr>
+      		<#if YGList ?? && (YGList.size()>0)>
+      			<#list YGList as lst>
+                  <tr>
+                    <td>
+                    	<input type="radio" name="selectedID" id="selectedID" value="${(lst.id)}" <#if strkit((lst.id)!'',(aca.user_id)!)>checked="checked" </#if>>
+                    </td>
+                    <td>${(lst.mc)!''}</td>
+                    <td>${(lst.mobile)!''}</td>
+                    <td>${(lst.xxdz)!''}</td>
+                  </tr>
+				</#list>
+			</#if>
+            </table>
+       </form>
+  </body>
+</html>

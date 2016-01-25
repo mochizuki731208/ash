@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+<script type="text/javascript">
+var map;// 创建地图实例    
+var point;// 创建点坐标   
+var opts = {
+	width : 300,     // 信息窗口宽度
+	height: 200,     // 信息窗口高度
+	title : "信息窗口" , // 信息窗口标题
+	enableMessage:true//设置允许信息窗发送短息
+};
+var jdrjd = "";
+var jdrwd = "";
+var paotuiArr;
+var carArr ;
+var sjjd = "113.67311";
+var sjwd = "34.716755";
+var kd = '-1';
+var MultiOrder = new Object();
+$(function(){
+	map = new BMap.Map("MblogMap");
+	point = new BMap.Point(113.67311, 34.716755);
+	map.centerAndZoom(point, 13); 
+	var myCity = new BMap.LocalCity();
+ 	myCity.get(myFun);
+ 	 //添加缩放控件  
+	map.addControl(new BMap.NavigationControl());    
+	map.addControl(new BMap.ScaleControl());    
+	map.addControl(new BMap.OverviewMapControl()); 
+	map.enableScrollWheelZoom(true);//开启鼠标滚轮缩放
+	
+	$("#searchBtn").bind("click",function(){
+		if(!$("input[type='radio'][name='baseId']:checked").val()){
+			alert("请勾选一个订单作为基础订单!");
+			return false;
+		}
+		if(!$("#multiType").val()){
+			alert("请选择一种集中订单方式");
+			return false;
+		}
+		var orderid = $("input[type='radio'][name='baseId']:checked").val();
+		var objJSON = {
+			orderid: orderid,
+			orderType: $("#orderType").val(),
+			area_id: $("#area_id").val(),
+			multiType: $("#multiType").val(),
+			juli: $("#juli").val(),
+			time: $("#time").val()
+		};
+		$.post("${CTX}/admin/order/searchMultiOrder",objJSON,function(data){
+			MultiOrder = new Object();
+			$("#doZhiPaiBtn").show();
+			$("#searchBtn").hide();
+			var orderList = $("#orderList");
+			$("#orderList tr").eq(0).nextAll().remove();//表头不删除
+            if(data.length > 0){
+            	if($("#orderType").val()==0){
+            		$.each(data,function(index,obj){
+                		var tr = $("<tr>");
+                		if(orderid==obj["id"]){
+                			$("<td>").html("<input id='selectid' type='checkbox' checked='checked' name='selectid' value='" + obj["id"] + "'/>").appendTo(tr);
+                		}else{
+                			$("<td>").html("<input id='selectid' type='checkbox' name='selectid' value='" + obj["id"] + "'/>").appendTo(tr);
+                		}
+                		
+                		 $("<td>").html("<a href='javascript:void(0)' onclick=uf_showddinfo('" + obj["id"] +"')>" +obj["sn"] + "</a>").appendTo(tr); 
+                		 $("<td>").html(obj["shdz"]).appendTo(tr); 
+                		 $("<td>").html(obj["xxdz"]).appendTo(tr); 
+                		 $("<td style='color: red;font-weight: 700'>").html(obj["ddzje"] + "￥").appendTo(tr); 
+                		tr.appendTo(orderList);
+                		obj["jd"]=obj.sjjd;
+                		obj["wd"]=obj.sjwd;
+                		MultiOrder[obj["id"] + ""]=obj;
+                	})
+                	point = new BMap.Point(data[0]["sjjd"],data[0]["sjwd"]);
+    				map.centerAndZoom(point, 13); 
+                	sjjd = data[0]["sjjd"];
+                	sjwd = data[0]["sjwd"];
+                	map.clearOverlays();
+                	MblogDotccMap();
+                	searchPaoTui();
+            	}else{
+            		$.each(data,function(index,obj){
+                		var tr = $("<tr>");
+                		if(orderid==obj["orderid"]){
+                			$("<td>").html("<input id='selectid' type='checkbox' checked='checked' name='selectid' value='" + obj["orderid"] + "'/>").appendTo(tr);
+                		}else{
+                			$("<td>").html("<input id='selectid' type='checkbox' name='selectid' value='" + obj["orderid"] + "'/>").appendTo(tr);
+                		}
+                		$("<td>").html("<a href='javascript:void(0)' onclick=uf_showddinfo('" + obj["orderid"] +"')>" +obj["sn"] + "</a>").appendTo(tr); 
+                		 $("<td>").html(obj["shdz"]).appendTo(tr); 
+                		 $("<td>").html(obj["send_addr"]).appendTo(tr); 
+                		 $("<td style='color: red;font-weight: 700'>").html(obj["ddzje"] + "￥").appendTo(tr); 
+                		tr.appendTo(orderList);
+                		obj["jd"]=obj.send_addr_jd;
+                		obj["wd"]=obj.send_addr_wd;
+                		MultiOrder[obj["orderid"] + ""]=obj;
+                	})
+                	point = new BMap.Point(data[0]["send_addr_jd"],data[0]["send_addr_wd"]);
+    				map.centerAndZoom(point, 13); 
+                	sjjd = data[0]["send_addr_jd"];
+                	sjwd = data[0]["send_addr_wd"];
+                	map.clearOverlays();
+                	MblogDotccMap();
+                	searchPaoTui();
+            	}
+			}else{
+				alert("暂无订单");
+				$("#doZhiPaiBtn").hide();
+				$("#searchBtn").show();
+			}
+		});
+	})
+	$("#searchBtnByTime").bind("click",function(){
+		//$("#searchBtn").click();
+	})
+	$("#orderType").bind("change",function(){
+		refresh();
+	})
+	$("#area_id").bind("change",function(){
+		refresh();
+	})
+	
+	//指派
+	$("#doZhiPaiBtn").bind("click",function(){
+		if(!$("#sjid").val()){
+			alert('请选择司机！');
+			return false;
+		}
+		
+		if($("input[type='checkbox']:checked").length==0){
+			alert('请至少勾选一个订单！');
+			return false;
+		}
+		
+		$.post("${CTX}/admin/order/doZhiPaiMulti",$("#inputForm").serialize(),function(data){
+			if(data=="true"){
+ 	            $.dialog.alert("操作成功！",function () {
+						refresh();
+				    }).time(0.8);
+ 			}else if(data=="false"){
+ 				$.dialog.alert("操作失败，请刷新页面重新操作！");
+ 			}else{
+ 				$.dialog.alert("操作失败，所选择的订单体积超标！请重新选择");
+ 			}
+		})
+	})
+	
+	$("#tb_city_id").change(function () {
+        //所属群组
+        $("#groupid").empty();
+        $.getJSON("${CTX}/admin/order/getGroupByCityId",{cityid:$("#tb_city_id").find("option:selected").val()},function(data){
+        	 //对请求返回的JSON格式进行分解加载
+        	$("#groupid").append($("<option/>").text("选择群组").attr("value",""));
+            $(data).each(function () {
+                $("#groupid").append($("<option/>").text(this.groupname).attr("value",this.id));
+            });
+        });
+    });
+});
+function showTipsWayOnMap(){
+// 	var content = "姓名:" + obj.mc + "<br>电话：" + obj.mobile + "<br><input type='button' class='button' value='选为接单人' onclick='choosejiedan(" + index+ ")'>";
+// 	addClickHandler(content,marker1);
+	console.info(MultiOrder);//打印日志
+	map.clearOverlays();
+	var idAarr = $("input[type='checkbox']:checked");
+	if(idAarr.length==0){
+		alert('请至少勾选一个订单！,在生成模拟路线');
+		return false;
+	}
+	//拿到发货地址
+	var pointFrom = new BMap.Point(sjjd,sjwd);
+	map.addOverlay(new BMap.Marker(pointFrom)); 
+// 	map.addOverlay(new BMap.Label("起点",{position:pointFrom}));  
+	var driving = new BMap.DrivingRoute(map);//创建驾车实例
+	var pointCenter = new Array();
+	for(var i = 0; i < idAarr.length;i++){
+		var obj = MultiOrder[$(idAarr[i]).val() + ""];
+		pointCenter.push({id:$(idAarr[i]).val() + "",point: new BMap.Point(obj.jd,obj.wd)});
+	}
+	var point01 = pointCenter[0];
+	driving.search(pointFrom, point01.point);
+	var maker01 = new BMap.Marker(point01.point);
+	map.addOverlay(maker01);
+	var content01 = "订单信息<br>订单号：" + MultiOrder[point01.id + ""].sn + "<br>发货地址：" + MultiOrder[point01.id + ""].send_addr + "<br>电话:" + MultiOrder[point01.id + ""].send_phone;
+	addClickHandler(content01,maker01);
+	map.addOverlay(new BMap.Label(MultiOrder[point01.id + ""].sn,{position: point01.point}));
+	
+	for(var j = 0;j < pointCenter.length - 1;j++){
+		var pointj = pointCenter[j];
+		var makerj = new BMap.Marker(pointj.point)
+		map.addOverlay(makerj);  
+		var contentj = "订单信息<br>订单号：" + MultiOrder[pointj.id + ""].sn + "<br>发货地址：" + MultiOrder[pointj.id + ""].send_addr + "<br>电话:" + MultiOrder[pointj.id + ""].send_phone;
+		addClickHandler(contentj,makerj);
+		map.addOverlay(new BMap.Label(MultiOrder[pointj.id + ""].sn,{position: pointj.point}));
+		driving.search(pointCenter[j].point, pointCenter[j+1].point);
+		if(j+1 == pointCenter.length - 1){
+			var pointjj = pointCenter[j + 1];
+			var makerjj = new BMap.Marker(pointjj.point)
+			map.addOverlay(makerjj);  
+			var contentjj = "订单信息<br>订单号：" + MultiOrder[pointjj.id + ""].sn + "<br>发货地址：" + MultiOrder[pointjj.id + ""].send_addr + "<br>电话:" + MultiOrder[pointjj.id + ""].send_phone;
+			addClickHandler(contentjj,makerjj);
+			map.addOverlay(new BMap.Label(MultiOrder[pointjj.id + ""].sn,{position: pointjj.point})); 
+// 			map.addOverlay(new BMap.Label("终点",{position: pointCenter[j+1]})); 
+		}
+	}
+	driving.setSearchCompleteCallback(function(){ 
+		var pts = driving.getResults().getPlan(0).getRoute(0).getPath();
+		var polyline = new BMap.Polyline(pts); 
+		map.addOverlay(polyline); 
+// 		var temp = [pointFrom].push(pointCenter);
+// 		setTimeout(function(){  
+// 			map.setViewport(temp);
+// 		},1000); 
+	})
+	MblogDotccMap();
+}
+
+	function myFun(result){
+		var cityName = result.name;
+	    map.setCenter(cityName);
+	}
+	function refresh(){
+		$('#inputForm').submit();
+		$('#inputForm').action = "";
+		$('#inputForm').target = "_self";
+	}
+	function addClickHandler(content,marker){
+		marker.addEventListener("click",function(e){
+			openInfo(content,e)}
+		);
+	}
+	function openInfo(content,e){
+		var p = e.target;
+		var point = new BMap.Point(p.point.lng, p.point.lat);
+		var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
+		map.openInfoWindow(infoWindow,point); //开启信息窗口
+	}
+	function choosejiedan(i){
+		var obj = paotuiArr[i];
+		jdrjd = obj.lng;
+		jdrwd = obj.lat;
+		$("#sjmobile").val(obj.mobile);//接单人，姓名
+		$("#sjid").val(obj.id);//接单人ID
+		MblogDotccMap();
+	}
+	function MblogDotccMap(){
+		//将发货点集中
+ 		point = new BMap.Point(sjjd,sjwd);
+ 		var markerfrom = new BMap.Marker(point);
+ 		map.addOverlay(markerfrom);
+ 		var labelfrom = new BMap.Label("发货地",{position:point,offset:new BMap.Size(10,-20)});
+ 		markerfrom.setLabel(labelfrom);
+ 		
+		$.each(paotuiArr, function(index,obj){
+    		 var pointCenter = new BMap.Point(sjjd,sjwd);
+			var dis = map.getDistance(pointCenter,new BMap.Point(obj.lng,obj.lat));
+			if(dis/1000 <= kd* 100 || kd <= 0){
+				var marker1;
+				if(obj.lng==jdrjd && obj.lat==jdrwd){
+					point = new BMap.Point(obj.lng,obj.lat);
+					var myIcon = new BMap.Icon("${CTX}/res/images/s.png", new BMap.Size(40,70));
+					marker1 = new BMap.Marker(point,{icon:myIcon});  // 创建标注
+					map.addOverlay(marker1);
+				}else{
+					//判断战士什么样的图片  车
+					var carname = carArr[index].type;
+					var url = "";
+					if(carname=="面包车"){url = "che_mianbao.png";}
+					if(carname=="大件车"){url = "che_dajian.png";}
+					if(carname=="高低板车"){url = "che_gaodiban.png";}
+					if(carname=="高栏车"){url = "che_gaolan.png";}
+					if(carname=="冷藏车"){url = "che_lengcang.png";}
+					if(carname=="平板车"){url = "che_pingban.png";}
+					if(carname=="面包车"){url = "che_tongyong.png";}
+					if(carname=="危险品车"){url = "che_weixianpin.png";}
+					if(carname=="厢车"){url = "che_xiang.png";}
+					var myIcon = new BMap.Icon("${CTX}/res/images/ordercar/" +url, new BMap.Size(80,90));
+					var point = new BMap.Point(obj.lng,obj.lat);
+					var marker1;
+					if(url==""){
+						marker1 = new BMap.Marker(point);
+					}else{
+						marker1 = new BMap.Marker(point,{icon:myIcon});  // 创建标注
+					}
+					map.addOverlay(marker1);
+					var label = new BMap.Label(obj.mc,{position:point,offset:new BMap.Size(20,-20)});
+					var color = "";
+					if(obj.zt && obj.zt=='0'){
+						color = "rgba(108, 113, 105, 1)";
+					}
+					if(obj.zt && obj.zt=='1'){
+						color = "rgba(95, 134, 193, 1)";
+					}
+					if(obj.zt && obj.zt=='2'){
+						color = "rgba(85, 157, 63, 1)";
+					}
+					if(obj.zt && obj.zt=='3'){
+						color = "rgba(227, 106, 9, 1)";
+					}
+					if(obj.zt && obj.zt=='4'){
+						color = "rgba(187, 13, 173, 1)";
+					}
+					label.setStyle({
+						  backgroundColor : color, 
+				          color : "white",
+				          fontSize : "12px",
+				          height : "20px",
+				          lineHeight : "20px",
+				          fontFamily:"微软雅黑"
+				        });
+					marker1.setLabel(label);
+				}
+				var content = "姓名:" + obj.mc + "<br>电话：" + obj.mobile + "<br><input type='button' class='button' value='选为接单人' onclick='choosejiedan(" + index+ ")'>";
+				addClickHandler(content,marker1);	 
+			}
+		});
+	}
+	
+	//跑团人员的搜索工作
+	function searchPaoTui(){
+		var pointStart = new BMap.Point(sjjd,sjwd);
+		$.ajax({
+			url: "${CTX}/admin/order/getPaoTui",
+			type: "POST",
+			data: {
+				msg:'',
+				id:1,
+				zt:$("#zt").val(),
+				selectStr:'',
+				sjjd: sjjd,
+				sjwd: sjwd,
+				kd: kd,
+				groupid: $("#groupid").val(),
+				tb_city_id: $("#tb_city_id").val()
+			},
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				paotuiArr = data.paotui_list;//跑腿人员信息
+				carArr = data.car_list;
+				$.each(paotuiArr, function(index, objVal) {
+					var pointEnd = new BMap.Point(objVal["lng"],objVal["lat"]);
+					var disTancs = (map.getDistance(pointStart,pointEnd)/1000).toFixed(1);
+					objVal["juli"] = disTancs;
+				})
+				paotuiArr = paotuiArr.sort(
+						function(a,b){
+							 return (a.juli - b.juli);  
+						}
+					);
+				if(paotuiArr.length > 200){
+					paotuiArr = paotuiArr.slice(0, 200);
+				}
+				carArr = paotuiArr;
+				showSjTable();
+				MblogDotccMap();
+			}
+		});
+	}
+		
+	function showSjTable(paotuitable){
+		var msg_paotui = $("#msg_paotui").val();
+		var paotuitable = $("#paotuitable");
+		paotuitable.empty();
+		var tr = $("<tr>");
+		$("<th width='2px'>").html("序号").appendTo(tr); 
+		$("<th width='20px'>").html("工号").appendTo(tr); 
+		$("<th width='20px'>").html("姓名").appendTo(tr); 
+		$("<th width='20px'>").html("电话").appendTo(tr); 
+		$("<th width='20px'>").html("距离").appendTo(tr); 
+		$("<th width='20px'>").html("余额").appendTo(tr); 
+		$("<th width='40px'>").html("体积(立方米)").appendTo(tr); 
+		$("<th width='20px'>").html("状态").appendTo(tr); 
+		tr.appendTo(paotuitable);
+		$.each(paotuiArr, function(index, objVal) {
+			tr = $("<tr  style='cursor:pointer' onclick='choosejiedan(" + index + ")'>")
+			$("<td align='left'>").html(index + 1).appendTo(tr);  
+	        $("<td align='left'>").html(objVal["loginid"]).appendTo(tr);  
+	        $("<td align='left'>").html(objVal["mc"]).appendTo(tr);  
+	        $("<td align='left'>").html(objVal["mobile"]).appendTo(tr); 
+	        $("<td align='left'>").html(objVal["juli"] + "公里").appendTo(tr);
+	        $("<td align='left'>").html(objVal["zhye"]).appendTo(tr);  
+	        $("<td align='left'>").html(objVal["vv"]).appendTo(tr);  
+	        if(0==objVal["zt"]){
+	        	$("<td align='left'>").html("离线").appendTo(tr);
+	        }else if(1==objVal["zt"]){
+	        	$("<td align='left'>").html("在线").appendTo(tr);
+	        }else if(2==objVal["zt"]){
+	        	$("<td align='left'>").html("空闲").appendTo(tr);
+	        }else if(3==objVal["zt"]){
+	        	$("<td align='left'>").html("忙碌").appendTo(tr);
+	        }else if(4==objVal["zt"]){
+	        	$("<td align='left'>").html("收工回家").appendTo(tr);
+	        }else{
+	            $("<td align='left'>").html("").appendTo(tr);
+	        }
+	        if(!msg_paotui){
+	        	tr.appendTo(paotuitable);
+	        }else{
+	        	if(objVal["mc"].indexOf(msg_paotui) > -1 ||
+	        	   objVal["loginid"].indexOf(msg_paotui) > -1||
+	        	   objVal["mobile"].indexOf(msg_paotui) > -1){
+	        		tr.appendTo(paotuitable);
+	        	}
+	        }
+		})
+	}
+	
+	 function changeJuLi(){
+		 var inputs = document.getElementsByName("changeJuLi");//获取所有的input标签对象
+		  for(var i = 0; i < inputs.length; i++){
+			  var obj = inputs[i];
+			  if(obj.type=='radio'){
+			   	if(obj.checked==true){
+			   		kd=obj.value;
+			    }
+			} 
+		  }
+		  MblogDotccMap();
+	 }
+	 function uf_showddinfo(id){
+			$.dialog({
+				title:'订单明细',
+				content: 'url:${CTX}/admin/dd/showdd?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 750,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+	 function showAllOrderOnMap(){
+		 $("#flag").val(1);
+		 $.post("${CTX}/admin/order/toMultiZhiPaiPage",$("#inputForm").serialize(),function(data){
+			    map.centerAndZoom(point, 5); 
+			    map.clearOverlays(); 
+				$.each(data,function(index,obj){
+					if($("#orderType").val()==1){
+						point = new BMap.Point(obj.send_addr_jd,obj.send_addr_wd);
+					}else{
+						point = new BMap.Point(obj.sjjd,obj.sjwd);
+					}
+			 		var marker = new BMap.Marker(point);
+			 		map.addOverlay(marker);
+			 		var label = new BMap.Label(obj.sn,{position:point,offset:new BMap.Size(10,-20)});
+			 		marker.setLabel(label);
+			 		var content = "<input type='button' class='button' value='选为基础订单' onclick=choseBaseOrder('" + obj.id+ "')>";
+					addClickHandler(content,marker);	
+				})
+				 $("#flag").val("");
+		})
+		searchPaoTui();
+	 }
+	 function choseBaseOrder(id){
+		 var checkedData = $("input[type='radio'][name='baseId']");
+	 	$.each(checkedData,function(index,obj){
+			 if($(obj).val()==id){
+				 $(obj).attr("checked","checked");
+			 }
+		 })
+	 }
+</script>
+</head>
+<body onload="showAllOrderOnMap()">
+ <form id="inputForm" name="inputForm" action="" method="post" >
+ <input type="hidden" value="" id="flag" name="flag">
+ <div style="width: 500px;float: left;">
+ <table class="input" >
+ 	<tr align="center">
+ 		<td>订单类型
+ 			<select id="orderType" name="orderType" style="width:100px;">
+				<option value="0" <#if strkit('0',(orderType)!)>selected</#if>>店铺</option>
+				<option value="1" <#if strkit('1',(orderType)!)>selected</#if>>同城</option>
+			</select>
+ 		</td>
+ 		<td>商圈
+ 			<select id="area_id" name="area_id" style="width:100px;">
+				<option value="">请选择</option>
+				<#if list_cityarea ??>
+					<#list list_cityarea as x>
+						<option value="${(x.id)!''}" <#if strkit((x.id)!,(area_id)!)>selected</#if>>${(x.mc)!''}</option>
+					</#list>
+				</#if>
+			</select>
+ 		</td>
+ 		<td>集中方式
+ 			<select id="multiType" name="multiType" style="width:100px;">
+				<option value="">请选择</option>
+				<option value="0">发货地</option>
+				<option value="1">收货地</option>
+				<option value="2">发货、收货地</option>
+			</select>
+ 		</td>
+ 	</tr>
+ 	<tr align="center">
+ 		<td>
+ 			距离范围
+ 			<select id="juli" name="juli"  style="width:100px;">
+ 				<option value="0.03">3公里</option>
+ 				<option value="0.05" selected="selected">5公里</option>
+ 				<option value="0.10">10公里</option>
+ 				<option value="0.20">20公里</option>
+ 				<option value="1.00">100公里</option>
+ 			</select>
+ 		</td>
+ 		<td>
+ 			司机<input type="text" id="sjmobile" name="simobile" placeholder="请从右侧地图选择司机" disabled="disabled">
+ 			<input type="hidden" id="sjid" name="sjid">
+ 		</td>
+ 		<td>
+ 			<input value="过滤订单" type="button" id="searchBtn" class="button">
+ 			<input value="指派订单" type="button" id="doZhiPaiBtn" class="button" style="display: none">
+ 		</td>
+ 	</tr>
+ 	<tr align="center">
+ 		<td colspan="2">预约时间
+ 			<select id="time" style="width:100px;">
+ 				<option value="">请选择</option>
+ 				<option value="15">15分钟内</option>
+ 				<option value="30">30分钟内</option>
+ 				<option value="60">1小时内</option>
+ 				<option value="120">2小时内</option>
+ 			</select>
+ 		</td>
+ 		<td>
+ 			<input type="button" value="线路生成" class="button" onclick="showTipsWayOnMap()">
+ 		</td>
+ 	</tr>
+ </table>
+ <table id="orderList" class="list" style="text-align: center;">
+ 	<tr>
+ 		<th width="10px">选择</th>
+ 		<th>编号</th>
+ 		<th>收货地址</th>
+ 		<th>发货地址</th>
+ 		<th>订单金额</th>
+ 	</tr>
+ 	<#list listpage as obj>
+ 		<tr>
+ 			<td>
+ 				<input id="baseId" type="radio" name="baseId" value="${(obj.id)!''}"></td>
+ 			<td>
+ 				<#if orderType == '1'>
+ 					<a href="javaScript:void(0);" onclick="uf_showddinfo('${(obj.orderid)!}')">${(obj.sn)!}</a>
+ 				<#else>
+ 					<a href="javaScript:void(0);" onclick="uf_showddinfo('${(obj.id)!}')">${(obj.sn)!}</a>
+ 				</#if>
+ 			</td>
+ 			<td>${(obj.shdz)!''}</td>
+ 			<td>
+ 				<#if strkit('1',(orderType)!)>${(obj.send_addr)!''}</#if>
+ 				<#if strkit('0',(orderType)!)>${(obj.xxdz)!''}</#if>
+ 			</td>
+ 			<td style="color: red;font-weight: 700">${(obj.ddzje)!''}￥</td>
+ 		</tr>
+ 	</#list>
+ </table>
+ </form>
+ </div>
+ <div  style="float:right">
+ 	<div style="width:650px;height:550px;border:1px solid gray;" id="MblogMap"></div>
+    <div id="paotuidiv">
+	<div>
+	   <input name="msg_paotui" id="msg_paotui" style="width: 80px" placeholder="工号/姓名/电话">
+	   	<select id="zt" name="zt">
+			<option value="">全部</option>
+			<option value="2">空闲</option>
+			<option value="-1">非空闲</option>
+		</select>
+	   	<#if user.id=='admin'>
+						<select name="tb_city_id" id="tb_city_id" >
+							<option value="">请选择城市</option>
+							<@_cityarea_list p_id='ROOT'>
+								<#list list as t>
+									<#if t.hassub==0>
+										 <option value="${(t.id)!}" <#if strkit((city_id)!,t.id)>selected</#if>>${(t.mc)!}</option>
+									<#else>
+									<optgroup label="${(t.mc)!}">
+										<@_cityarea_list p_id=t.id>
+											<#list list as sub>
+												<option value="${(sub.id)!}" <#if strkit((city_id)!,sub.id)>selected</#if>>${(sub.mc)!}</option>
+											</#list>
+										</@_cityarea_list>
+									</optgroup>
+									</#if>
+								</#list>
+							</@_cityarea_list>
+					</select>
+		</#if>
+		<#if user.id!='admin'><input type="hidden" name="tb_city_id" id="tb_city_id" value="${(tb_city_id)!''}"></#if>
+	   	<select id="groupid" name="groupid">
+			<option value="">选择群组</option>
+			<#if suglist ??>
+				<#list suglist as x>
+					<option value="${(x.id)!''}">${(x.groupname)!''}</option>
+				</#list>
+			</#if>
+		</select>
+		公里:
+		<label onclick="changeJuLi()"><input type="radio" name="changeJuLi" id="changeJuLi" value="0.05">5</label>
+		<label onclick="changeJuLi()"><input type="radio" name="changeJuLi" id="changeJuLi"  value="0.10">10</label>
+		<label onclick="changeJuLi()"><input type="radio" name="changeJuLi" id="changeJuLi" value="0.20">20</label>
+		<label onclick="changeJuLi()"><input type="radio" name="changeJuLi" id="changeJuLi" value="0.50">50</label>
+		<label onclick="changeJuLi()"><input type="radio" name="changeJuLi" id="changeJuLi" value="1.00">100</label>
+		<label onclick="changeJuLi()"><input type="radio" name="changeJuLi" id="changeJuLi"  checked="checked" value="-1">All</label>
+		<input type="button" class="button"  value="查找" onclick="searchPaoTui()">
+		<table class="list"  id="paotuitable"></table>
+	</div>
+  </div>   
+ </div>
+</body>
+</html>

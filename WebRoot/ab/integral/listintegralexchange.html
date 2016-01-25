@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/page.css" />
+<script type="text/javascript">
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+<body>
+	<#include '../inc/top.html'>
+	<!-- 搜索栏 -->
+	<#include '../inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+	<#include '../inc/nav.html'>
+	<div class="blank10"></div>
+	<div class="advert-box">
+		<div class="advert-box-exchange">
+			<a href=# class=go><img
+				src="${CTX}/res/css/ab/images/credit_store_rules.png" /></a>
+		</div>
+	</div>
+	<div class=h10></div>
+	<div class="pagemain">
+		<ul class="voucher_list_con_top">
+			<li><a href="javascript:return false;" class="now">线上优惠代码</a></li>
+		</ul>
+		<div class="itemlist">
+			<#if goods ??> <#list goods as lst>
+			<div class="item-wrap">
+				<div class="item-conent">
+					<div class="top" onclick="">
+						<img class="lazy_img" lazy-src="${CTX}/upload/${(lst.img_url)!}"
+							src="${CTX}/upload/${(lst.img_url)!}" width="310" height="159">
+					</div>
+					<div class="middle">
+						<p>
+							<span class="c666 f14 fb">【${(lst.title)!''}】</span>
+						</p>
+						<p>
+							<span class="c999 f12 fb">有效期至：</span><span class="#999">${(lst.endtime)!''}</span>
+						</p>
+					</div>
+					<div class="bottom">
+						<div class="left">
+							<p>
+								<span class="cCF3E41 fb f14"><#if (lst.money!=0)>${(lst.money)!''}元  + </#if>   ${(lst.score)!''}积分</span>
+							</p>
+							<div>
+								<!-- <img src="${CTX}/res/css/ab/images/people.jpg" /> <span
+									class="morebess c333">多商圈</span>
+								<div class="many_business_img img1">
+									<div class="many_business_show" style="display: none;">
+										<ul class="clearfix">
+											<li>闸北</li>
+											<li>大华</li>
+											<li>和平公园</li>
+											<li>凉城</li>
+										</ul>
+									</div>
+								</div> -->
+								&nbsp;&nbsp;<span class="c999">可兑换：${(lst.count)!''} 个</span>
+							</div>
+						</div>
+						<div class="right">
+							<#if (lst.count>0)>
+								<a href="${CTX}/ab/exc/editexchange?id=${(lst.id)!}" class="changed">
+									<img src="${CTX}/res/css/ab/images/exchange_link.jpg"/>
+								</a>
+							</#if>
+							<#if (lst.count=0)>
+								<img src="${CTX}/res/css/ab/images/exchange_hover.jpg"/>
+							</#if>
+						</div>
+					</div>
+				</div>
+			</div>
+			</#list> </#if>
+		</div>
+	</div>
+	</div>
+	</form>
+	<div class="blank10"></div>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+</body>
+</html>

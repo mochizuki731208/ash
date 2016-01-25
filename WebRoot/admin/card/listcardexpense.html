@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<script type="text/javascript"
+	src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+<script type="text/javascript">
+
+	function uf_showdd(id){
+		$.dialog({
+			title:'订单明细',
+			content: 'url:${CTX}/admin/dd/showdd?id='+id,
+		    lock:true,
+		    resize: false,
+		    width : 900,
+			height : 480,
+			cover:true,
+			max:true,
+			min:true,
+			cancel:true,
+	        cancelVal:'关 闭'
+		});//弹出框
+	}
+	function refresh() {
+		$('#myform').submit();
+		$('#myform').action = "";
+		$('#myform').target = "_self";
+	}
+	
+</script>
+</head>
+<body>
+	<form id="myform" name="myform" method="post" action="">
+		订单号： <input type="text" name="number" id="number" class="text" style="width: 100px;" />
+		会员卡号： <input type="text" name="cardnumberd" id="cardnumber" class="text" style="width: 100px;" />
+		类型：<select id="cardtype" name="cardtype" style="width:100px;">
+				<option value="">全部</option>
+				<option value="1">送餐卡</option>
+				<option value="2">消费卡</option>
+			</select>
+			 <input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();" />
+		<table class="list">
+			<tr>
+				<th width="3%">序号</th>
+				<th width="8%">订单号</th>
+				<th width="8%">商户名称</th>
+				<th width="8%">会员卡号</th>
+				<th width="6%">类型</th>
+				<th width="6%">卡名称</th>
+				<th width="8%">下单人名称</th>
+				<th width="8%">接单人名称</th>
+				<th width="3%">抵扣金额</th>
+				<th width="8%">下单时间</th>
+			</tr>
+			<#if listpage ??> <#list listpage.list as lst>
+			<tr>
+				<td>${(lst_index+1)!''}</td>
+				 <td><a href="javascript:void(0);" onclick="uf_showdd('${(lst.order_id)!}')">${(lst.sn)!''}</a></td>
+				<td>${(lst.mname)!''}</td>
+				<td>${(lst.card_number)!''}</td>
+				<td>${(lst.name)!''}</td>
+				<td>
+					<#if strkit('1',(lst.type)!)>送餐卡</#if> 
+					<#if strkit('2',(lst.type)!)>消费卡</#if> 
+				</td>
+				<td>${(lst.xdrmc)!''}</td>
+				<td>${(lst.qdrname)!''}</td>
+				<td>${(lst.money?string("currency"))!''}</td>
+				<td>${(lst.xdsj)!''}</td>
+			</tr>
+			</#list> </#if>
+			<tr>
+				<td colspan="10"><#include '../../common/_paginate.html'></td>
+			</tr>
+		</table>
+
+	</form>
+</body>
+</html>

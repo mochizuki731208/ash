@@ -1,0 +1,243 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					
+				}
+			});
+			
+			$("#btn_send").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$("#btn_send").attr('disabled',true);
+					$("#btn_send").val("保存中...")
+					$.post("${CTX}/ab/save_user_info",$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("保存数据成功！",function () {
+								refresh();
+					        }).time(0.6);
+						}else{
+							$.dialog.alert("保存数据失败！");
+						}
+					});
+				}
+			});
+			
+			
+		});
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+	<style type="text/css">
+		.user_table {
+			width:100%;
+		}
+		.user_table td {height:40px;line-height: 40px;}
+		.user_td{
+			height: 50px;
+		}
+		.user_td1 {
+			height:30px;
+			width:50%;
+		}
+		.user_pic {
+			width:50px;
+			height:50px;
+			float: left;
+		}
+		.user_name {
+			height:50px;
+			float: left;
+			padding:5px 20px;
+			line-height: 20px;
+		}
+		.user_right .content_main {
+			margin:20px auto;
+		}
+		.user_right .content_main_tap {
+			margin-top:20px;
+			height:20px;
+		}
+		.user_right .content_main_tap a {
+			padding:5px 20px;
+			border-radius:5px 5px 0 0;
+			border:1px #BDBDBD solid;
+			border-bottom: none;
+			color:#333;
+			font-weight: bold;
+		}
+		.user_right .content_main_tap .d {
+			background:#F2F2F2;
+			
+		}
+		
+		
+	/*个人资料*/
+	.user_td2 {
+		height:30px;
+		background:#EEE;
+		padding-left:35px;
+		font-weight: bold;
+		line-height: 30px;
+	}
+	.user_td3 {
+		height:30px;
+		padding:0 10px;
+		font-weight: bold;
+		color:#666;
+	}
+	.info_head {
+		border-radius:5px;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		padding:20px;
+		border:1px #EEE solid;
+	}
+	.info_head table td {
+		padding:5px 10px;
+		line-height: 30px;
+	}
+	.info_from {
+		height:25px;
+		width:300px;
+		border:none;
+		border-bottom:1px #EEE solid;
+	}
+	.info_submit {
+		width:80px;
+		height:30px;
+		border:none;
+		background:#FF7F24;
+		color:#FFF;
+		margin:20px 20px;
+	}
+	</style>
+ </head>
+  <body>
+  	<#include 'inc/top.html'>
+	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include 'inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">用户信息</h2>
+			<div class="editinfo">
+			<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+				<input type="hidden" id="tb_id" name="tb_id" class="info_from" value="${(vo.id)!''}">
+				<table class="user_table">
+						<tr>
+							<td colspan="2" class="user_td">
+								<div class="user_pic" style="margin-left: 5px;">
+									<#if abuser.logo?exists>
+										<img src="${CTX}/upload/${(abuser.logo)!''}" style="max-width: 50px;max-height:50px;">
+									<#else>
+										<img src="${CTX}/res/images/tx.jpg" style="max-width: 50px;max-height:50px;">
+									</#if>
+								</div>
+								<div class="user_name">
+									<h3>${(vo.nc)!}</h3>
+									<p>安全等级：<a href="javascript:;" class="user_right_aq">低</a></p>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="user_td2" colspan="2">基本资料</td>
+						</tr>
+						<tr>
+							<th align="right" class="user_td3">昵称：</th>
+							<td><input type="text" class="info_from" id="tb_nc" name="tb_nc" value="${(vo.nc)!}"></td>
+						</tr>
+						<tr>
+							<th align="right" class="user_td3">年龄：</th>
+							<td><input type="text" class="info_from" id="tb_nl" name="tb_nl" value="${(vo.nl)!}"></td>
+						</tr>
+						<tr>
+							<th align="right" class="user_td3">星座：</th>
+							<td>
+								<select id="tb_xz" name="tb_xz">
+									<option value="">请选择</option>
+									<option value="水瓶座" <#if strkit('水瓶座',(vo.xz)!)>selected</#if>>水瓶座</option>
+									<option value="双鱼座" <#if strkit('双鱼座',(vo.xz)!)>selected</#if>>双鱼座</option>
+									<option value="白羊座" <#if strkit('白羊座',(vo.xz)!)>selected</#if>>白羊座</option>
+									<option value="金牛座" <#if strkit('金牛座',(vo.xz)!)>selected</#if>>金牛座</option>
+									<option value="双子座" <#if strkit('双子座',(vo.xz)!)>selected</#if>>双子座</option>
+									<option value="巨蟹座" <#if strkit('巨蟹座',(vo.xz)!)>selected</#if>>巨蟹座</option>
+									<option value="狮子座" <#if strkit('狮子座',(vo.xz)!)>selected</#if>>狮子座</option>
+									<option value="处女座" <#if strkit('处女座',(vo.xz)!)>selected</#if>>处女座</option>
+									<option value="天秤座" <#if strkit('天秤座',(vo.xz)!)>selected</#if>>天秤座</option>
+									<option value="天蝎座" <#if strkit('天蝎座',(vo.xz)!)>selected</#if>>天蝎座</option>
+									<option value="射手座" <#if strkit('射手座',(vo.xz)!)>selected</#if>>射手座</option>
+									<option value="摩羯座" <#if strkit('摩羯座',(vo.xz)!)>selected</#if>>摩羯座</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<th align="right" class="user_td3">身高：</th>
+							<td><input type="text" class="info_from" id="tb_sg" name="tb_sg" value="${(vo.sg)!}"></td>
+						</tr>
+						<tr>
+							<td class="user_td2" colspan="2">详细资料</td>
+						</tr>
+						<tr>
+							<th align="right" class="user_td3">签名：</th>
+							<td><input type="text" class="info_from" id="tb_qm" name="tb_qm" value="${(vo.qm)!}"></td>
+						</tr>
+						<tr>
+							<th align="right" class="user_td3">月薪：</th>
+							<td><input type="text" class="info_from" id="tb_yx" name="tb_yx" value="${(vo.yx)!}"></td>
+						</tr>
+						<tr>
+							<th align="right" class="user_td3">地区：</th>
+							<td><input type="text" class="info_from" id="tb_dq" name="tb_dq" value="${(vo.dq)!}"></td>
+						</tr>
+						<tr>
+							<th align="right" class="user_td3">职业：</th>
+							<td><input type="text" class="info_from" id="tb_zhiye" name="tb_zhiye" value="${(vo.zhiye)!}"></td>
+						</tr>
+						<tr>
+							<th align="right" class="user_td3">情感：</th>
+							<td><input type="text" class="info_from" id="tb_qg" name="tb_qg" value="${(vo.qg)!}"></td>
+						</tr>
+						<tr>
+							<th align="right" class="user_td3">是否抽烟：</th>
+							<td><input type="checkbox" id="tb_cy" name="tb_cy" value="1" <#if strkit('1',(vo.cy)!)>checked</#if>/></td>
+						</tr>
+						<tr>
+							<th align="right" class="user_td3">是否喝酒：</th>
+							<td><input type="checkbox" id="tb_hj" name="tb_hj" value="1" <#if strkit('1',(vo.hj)!)>checked</#if>/></td>
+						</tr>
+						<tr>
+							<th align="right" class="user_td3"></th>
+							<td>
+							<input type="button" id="btn_send" class="button" value="修 改" />
+							<input type="reset" class="button" value="取 消" />
+							</td>
+						</tr>
+				</table>
+			</form>
+			</div>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</body>
+</html>

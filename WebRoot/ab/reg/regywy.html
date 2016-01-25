@@ -1,0 +1,259 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			$("#myform").validate({
+				rules: {
+					user_mobile: {required:true,mobile:true,
+						remote:{
+							type:"POST",
+							url:"${CTX}/ab/reg/checkloginid",
+			               	dataType:"json",
+			                data: {
+			                    mobile: function() { return $("#user_mobile").val();}
+			                }
+						}
+					},
+					user_loginpwd: {required:true,stringCheck:true,rangelength:[6,20]},
+					rpassword: {required:true,equalTo:"#user_loginpwd"},
+					user_mc:{required:true,stringMaxLength:50},
+					user_zhlx:{required:true},
+					user_city_id:{required:true},
+					user_area_id:{required:true},
+					user_xxdz:{required:true,stringMaxLength:100},
+					smsCodeRand: {required:true,stringMinLength:6,equalTo:"#checkcode"}
+				},
+				messages:{
+					user_mobile:{required:"手机号不能为空！",mobile:"请输入合法的手机号！",remote:"该手机号已经被注册，请重新选择！"},
+					user_loginpwd:{required:"登录密码不能为空！",stringCheck:"长度在6-20之间，只能包含字符、数字和下划线。",rangelength:"长度在6-20之间，只能包含字符、数字和下划线"},
+					rpassword:{required:"确认密码不能为空！",equalTo:"两次输入的密码不一致！"},
+					user_xxdz:{required:"详细地址不能为空！",stringMaxLength:"长度不能超过100个字符"},
+					user_city_id:{required:"所属城市不能为空！"},
+					user_area_id:{required:"所属商圈不能为空！"},
+					smsCodeRand:{required:"手机验证码不能为空！",stringMinLength:"验证码长度不正确，为6位数字",equalTo:"验证码输入不正确或已过期！"}
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$("#user_city_name").attr('value',$("#user_city_id").find("option:selected").text());
+					$("#user_area_name").attr('value',$("#user_area_id").find("option:selected").text());
+					$.post("${CTX}/ab/reg/saveregywy",$("#myform").serializeArray(),function(data){
+	                    if(data){window.location.href="${CTX}/ab/mainywy";}
+					});
+				}
+			});
+			
+			$("#user_city_id").change(function () {
+                //清除二级下拉列表
+                $("#user_city_id").empty();
+                //$("#mer_area_id").append($("<option/>").text("--请选择--").attr("value","-1"));
+                //将选中的一级下拉列表项的id传过去
+                $.getJSON("${CTX}/common/subarea", {p_id:$("#user_city_id").find("option:selected").val()},function (data) {
+                    //对请求返回的JSON格式进行分解加载
+                    $(data).each(function () {
+                        $("#user_area_id").append($("<option/>").text(this.mc).attr("value",this.id));
+                    });
+                });
+            });
+			
+			
+			var info = {};
+			var currcity = "${(currcity.mc)!}";
+			var map = new BMap.Map("container");
+			map.centerAndZoom(currcity, 13);
+			var localSearch = new BMap.LocalSearch(map);
+			var ac = new BMap.Autocomplete(
+				//建立一个自动完成的对象
+		    	{"input" : "user_xxdz","location" : map,location:currcity}
+		    );
+			ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+			    //计算距离
+			    var _value = e.item.value;
+				$("#user_mapbusiness").attr('value',_value.business);
+			    localSearch.search(_value.business);
+			    localSearch.setSearchCompleteCallback(function (searchResult) {
+			　　　　var poi = searchResult.getPoi(0);
+				  $("#user_lng").attr('value', poi.point.lng);
+				  $("#user_lat").attr('value', poi.point.lat);
+			　　});
+			});
+		});
+	</script>	
+ </head>
+  <body>
+  	<div id="container" style="display: none;"></div>
+  	<#include '../inc/top.html'>
+  	<!-- 搜索栏 -->
+	<#include '../inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+	<#include '../inc/nav.html'>
+	<div class="blank10"></div>
+	<!-- 用户注册 -->
+	<div class="c">
+		<form id="myform" name="myform" action="${CTX}/ab/reg/savereguser" method="post">
+		<input type="hidden" id="user_mapbusiness" name="user_mapbusiness" value=""/>
+		<input type="hidden" id="checkcode" name="checkcode" value=""/>
+		<input type="hidden" id="user_role_id" name="user_role_id" value="106"/>
+		<input type="hidden" id="user_role_name" name="user_role_name" value="业务员"/>
+		<input type="hidden" id="user_lng" name="user_lng" value=""/>
+		<input type="hidden" id="user_lat" name="user_lat" value=""/>
+		<input type="hidden" id="user_zhlx" name="user_zhlx" value="${(subject.id)!''}"/>
+		<table width="800px;" style="margin-left: 100px;" align="center" class="input">
+			<tr>
+				<td colspan="2"><h1>司机注册</h1></td>
+			</tr>
+<!-- 			<tr> -->
+<!-- 				<th>司机姓名：<font color="red">*</font></th> -->
+<!-- 				<td><input class="text" id="user_mc" name="user_mc" type="text" maxlength="50" value="" tabindex="1"/></td> -->
+<!-- 			</tr> -->
+			<tr>
+				<th>手机号：<font color="red">*</font></th>
+				<td><input class="text" id="user_mobile" name="user_mobile" type="text" maxlength="11" value="" tabindex="1"/></td>
+			</tr>
+			<tr>
+				<th >密码：<font color="red">*</font></th>
+				<td><input class="text" id="user_loginpwd" name="user_loginpwd" type="password" maxlength="11" value="" tabindex="2"/></td>
+			</tr>
+			<tr>
+				<th >确认密码：<font color="red">*</font></th>
+				<td><input class="text" id="rpassword" name="rpassword" type="password" maxlength="11" value="" tabindex="3"/></td>
+			</tr>
+			<tr>
+				<th>所属城市：<font color="red">*</font></th>
+				<td>
+					<input class="text" id="user_city_name" name="user_city_name" type="hidden" value=""/>
+					<select name="user_city_id" id="user_city_id" style="width: 205px;" >
+						<option value="">请选择...</option>
+						<@_cityarea_list p_id='ROOT'>
+			      			<#list list as t>
+				      			<#if t.hassub==0>
+				      				<option value="${(t.id)!}" <#if strkit(currcity.id,t.id)>selected</#if>>${(t.mc)!}</option>
+				      			<#else>
+					      			<optgroup label="${(t.mc)!}">
+					      				<@_cityarea_list p_id=t.id>
+							      			<#list list as sub>
+							      			<option value="${(sub.id)!}" <#if strkit(currcity.id,sub.id)>selected</#if>>${(sub.mc)!}</option>
+							      			</#list>
+										</@_cityarea_list>
+					      			</optgroup>
+				      			</#if>
+			      			</#list>
+						</@_cityarea_list>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th>所属商圈：<font color="red">*</font></th>
+				<td>
+					<select name="user_area_id" id="user_area_id" style="width: 205px;" >
+						<option value="">请选择</option>
+						<#if currcity?? && currcity.id??>
+							<@_cityarea_list p_id=currcity.id>
+				      			<#list list as lst>
+				      			<option value="${(lst.id)!}">${(lst.mc)!}</option>
+				      			</#list>
+							</@_cityarea_list>
+						</#if>
+					</select>
+					<input class="text" id="user_area_name" name="user_area_name" type="hidden" value=""/>
+				</td>
+			</tr>
+<!-- 			<tr>
+				<th>详细地址：<font color="red">*</font></th>
+				<td><input class="text" id="user_xxdz" name="user_xxdz" type="text" style="width: 400px;" value="" maxlength="100" tabindex="5"/></td>
+			</tr>
+ -->			<tr>
+				<th>手机校验码：<font color="red">*</font></th>
+				<td><input class="text" id="smsCodeRand" name="smsCodeRand" type="text" maxlength="11" value="" tabindex="6"/><input type="button" id="btn_send" value="获取验证码"/></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td><input type="button" id="btn_save" name="btn_save" class="button" value="注 册"/></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
+					<div class="protocol"><a href="${CTX}/ab/news/zcxy-11" title="" id="protocolBtn"><span class="xy_icon"></span>网站服务协议</a></div>
+				</td>
+			</tr>
+		</table>
+		</form>
+		
+	</div>
+	
+	<!-- 栏目页 -->
+	<div class="blank10"></div>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	<script type="text/javascript">
+		var wait=60;
+		
+		//获取6位随机验证码
+		function random() {
+		    var num = "";
+		    for (i = 0; i < 6; i++) {
+		        num = num + Math.floor(Math.random() * 10);
+		    }
+		    return num;
+		}
+		
+		function time(o) {
+	        if (wait == 0) {
+	        	$("#checkcode").attr("value",'');
+	            o.removeAttribute("disabled");            
+	            o.value="获取验证码";
+	            wait = 60;
+	        } else {
+	        	if(wait==60){
+	        		$("#checkcode").attr("value",random());//填充内容
+	        		$.ajax({
+					      type: "POST",
+					      url: "${CTX}/ab/reg/sendSmsMsg?phone=" + $("#user_mobile").val() + "&smsCodeRand=" + $("#checkcode").val(),
+					      dataType:"json",
+					      success: function(data) {
+					          if (data) {
+					             	o.setAttribute("disabled", true);
+						            o.value="重新发送(" + wait + ")";
+						            wait--;
+						            setTimeout(function() {
+						                time(o)
+						            },
+						            1000);
+					          }
+					          else {
+					              alert("验证码获取失败！请重新获取");
+					          }
+					       },
+					       error: function() { alert("error"); }
+					  });
+	        	}else{
+	        		o.setAttribute("disabled", true);
+		            o.value="重新发送(" + wait + ")";
+		            wait--;
+		            setTimeout(function() {
+		                time(o)
+		            },
+		            1000);
+	        	}
+	        }
+	    }
+		document.getElementById("btn_send").onclick=function(){
+			if($("#user_mobile").val()!=''){
+				time(this);
+			}
+		}
+	</script>	
+	</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+	<#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					role_jsmc: {required:true,stringMaxLength:20},
+					role_sxh: {required:true,integer:true,min:1},
+					role_ddesc: {stringMaxLength:200}
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				$('#myform').attr("action","${CTX}/admin/role/save");
+				if($("#myform").valid()){
+				    $("#myform").submit();
+				}
+			});
+		});
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" method="post" >
+    <input type="hidden" name="role_id" id="role_id" class="text" value="${(vo.id)!}">
+	<table class="input">
+		<tr>
+			<th align="right">角色名称：</th>
+			<td><input type="text" name="role_jsmc" id="role_jsmc" class="text" value="${(vo.jsmc)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">顺序号：</th>
+			<td><input type="text" name="role_sxh" id="role_sxh" class="text" value="${(vo.sxh)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">备注：</th>
+			<td><textarea id="role_ddesc" name="role_ddesc" class="text">${(vo.ddesc)!}</textarea></td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

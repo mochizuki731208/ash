@@ -1,0 +1,430 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<link rel="stylesheet" href="${CTX}/res/tc/css/state.css" />
+	
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-zh-CN.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/tc/js/param.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript" src="${CTX}/res/js/tc_address.js"></script>
+	<script type="text/javascript">
+		
+	address_interval = null;
+	var clear_interval = function() {
+		if (address_interval)
+			window.clearInterval(address_interval);
+	};
+	var currLoc = "${(currcity.mc)!}";
+		$().ready(function() {
+			
+			var $inputForm = $("#myform");
+			var wl = '${(wl)!''}';
+			// 表单验证
+			$inputForm.validate({
+				rules: {
+					us_mobile: {required:true,mobile:true,
+						remote:{
+							type:"POST",
+							url:"${CTX}/ab/reg/checkloginid",
+			               	dataType:"json",
+			                data: {
+			                    mobile: function() { return $("#user_mobile").val();}
+			                }
+						}
+					},
+					<#if (us.id)??><#else>
+					us_loginpwd: {required:true,stringCheck:true,rangelength:[6,20]},
+					rpassword: {required:true,equalTo:"#user_loginpwd"},
+					</#if>
+					userSubType: {required:true},
+					mer_mc: {required:true,stringMaxLength:50},
+					tb_city_id: {required:true},
+					tb_area_id: {required:true},
+					tb_xxdz:{required:true,stringMaxLength:100},
+				},
+				messages:{
+					tb_mc:{required:"企业名称不能为空！"},
+					userSubType: {required:"请选择类型！"},
+					us_mobile:{required:"手机号不能为空！",mobile:"请输入合法的手机号！",remote:"该手机号已经被注册，请重新选择！"},
+					<#if (us.id)??><#else>
+					us_loginpwd:{required:"登录密码不能为空！",stringCheck:"长度在6-20之间，只能包含字符、数字和下划线。",rangelength:"长度在6-20之间，只能包含字符、数字和下划线"},
+					rpassword:{required:"确认密码不能为空！",equalTo:"两次输入的密码不一致！"},
+					</#if>
+					mer_mc:{required:"商家名称不能为空！",stringMaxLength:"最长不超过50个字符！"},
+					tb_city_id:{required:"请选择城市！"},
+					tb_area_id:{required:"请选择商圈！"},
+					lo_servhotline:{required:"服务监督电话不能为空！"},
+					lo_chief:{required:"负责人不能为空！"},
+					tb_xxdz:{required:"详细地址不能为空！",stringMaxLength:"长度不能超过100个字符"},
+				}
+			});
+			
+			$.post("${CTX}/ab/subject/getSubSubject",{userType: '1020'},function(data){
+				$.each(data,function(i,o){
+					$("#userSubType").append($("<option value='" + o.id + "'>" + o.mc + "</option>"))
+				});
+				<#if (mer.id)??>$("#userSubType option[value='${(mer.subject_id)}']").attr("selected", true);  </#if>
+			});
+			
+			$("#tb_city_id").change(function () {
+				
+				 //清除二级下拉列表
+                $("#tb_area_id").empty();
+				currcity = $("#tb_city_id").find("option:selected").text();
+				initMap();
+                //$("#tb_area_id").append($("<option/>").text("--请选择--").attr("value","-1"));
+                //将选中的一级下拉列表项的id传过去
+                $.getJSON("${CTX}/common/subarea", {p_id:$("#tb_city_id").find("option:selected").val()},function (data) {
+                    //对请求返回的JSON格式进行分解加载
+                    $(data).each(function () {
+                        $("#tb_area_id").append($("<option/>").text(this.mc).attr("value",this.id));
+                    });
+                });
+            });
+				$("#btn_save").click(function(){
+					var r = $("#myform").valid();
+					if(!r) {
+						return false;
+					}else{
+						$.post("${CTX}/admin/logi/savemer2",$("#myform").serializeArray(),function(data){
+		                    if(data){
+		                    	$.dialog.alert("保存数据成功！",function () {
+									$("#btn_save").attr('value','保存');
+									window.location.href="${CTX}/admin/logi/list";
+							    }).time(0.5);
+		                    } else {
+		                    	alert("保存数据失败！");
+		                    }
+						});
+					}
+				});
+				//首页图片
+				$('#titleimg').uploadify({
+					swf:'${CTX}/res/js/uploadify/uploadify.swf',
+					uploader:'${CTX}/common/upload',
+					multi: false,
+					sizeLimit:'1024*1024',
+					buttonText :'选择图片',
+					fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+					onUploadSuccess:function(file,data,response){
+						$('#myform').append("<input type='hidden' name='tb_img_url' value='"+data+"'/>");
+	                 }
+				});
+			
+				$('#file_upload').uploadify({
+					swf: '${CTX}/res/js/uploadify/uploadify.swf',
+					uploader: '${CTX}/common/upload',
+					debug:false,
+					multi: true,
+					sizeLimit:'1024*1024',
+					buttonText :'选择图片',
+					fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+	                onUploadSuccess:function(file,data,response){
+						$('#myform').append("<input type='hidden' name='imgurl' value='"+data+"'/>");
+						$('#myform').append("<input type='hidden' name='imgsize' value='"+file.size+"'/>");
+						$('#myform').append("<input type='hidden' name='imgtype' value='"+file.type+"'/>");
+						$('#myform').append("<input type='hidden' name='imgname' value='"+file.name+"'/>");
+						$('#imgb').append("<img src='${CTX}/upload/"+data+"' width=130px height=100px/>");
+	                 }
+				});
+				addressSearch0 = new AddressSearch(currLoc,5,
+					function(search_data) {
+						if (!search_data) {
+							// 查询结果为空
+							return;
+						}
+						if (search_keyword != search_data.keyword) {
+							// 查询关键词与当前查询不匹配
+							return;
+						}
+						//sendSuggest.refresh(search_data['data']);
+						var html = '<div id="address-common">'
+								+ '   <div class="address-common-list-wrap">';
+						for ( var i = 0; i < search_data['data'].length; i++) {
+							var item = search_data['data'][i];
+							html += '       <div class="address-common-list" index="'
+									+ i
+									+ '">'
+									+ '           <span class="address-common-icon"></span>'
+									+ '           <p class="address-common-address">'
+									+ '               <span class="address-common-title">'
+									+ item['title']
+									+ '</span>'
+									+ '               <span class="address-common-detail-address"> 详细地址：<em>'
+									+ item['address']
+									+ '</em></span>'
+									+ '               <span style="display:none;" class="lng">'
+									+ item['lng']
+									+ '</span>'
+									+ '               <span style="display:none;" class="lat">'
+									+ item['lat'] + '</span>' + '           </p>'
+									+ '       </div>';
+						}
+						html += '   </div>' + '</div>';
+						$("#tb_xxdz_panel").html(html);
+						$(".address-common-list").click(function() {
+							$("#tb_xxdz").val($(this).find("em").html());
+							$("#tb_xxdz_panel").html('');
+							info['from'] = $(this).find("em").html();
+							info['from_lng'] = $(this).find(".lng").html();
+							info['from_lat'] = $(this).find(".lat").html();
+							tryDrive();
+						});
+					});
+		
+					$("#tb_xxdz").on('focus', function() {
+						var that = $(this);
+						var last_val = that.val();
+						
+						clear_interval();
+						address_interval = window.setInterval(function() {
+							search_keyword = that.val();
+							if (search_keyword && (search_keyword != last_val)) {
+								addressSearch0.search(search_keyword);
+								last_val = search_keyword;
+							}
+						}, 100);
+					}).on('blur', function() {
+						clear_interval();
+					});
+				
+					$("input[name!='tb_xxdz']").on('focus', function() {
+						$("#tb_xxdz_panel").html("");
+					});
+					<#if (mer.xxdz)??>
+					<#else>
+					initMap();
+					</#if>
+			});
+		function initMap() {
+			var map = new BMap.Map("container");
+			map.centerAndZoom(currcity, 13);
+				var localSearch = new BMap.LocalSearch(map);
+				var ac = new BMap.Autocomplete(
+					//建立一个自动完成的对象
+			    	{"input" : "tb_xxdz","location" : map,location:currcity}
+			    );
+				ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+				    //计算距离
+				    var _value = e.item.value;
+					$("#user_mapbusiness").attr('value',_value.business);
+					$("#tb_xxdz").attr('value',_value.business);
+					localSearch.search(_value.business);
+				    localSearch.setSearchCompleteCallback(function (searchResult) {
+				　　　　var poi = searchResult.getPoi(0);
+					  $("#user_lng").attr('value', poi.point.lng);
+					  $("#user_lat").attr('value', poi.point.lat);
+					  $("#tb_lng").attr('value', poi.point.lng);
+					  $("#tb_lat").attr('value', poi.point.lat);
+				　　});
+				});
+			}
+	</script>
+	<style type="text/css">
+	#mainline {
+		width: 120px;
+	}
+	</style>
+ </head>
+  <body>
+  <div id="container" style="display: none;"></div>
+	<!-- 用户注册 -->
+	<div class="registeruser">
+		<form id="myform" name="myform" action="${CTX}/admin/logi/savemer" method="post">
+		<input type="hidden" id="checkcode" name="checkcode" value=""/>
+		
+		<input type="hidden" id="user_id" name="us_id" value="${(us.id)!}"/>
+		<input type="hidden" id="user_role_id" name="us_role_id" value="105"/>
+		<input type="hidden" id="user_role_name" name="us_role_name" value="店铺商家"/>
+		<input type="hidden" id="user_mapbusiness" name="us_mapbusiness" value="${(us.mapbusiness)!}"/>
+		<input type="hidden" id="user_lng" name="us_lng" value="${(us.lng)!}"/>
+		<input type="hidden" id="user_lat" name="us_lat" value="${(us.lat)!}"/>
+		<input type="hidden" id="mer_lng" name="mer_lng" value="${(mer.lng)!}"/>
+		<input type="hidden" id="mer_lat" name="mer_lat" value="${(mer.lat)!}"/>
+		
+		<!--
+		<input type="hidden" id="user_zhlx" name="us_zhlx" value="1020"/>
+		<input type="hidden" id="mer_subject_id" name="mer_subject_id" value="1020"/>
+		<input type="hidden" id="mer_subject_name" name="mer_subject_name" value="${(subject.mc)!''}"/>
+		<input type="hidden" id="mer_is_type" name="mer_is_type" value="${(subject.is_type)!''}"/>
+		-->
+		
+		<input type="hidden" class="text" name="mer_id" value="${(mer.id)!}">
+		<input class="text" name="mer_sfzs" type="hidden" value="1" /> 
+				<input class="text" name="mer_business_status" type="hidden" value="1" /> 
+				<input class="text" name="mer_zdpsje" type="hidden" value="0" /> 
+				<input class="text" name="mer_chk_fgzrxd" type="hidden" value="1" />
+				<input type="hidden" id="mer_img_url" name='mer_img_url' value="${(mer.img_url)!}"/>
+				
+		<table width="800px;" style="margin-left: 100px;" align="center" class="input">
+			<tr>
+				<td colspan="4"><h1>供应商注册：<span style="line-height: 30px;color: black;font-size: 14px;">&nbsp;&nbsp;物流企业注册</span></h1></td>
+			</tr>
+				<!--================================ 地址  =========================================-->
+					<tr>
+				<th align="right">企业名称：<font color="red">*</font></th>
+				<td><input type="text" id="tb_mc"  name="tb_mc" class="text required" value="${(vo.mc)!''}"></td>
+			</tr>
+			<tr>
+				<th>物流企业用户类型：<font color="red">*</font></th>
+				<td width="600px"><select name="userSubType" id="userSubType">
+				<option value=""></option>
+			</select></td>
+			</tr>
+			<tr>
+				<th>手机号：<font color="red">*</font></th>
+					<td>
+					<input class="text" id="tb_mobile" name="tb_mobile" type="text" maxlength="11" value=""/>
+				</td>
+			</tr>
+			<tr>
+				<th>密码：<font color="red">*</font></th>
+				<td><input class="text" id="user_loginpwd" name="us_loginpwd" type="password" maxlength="11" value=""/></td>
+			</tr>
+			<tr>
+				<th>所属城市：<font color="red">*</font></th>
+				<td>
+					<input class="text" id="tb_city_name" name="tb_city_name" type="hidden" value=""/>
+					<select name="tb_city_id" id="tb_city_id" style="width: 205px;" >
+						<option value="">请选择...</option>
+						<@_cityarea_list p_id='ROOT'>
+			      			<#list list as t>
+				      			<#if t.hassub==0>
+				      				<option value="${(t.id)!}" <#if (mer.city_id)?? && strkit(mer.city_id,t.id)>selected</#if>>${(t.mc)!}</option>
+				      			<#else>
+					      			<optgroup label="${(t.mc)!}">
+					      				<@_cityarea_list p_id=t.id>
+							      			<#list list as sub>
+							      			<option value="${(sub.id)!}" <#if (mer.city_id)?? && strkit(mer.city_id,sub.id)>selected</#if>>${(sub.mc)!}</option>
+							      			</#list>
+										</@_cityarea_list>
+					      			</optgroup>
+				      			</#if>
+			      			</#list>
+						</@_cityarea_list>
+					</select>
+				</td>
+				
+			</tr>
+			<tr>
+				<th>所属商圈：<font color="red">*</font></th>
+				<td>
+					<select name="tb_area_id" id="tb_area_id" style="width: 205px;" >
+						<option value="">请选择</option>
+						<#if (mer.city_id)??>
+							<@_cityarea_list p_id=mer.city_id>
+				      			<#list list as lst>
+				      			<option value="${(lst.id)!}" <#if (mer.area_id)?? && mer.area_id==lst.id>selected</#if>>${(lst.mc)!}</option>
+				      			</#list>
+							</@_cityarea_list>
+						</#if>
+					</select>
+					<input class="text" id="tb_area_name" name="tb_area_name" type="hidden" value="${(mer.area_name)!}"/>
+				</td>
+			</tr>
+			<tr>
+				<th>详细地址：<font color="red">*</font></th>
+				<td>
+					<input class="text required" id="tb_xxdz" name="tb_xxdz" type="text" value="${(vo.xxdz)!''}" style="width: 400px;" />
+					<span id="tb_xxdz_panel"></span>
+				</td>
+			</tr> 
+			<tr>
+				<th align="right">店铺LOGO展示图：</th>
+				<td>
+					<input type="file" name="titleimg" id="titleimg" multiple="false"/> 
+				</td>
+			</tr>
+			<tr>
+				<th align="right">店铺图片(1280x300)：</th>
+				<td>
+					
+					<input id="file_upload" name="file_upload" type="file" multiple="true"></td>
+			</tr>
+			
+			<tr>
+				<th align="right">运输方式：</th>
+				<td><input type="checkbox" class="transtype" name="transtype" <#if (lo.transtype)?? && lo.transtype?contains("汽运")>checked="checked"</#if> value="汽运">汽运
+				<input type="checkbox" class="transtype"  name="transtype" <#if (lo.transtype)?? && lo.transtype?contains("铁路")>checked="checked"</#if> value="铁路">铁路
+				<input type="checkbox" class="transtype"  name="transtype" <#if (lo.transtype)?? && lo.transtype?contains("海运")>checked="checked"</#if> value="海运">海运
+				<input type="checkbox" class="transtype"  name="transtype" <#if (lo.transtype)?? && lo.transtype?contains("空运")>checked="checked"</#if> value="空运">空运</td>
+			</tr>
+			
+			<tr>
+				<th align="right">运输承保公司：</th>
+				<td><input type="text" class="text"  name="lo_ticc" value=""></td>
+			</tr>
+			
+			<tr>
+				<th align="right">放款周期：</th>
+				<td><input type="text" class="text" name="lo_loan_period" value=""></td>
+			</tr>
+			<tr>
+				<th align="right">放款时间：</th>
+				<td><input type="text" class="text" name="lo_loan_time" value=""></td>
+			</tr>
+			<tr>
+				<th align="right">放款方式：</th>
+				<td>
+					<input type="checkbox" class="loan_type"  name="loan_type" <#if (lo.loan_type)?? && lo.loan_type?contains("人工")>checked="checked"</#if> value="人工">人工
+					<input type="checkbox" class="loan_type"  name="loan_type" <#if (lo.loan_type)?? && lo.loan_type?contains("银行")>checked="checked"</#if> value="银行">银行
+				</td>
+			</tr>
+			<tr>
+				<th align="right">查款电话：</th>
+				<td><input type="text" class="text" name="lo_checkphone" value="${(lo.checkphone)!}"></td>
+			</tr>
+			<tr>
+				<th align="right">QQ：</th>
+				<td><input type="text" class="text" name="lo_qq" value="${(lo.qq)!}"></td>
+			</tr>
+			<tr>
+				<th align="right">收货地址：</th>
+				<td><textarea rows="5" cols="80" name="lo_recaddress">${(lo.recaddress)!}</textarea>
+				</td>
+			</tr>
+			<tr>
+				<th align="right">卸货地址：</th>
+				<td><textarea rows="5" cols="80" name="lo_disaddress">${(lo.disaddress)!}</textarea>
+				</td>
+			</tr>
+			<tr>
+				<th align="right">公司简介：</th>
+				<td><textarea rows="5" cols="80" name="lo_profile">${(lo.profile)!}</textarea>
+				</td>
+			</tr>
+			<tr>
+				<th align="right">服务承诺：</th>
+				<td><textarea rows="5" cols="80" name="lo_servpromise">${(lo.servpromise)!}</textarea>
+				</td>
+			</tr>
+			<tr>
+				<th align="right">负责人：<font color="red">*</font></th>
+				<td><input type="text" class="text required" name="lo_chief" id="lo_chief" ></td>
+			</tr>
+			<tr>
+				<th align="right">服务监督电话：<font color="red">*</font></th>
+				<td><input type="text" class="text required" name="lo_servhotline" id="lo_servhotline" value="${(lo.servhotline)!}"></td>
+			</tr>
+
+			
+			<tr>
+				<td>&nbsp;</td>
+				<td><input type="button" id="btn_save" name="btn_save" class="button" value="保 存"/></td>
+			</tr>
+		</table>
+		</form>
+		
+	</div>
+	</body>
+</html>

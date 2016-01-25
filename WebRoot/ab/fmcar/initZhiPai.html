@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base href="${CTX}/">
+<#include '../inc/meta.html'>
+<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<link rel="stylesheet" type="text/css"	href="${CTX}/res/css/admin/admin.css" />
+<script type="text/javascript">
+$(function() {
+	/* 表单验证*/
+	$("#myform").validate({
+		rules:{
+			car_id: {required:true},
+			order_id:{required:true}
+		}
+	});
+})
+</script>
+</head>
+
+<body><br>
+<form action="" method="post" id="myform">
+	<input type="hidden" value="${(id)!}" name="id" id="id">
+	<h2>待发货订单列表</h2>
+	<table class="list">
+		<tr>
+			<th></th>
+		    <th>起始地</th>
+		    <th>目的地</th>
+		    <th>车长</th>
+		    <th>车型</th>
+		    <th>装车时间</th>
+		    <th>创建时间</th>
+		    <th>联系电话</th>
+		    <th>价格</th>
+		    <th>订单状态</th>
+		    <th>接单司机</th>
+		    <th>支付状态</th>
+		    <th>支付方式</th>
+		</tr>
+		<#list listpage.list as lst>
+			<tr>
+				<td><input type="checkbox" id="order_id" name="order_id" value="${(lst.id)}"></td>
+				<td>
+      						${(lst.start_province_name)!}
+      						${(lst.start_city_name)!}
+      						${(lst.start_county_name)!}
+      						${(lst.start_addr)!}
+      					</td>
+      					<td>
+      						${(lst.arr_province_name)!}
+      						${(lst.arr_city_name)!}
+      						${(lst.arr_county_name)!}
+      						${(lst.arr_addr)!}
+      					</td>
+      					<td>${(lst.car_length)!}</td>
+      					<td>${(lst.car_type)!}</td>
+      					<td>${(lst.load_time)!}</td>
+      					<td>${(lst.create_time)!}</td>
+      					<td>${(lst.mobile)!}</td>
+      					<td style="color: red">${(lst.zje)!}</td>
+      					<td>
+							<#if strkit('1',(lst.ddzt)!)><font color="red">已提交</font></#if>
+							<#if strkit('2',(lst.ddzt)!)><font color="red">取货中</font></#if>
+							<#if strkit('3',(lst.ddzt)!)><font color="red">送货中</font></#if>
+							<#if strkit('4',(lst.ddzt)!)><font color="red">已送达</font></#if>
+							<#if strkit('5',(lst.ddzt)!)><font color="red">已签收</font></#if>
+							<#if strkit('6',(lst.ddzt)!)><font color="red">拒单</font></#if>
+							<#if strkit('7',(lst.ddzt)!)><font color="red">已退单</font></#if>
+      					</td>
+      					<td>${(lst.driver)!}</td>
+      					<td>
+							<#if strkit('0',(lst.zfzt)!)><font color="red">未支付</font></#if>
+							<#if strkit('1',(lst.zfzt)!)><font color="red">已支付</font></#if>
+      					</td>
+      					<td>
+							<#if strkit('1',(lst.zffs)!)><font color="red">在线支付</font></#if>
+							<#if strkit('2',(lst.zffs)!)><font color="red">现付</font></#if>
+							<#if strkit('3',(lst.zffs)!)><font color="red">到付</font></#if>
+							<#if strkit('4',(lst.zffs)!)><font color="red">回单付</font></#if>
+      					</td>
+			</tr>
+		</#list>
+	</table>
+	
+	
+	<h2>我的车队</h2>
+	<table class="list">
+		<tr>
+			<th></th>
+			<th>车辆信息</th>
+			<th>车主信息</th>
+			<th>常跑城市</th>
+		</tr>
+		<#list mycarList as ls>
+			<tr>
+				<td><input type="checkbox" id="car_id" name="car_id" value="${(ls.id)}"></td>
+				<td>${(ls.car_no)}&nbsp;&nbsp;${(ls.type)}&nbsp;&nbsp;${(ls.length)}&nbsp;&nbsp;${(ls.vv)!'-'}立方米</td>
+				<td>${(ls.driver)}&nbsp;&nbsp;${(ls.mobile)}</td>
+				<td title="${(ls.city_name)}">
+					<#if ls.city_name?length gt 10>
+						${(ls.city_name.substring(0,10))}...
+					<#else>
+						${(ls.city_name)}
+					</#if>
+				</td>
+			</tr>
+		</#list>
+	</table>
+	
+	
+</form>
+</div>
+</body>
+</html>

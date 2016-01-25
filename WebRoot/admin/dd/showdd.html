@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+</head>
+  <body>
+	<table class="input">
+		<tr>
+			<th align="right">订单编号：</th>
+			<td>${(vo.sn)!}</td>
+			<th align="right">商家：</th>
+			<td>${(vo.mname)!}</td>
+		</tr>
+		<tr>
+			<th align="right">收货邮政编码：</th>
+			<td>${(vo.yzbm)!}</td>
+			<th align="right">收货通讯地址：</th>
+			<td>${(vo.shdz)!}</td>
+		</tr>
+		<tr>
+			<th align="right">收货联系人：</th>
+			<td>${(vo.lxr)!}</td>
+			<th align="right">收货人联系电话：</th>
+			<td>${(vo.lxrdh)!}</td>
+		</tr>
+		<tr>
+			<th align="right">支付状态：</th>
+			<td><#if vo.zfzt=='0'>未支付</#if><#if vo.zfzt=='1'>已支付</#if>
+						(支付方式：
+						<font color="red">
+						<#if strkit('1',(vo.zffs)!)>充值直扣</#if>
+                    	<#if strkit('2',(vo.zffs)!)>支付宝</#if>
+                    	<#if strkit('3',(vo.zffs)!)>货到付款</#if>
+                    	<#if strkit('4',(vo.zffs)!)>无支付</#if>
+                    	</font>
+                    	)
+			</td>
+			<th align="right">支付时间：</th>
+			<td>${(vo.zfsj)!}</td>
+		</tr>
+		<tr>
+			<th align="right">下单时间：</th>
+			<td>${(vo.xdsj)!}</td>
+			<th align="right">订单状态：</th>
+			<td>
+				<#if strkit('0',(vo.ddzt)!)><font color="red">未提交</font></#if>
+               	<#if strkit('1',(vo.ddzt)!)>已受理</#if>
+               	<#if strkit('2',(vo.ddzt)!)>已预订</#if>
+               	<#if strkit('3',(vo.ddzt)!)>配货中</#if>
+               	<#if strkit('4',(vo.ddzt)!)>已完成</#if>
+               	<#if strkit('5',(vo.ddzt)!)><font color="red">已撤单</font></#if>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">商品总价：</th>
+			<td style="color: red">${(vo.spzj)?string("currency")}</td>
+			<th align="right">赠送积分：</th>
+			<td>${(vo.zsjf)!}</td>
+		</tr>
+		<tr>
+			<th align="right">优惠金额：</th>
+			<td style="color: red">${(vo.yhje)?string("currency")}</td>
+			<th align="right">跑腿费：</th>
+			<td style="color: red">${(vo.ptf)?string("currency")}</td>
+		</tr>
+		<tr>
+			<th align="right">超距离附加费：</th>
+			<td style="color: red">${(vo.cjlfjf)?string("currency")}</td>
+			<th align="right">订单总金额：</th>
+			<td style="color: red">${(vo.ddzje)?string("currency")}</td>
+		</tr>
+		<tr>
+			<th align="right">要求送达时间：</th>
+			<td style="color: red" colspan="3">${(vo.yqsdsj)!}</td>
+		</tr>
+		<tr>
+			<th align="right">接单人：</th>
+			<td>${(vo.qdrname)!}</td>
+			<th align="right">接单时间：</th>
+			<td>${(vo.qdsj)!}</td>
+		</tr>
+	</table>
+	<table class="list" style="border: 0px;">
+	    <tr>
+			<th width="4%;">序号</th>
+			<th width="14%;">商家名称</th>
+			<th width="15%;">商品图片</th>
+			<th width="10%;">分类</th>
+			<th width="*">名称</th>
+			<th width="12%;">单价</th>
+			<th width="10%;">购买数量</th>
+			<th width="10%;">金额</th>
+		</tr>
+		<#if list_item ?? >
+	       <#list list_item  as sub>
+	       	<tr>
+				<td>${sub_index+1}</td>
+                <td>${(sub.mname)!}</td>
+				<td><#if sub.img_url??><img src="${CTX}/upload/${(sub.img_url)!}" style="width: 80px;height: 60px;"></#if></td>
+				<td>${(sub.thr_name)!}</td>
+				<td>${(sub.itemname)!}</td>
+				<td style="color: red">${(sub.price)?string("currency")}</td>
+                <td>${(sub.quantity)!}</td>
+                <td style="color: red">${(sub.totalmoney)?string("currency")}</td>
+		     </tr>
+       		</#list>
+       	</#if>
+     </table>
+  </body>
+</html>
+

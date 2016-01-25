@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>易生活网</title>
+    <#include '../inc/meta.html'>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">商家评论记录</h2>
+			<div class="infotext lh30">
+				信用评级：${(r.rate)!}分，服务评级：${(r.grade)!}分
+			</div>
+			<table class="list">
+            <tr>
+	            <th width="4%">序号</th>
+	            <th width="20%">标题</th>
+	            <th width="10%">信用评级</th>
+	            <th width="10%">服务评级</th>
+	            <th width="40%">评论内容</th>
+				<th width="*%">评论时间</th>
+	        </tr>
+	        <#if listcomm??>
+      			<#list listcomm as s>
+                  <tr>
+                  	<td>${(s_index+1)!''}</td>
+                    <td>${(s.title)!''}</td>
+                  	<td><font color="red"><#list 1..s.rate as t>★</#list></font></td>
+                    <td><font color="red"><#list 1..s.grade as t>★</#list></td>
+                    <td style="text-align: left;">${(s.content)!''}</td>
+                    <td>${(s.createtime)!''}</td>
+                  </tr>
+				</#list>
+			</#if>
+            </table>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

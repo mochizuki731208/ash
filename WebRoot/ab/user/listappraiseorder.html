@@ -1,0 +1,334 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/page.css" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/admin.css"/>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+<script type="text/javascript">
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		$().ready(function() {
+			$('#appraiseimage').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='appimage' value='"+data+"'/>");
+					$('#logopic').append("<img src='${CTX}/upload/"+data+"'/>");
+	             }
+			});
+            $('.many_business_img').bind('mouseover', function () {
+                var $self = $(this);
+                $self.removeClass('img1');
+                $self.addClass('img2');
+                $self.find('.many_business_show').show();
+            }).bind('mouseleave', function () {
+                var $self = $(this);
+                $self.removeClass('img2');
+                $self.addClass('img1');
+                $self.find('.many_business_show').hide();
+            });
+
+            $('.trends-score').each(function () {
+                $(this).bind('mouseover', function () {
+                    var score = $(this).attr('score');
+                    var $p = $(this).parent();
+                    $p.removeClass();
+                    $p.addClass('score-box'+score)
+                });
+            });
+        });
+	    function showAppraiseBox(orderId, mid) {
+	        	$('#orderid').val(orderId);
+	        	$('#mid').val(mid);
+	            var masklayer = $('.masklayer');
+	            if (masklayer.length == 0) {
+	                masklayer = $('<div class="masklayer" style=" display:none;position:absolute;left:0;top:0; z-index:100;background-color:#000;"></div>');
+	                masklayer.css({ width: $(window).width(), height: $('body').height(), opacity:'.3' });
+	                masklayer.appendTo($('body'));
+	            }            
+	            masklayer.show();
+	            var appraiseBox = $('.appraise-box');
+	            appraiseBox.css({
+	                top: $(window).height() / 2 - appraiseBox.height() / 2,
+	                left: $(window).width() / 2 - appraiseBox.width() / 2
+	            });
+	            appraiseBox.find('.close').unbind().bind('click', function () {
+	                $(this).parent().parent().hide();
+	                $('.masklayer').hide();
+	            });
+	            appraiseBox.find('.cancel').unbind().bind('click', function () {
+	                $(this).parent().parent().hide();
+	                $('.masklayer').hide();
+	            });
+	            appraiseBox.find('.save').unbind().bind('click', function () {
+	                if(uf_addappraise()){
+		                $(this).parent().parent().hide();
+		                $('.masklayer').hide();
+		                clear_appraise();
+	                }
+	            });       
+	            appraiseBox.show();
+	        }
+		
+	    function get_score(str){
+	    	var len = str.length;
+			//score-box 长度为9
+	    	if(len <= 9){
+	    		return 0;
+	    	}else {
+	    		return str.substr(9);
+	    	}
+	    }
+	    
+		function uf_addappraise(){
+			var mah = get_score($('#dyncmah').attr('class'));
+			var ser = get_score($('#dyncser').attr('class'));
+			var spd = get_score($('#dyncspd').attr('class'));
+			$('#mah').val(mah);
+        	$('#ser').val(ser);
+        	$('#spd').val(spd);
+        	var listimgs = $("input:hidden[name='appimage']");
+        	if(listimgs.length > 5){
+        		var $msg = $("#limitMsg");
+        		$msg.html("图片删除超过限制！");
+        		return false;
+        	}else{
+        		 $("#myform").submit();
+        	}
+        	return true;
+		}
+		
+		function clear_appraise(){
+			$('#mah').val('');
+        	$('#ser').val('');
+        	$('#spd').val('');
+        	$('#orderid').val('');
+        	$('#mid').val('');
+        	$('#appraisetype').val('1');
+        	$('#private').val('1');
+			
+		}
+	</script>
+</head>
+<body>
+	<#include '../inc/top.html'> <#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl"><#include '../inc/leftmenu.html'></div>
+		<div class="rightcon fr">
+			<h2 class="box_title">我的评价</h2>
+			<div style="height: 40px; line-height: 40px;" />
+			<table class="list">
+				<tr>
+					<th width="30px;">序号</th>
+					<th width="25px;">评价</th>
+					<th width="60px;">订单</th>
+					<th width="60px;">商户</th>
+					<th width="70px;">信用等级</th>
+					<th width="70px;">客户评价</th>
+					<th width="40px;">操作</th>
+				</tr>
+				<#if listpage ??> <#list listpage.list as lst>
+				<tr>
+					<td>${(lst_index+1)!}</td>
+					<td>
+						<#if strkit('1',(lst.type)!)><img src="${CTX}/res/css/ab/images/img2.png" />好评</#if>
+						<#if strkit('2',(lst.type)!)><img src="${CTX}/res/css/ab/images/img3.png" />中评</#if>
+						<#if strkit('3',(lst.type)!)><img src="${CTX}/res/css/ab/images/img4.png" />差评</#if>
+					</td>
+					<td>${(lst.subject_name)!}</td>
+					<td>${(lst.mmc)!}</td>
+					<td><#if strkit('1',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('2',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('3',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('4',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('5',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('6',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('7',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('8',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('9',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('10',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('11',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if> <#if
+						strkit('12',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if> <#if
+						strkit('13',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if> <#if
+						strkit('14',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if> <#if
+						strkit('15',(lst.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if>
+					</td>
+					<td>
+						<#if (lst.dync_val>=0 && lst.dync_val<1)> ☆☆☆☆☆ </#if> 
+						<#if (lst.dync_val>=1 && lst.dync_val<2)> ★☆☆☆☆ </#if> 
+						<#if (lst.dync_val>=2 && lst.dync_val<3)> ★★☆☆☆ </#if>
+						<#if (lst.dync_val>=3 && lst.dync_val<4)> ★★★☆☆ </#if> 
+						<#if (lst.dync_val>=4 && lst.dync_val<5)> ★★★★☆ </#if> 
+						<#if (lst.dync_val>=5 && lst.dync_val<6)> ★★★★★ </#if> 
+					</td>
+					<td>
+						<a href="javascript:void(0);" onclick="showAppraiseBox('${(lst.order_id)!}','${(lst.mid)!}')">我要评价</a>
+					</td>
+				</tr>
+				</#list>
+				<tr>
+					<td colspan="12"><#include '../../common/_paginate.html'></td>
+				</tr>
+				</#if>
+			</table>
+		</div>
+	</div>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	<form id="myform" name="myform" method="post" action="${CTX}/ab/appraise/addappraise">
+	<div class="appraise-box" style="display: none">
+		<input type="hidden" id="orderid" name="orderid"> 
+		<input type="hidden" id="mid" name="mid">
+		<input type="hidden" id="mah" name="mah">
+		<input type="hidden" id="ser" name="ser">
+		<input type="hidden" id="spd" name="spd">
+		<div class="appraise-box-top">
+			商品评价<a href="javascript:void(0)" class="close"><img
+				src="${CTX}/res/css/ab/images/del.png" /></a>
+		</div>
+		<div class="appraise-box-body">
+			<div class="appraise-box-body-conent">
+				<div class="appraise-box-body-conent-left">
+					<div id="logopic" class="logopic">
+					</div>
+					<div class=lh24>
+						<span></span>
+					</div>
+				</div>
+				<div class="appraise-box-body-conent-right">
+					<div class="lh24 h24 appraise-box-body-conent-right-hua">
+						<input type="radio" name="appraisetype" checked="checked" value="1"/>
+						<img src="${CTX}/res/css/ab/images/img2.png" /> 
+						<input type="radio" name="appraisetype" value="2"/>
+						<img src="${CTX}/res/css/ab/images/img3.png" /> 
+						<input type="radio" name="appraisetype" value="3"/>
+						<img src="${CTX}/res/css/ab/images/img4.png" />
+					</div>
+					<div class="appraise-box-body-conent-right-text">
+						<textarea name="appraisecontent" id="appraisecontent">
+						</textarea>
+						<div class="pic">
+						<span id="limitMsg" class="message" style="font-color:red;"></span>
+						<input type="file" name="appraiseimage" id="appraiseimage"  multiple="true"/>
+							 <span class="ca6adb3">限5张</span>
+							&nbsp;&nbsp;
+							<div class="private">
+								<input type="radio" name="private" checked="checked" value="1"/><span
+									class="c494947">公开</span><input type="radio" name="private"  value="2"/><span
+									class="c494947">匿名</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class=cl></div>
+			</div>
+			<div class="appraise-box-body-bottom">
+				<div class="appraise-box-body-bottom-left">
+					<span>店铺动态评分</span>
+				</div>
+				<div class="appraise-box-body-bottom-right">
+					<div class="item mt5">
+						<div class="c36353a service-item">宝贝与描述相符</div>
+						<div class="score-box" id="dyncmah">
+							<div class="score1 trends-score" score="1"></div>
+							<div class="score2 trends-score" score="2"></div>
+							<div class="score3 trends-score" score="3"></div>
+							<div class="score4 trends-score" score="4"></div>
+							<div class="score5 trends-score" score="5"></div>
+						</div>
+						<div class=cl></div>
+					</div>
+					<div class="item">
+						<div class="c36353a service-item">卖家的服务态度</div>
+						<div class="score-box" id="dyncser">
+							<div class="score1 trends-score" score="1"></div>
+							<div class="score2 trends-score" score="2"></div>
+							<div class="score3 trends-score" score="3"></div>
+							<div class="score4 trends-score" score="4"></div>
+							<div class="score5 trends-score" score="5"></div>
+						</div>
+						<div class=cl></div>
+					</div>
+					<div class="item">
+						<div class="c36353a service-item">卖家的发货速度</div>
+						<div class="score-box" id="dyncspd">
+							<div class="score1 trends-score" score="1"></div>
+							<div class="score2 trends-score" score="2"></div>
+							<div class="score3 trends-score" score="3"></div>
+							<div class="score4 trends-score" score="4"></div>
+							<div class="score5 trends-score" score="5"></div>
+						</div>
+						<div class=cl></div>
+					</div>
+				</div>
+				<div class=cl></div>
+			</div>
+		</div>
+		<div class="appraise-box-bottom">
+			<a href=# class="save">保 存</a> <a href=#
+				class=cancel>取 消</a>
+		</div>
+	</div>
+	</form>
+</body>
+</html>

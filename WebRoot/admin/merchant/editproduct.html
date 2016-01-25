@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					product_mc: {required:true,stringMaxLength:50},
+					product_sub_id: {required:true},
+					product_price: {required:true,number:true,decimal:true,min:0},
+					product_mdprice: {required:true,stringMaxLength:50},
+					product_jf: {required:true,number:true,decimal:true,min:0},
+					product_seq_num: {required:true,integer:true,min:0},
+					product_productinfo: {stringMaxLength:200}
+				}
+			});
+			$('#titleimg').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='img_url' value='"+data+"'/>");
+					$('#imga').append("<img src='${CTX}/upload/"+data+"' width=80px height=60px/>");
+                 }
+			});
+			
+			$('#file_upload').uploadify({
+				swf: '${CTX}/res/js/uploadify/uploadify.swf',
+				uploader: '${CTX}/common/upload',
+				debug:false,
+				multi: true,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+                onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='imgurl' value='"+data+"'/>");
+					$('#myform').append("<input type='hidden' name='imgsize' value='"+file.size+"'/>");
+					$('#myform').append("<input type='hidden' name='imgtype' value='"+file.type+"'/>");
+					$('#myform').append("<input type='hidden' name='imgname' value='"+file.name+"'/>");
+					$('#imgb').append("<img src='${CTX}/upload/"+data+"' width=80px height=60px/>");
+                 }
+			});
+		});
+	</script>
+</head>
+  <body>
+    <form id="myform" name="myform" method="post">
+	<input type="hidden" name="product_id" id="product_id" value="${(vo.id)!}"/>
+	<input type="hidden" name="product_subject_id" id="product_subject_id" value="${(vo.subject_id)!}"/>
+	<input type="hidden" name="product_subject_name" id="product_subject_name" value="${(vo.subject_name)!}"/>
+	<input type="hidden" name="product_sub_name" id="product_sub_name" value="${(vo.sub_name)!}"/>
+	<input type="hidden" name="product_is_type" id="product_is_type" value="${(vo.is_type)!}"/>
+	<input type="hidden" name="product_mid" id="product_mid" value="${(vo.mid)!}"/>
+	<input type="hidden" name="product_mname" id="product_mname" value="${(vo.mname)!}"/>
+	<table class="input">
+		<tr>
+			<th align="right">商品名称：</th>
+			<td><input type="text" name="product_mc" id="product_mc" class="text" value="${(vo.mc)!}"></td>
+			<th align="right">商品分类：</th>
+			<td>
+				<select name="product_sub_id" id="product_sub_id">
+					<optgroup label="${(vo.subject_name)!''}">
+						<#list list_subject as x>
+						    <option value="${(x.id)!''}" <#if strkit((x.id)!'',(vo.sub_id)!)>selected</#if>>${(x.mc)!''}</option>
+						</#list>
+					</optgroup>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">商品价格：</th>
+			<td><input type="text" name="product_price" id="product_price" class="text" value="${(vo.price)!}"></td>
+			<th align="right">门店价格：</th>
+			<td><input type="text" name="product_mdprice" id="product_mdprice" class="text" value="${(vo.mdprice)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">赠送积分：</th>
+			<td><input type="text" name="product_jf" id="product_jf" class="text" value="${(vo.jf)!}"></td>
+			<th align="right">排列顺序：</th>
+			<td><input type="text" id="product_seq_num" name="product_seq_num" class="text" value="${(vo.seq_num)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">商品描述：</th>
+			<td colspan="3"><textarea id="product_productinfo" name="product_productinfo" class="text">${(vo.productinfo)!}</textarea></td>
+		</tr>
+		<tr>
+			<th align="right">首页展示图：</th>
+			<td colspan="3">
+				<div id="imga"><#if vo.img_url??><img src="${CTX}/upload/${(vo.img_url)!''}" style="width: 80px;height: 60px;"></#if></div>
+			<input type="file" name="titleimg" id="titleimg" multiple="false"/> </td>
+		</tr>
+		<tr>
+			<th align="right">商品图片：</th>
+			<td colspan="3">
+				<div id="imgb">
+					<#list list_img as x>
+					    <img src="${CTX}/upload/${(x.lager)!''}" style="width: 80px;height: 60px;">
+					</#list>
+				</div>
+				<input id="file_upload" name="file_upload" type="file" multiple="true"></td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

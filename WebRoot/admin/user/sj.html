@@ -1,0 +1,172 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript">
+		$(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					nums:{required:true}
+				}
+			});
+			
+			$("#name").focus();
+			
+			$("#batchadd").bind("click",function(){
+				var r = $("#myform").valid();
+				if(!r){return false;}
+				$.ajax({
+					url: "${CTX}/admin/user/bachAddSJ",
+					data:$("#myform").serialize(),
+					type: "POST",
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							alert("操作成功！");
+							self.location.reload(true);
+						}else{
+							alert("操作失败！");
+						}
+					}
+				});
+			});
+			$("#batchaddJiaDan").bind("click",function(){
+				$.ajax({
+					url: "${CTX}/admin/user/addJiaDan",
+					data:{jiadannums: $("#jiadannums").val()},
+					type: "POST",
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							alert("操作成功！");
+							self.location.reload(true);
+						}else{
+							alert("操作失败！");
+						}
+					}
+				});
+			})
+			$("#batchdelJiaDan").bind("click",function(){
+				$.ajax({
+					url: "${CTX}/admin/user/delAllJiaDan",
+					data:{},
+					type: "POST",
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							alert("操作成功！");
+							self.location.reload(true);
+						}else{
+							alert("操作失败！");
+						}
+					}
+				});
+			});
+			var map = new BMap.Map("container");          // 创建地图实例    
+			var point = new BMap.Point(113.67311, 34.716755);  // 创建点坐标    
+			map.centerAndZoom(point, 13); 
+			var myCity = new BMap.LocalCity();
+		 	myCity.get(myFun);
+		 	function myFun(result){
+		 		var cityName = result.name;
+			    map.setCenter(cityName);
+			    $("#cityname").val(cityName);
+			 	var localSearch = new BMap.LocalSearch(map);
+				var ac = new BMap.Autocomplete(
+			    	{"input" : "xxdz","location" : map,location: cityName}
+			    );
+				ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+				    var _value = e.item.value;
+					$("#mapbusiness").attr('value',_value.business);
+				    localSearch.search(_value.business);
+				    localSearch.setSearchCompleteCallback(function (searchResult) {
+				　　　　var poi = searchResult.getPoi(0);
+					  $("#lng").attr('value', poi.point.lng);
+					  $("#lat").attr('value', poi.point.lat);
+				　　});
+				});
+			}
+		});
+	</script>
+</head>
+
+  <body>
+   <div id="container" style="display: none;"></div>
+    <form id="myform" name="myform" method="post" >
+	    <div style="width: 250px;height:30px;text-align: center;background-color: rgb(237,200,58);">
+		  	 <font color="#e66629" style="font-size: 20px;">随机生成司机人员信息</font>
+		 </div>
+		 <input type="hidden" id="mapbusiness" name="mapbusiness" value=""/>
+		 <input type="hidden" id="cityname" name="cityname" value=""/>
+		 <input type="hidden" id="lng" name="lng" value=""/>
+		 <input type="hidden" id="lat" name="lat" value=""/>
+		<table class="input">
+			<tr>
+				<th align="right">数量：</th>
+				<td><input type="text" name="nums" id="nums" class="text"></td>
+			</tr>
+			<tr>
+				<th>详细地址：</th>
+				<td><input class="text" id="xxdz" name="xxdz" type="text" style="width: 400px;" value="" maxlength="100" tabindex="5"/></td>
+			</tr>
+			<tr>
+				<td colspan="2" align="center">
+					<input type="button" value="批量添加" class="button" id="batchadd">
+				</td>
+			</tr>
+		</table>
+	</form>
+	<hr style="border-bottom-width: 10px">
+	<div style="width: 250px;height:30px;text-align: center;background-color: rgb(237,200,58);">
+		 <font color="#e66629" style="font-size: 20px;">随机生成假单</font>
+	</div>
+	<table  class="input">
+		<tr>
+			<th align="right">假单数量：</th>
+			<td><input type="text" name="jiadannums" id="jiadannums" class="text"></td>
+		</tr>
+		<tr>
+			<td colspan="2" align="center">
+				<input type="button" value="批量添加" class="button" id="batchaddJiaDan">
+				<input type="button" value="清空假单" class="button" id="batchdelJiaDan">
+			</td>
+		</tr>
+	</table>
+	<table class="list">
+		<thead>
+			<th>序号</th>
+			<th>编号</th>
+			<th>送货地址</th>
+			<th>收货地址1</th>
+			<th>收货地址2</th>
+			<th>收货地址3</th>
+			<th>收货地址4</th>
+			<th>收货地址5</th>
+			<th>最终费用</th>
+			<th>送货时间</th>
+		</thead>
+		<#list ateolist as o>
+			<tr>
+				<td>${(o_index + 1)!''}</td>
+				<td>${(o.sn)!'-'}</td>
+				<td>${(o.send_addr)!'-'}</td>
+				<td>${(o.rcv_addr1)!'-'}</td>
+				<td>${(o.rcv_addr2)!'-'}</td>
+				<td>${(o.rcv_addr3)!'-'}</td>
+				<td>${(o.rcv_addr4)!'-'}</td>
+				<td>${(o.rcv_addr5)!'-'}</td>
+				<td>${(o.total_price)!'-'}</td>
+				<td>${(o.send_time)!'-'}</td>
+			</tr>
+		</#list>
+	</table>
+  </body>
+</html>
+

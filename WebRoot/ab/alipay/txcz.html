@@ -1,0 +1,83 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<link rel="stylesheet" type="text/css"	href="${CTX}/res/css/admin/admin.css" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/tab/style.css"/>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/bootstrap.min.css" />
+<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+
+<script type="text/javascript">
+function refresh(){
+	$('#myform').submit();
+	$('#myform').action = "";
+	$('#myform').target = "_self";
+}
+</script>
+</head>
+<body>
+		<#include '../inc/top.html'>
+		<#include '../inc/header.html'>
+		<#include '../inc/nav.html'>
+		<div class="blank5"></div>
+		<div class="cm">
+			<div class="leftmenu fl">
+				<#include '../inc/leftmenu.html'>
+			</div>
+			<div class="rightcon fr" style="text-align: center;">
+				<h2 class="box_title">资金明细</h2>
+				<form id="myform" name="myform" method="post" action="">
+					<div style="height: 40px;line-height: 40px;">
+						&nbsp;资金类型
+						<select name="type" id="type" style="width: 80px;">
+							<option value="">全部</option>
+							<option value="0" <#if (((type)!) == '0')>selected="selected"</#if> >充值</option>
+							<option value="1" <#if (((type)!) == '1')>selected="selected"</#if> >提现</option>
+							<option value="2" <#if (((type)!) == '2')>selected="selected"</#if> >付款</option>
+						</select>
+						<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+					</div>
+					<table class="list">
+			            <tr>
+				            <th>序号</th>
+				            <th>订单号</th>
+				            <th>类型</th>
+				            <th>状态</th>
+				            <th>金额</th>
+				        </tr>
+				        <#if listpage ??>
+			      				<#list listpage.list as lst>
+			                  <tr>
+			                  	<td>${(lst_index+1)!}</td>
+			                  	<td>${(lst.tradeno)!}</td>
+			                    <td>
+			                   		<#if lst.type=='0'>充值</#if>
+			                   		<#if lst.type=='1'>提现</#if>
+			                   		<#if lst.type=='2'>付款</#if> 
+			                    </td>
+			                    <td>
+			                    	<#if lst.result=='0'>等待</#if>
+			                   		<#if lst.result=='1'>成功</#if>
+			                   		<#if lst.result=='2'>失败</#if> 
+			                    </td>
+			                    <td class="red">${(lst.totalfee)!'0'}￥</td>
+			                  </tr>
+							</#list>
+							<tr>
+								<td colspan="5">
+								<#include '../../common/_paginate.html'>
+								</td>
+							</tr>
+						</#if>
+			            </table>
+		            </form>
+				</div>
+			</div>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+</body>
+</html>
+

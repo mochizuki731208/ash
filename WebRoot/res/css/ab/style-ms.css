@@ -1,0 +1,56 @@
+@charset "utf-8";
+/* CSS Document */
+
+.contain{padding:0 20px 20px;}
+.dl-tit{  padding-top:20px; padding-bottom:20px;  font-size:26px; color:#FF7F24;}
+.dl-tit b{background-image:url(../images/xiaz.png); background-repeat:no-repeat; background-position:left 50%; padding:10px 0 10px 40px;}
+.version{ border:solid 1px #eee; background:#ffffff; padding:0px 90px 20px;}
+.version dt{ font-size:20px; color:#777a88; padding:20px 0;}
+.version dd{ padding:35px 0; border-bottom:dashed 1px #cccccc;}
+.version dd i{ padding:60px 0px 0 0; width:230px; text-align:center;}
+.version dd .ewm{ border:solid 1px #dadbdc; padding:15px 15px 8px 15px; text-align:center;}
+.version dd .ewm p{ padding-top:5px;}
+.version dd .download{ padding-top:90px; padding-left:30px;}
+.version dd .download p{ color:#98999f; padding-bottom:5px; padding-left:5px; font-size:14px;}
+.red-btn{ background-color:#FF7F24; padding:10px; display:block; width:200px; color:#ffffff; font-size:16px; text-align:center; border-radius:10px;}
+
+/**办卡送红包**/
+.red-banner{ height:430px;}
+.red-contain{ background-color:#fffbe7;}
+.cardlist{ padding:30px 75px;}
+.cardlist li{ padding:10px 10px 0 0;}
+.cardlist .card-img{ padding-top:10px; width:330px;}
+.cardlist .card-left{ font-size:20px; padding:15px 0 0 20px; width:450px;}
+.cardlist .card-left p{ padding-top:15px;}
+.cardlist .card-left a{ padding:3px 10px; background-color:#cc0000; color:#ffffff; font-size:14px;}
+.cardlist .card-left b{ color:#cc0000; font-size:24px;}
+.red-tit{ border-bottom:solid 1px #f87e8b;}
+.red-tit strong{ background:url(../images/red-tit.png) left bottom no-repeat; color:#ffffff; display:block; width:84px; line-height:23px; height:23px; overflow:hidden; padding-left:20px;}
+.rhbl{ padding:10px 85px;font-size:16px; line-height:28px;}
+.rhbl h4{ font-size:20px; color:#cc0000;}
+.cardlist .hbsm{ font-size:16px; line-height:28px;}
+.hbsm h4{ font-size:20px; color:#cc0000;}
+
+/**餐费减10元**/
+.plus-banner{ height:385px;}
+.plus-contain{ background-color:#f5fafe; background:url(../images/lijbg.jpg) center top repeat-y;}
+.plus1{ padding:30px 100px;}
+.plus1 .plustxt{ padding-top:70px;width:440px; font-size:18px; text-align:center;}
+.plus1 .plustxt h3{ font-size:28px; padding-bottom:20px;}
+.plus1 .plustxt b{ font-size:34px; color:#cc0000;}
+.plus2{padding:20px 100px 50px;}
+.plus2 .plustxt{ padding-top:20px;}
+.plus2 .plustxt h3{ font-size:26px;}
+.plus2 ul{ padding-top:5px;}
+.plus2 .plustxt li{ background:url(../images/icoarrow.png) left 50% no-repeat; line-height:26px; font-size:16px; padding-left:30px;}
+.plus2 .plusimg h3{ font-size:26px; color:#cc0000; font-style:italic;}
+.plus2 span{ display:block; background:url(../images/kuang.png) left top no-repeat; padding:5px 15px 5px 5px;}
+/**关注微信 立送10元**/
+.weixin-banner{ height:388px;}
+.wxtit{ background-color:#ffe874; color:#333333; font-size:26px; line-height:140px; padding-left:120px;}
+.wxlist .wx1{ background-color:#9ad6cc; padding-right:180px;}
+.wxlist li{ padding:20px 140px 20px 120px; font-size:32px;}
+.wxlist li h3{ font-size:34px;}
+.wxlist .wx2{ background-color:#ee8ba0;}
+.wxlist .wx3{ background-color:#58c3c9;padding-right:200px;}
+.wxlist .wx4{ background-color:#ffcd98; padding:15px 0 80px; text-align:center;}

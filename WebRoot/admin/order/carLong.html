@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>后台管理系统</title>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+</head>
+<body>
+	<div style="text-align: center;vertical-align: middle;font-size: 16px">
+		<#list ccList as obj>
+			<label>
+				<input type="radio" name="cc" value="${(obj)!''}" <#if strkit((obj)!'',(cc)!)>checked="checked"</#if>/>&nbsp;${(obj)!''}米&nbsp;&nbsp;
+			</label>
+		</#list>
+	</div>
+</body>
+</html>
+

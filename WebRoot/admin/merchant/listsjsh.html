@@ -1,0 +1,506 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_sptg(id){
+			if(confirm("是否将此企业审核通过吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/merchant/sptg",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("此企业信息审核通过成功！");
+							refresh();
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		
+		function uf_spbtg(id){
+			if(confirm("是否将此企业审核不通过吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/merchant/spbtg",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("此企业信息审核不通过成功！");
+							refresh();
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		function uf_show(id){
+	    	$.dialog({
+				title:'企业信息',
+				content: 'url:${CTX}/admin/merchant/showmerchant/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 500,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});
+	    }
+	    
+	    function uf_add(id){
+			$.dialog({
+				title:'信息编辑',
+				content: 'url:${CTX}/admin/merchant/addsj/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1024,
+				height : 520,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							this.content.$("#tb_city_name").attr('value',this.content.$("#tb_city_id").find("option:selected").text());
+							this.content.$("#tb_area_name").attr('value',this.content.$("#tb_area_id").find("option:selected").text());
+							this.content.$("#tb_subject_name").attr('value',this.content.$("#tb_subject_id").find("option:selected").text());
+							$.post("${CTX}/admin/merchant/savesj",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+									$.dialog.alert("企业信息保存成功！",function () {
+										refresh();
+							        }).time(0.5);
+								}else{
+									$.dialog.alert("企业信息保存失败！");
+								}
+							});
+						}
+			            return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+	    
+	    function uf_edit(id){
+			$.dialog({
+				title:'企业信息编辑',
+				content: 'url:${CTX}/admin/merchant/editsj?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 990,
+				height : 520,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							$.post("${CTX}/admin/merchant/savesj",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+									$.dialog.alert("企业信息保存成功！",function () {
+										refresh();
+							        }).time(0.5);
+								}else{
+									$.dialog.alert("企业信息保存失败！");
+								}
+							});
+						}
+			            return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+	    
+	    function uf_del(id){
+			if(confirm("是否将此企业信息删除?")){
+			 	$.ajax({
+					url: "${CTX}/admin/merchant/delete",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("此企业信息已删除！");
+							refresh();
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+	    function uf_tjsz(id){
+			$.dialog({
+				title:'企业推荐设置',
+				content: 'url:${CTX}/admin/merchant/edittjsz?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 600,
+				height : 180,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							$.post("${CTX}/admin/merchant/savesjtjyes",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+									$.dialog.alert("企业推荐时间设置成功！",function () {
+										refresh();
+							        }).time(0.5);
+								}else{
+									$.dialog.alert("企业推荐时间设置失败！");
+								}
+							});
+						}
+			            return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+	    
+	    function uf_sjtjno(id){
+			if(confirm("确定要取消推荐此企业吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/merchant/savesjtjno",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("取消企业推荐成功！");
+							refresh();
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		
+		$().ready(function() {
+			$("#btn_all").click(function (){
+				$("#check_status").attr("value","");
+				refresh();
+			});
+			
+			$("#btn_ytg").click(function (){
+				$("#check_status").attr("value","1");
+				refresh();
+			});
+			
+			$("#btn_wtg").click(function (){
+				$("#check_status").attr("value","2");
+				refresh();
+			});
+			
+			$("#btn_dsh").click(function (){
+				$("#check_status").attr("value","0");
+				refresh();
+			});
+			
+			$("#btn_qx").click(function(){
+				if($("#btn_qx").prop("checked")==true){
+					$("[name='ids']").prop("checked",true);//全选
+				}else{
+					$("[name='ids']").prop("checked",false);//全否 
+				}
+			});
+			
+			
+			$("#btn_pl_shtg").click(function (){
+				
+				var obj=document.getElementsByName('ids');  //选择所有name="'test'"的对象，返回数组    
+			    var s='';    
+				for(var i=0; i<obj.length; i++){    
+				    if(obj[i].checked) s+=obj[i].value+',';  //如果选中，将value添加到变量s中    
+				}
+				
+				if(s==''){
+					return false;
+					alert("你还没有选择任何内容！");
+				}
+				
+				if(confirm("是否将所选企业审核通过吗?")){
+				 	$.ajax({
+						url: "${CTX}/admin/merchant/sptg_pl",
+						type: "POST",
+						data: {ids:s},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("所选企业信息审核通过！",function(){
+									refresh();
+								});
+							}
+						}
+					});
+				}else{
+					return false;
+				} 
+			});
+			
+			$("#btn_pl_shbtg").click(function (){
+				
+				var obj=document.getElementsByName('ids');  //选择所有name="'test'"的对象，返回数组    
+			    var s='';    
+				for(var i=0; i<obj.length; i++){    
+				    if(obj[i].checked) s+=obj[i].value+',';  //如果选中，将value添加到变量s中    
+				}
+				
+				if(s==''){
+					return false;
+					alert("你还没有选择任何内容！");
+				}
+				
+				if(confirm("是否将所选企业审核不通过吗?")){
+				 	$.ajax({
+						url: "${CTX}/admin/merchant/spbtg_pl",
+						type: "POST",
+						data: {ids:s},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("所选企业信息审核不通过！",function(){
+									refresh();
+								});
+							}
+						}
+					});
+				}else{
+					return false;
+				} 
+			});
+			
+			$("#btn_pl_delete").click(function (){
+				
+				var obj=document.getElementsByName('ids');  //选择所有name="'test'"的对象，返回数组    
+			    var s='';    
+				for(var i=0; i<obj.length; i++){    
+				    if(obj[i].checked) s+=obj[i].value+',';  //如果选中，将value添加到变量s中    
+				}
+				
+				if(s==''){
+					return false;
+					alert("你还没有选择任何内容！");
+				}
+				
+				if(confirm("是否将所选企业信息删除?")){
+				 	$.ajax({
+						url: "${CTX}/admin/merchant/delete_pl",
+						type: "POST",
+						data: {ids:s},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("所选企业信息删除成功！",function(){
+									refresh();
+								});
+							}
+						}
+					});
+				}else{
+					return false;
+				} 
+			});
+		});
+		
+		function uf_yjsz(id,yj){
+			$.dialog.prompt('请填写此商家接单的佣金比例（1-100直接的整数）',
+			    function(val){
+			        $.post("${CTX}/admin/merchant/savesjyj",{id:id,yj:val},function(data){
+	                    if(data){
+							$.dialog.alert("佣金比例设置成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("佣金比例设置失败！");
+						}
+					});
+					return false;
+			    },
+			    yj
+			);
+		}
+		function set_P_Id(id){
+			$.dialog({
+				title:'所属区管理员设置',
+				content: 'url:${CTX}/admin/user/getAllAdmin?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 600,
+				height : 80,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+	            	callback: function(){
+	            		 var r = this.content.$("#myform").valid();
+							if(!r) {
+								return false;
+							}else{
+								$.post("${CTX}/admin/user/doSetAdminForVip",this.content.$("#myform").serializeArray(),function(data){
+				                    if(data){
+				                    	$.dialog.alert("保存用户数据成功！",function () {
+											refresh();
+								        }).time(0.8);
+									}else{
+										$.dialog.alert("保存用户数据失败！");
+									}
+								});
+							}
+							return false;
+	            	},
+	            	focus: true
+				}],
+				cancelVal:'关 闭'
+			})
+		}
+	</script>
+</head>
+  <body>
+  	  <form id="myform" name="myform" method="post" action="">
+  	  	<input type="hidden" id="check_status" name="check_status" value=""/>
+			企业名称：<input type="text" name="mname" id="mname" class="text" value="${(mname)!}" style="width: 120px;"/>
+			手机号：<input type="text" name="sjh" id="sjh" class="text" value="${(sjh)!}" style="width: 120px;"/>
+			分类：
+			<select name="subjectid" id="subjectid">
+				<option value="">全部...</option>
+				<optgroup label="联盟商家">
+					<#list list_subject as x>
+						<#if x.p_id=='1019'>
+				    		<option value="${(x.id)!''}" <#if strkit((x.id)!'',(subjectid)!)>selected</#if>>${(x.mc)!''}</option>
+				    	</#if>
+					</#list>
+				</optgroup>
+			</select>
+			管理员：
+			<select id="admin_id" name="admin_id" style="width:150px;">
+				<option value="">请选择</option>
+				<#if admin_list ??>
+					<#list admin_list as x>
+						<option value="${(x.id)!''}" <#if strkit((x.id)!'',(admin_id)!)>selected</#if>>${(x.mc)!''}</option>
+					</#list>
+				</#if>
+			</select>
+			<input type="button" id="btn_all" class="button" value="全部" onclick="refresh();"/>
+			<input type="button" id="btn_ytg" class="button" value="已通过" onclick="refresh();"/>
+			<input type="button" id="btn_wtg" class="button" value="未通过" onclick="refresh();"/>
+			<input type="button" id="btn_dsh" class="button" value="待审核" onclick="refresh();"/>
+			<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+			<input type="button" id="btn_add" class="button" value="新 增" onclick="uf_add('');"/>
+	  		<table class="list">
+	            <tr>
+		            <th width="40px;">序号</th>
+		            <th width="*%">名称</th>
+		            <th width="8%">分类</th>
+		            <th width="6%">城市</th>
+		            <th width="8%">商圈</th>
+					<th width="8%">手机号</th>
+					<th width="22%">地址</th>
+					<th width="6%">审核状态</th>
+					<th width="6%">是否推荐</th>
+					<th width="28%">操作</th>
+		        </tr>
+	      		<#if listpage ??>
+      				<#list listpage.list as lst>
+	                  <tr>
+	                  	<td><input type="checkbox" id="ids" name="ids" value="${(lst.id)!}"/></td>
+	                    <td><a href="javascript:void(0);" onclick="uf_show('${(lst.id)!''}')">${(lst.mc)!''}</a></td>
+	                    <td>${(lst.subject_name)!''}</td>
+	                    <td>${(lst.city_name)!''}</td>
+	                    <td>${(lst.area_name)!''}</td>
+	                    <td>${(lst.mobile)!''}</td>
+	                    <td>${(lst.xxdz)!''}</td>
+	                    <td>
+	                    	<#if strkit('0',(lst.check_status)!)>待审</#if>
+	                    	<#if strkit('1',(lst.check_status)!)>通过</#if>
+	                    	<#if strkit('2',(lst.check_status)!)>不通过</#if>
+	                    </td>
+	                    <td>
+	                    	<#if strkit('0',(lst.is_recommend)!)>否</#if>
+	                    	<#if strkit('1',(lst.is_recommend)!)>是</#if>
+	                    </td>
+	                    <td>
+	                    	<a href="javascript:void(0)" onclick="uf_spbtg('${(lst.id)!}')"><img src="${CTX}/res/images/btn/del.png"/>不通过</a> 
+	                    	<a href="javascript:void(0)" onclick="uf_sptg('${(lst.id)!}')"><img src="${CTX}/res/images/btn/tick.png"/>通过</a> 
+	                    	<#if strkit('0',(lst.is_recommend)!)>
+	                    	<a href="javascript:void(0);" onclick="uf_tjsz('${(lst.id)!}')"><img src="${CTX}/res/images/btn/tick.png"/>推荐</a>
+	                    	<#else> 
+	                    	<a href="javascript:void(0);" onclick="uf_sjtjno('${(lst.id)!}')"><img src="${CTX}/res/images/btn/del.png"/>取消推荐</a>
+	                    	</#if> 
+	                    	<!-- 
+	                    	<a href="javascript:void(0)" onclick="uf_yjsz('${(lst.id)!}','${(lst.yj)!}')"><img src="${CTX}/res/images/btn/config.png"/>佣金</a>
+	                    	 -->
+	                    	<a href="javascript:void(0)" onclick="uf_yjsz('${(lst.id)!}','${(lst.yj)!}')"><img src="${CTX}/res/images/btn/config.png"/>佣金</a>
+	                    	<a href="javascript:void(0);" onclick="uf_add('${(lst.id)!}')">编辑</a> 
+	                    	<a href="javascript:void(0);" onclick="uf_del('${(lst.id)!}')">删除</a> 
+	                    </td>
+	                  </tr>
+					</#list>
+				</#if>
+				<tr>
+					<td colspan="10" style="text-align: left">&nbsp;
+					<input type="checkbox" id="btn_qx">全选
+					<input type="button" id="btn_pl_shtg" class="button" value="批量通过" />
+					<input type="button" id="btn_pl_shbtg" class="button" value="批量不通过"/>
+					<input type="button" id="btn_pl_delete" class="button" value="批量删除"/>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="10">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+            </table>
+   
+			</form>
+  </body>
+</html>

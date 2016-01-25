@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<script type="text/javascript"
+	src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+<script type="text/javascript">
+		function uf_delete(lid,rid){
+			$.dialog.confirm('确认要删除当前选择的数据吗？', function(){
+			   $.ajax({
+					url: "${CTX}/admin/leave/deleteleave",
+					type: "POST",
+					data: {lid:lid, rid:rid},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除数据成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("删除数据失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+<body>
+	<form id="myform" name="myform" method="post" action="">
+		用户：
+		<input type="text" name="username" id="username" class="text" value="${(username)!}" style="width: 100px;" /> 
+		商户：
+		<input type="text" name="merchant" id="merchant" class="text" value="${(merchant)!}" style="width: 100px;" /> 
+		内容：
+		<input type="text" name="content" id="content" class="text" value="${(content)!}" style="width: 100px;" /> 
+		
+		<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();" />
+		<table class="list">
+			<tr>
+				<th width="3%">序号</th>
+				<th width="15%">留言/回复时间</th>
+				<th width="38%">内容</th>
+				<th width="12%">用户名称</th>
+				<th width="12%">商户名称</th>
+				<th width="12%">接单人名称</th>
+				<th width="*%">操作</th>
+			</tr>
+			<#if listpage ??> <#list listpage.list as lst>
+			<tr>
+				<td>${(lst_index+1)!''}</td>
+				<td>${(lst.datetime)!''}</td>
+				<td>${(lst.content)!''}</td>
+				<td>${(lst.mc)!''}</td>
+				<td>${(lst.mmc)!''}</td>
+				<td>${(lst.qmc)!''}</td>
+				<td>
+					<a href="javascript:void(0);" onclick="uf_delete('${(lst.id)!}','${(lst.rid)!}')">删除</a>
+				</td>
+			</tr>
+			</#list> </#if>
+			<tr>
+				<td colspan="14"><#include '../../common/_paginate.html'></td>
+			</tr>
+		</table>
+
+	</form>
+</body>
+</html>

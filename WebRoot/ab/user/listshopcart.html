@@ -1,0 +1,224 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_showorder(orderid){
+			$.dialog({
+				title:'订单明细',
+				content: 'url:${CTX}/ab/user/listitem/'+orderid,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480,
+				cover:true,
+				fixed:true,
+				max:false,
+				min:true,
+				cancel:true,
+				cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function uf_submitorder(id){
+			$.dialog.confirm('确定要提交所选订单吗，提交后将不能修改？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/order/savesubmitorder",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("订单提交成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("订单提交失败！");
+						}
+					}
+				});
+			}, function(){
+			    $.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_delpro(id){
+			$.dialog.confirm('是否要删除所选购物车商品信息？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/order/delproduct",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除数据成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("删除数据失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_delorder(id){
+			$.dialog.confirm('是否要删除所选订单信息？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/order/delorder",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除数据成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("删除数据失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_addnum(orderid,itemid){
+			$('#buy_num_'+itemid).attr("value",parseInt($('#buy_num_'+itemid).val())+1);
+			//对数值进行修改
+			$.ajax({
+				url: "${CTX}/ab/order/updateorderitemnum",
+				type: "POST",
+				data: {orderid:orderid,proid:itemid,pronum:$('#buy_num_'+itemid).val()},
+				dataType: "json",
+				cache: false,
+				success: function(data) {
+					if(data){
+						refresh();
+					}else{
+						$.dialog.alert("修改数量失败，请刷新页面重新操作！");
+					}
+				}
+			});
+		}
+		
+		function uf_reduce(orderid,itemid){
+			if(parseInt($('#buy_num_'+itemid).val())>1){
+				$('#buy_num_'+itemid).attr("value",parseInt($('#buy_num_'+itemid).val())-1);
+				
+				//对数值进行修改
+				$.ajax({
+					url: "${CTX}/ab/order/updateorderitemnum",
+					type: "POST",
+					data: {orderid:orderid,proid:itemid,pronum:$('#buy_num_'+itemid).val()},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							refresh();
+						}else{
+							$.dialog.alert("修改数量失败，请刷新页面重新操作！");
+						}
+					}
+				});
+			}
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>	
+ </head>
+  <body>
+  	<form id="myform" name="myform">
+  	<#include '../inc/top.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">我的购物车</h2>
+			<table class="list">
+            <tr>
+	            <th width="30px;">序号</th>
+	            <th width="120px;">订单号</th>
+	            <th width="80px;">用途</th>
+	            <th width="*;">商家</th>
+	            <th width="100px;">总金额</th>
+	            <th width="100px;">跑腿费</th>
+				<th width="120px;">创建时间</th>
+				<th width="100px;">操作</th>
+	        </tr>
+	        <#if list_cart ??>
+      				<#list list_cart  as lst>
+	                  <tr>
+	                  	<td rowspan="2">${(lst_index+1)!''}</td>
+	                    <td class="bold"><a href="${CTX}/ab/user/myshopcart/${(lst.id)!}">${(lst.sn)!''}</a></td>
+	                    <td><#if strkit('0',(lst.yt)!)>犒劳自己</#if><#if strkit('1',(lst.yt)!)>赠送他人</#if></td>
+	                    <td class="red bold">${(lst.mname)!}</td>
+	                    <td class="red bold">${(lst.ddzje)?string("currency")}</td>
+	                    <td class="red bold">${(lst.ptf)?string("currency")}</td>
+	                    <td>${(lst.xdsj)!''}</td>
+	                    <td>
+	                    	<a href="javascript:void(0);" onclick="uf_delorder('${(lst.id)}')">删除</a>
+	                    	<a href="javascript:void(0);" onclick="uf_submitorder('${(lst.id)}')">提交</a>
+	                    	<a href="${CTX}/ab/order/submitshopcart/${(lst.id)}">提交下一步</a>
+	                    </td>
+	                  </tr>
+	                  
+	                  <#if lst.listitem ??>
+	                  <tr>
+	                  	<td colspan="8" style="border: 0px;">
+	                  		<table class="list" style="border: 0px;">
+	                  			<tr>
+									<th width="30px;">序号</th>
+									<th width="118px;">图片</th>
+									<th width="*">名称</th>
+									<th width="80px;">单价</th>
+									<th width="80px;">跑腿费</th>
+									<th width="100px;">赠送积分</th>
+									<th width="120px;">购买数量</th>
+									<th width="100px;">操作</th>
+								</tr>
+						        <#list lst.listitem  as sub>
+						        	<tr>
+										<td>${sub_index+1}</td>
+										<td><#if sub.img_url??><img src="${CTX}/upload/${(sub.img_url)!}" style="width: 80px;height: 60px;"></#if></td>
+										<td>${(sub.itemname)!}</td>
+										<td class="red">${(sub.price)?string("currency")}</td>
+										<td class="red">${(sub.ptf)?string("currency")}</td>
+					                    <td>${(sub.jf)!''}</td>
+					                    <td>
+					                    	<a href="javascript:void(0);" onclick="uf_reduce('${(sub.orderid)!}','${(sub.itemid)!}')">-</a>
+					                    	<input type="text" class="text" id="buy_num_${(sub.itemid)!}" name="buy_num_${(sub.itemid)!}" value="${(sub.quantity)!}" re style="height: 24px;width: 35px;text-align: center"/>
+					                    	<a href="javascript:void(0);" onclick="uf_addnum('${(sub.orderid)!}','${(sub.itemid)!}')">+</a>
+					                    </td>
+					                    <td><a href="javascript:void(0);" onclick="uf_delpro('${(sub.id)!}');">删除</a></td>
+									</tr>
+						        </#list>
+	                  		</table>
+	                  	</td>
+	                  </tr>
+	                  </#if>
+				</#list>
+			</#if>
+            </table>
+		</div>
+	</div>
+	</form>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

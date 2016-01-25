@@ -1,0 +1,208 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_savelxrxx(id){
+			 $.post("${CTX}/ab/order/saveorderlxrxx",$("#myform").serializeArray(),function(data){
+                  if(data){
+					$.dialog.alert("保存成功！",function () {
+						window.location.href = "${CTX}/ab/order/submitshopcart/${(vo.id)!}"
+			        }).time(1);
+				}else{
+					$.dialog.alert("保存失败！");
+				}
+			});
+		}
+		
+		function uf_savememo(id){
+		   if($('#memo').val().length>200){
+		   		$.dialog.alert("长度不能大于100个中文！");
+		   		document.all.memo.focus();
+		   		return false;
+		   }else{
+			   $.post("${CTX}/ab/order/saveordermemo",$("#myform").serializeArray(),function(data){
+	                if(data){
+						$.dialog.alert("保存赠言成功！",function () {
+							window.location.href = "${CTX}/ab/order/submitshopcart/${(vo.id)!}";
+				        }).time(1);
+					}else{
+						$.dialog.alert("保存赠言失败！");
+					}
+				});
+			}
+		}
+		//获取经纬度坐标信息
+		function uf_getzbxx(){
+			$.post("${CTX}/ab/order/getzbwz",$("#myform").serializeArray(),function(data){
+				if(data==''){
+					$.dialog.alert("无法获得送货地图坐标！");
+				}else{
+		             $('#shdzjd').val(data.result.location.lat);
+		             $('#shdzwd').val(data.result.location.lng);
+				}
+			});
+		}
+		
+		function uf_submitorder(){
+			$.dialog.confirm('确定提交并支付吗，提交后将不能再次修改？', function(){
+			   $.post("${CTX}/ab/order/saveorderlxrxx",$("#myform").serializeArray(),function(data){
+                   if(data){
+						$.dialog.alert("收货信息修改成功！",function () {
+							window.location.href = "${CTX}/ab/order/submitshopcart/${(vo.id)!}"
+				        }).time(0.5);
+					}else{
+						$.dialog.alert("收货信息修改失败！");
+					}
+				});
+			}, function(){
+			    $.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function refresh(){
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+			$('#myform').submit();
+		}
+	</script>	
+ </head>
+  <body>
+  	<form id="myform" name="myform">
+  	<input type="hidden" class="text" id="yt" name="yt" value="${(vo.yt)!}"/>
+  	<input type="hidden" class="text" id="id" name="id" value="${(vo.id)!}"/>
+  	<#include '../inc/top.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">订单明细</h2>
+			<table class="input">
+	            <tr>
+		            <th width="120px;">订单号</th>
+		            <td class="bold">${(vo.sn)!''}</td>
+		        </tr>
+		        <tr>
+		            <th width="80px;">用途</th>
+		            <td><#if strkit('0',(vo.yt)!)>犒劳自己</#if><#if strkit('1',(vo.yt)!)>赠送他人</#if></td>
+		        </tr>
+		        <tr>
+		            <th width="*;">商家</th>
+		            <td class="red bold">${(vo.mname)!}</td>
+		        </tr>
+		        <tr>
+		            <th width="100px;">总金额</th>
+		            <td class="red bold">${(vo.ddzje)?string("currency")}</td>
+		        </tr>
+		        <tr>
+		            <th width="100px;">跑腿费</th>
+		            <td class="red bold">${(vo.ptf)?string("currency")}</td>
+				</tr>
+            </table>
+            <table class="input">
+            	<tr>
+		            <td colspan="2" align="left">联系人信息</td>
+		        </tr>
+		        <tr>
+		            <th>收货联系人</th>
+		            <td><input type="text" class="text" id="lxr" name="lxr" value="${(vo.lxr)!}"/></td>
+		        </tr>
+		        <tr>
+		            <th>收货人联系电话</th>
+		            <td>
+		            	<input type="text" class="text" id="lxrdh" name="lxrdh" value="${(vo.lxrdh)!}"/>
+		            	<input type="button" id="btn_savelxr" onclick="uf_savelxrxx('${(vo.id)!}');" value="保存联系人信息"/>
+		            </td>
+		        </tr>
+            	<#if strkit('0',(vo.yt)!)>
+	            <tr>
+		            <th>收货邮政编码</th>
+		            <td><input type="text" class="text" id="yzbm" name="yzbm" value="${(vo.yzbm)!}"/></td>
+		        </tr>
+		        <tr>
+		            <th>城市</th>
+		            <td><input type="text" class="text" id="city" name="city" readonly="readonly" value="${(currcity.mc)!}"/></td>
+		        </tr>
+		        <tr>
+		            <th>精度</th>
+		            <td><input type="text" class="text" id="shdzjd" name="shdzjd" value="${(vo.shdzjd)!}"/></td>
+		        </tr>
+		        <tr>
+		            <th>纬度</th>
+		            <td><input type="text" class="text" id="shdzwd" name="shdzwd" value="${(vo.shdzwd)!}"/></td>
+		        </tr>
+		        <tr>
+		            <th>收货通讯地址</th>
+		            <td>
+		            	<input type="text" class="text" id="shdz" name="shdz" value="${(vo.shdz)!}"/>
+		            	<input type="button" id="btn_savelxr" onclick="uf_getzbxx();" value="获取坐标"/>
+		            </td>
+		        </tr>
+	            </#if>
+	            <#if strkit('1',(vo.yt)!)>
+		        <tr>
+		            <th>赠言：</th>
+		            <td>
+		            	<textarea class="text" id="memo" name="memo" style="height: 100px;">${(vo.memo)!}</textarea>
+		            	<input type="button" id="btn_savelxr" onclick="uf_savememo('${(vo.id)!}');" value="保存赠言"/>
+		            </td>
+		        </tr>
+	            <tr>
+		            <th>分享赠对象填写详细地址：</th>
+		            <td>
+		            <script type="text/javascript" ckharset="utf-8" src="http://static.bshare.cn/b/buttonLite.js#style=-1&uuid=&pophcol=2&lang=zh"></script>  
+					<script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/bshareC0.js"></script>
+		            <div class="bshare-custom icon-medium-plus"><a title="分享到QQ空间" class="bshare-qzone"></a><a title="分享到微信" class="bshare-weixin"></a><a title="分享到QQ好友" class="bshare-qqim"></a><a title="分享到百度空间" class="bshare-baiduhi"></a><a title="分享到新浪微博" class="bshare-sinaminiblog"></a><a title="分享到人人网" class="bshare-renren"></a><a title="分享到开心网" class="bshare-kaixin001"></a><a title="分享到腾讯微博" class="bshare-qqmb"></a><a title="分享到网易微博" class="bshare-neteasemb"></a><a title="更多平台" class="bshare-more bshare-more-icon more-style-addthis"></a><span class="BSHARE_COUNT bshare-share-count">0</span></div><script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/button.js#style=-1&amp;uuid=${vo.id}&amp;pophcol=2&amp;lang=zh"></script><a class="bshareDiv" onclick="javascript:return false;"></a><script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/bshareC0.js"></script>
+		            <script type="text/javascript" charset="utf-8">
+					bShare.addEntry({
+					    title: '赠言：${vo.memo}。订单号：${vo.sn}，',
+					    url: 'http://192.168.1.155:8888/ash/ab/order/editshdz?id=${(vo.id)!}',
+					    summary: '需要您打开分享的链接，填写详细的送货地址。',
+					    pic: ""
+					});
+					</script>
+		            </td>
+		        </tr>
+            </table>
+            </#if>
+            <table class="list" style="border: 0px;">
+               	<tr>
+					<th width="30px;">序号</th>
+					<th width="118px;">图片</th>
+					<th width="*">名称</th>
+					<th width="80px;">单价</th>
+					<th width="80px;">跑腿费</th>
+					<th width="100px;">赠送积分</th>
+					<th width="120px;">购买数量</th>
+				</tr>
+            <#if listitem ??>
+		        <#list listitem  as sub>
+		        	<tr>
+						<td>${sub_index+1}</td>
+						<td><#if sub.img_url??><img src="${CTX}/upload/${(sub.img_url)!}" style="width: 80px;height: 60px;"></#if></td>
+						<td>${(sub.itemname)!}</td>
+						<td class="red">${(sub.price)?string("currency")}</td>
+						<td class="red">${(sub.ptf)?string("currency")}</td>
+	                    <td>${(sub.jf)!''}</td>
+	                    <td class="red">${(sub.quantity)!}</td>
+					</tr>
+		        </#list>
+            </#if>
+             </table>
+             <div align="right">
+             	订单总金额：<span class="red bold">${(vo.ddzje)?string("currency")}</span>
+             	跑腿费：<span class="red bold">${(vo.ptf)?string("currency")}</span>
+             	<input type="button" id="btn_submit" value="提交支付" onclick="uf_submitorder();"/>
+             </div>
+		</div>
+	</div>
+	</form>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>后台管理系统</title>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/admin.css"/>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/otree/otree.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/otree/otree.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/otree/common.js"></script>
+</head>
+  <body>
+  <form id="myform" name="myform" action="" method="post">
+  	<input type="hidden" id="p_id" name="p_id"/>
+	<table id="frametable" cellpadding="0" cellspacing="0" width="100%" height="100%" style="width: 100%;">
+	    <tr>
+	        <td valign="top" width="200" height="100%">
+	            <div id="tleft" class="tleft" style="width:200px;border-right:1px solid #70cbea;overflow: auto;"/>
+	        </td>
+	        <td valign="top" width="100%" height="100%">
+	            <iframe id="dlist" name="dlist" src="${CTX}/admin/subject/list?p_id=1" width="100%" allowtransparency="true" width="100%" height="100%" frameborder="0" scrolling="yes" style="overflow:visible;"></iframe>
+	        </td>
+	    </tr>
+	</table>
+	</form>
+	
+	<script type="text/javascript">
+		var TreeData=${str_Script};
+		var otree = new OTree({
+			panel 	: document.getElementById("tleft"),
+			data	: TreeData
+			});
+		otree.paint();
+		//otree.expandAll();
+		function ClickEvent(node){
+		       document.all.p_id.value=node.attributes.id;
+		       document.all.myform.target="dlist";
+		       document.all.myform.action="${CTX}/admin/subject/list";
+		       document.all.myform.submit();
+			}
+		otree.addListener('click',ClickEvent);
+		
+		$('#frametable').width($(window).width());
+		$('#frametable').height($(window).height());
+		$('#tleft').height($(window).height());
+		$('#dlist').width($(window).width()-201);
+		$('#dlist').height($(window).height());
+	    $(window).resize(function(){
+	        $('#frametable').width($(window).width());
+			$('#frametable').height($(window).height());
+			$('#tleft').height($(window).height());
+			$('#dlist').width($(window).width()-201);
+			$('#dlist').height($(window).height());
+	    });
+	</script>
+  </body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					tb_mc: {required:true,stringMaxLength:50},
+					tb_is_enable: {required:true},
+					tb_is_display: {required:true},
+					tb_is_type: {required:true},
+					tb_seq_num: {required:true,integer:true,min:1},
+					tb_ddesc: {stringMaxLength:200}
+				}
+			});
+		});
+	</script>
+</head>
+  <body>
+    <form id="myform" name="myform" action="${CTX}${NAME_SPACE}/save" method="post">
+    <input type="hidden" name="m" id="m" value="${(method)!}">
+    	<input type="hidden" id="tb_id" name="tb_id" class="text" value="${(vo.id)!}">
+    	<input type="hidden" id="tb_p_id" name="tb_p_id" class="text" value="${(vo.p_id)!}">
+    	<input type="hidden" id="tb_ccm" name="tb_ccm" class="text" value="${(vo.ccm)!}">
+		<table class="input">
+			<tr>
+				<td style="width: 150px;" align="right">分类名称：</td>
+				<td><input type="text" name="tb_mc" id="tb_mc" class="text" value="${(vo.mc)!''}"></td>
+			</tr>
+			<tr>
+				<td align="right">导航是否显示：</td>
+				<td>
+					<select name="tb_is_enable" style="width:150px;">
+							<option value="1" <#if "1"=(vo.is_enable)!''>selected="selected"</#if>>是</option>
+							<option value="0" <#if "0"=(vo.is_enable)!''>selected="selected"</#if>>否</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td align="right">首页是否显示：</td>
+				<td>
+					<select name="tb_is_display" style="width:150px;">
+							<option value="1" <#if "1"=(vo.is_display)!''>selected="selected"</#if>>是</option>
+							<option value="0" <#if "0"=(vo.is_display)!''>selected="selected"</#if>>否</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td align="right">类型：</td>
+				<td>
+					<select name="tb_is_type" style="width:150px;">
+							<option value="0" <#if "0"=(vo.is_type)!''>selected</#if>>货物类</option>
+							<option value="1" <#if "1"=(vo.is_type)!''>selected</#if>>服务类</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 150px;" align="right">排序号：</td>
+				<td><input type="text" name="tb_seq_num" id="tb_seq_num" class="text" value="${(vo.seq_num)!''}"></td>
+			</tr>
+			<tr>
+				<td style="width: 150px;" align="right">分类描述：</td>
+				<td><textarea style="width: 80%;height: 60px;" name="tb_ddesc" id="tb_ddesc" class="text">${(vo.ddesc)!''}</textarea></td>
+			</tr>
+		</table>
+	</form>
+	
+  </body>
+</html>
+

@@ -1,0 +1,384 @@
+/* CSS Document */
+*{margin:0px;padding:0px;font-size:14px;}
+
+a:hover {
+    text-decoration: none;
+}
+
+.header {
+    background-color: #ffffff;
+    height: 80px;
+    width: 100%;
+}
+
+.header_cen {
+    font-size: 35px;
+    height: auto;
+    margin: 0 auto;
+    width: 1000px;
+}
+.logo {
+    float: left;
+    margin-top: 20px;
+	display: inline;
+    float: left;
+	height: 48px;
+    width: 182px;
+}
+
+.logo a {
+    line-height:0;
+}
+.button_zhu {
+    border: 1px solid #ec7b01;
+    border-radius: 5px;
+    float: right;
+    height: 35px;
+    line-height: 35px;
+    margin-left: 30px;
+    margin-right: 50px;
+    margin-top: 20px;
+    text-align: center;
+    width: 75px;
+	color:#878787;	
+}
+
+.button_deng {
+    background-color: #ec7b01;
+    border-radius: 5px;
+    color: #ffffff;
+    float: right;
+    height: 37px;
+    line-height: 37px;
+    margin-top: 20px;
+    text-align: center;
+    width: 77px;
+}
+
+#header_down{
+	height:470px;
+	width:100%;	
+	border-top:solid 1px #A4A3A2;
+	border-bottom:solid 1px #A4A3A2;
+	background-color:#F3F3F3;
+}
+
+.header_down_cen {
+    margin: 0 auto;
+    width: 1030px;
+}
+
+.headerImg{
+	width:352px;
+	float:left;
+	overflow:hidden;
+}
+
+.xinxi {
+    float: left;
+	overflow:hidden;
+	line-height:30px;
+    margin-left: 20px;
+    margin-top: 50px;
+    width:300px;
+	height:300px;
+	border:solid 1px #EEE;
+}
+
+.shop_title {
+    font-size: 24px;
+    line-height: 40px;
+}
+
+.xinxi dt{
+	width:45px;
+	float:left;
+	overflow:hidden;
+	text-align:right;
+	font-size:14px;
+	color:#6C6C6C;
+	display:block;
+}
+
+.xinxi dd{
+	width:277px;
+	height:42px;
+	margin:0 0 0 38px;
+	display:inline;
+	font-size:24px;
+}
+
+.jianPro{
+	float:left;
+	overflow:hidden;
+	margin-left:38px;
+	margin-top:8px;
+	background:url(../images/jian01.jpg) no-repeat;
+	width:28px;
+	height:28px;
+	border:none;	
+}
+.jianPro2{
+	float:left;
+	overflow:hidden;
+	margin-left:38px;
+	margin-top:8px;
+	background:url(../images/jian02.jpg) no-repeat;
+	width:28px;
+	height:28px;
+	border:none;	
+}
+.shuliangPro{
+	float:left;
+	overflow:hidden;
+	margin-top:8px;
+	border:solid 1px #999999;
+	width:50px;
+	height:26px;
+	text-align:center;
+}
+.jiaPro{
+	float:left;
+	overflow:hidden;
+	margin-top:8px;
+	background:url(../images/jia.jpg) no-repeat;
+	width:28px;
+	height:28px;
+	border:none;
+}
+.cart{
+	background:url(../images/shop.png) no-repeat;
+	width:136px;
+	height:41px;
+	border:none;
+	margin:20px 50px;
+	overflow:hidden;
+	cursor:pointer;
+}
+.xinxi ul{
+	width:120px;
+	float:right;
+}
+
+.xinxi ul li {
+    background-color: #ec7b01;
+    border-radius: 5px;
+    float: left;
+    height: 24px;
+    line-height: 24px;
+    margin: 13px 10px 0 0;
+    text-align: center;
+    width: 24px;
+}
+.xinxi ul li a {
+    color: #ffffff;
+    font-size: 12px;
+}
+.xinxi ul li a:hover {
+    background-color: #f3f3f3;
+    border: 1px solid #929292;
+    border-radius: 5px;
+    color: #929292;
+    display: block;
+    line-height: 24px;
+	cursor:pointer;
+}
+.shop_cart{
+	float:left;
+	overflow:hidden;
+	width:310px;
+	height:460px;
+	margin:5px 20px;
+	border:solid 1px #CCCCCC;
+}
+.shop_store{
+	width:100%;
+	height:40px;
+}
+.shop_store img{
+	border:none;
+	margin-top:4px;
+}
+
+.mycart{
+	width:310px;
+	height:420px;
+}
+.cart_top{
+	width:310px;
+	height:50px;
+	border-top:solid 1px #DDDDDD;
+	border-bottom:solid 1px #DDDDDD;
+}
+.cartTopConent{
+	width:270px;
+	height:30px;
+	margin:10px 20px;
+}
+.shopMyCart{
+	text-align:center;
+	height:30px;
+	line-height:30px;
+	font-size:20px;
+}
+.clearContent{
+	font-size:12px;
+	color:#EAA146;
+	float:right;
+	height:30px;
+	line-height:30px;
+}
+.myshop{
+	width:290px;
+	min-height:200px;
+	margin:0 auto;
+}
+
+.jianCart{
+	float:left;
+	overflow:hidden;	
+	background:url(../images/jian01.jpg) no-repeat;
+	width:28px;
+	height:28px;
+	border:none;
+	margin-top:6px;	
+}
+.shuliangCart{
+	float:left;
+	overflow:hidden;	
+	border:solid 1px #999999;
+	width:50px;
+	height:26px;
+	text-align:center;
+	margin-top:6px;
+}
+.jiaCart{
+	float:left;
+	overflow:hidden;	
+	background:url(../images/jia.jpg) no-repeat;
+	width:28px;
+	height:28px;
+	border:none;
+	margin-top:6px;
+}
+
+.myshopContent{
+	width:290px;
+	height:38px;
+	line-height:38px;
+	border-bottom:solid 1px #EEEEEE;
+}
+.myshopContent dt{
+	float:left;
+	text-align:right;
+	width:78px;
+	margin-right:25px;
+}
+.myshopContent dd{
+	float:left;
+	margin-right:20px;
+}
+.accountList{
+	width:310px;
+	min-height:120px;
+	border-top:solid 1px #DDDDDD;
+	border-bottom:solid 1px #DDDDDD;
+}
+.listContent{
+	width:310px;
+	height:20px;
+	line-height:20px;
+	margin-top:10px;
+}
+.listContent dt{
+	float:left;
+	width:260px;
+	text-align:right;
+	font-family:SimHei;
+	font-size:15px;
+	font-weight:bold;
+}
+.listContent dd{
+	float:left;
+	width:50px;
+	text-align:right;
+	color:#E47D16;
+	font-family:SimHei;
+	font-size:14px;
+	font-weight:blod;
+}
+
+.total{
+	width:310px;
+	height:54px;
+	border-top:solid 1px #DDDDDD;
+	border-bottom:solid 1px #DDDDDD;
+}
+.totalContent{
+	width:310px;
+	height:30px;
+	margin-top:7px;
+}
+
+.accButton{
+	text-decoration:none;
+}
+.accButton img{
+	border:none;
+}
+
+.account{
+	height: 32px;
+	width:310px;
+}
+
+.productDes{
+	width:962px;
+	margin:20px auto;
+}
+
+.productTip{
+	width:962px;
+	height:48px;
+	background:#F6F6F6;
+}
+.productTip img {
+	border:none;
+}
+
+.productFont{
+	height:50px;
+	line-height:50px;
+	font-size:28px;
+	color:#8D0100;
+	border-bottom:solid 3px #8D0100;
+}
+
+.productInfo{
+	width:800px;
+	height:40px;
+	line-height:40px;
+}
+
+.productInfo dt{
+	float:left;
+	width:150px;
+	text-align:right;
+	color:#8D0100;
+	font-family:SimHei;
+	font-size:18px;
+	font-weight:bold;
+	margin:0 20px;
+	
+}
+
+.productInfo dd{
+	float:left;
+	font-size:14px;
+	font-family:SimHei;
+}
+
+.footer {width: 100%;border-top: 2px solid #eee;color: #A2A2A2;}
+.footer .flink {margin: 0 auto;width:1002px;height:32px;line-height:32px;text-align:center;font-size:12px;}
+.footer .flink a{color: #A2A2A2;text-decoration:none;}
+.footer .flink a:hover{color:#808080;}

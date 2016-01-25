@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			 $("#myform").validate({
+				rules: {
+					config_yt: {required:true,stringMaxLength:50},
+					config_c1: {required:true,stringMaxLength:50},
+					config_c2: {required:true,stringMaxLength:50},
+					config_c3: {required:true,stringMaxLength:50},
+					config_c4: {stringMaxLength:100}
+				},
+				messages:{
+					config_yt:"名称不能为空！",
+					config_c1:"服务器地址不能为空！",
+					config_c2:"用户名不能为空！",
+					config_c3:"密码不能为空！"
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				if($("#myform").valid()){
+				    $.post("${CTX}/admin/config/saveconfig",$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("短信接口数据配置成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("短信接口数据配置失败！");
+						}
+					});
+				    
+				    
+				}
+			});
+		});
+		
+		function refresh(){
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+			$('#myform').submit();
+		}
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" method="post">
+	<input type="hidden" name="config_id" id="config_id" value="${(vo.id)!}"/>
+	<div class="path">
+		<a href="javascript:void(0);">首页</a> &raquo; 短信服务配置
+	</div>
+	<table class="input">
+		<tr>
+			<th align="right">名称：</th>
+			<td><input type="text" name="config_yt" id="config_yt" class="text" value="${(vo.yt)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">服务器地址：</th>
+			<td><input type="text" name="config_c1" id="config_c1" class="text" value="${(vo.c1)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">用户名：</th>
+			<td><input type="text" id="config_c2" name="config_c2" class="text" value="${(vo.c2)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">密码：</th>
+			<td><input type="text" id="config_c3" name="config_c3" class="text" value="${(vo.c3)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">备注：</th>
+			<td><textarea id="config_c4" name="config_c4" class="text" style="width: 400px;">${(vo.c4)!}</textarea></td>
+		</tr>
+		<tr>
+			<th align="right">下单成功：</th>
+			<td>
+				<select id="config_c5" name="config_c5">
+					<option value="0" <#if strkit('0',(vo.c5)!)>selected="selected"</#if>>开</option>
+					<option value="1" <#if strkit('1',(vo.c5)!)>selected="selected"</#if>>关</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">订单发货：</th>
+			<td>
+				<select id="config_c6" name="config_c6">
+					<option value="0" <#if strkit('0',(vo.c6)!)>selected="selected"</#if>>开</option>
+					<option value="1" <#if strkit('1',(vo.c6)!)>selected="selected"</#if>>关</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">司机接收订单：</th>
+			<td>
+				<select id="config_c7" name="config_c7">
+					<option value="0" <#if strkit('0',(vo.c7)!)>selected="selected"</#if>>开</option>
+					<option value="1" <#if strkit('1',(vo.c7)!)>selected="selected"</#if>>关</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">送达提醒评价：</th>
+			<td>
+				<select id="config_c8" name="config_c8">
+					<option value="0" <#if strkit('0',(vo.c8)!)>selected="selected"</#if>>开</option>
+					<option value="1" <#if strkit('1',(vo.c8)!)>selected="selected"</#if>>关</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">用户注册：</th>
+			<td>
+				<select id="config_c9" name="config_c9">
+					<option value="0" <#if strkit('0',(vo.c9)!)>selected="selected"</#if>>开</option>
+					<option value="1" <#if strkit('1',(vo.c9)!)>selected="selected"</#if>>关</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+		<td>&nbsp;</td>
+		<td>
+			<input type="button" id="btn_save" class="button" value="保 存" />
+			<input type="button" id="btn_return" class="button" value="刷 新" onclick="javascript:window.location.href='${CTX}/admin/config/editsms'"/>
+		</td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

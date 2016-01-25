@@ -1,0 +1,91 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<#include '../ab/inc/meta.html'>
+<title>投诉建议-${(vo.mc)!'物流企业'}</title>
+<link href="${CTX}/res/trans/css/mystyle.css" type="text/css" rel="stylesheet" />
+<link href="${CTX}/res/trans/css/jqhdp.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+<script type="text/javascript">
+$().ready(function() {
+	$("#btn_save").click(function(){
+			$.post("${CTX}/trans/saveTousu",$("#myform").serializeArray(),function(data){
+				$("#msg").html(data.msg);
+				console.log(data);
+                if(data.flag) {
+                	$.dialog.alert("保存数据成功！",function () {
+						window.location.href="${CTX}/trans/${loginid!}";
+				    }).time(0.5);
+                } else {
+                	alert("保存数据失败！" + data.msg);
+                }
+			});
+	});
+	
+	$("#rndImg").click(function(){
+		var d = new Date();
+		document.getElementById("rndImg").src="${CTX}/25console/imgcode?t="+d.toString(40);
+	});
+	
+});
+</script>
+</head>
+<body>
+<#include '../ab/inc/top.html'>
+<div class="top_2">
+	<div class="title"><span>${(vo.mc)!}</span></div>
+</div>
+<#include 'inc/nav.html'>
+<!-- 幻灯片开始-->
+<#include 'inc/slider.html'>
+<!--幻灯片结束-->
+<div class="container">
+   <#include 'inc/left.html'>
+   
+   <div class="body_content">
+    <div class="body_content1">
+    <ul>
+    	<li>投诉建议</li>
+     </ul>
+     <div class="formtousu">
+     <form id="myform" name="myform" action="" method="post">
+     	<input type="hidden" name="companyname" value="临沂祥义（原义达）物流">
+        <input type="hidden" name="mid" value="${(vo.id)!}">
+        <input type="hidden" name="ts_lid" value="${(lo.id)!}">
+        <input type="hidden" name="loginid" value="${(loginid)!}">
+        <table>
+           	<tbody><tr>
+               	<th colspan="4">&nbsp; 请注意带有 <font color="#FF0000">*</font> 的项目必须填写</th>
+            </tr>
+          	<tr>
+               	<td width="97">&nbsp; <font color="#FF0000">*</font> 联系人：</td>
+               	<td><input type="text" name="ts_contact" value="${ts_contact!}" class="required"></td>
+               	<td width="90">&nbsp; <font color="#FF0000">*</font> 联系电话：</td>
+               	<td><input type="text" name="ts_phone" value="${ts_phone!}" class="required"></td>
+            </tr>
+           	<tr>
+               	<td>&nbsp; <font color="#FF0000">*</font> 内容：</td>
+               	<td colspan="3"><textarea name="ts_common" class="required">${ts_common!}</textarea></td>
+            </tr>
+           	<tr>
+               	<td>&nbsp; <font color="#FF0000">*</font> 验证码：</td><td colspan="3">
+               	<div class="right"><input class="textbox" type="text" name="verify" placeholder="输入验证码">
+		   		<img id="rndImg" src="${CTX}/25console/imgcode" border="0" alt="点击刷新验证码" style="cursor:pointer;vertical-align:middle"></div></td>
+            </tr>
+           	<tr>
+               	<td colspan="4" align="center"><button class="mybutton" id="btn_save" name="btn_save" type="button">确认提交</button>
+               	&nbsp; &nbsp;<#if message??>提交失败：</#if>${message!}<span id="msg"></span></td>
+            </tr>
+           </tbody>
+           </table>
+       </form>
+     </div>
+    </div>
+   </div>
+
+	<div class="bottom"></div>    
+</div>
+
+<#include 'inc/footer.html'>
+</body>
+</html>

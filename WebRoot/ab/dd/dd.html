@@ -1,0 +1,447 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<#include '../inc/meta.html'>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/dd/main.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/dd/style.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/dd/order.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript">
+	$().ready(function() {
+		// 表单验证
+		$("#myform").validate({
+			rules: {
+				lxr: {required:true,stringMaxLength:20},
+				lxrdh: {required:true,stringMaxLength:20},
+				shdz: {required:true,stringMaxLength:50},
+				memo: {stringMaxLength:100},
+				yqsdsj: {stringMaxLength:20}
+			}
+		});
+	});
+	
+	
+	function uf_delpro(id){
+		$.dialog.confirm('是否要删除所选商品务？', function(){
+			$.post("${CTX}/ab/order/delproduct",{id:id},function(data){
+	            if(data){
+					window.location.href="${CTX}/ab/order/ddjs";
+				}else{
+					$.dialog.alert("删除数据失败，请刷新页面重新操作！");
+				}
+			});
+		});
+	}
+	
+	var info = {};
+	var currcity = "${(currcity.mc)!}";
+	
+	$(function() {
+		uf_distance();
+		$(".subtract").click(function(){
+			if($('#userid').val()==''){
+				$.dialog.alert("请登录后进行选择！",function(){
+					window.location.href="${CTX}/ab/login";
+				});
+				return false;
+			}
+			var buyNum = $(this).siblings(".buyNum").val();
+			if(buyNum>1){
+				buyNum--;
+				$.post("${CTX}/ab/order/addtocart",{mid:$(this).siblings(".buyMId").val(),proid:$(this).siblings(".buyProId").val(),addnum:buyNum},function(data){
+	                if(data){
+				        window.location.href="${CTX}/ab/order/ddjs";
+					}else{
+						$.dialog.alert("更新购物车商品数量失败！");
+					}
+				});
+				
+			}
+		});
+		$(".plus").click(function(){
+			if($('#userid').val()==''){
+				$.dialog.alert("请登录后进行选择！",function(){
+					window.location.href="${CTX}/ab/login";
+				});
+				return false;
+			}
+			var buyNum = $(this).siblings(".buyAddNum").val();
+			
+			if(buyNum<100){
+				buyNum++;
+				$.post("${CTX}/ab/order/addtocart",{mid:$(this).siblings(".buyAddMId").val(),proid:$(this).siblings(".buyAddProId").val(),addnum:buyNum},function(data){
+                   	if(data){
+				        window.location.href="${CTX}/ab/order/ddjs";
+					}else{
+						$.dialog.alert("更新购物车商品数量失败！");
+					}
+				});
+			}
+			
+		});
+		
+	});
+	
+	
+	function uf_distance(){
+		var map = new BMap.Map("container");
+		map.centerAndZoom(currcity, 13);
+		<#if list_order ??>
+	      	<#list list_order as lst>
+			var options${(lst.id)!} = {
+				onSearchComplete: function(results){
+					if (driving${(lst.id)!}.getStatus() == BMAP_STATUS_SUCCESS){
+						var meter = results.getPlan(0).getRoute(0).getDistance(false);
+						info['kilo'] = 	(Math.floor(meter/1000) + 1);
+						uf_total('${(lst.id)!}','${(lst.sfzs)!}');
+						//调用完之后进行计算总金额
+						<#if (lst_index+1) gte list_order?size>
+							//计算总金额
+							var v_cjlfjf=0,v_ddzje=0;
+							<#if list_order ??>
+						      	<#list list_order as lst>
+								v_cjlfjf += parseFloat($('#cjlfjf_${(lst.id)!}').val());
+								v_ddzje += parseFloat($('#spzj_${(lst.id)!}').val())+parseFloat($('#ptf_${(lst.id)!}').val())+parseFloat($('#cjlfjf_${(lst.id)!}').val())-parseFloat($('#yhje_${(lst.id)!}').val());
+								</#list>
+							</#if>
+							
+							$('#span_total_cjlfjf').html('￥'+v_cjlfjf.toFixed(2));
+							$('#span_total_ddzje').html('￥'+v_ddzje.toFixed(2));
+							$('#total_cjlfjf').attr('value',v_cjlfjf);
+							$('#total_ddzje').attr('value',v_ddzje);
+						</#if>
+					}
+				}
+			};
+			</#list>
+		</#if>
+		
+		<#if list_order ??>
+	      	<#list list_order as lst>
+			var driving${(lst.id)!} = new BMap.DrivingRoute(map, options${(lst.id)!});
+			</#list>
+		</#if>
+		
+		var ac = new BMap.Autocomplete(
+			//建立一个自动完成的对象
+	    	{"input" : "shdz","location" : map,location:currcity}
+	    );
+	   
+		ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+		    //计算距离
+		    var _value = e.item.value;
+		    info['to'] = _value.business;
+		   
+			if(info['to']){
+				<#if list_order ??>
+			      	<#list list_order as lst>
+					driving${(lst.id)!}.search('${(lst.mapbusiness)!}', info['to']);
+					</#list>
+				</#if>
+				
+				
+			}
+		});
+	}
+	
+	
+	
+	function uf_total(id,sfzs){
+		if('1'!=sfzs){
+			if(parseFloat(info['kilo'])>=parseFloat('6')){
+				$('#span_cjlfjf_'+id).html("￥${(config.c3)!}");
+				$('#cjlfjf_'+id).attr('value',"${(config.c3)!}");
+				$('#span_ddzje_'+id).html("￥"+(parseFloat($('#spzj_'+id).val())+parseFloat($('#ptf_'+id).val()) + parseFloat($('#cjlfjf_'+id).val())- parseFloat($('#yhje_'+id).val())).toFixed(2));
+				$('#ddzje_'+id).attr('value',(parseFloat($('#spzj_'+id).val())+parseFloat($('#ptf_'+id).val()) + parseFloat($('#cjlfjf_'+id).val())- parseFloat($('#yhje_'+id).val())).toFixed(2));
+			}else if((parseFloat(info['kilo'])>=parseFloat('4.5')) && (parseFloat(info['kilo'])<parseFloat('6'))){
+				$('#span_cjlfjf_'+id).html("￥${(config.c2)!}");
+				$('#cjlfjf_'+id).attr('value',"${(config.c2)!}");
+				$('#span_ddzje_'+id).html("￥"+(parseFloat($('#spzj_'+id).val())+parseFloat($('#ptf_'+id).val())+parseFloat($('#cjlfjf_'+id).val()) - parseFloat($('#yhje_'+id).val())).toFixed(2));
+				$('#ddzje_'+id).attr('value',(parseFloat($('#spzj_'+id).val())+parseFloat($('#ptf_'+id).val()) +parseFloat($('#cjlfjf_'+id).val())- parseFloat($('#yhje_'+id).val())).toFixed(2));
+			}else if((parseFloat(info['kilo'])>=parseFloat('3')) && (parseFloat(info['kilo'])<parseFloat('4.5'))){
+				$('#span_cjlfjf_'+id).html("￥${(config.c1)!}");
+				$('#cjlfjf_'+id).attr('value',"${(config.c1)!}");
+				$('#span_ddzje_'+id).html("￥"+(parseFloat($('#spzj_'+id).val())+parseFloat($('#ptf_'+id).val())+parseFloat($('#cjlfjf_'+id).val()) - parseFloat($('#yhje_'+id).val())).toFixed(2));
+				$('#ddzje_'+id).attr('value',(parseFloat($('#spzj_'+id).val())+parseFloat($('#ptf_'+id).val())+parseFloat($('#cjlfjf_'+id).val()) - parseFloat($('#yhje_'+id).val())).toFixed(2));
+			}else{
+				$('#span_cjlfjf_'+id).html("￥0.00");
+				$('#cjlfjf_'+id).attr('value',"0");
+				$('#span_ddzje_'+id).html("￥"+(parseFloat($('#spzj_'+id).val())+parseFloat($('#ptf_'+id).val())+parseFloat($('#cjlfjf_'+id).val()) - parseFloat($('#yhje_'+id).val())).toFixed(2));
+				$('#ddzje_'+id).attr('value',(parseFloat($('#spzj_'+id).val())+parseFloat($('#ptf_'+id).val())+parseFloat($('#cjlfjf_'+id).val()) - parseFloat($('#yhje_'+id).val())).toFixed(2));
+			}
+		}
+	}
+	
+	function check(obj) {
+		$("input[name='zffs']").each(function () {
+	        if (this != obj)
+	            $(this).attr("checked", false);
+	        else {
+	            if ($(this).prop("checked"))
+	                $(this).attr("checked", true);
+	            else
+	                $(this).attr("checked", false);
+	        }
+	    });
+	}
+	function uf_submit(){
+		
+		<#if list_m ??>
+	      	<#list list_m as lst>
+			if('${(lst.business_status)!}'!='1'){
+				$.dialog.alert("商家【${(lst.mc)!}】暂停营业，不能提交订单！");
+				return false;
+			}
+			</#list>
+		</#if>
+		
+	 	<#if list_m ??>
+	      	<#list list_m as lst>
+			if('${(lst.iswork)!}'=='ydy'){
+				$.dialog.alert("商家【${(lst.mc)!}】处于休息中，不能接单，请在商家营业状态下提交订单！");
+				return false;
+			}
+			</#list>
+		</#if> 
+		
+		//最低配送金额判断
+		<#if list_m ??>
+	      	<#list list_m as lst>
+	      		<#if strkit('1',(lst.sfzs)!)>
+					if(parseFloat('${(lst.zdpsje)!}')>parseFloat('${(lst.spzj)!}')){
+						$.dialog.alert("商家【${(lst.mc)!}】商品总价低于商家设置的最低配送金额，不能提交订单！");
+						return false;
+					}
+	      		</#if>
+			</#list>
+		</#if>
+		
+		var orderids =document.getElementsByName("orderid");
+		var ids = '';
+		if(orderids=='undefined' || orderids==''){
+			$.dialog.alert("购物车无商品，请现在商品后进行提交！");
+			return false;
+		}else{
+			for (var i = 0, j = orderids.length; i < j; i++){
+				ids+=orderids[i];
+			}
+		}
+		
+		if(ids==''){
+			$.dialog.alert("购物车无商品，请现在商品后进行提交！");
+			return false;
+		}
+		
+		
+		
+		var r = $("#myform").valid();
+		if(!r) {
+			return false;
+		}else{
+			//根据用户的支付方式选择付款
+			var str="";
+			var cnt = 0;
+			
+			$("[name='zffs'][checked]").each(function(){
+				str+=$(this).val();
+				++cnt;
+			})
+			
+			if(cnt<1){ 
+				$.dialog.alert("必须选择一种支付方式！");
+				return false;
+			}else{
+				if(str=='1'){
+					//检查帐户余额是否充足
+					$.ajax({  
+				          type : "post",  
+				          url : "${CTX}/ab/order/checkMoney",  
+				          data : "finalprice="+$("#finalprice").val()+"&total_ddzje=" + $("#total_ddzje").val(),  
+				          async : false,  
+				          success : function(data){
+					          	if(!data){ 
+						            $.dialog.alert("帐户余额不足，请选择其他支付方式！");
+								}else{
+									$("#myform").submit();
+									/**
+									$.post("${CTX}/ab/order/save_order_submit",$("#myform").serializeArray(),function(data){
+					                    if(data){
+					                    	$.dialog.alert("订单提交成功！",function () {
+												window.location.href="${CTX}/ab/mainuser";
+									        }).time(3);
+										}else{
+											$.dialog.alert("订单提价失败，请关闭浏览器重新提交订单！");
+										}
+									});
+									*/
+								}
+				          } 
+			         }); 
+				}else{
+					$('#myform').submit();
+				}
+			}
+		}
+	}
+	
+	
+	function uf_set_lxr(lxr,lxrdh,shdz){
+		$('#lxr').attr('value',lxr);
+		$('#lxrdh').attr('value',lxrdh);
+		$('#shdz').attr('value',shdz);
+	}
+	
+	function refresh(){
+		$('#myform').action = "";
+		$('#myform').target = "_self";
+		$('#myform').submit();
+	}
+	</script>
+</head>
+<body>
+	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<form id="myform" name="myform" action="${CTX}/ab/order/save_order_submit" method="post">
+	<input id="userid" type="hidden" value="${(userid)!}"/>
+	<div id="container" style="display: none;"></div>
+	<!-- 
+	<div class="buy_head">
+		<div class="buy_top">
+			<div class="logo"><img src="${CTX}/res/css/ab/images/dd/logo1.png" /></div>
+			<div class="buy_nav">
+				<a href="javascript:;" target="_blank">订单监控</a>
+				<span>用户：<#if abuser?? >${abuser.loginid}</#if></span>
+			</div>
+		</div>
+	</div>
+	 -->
+	<div class="buy_main">
+		<div class="buy_order">
+				<h2>货品信息：</h2>
+				<#if list_order ??>
+			      	<#list list_order as lst>
+						<div name="one">
+						<p><input type="hidden" id="orderid" name="orderid" value="${(lst.id)!}"/>订单号：<span>${(lst.sn)!}</span>商家：<span>${(lst.mname)!}</span></p>
+						<table class="buy_orderlist">
+							<tr class="table_head">
+								<th width="10%">序号</th>
+								<th width="*%">商品名称</th>
+								<th width="13%">单价</th>
+								<th width="13%">数量</th>
+								<th width="13%">小计</th>
+								<th width="10%">操作</th>
+							</tr>
+							<#if lst.list_order_item ??>
+			      					<#list lst.list_order_item as lstitem>
+			                            <tr class="table_list list">
+											<td>${(lstitem_index+1)}</td>
+											<td>
+												<div class="pro">
+													<p>${(lstitem.itemname)!}</p>
+												</div>
+											</td>
+											<td width="40">${(lstitem.price)?string("currency")}</td>
+											<td>
+			                                	<input type="hidden" class="buyProId" value="${(lstitem.itemid)!}"/>
+			                                	<input type="hidden" class="buyMId" value="${(lstitem.mid)!}"/>
+			                                	<input type="hidden" class="buyNum" value="${(lstitem.quantity)!}"/>
+			                                    <a class="subtract" href="javascript:void(0);">-</a>
+			                                    <input type="text" class="text" style="width: 40px;text-align: center" value="${(lstitem.quantity)}"/>
+			                                	<input type="hidden" class="buyAddProId" value="${(lstitem.itemid)!}"/>
+			                                	<input type="hidden" class="buyAddMId" value="${(lstitem.mid)!}"/>
+			                                	<input type="hidden" class="buyAddNum" value="${(lstitem.quantity)!}"/>
+			                                    <a class="plus" href="javascript:void(0);">+</a>
+											<td><span>&yen;${(lstitem.price)?string("currency")}</span></td>
+											<td><a href="javascript:void(0);" onclick="uf_delpro('${(lstitem.id)!}');">删除</a></td>
+										</tr>
+			      					</#list>
+								</#if>
+								<tr>
+			                        <td colspan="6">
+				                        <p class="p_list">
+					                        <input type="hidden" id="mname_${(lst.id)!}" value="${(lst.mname)!}"/>
+					                        <input type="hidden" id="spzj_${(lst.id)!}" name="spzj" value="${(lst.spzj)!}"/>
+					                        <input type="hidden" id="ptf_${(lst.id)!}" name="ptf" value="${(lst.ptf)!}"/>
+                       						<input type="hidden" id="cjlfjf_${(lst.id)!}" name="cjlfjf" value="${(lst.cjlfjf)!}"/>
+					                        <input type="hidden" id="yhje_${(lst.id)!}" name="yhje" value="${(lst.yhje)!}"/>
+					                        
+					                        
+                        	
+					                        
+				                        	商品总价：<span id="span_spzj_${(lst.id)!}">${(lst.spzj)?string("currency")}</span>|
+				                        	配送费：<span id="span_psf_${(lst.id)!}">${(lst.ptf)?string("currency")}</span>|
+				                        	超距离附加费：<span class="cd48543" id="span_cjlfjf_${(lst.id)!}">${(lst.cjlfjf)?string("currency")}</span>|
+				                        	优惠：<span id="span_yhje_${(lst.id)!}">${(lst.yhje)?string("currency")}</span>|
+				                        	合计：<span id="span_ddzje_${(lst.id)!}">${(lst.ddzje)?string("currency")}</span>
+			                        	</p>
+			                        </td>
+			                    </tr>
+						</table>
+						</div>
+					</#list>
+				</#if>
+				<p class="p_list p_list_all">
+				商品总价：<input type="hidden" id="total_spzj" name="total_spzj" value="${(vo.spzj)!}"/><span class="cd48543" id="span_total_spzj">${(vo.spzj)?string("currency")}</span>|
+				配送费：<input type="hidden" id="total_ptf" name="total_ptf" value="${(vo.ptf)!}"/><span class="cd48543" id="span_total_ptf">${(vo.ptf)?string("currency")}</span>|
+				超距离附加惠：<input type="hidden" id="total_cjlfjf" name="total_cjlfjf" value="${(vo.cjlfjf)!}"/><span id="span_total_cjlfjf"  class="cd48543">${(vo.cjlfjf)?string("currency")}</span>|
+				商家优惠：<input type="hidden" id="total_yhje" name="total_yhje" value="${(vo.yhje)!}"/><span id="span_total_yhje"  class="cd48543">${(vo.yhje)?string("currency")}</span>|
+				<#if (deduction>0)>
+				会员卡抵扣:<input type="hidden" id="deduction" name="deduction" value="${(vo.yhje)!}"/><span id="span_deduction"  class="cd48543">${(deduction)?string("currency")}</span>|
+                </#if>
+				总计：<input type="hidden" id="finalprice" name="finalprice" value="${(finalprice)!}"/>
+                    	<input type="hidden" id="total_ddzje" name="total_ddzje" value="${(vo.ddzje)!}"/>
+                    	<span id="span_total_ddzje"  class="cd48543">${(finalprice)?string("currency")}</span>
+				</p>
+				
+			</div>
+			
+			
+			<div class="buy_addr" >
+				<h2 class="title">送货信息</h2>
+				
+				<div class="buy_addrlist">
+					<div class="left"><p>派送至：</p></div>
+					<div class="right">
+						<#if list_address ??>
+	      					<#list list_address as lst>
+	      					<p class="addrlist"><input type="radio"  name="addr" onclick="uf_set_lxr('${(lst.name)!}','${(lst.sjh)!}','${(lst.addr)!}');"/>${(lst.addr)!} (${(lst.name)!} 收) ${(lst.sjh)!}</p>
+	      					</#list>
+			      		</#if>
+			      		<!-- 
+						<input type="button" class="button" value="+ 新增收货地址" id="add" />
+						 -->
+					</div>
+					
+					<!--/新增地址-->
+					<div class="clear"></div>
+				</div>	
+				<div class="buy_pay">
+					<p>姓名：<input type="text" class="text" id="lxr" name="lxr" style="width: 160px;" value="${(abuser.mc)!}"/> <font color="red">*</font></p>
+					<p>电话：<input type="text" class="text" id="lxrdh" name="lxrdh" style="width: 160px;" value="${(abuser.lxrdh)!}"/> <font color="red">*</font></p>
+					<p>地址：<input type="text" class="text" id="shdz" name="shdz" style="width: 260px;" size="100" value="${(vo.shdz)!}" style="width:300px;"/> <font color="red">*</font></p>
+					<p>备注：&nbsp;&nbsp;&nbsp;<textarea id="memo" name="memo" class="text" style="width: 600px;height: 100px;">${(vo.memo)!}</textarea></p>
+					<p>支付：&nbsp;&nbsp;
+						<input type="checkbox" value="1" <#if strkit('1',(vo.zffs)!)>checked</#if> name="zffs" class="zffs" onclick="check(this);"/>充值直扣
+                        <input type="checkbox" value="2" <#if strkit('2',(vo.zffs)!)>checked</#if> name="zffs" class="zffs" onclick="check(this);"/>支付宝
+                        <input type="checkbox" value="3" <#if strkit('3',(vo.zffs)!)>checked</#if> name="zffs" class="zffs" onclick="check(this);"/>货到付款 <font color="red">*</font>
+					</p>
+					<p>送达：<input class="Wdate text" id="yqsdsj" name="yqsdsj" value="${(vo.yqsdsj)!}" style="width: 160px;"  onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss'})" /></p>
+				</div>
+			</div>
+			<div class="pay_submit">
+				<a href="javascript:;" class="submit" onclick="uf_submit();">提交订单</a>
+				<a href="${CTX}/" class="submit">返回首页</a>
+			</div>
+			
+	</div>
+    </form>
+    <#include '../inc/foot.html'>
+</body>
+</html>

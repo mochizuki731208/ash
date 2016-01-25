@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>后台管理系统</title>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/admin.css"/>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/otree/otree.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/otree/otree.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/otree/common.js"></script>
+</head>
+  <body>
+  <form id="myform" name="myform" action="" method="post">
+  	<input type="hidden" id="area_id" name="area_id"/>
+  	<input type="hidden" id="subject_id" name="subject_id"/>
+	<table id="frametable" cellpadding="0" cellspacing="0" width="100%" height="100%" style="width: 100%;">
+	    <tr>
+	        <td valign="top" width="200" height="100%">
+	            <div id="t_area" style="width:200px;border-right:1px solid #70cbea;overflow: auto;"/>
+	        </td>
+	        <td valign="top" width="200" height="100%">
+	            <div id="t_subject" style="width:200px;border-right:1px solid #70cbea;overflow: auto;"/>
+	            </div>
+	        </td>
+	        <td valign="top" width="100%" height="100%">
+	            <iframe id="t_user" name="t_user" src="${CTX}/admin/subject/editptf" width="98%" height="99%" frameborder="0" scrolling="yes" style="overflow:auto;"></iframe>
+	        </td>
+	    </tr>
+	</table>
+	</form>
+	
+	<script type="text/javascript">
+		var TreeData=${str_area};
+		var otree = new OTree({
+			panel 	: document.getElementById("t_area"),
+			data	: TreeData
+		});
+		otree.paint();
+		//otree.expandAll();
+		function otree_Event(node){
+	       document.all.area_id.value=node.attributes.id;
+	       
+	       if($('subject_id').val()==''){
+	       		//
+	       }else{
+		        document.all.myform.target="t_user";
+		        document.all.myform.action="${CTX}/admin/subject/editptf";
+		        document.all.myform.submit();
+	       }
+		}
+		otree.addListener('click',otree_Event);
+		
+		TreeData=${str_subject};
+		var ot_subject = new OTree({
+			panel 	: document.getElementById("t_subject"),
+			data	: TreeData
+		});
+		
+		ot_subject.paint();
+		function ClickEvent(node){
+		       document.all.subject_id.value=node.attributes.id;
+		       if($('city_id').val()==''){
+		       		//
+		       }else{
+			        document.all.myform.target="t_user";
+			        document.all.myform.action="${CTX}/admin/subject/editptf";
+			        document.all.myform.submit();
+		       }
+			}
+		ot_subject.addListener('click',ClickEvent);
+		
+		$('#frametable').width($(window).width());
+		$('#frametable').height($(window).height());
+		$('#t_area').height($(window).height());
+		$('#t_area').width(200);
+		$('#t_subject').height($(window).height());
+		$('#t_subject').width(200);
+		$('#t_user').width($(window).width()-402);
+	    $(window).resize(function(){
+	        $('#frametable').width($(window).width());
+			$('#frametable').height($(window).height());
+			$('#t_area').height($(window).height());
+			$('#t_area').width(200);
+			$('#t_subject').height($(window).height());
+			$('#t_subject').width(200);
+			$('#t_user').width($(window).width()-402);
+	    });
+	</script>
+  </body>
+</html>

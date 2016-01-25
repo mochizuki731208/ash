@@ -1,0 +1,156 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<#include '../ab/inc/meta.html'>
+<title>主页-${(vo.mc)!'物流企业'}</title>
+<link href="${CTX}/res/trans/css/mystyle.css" type="text/css" rel="stylesheet" />
+<link href="${CTX}/res/trans/css/jqhdp.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+<#include '../ab/inc/top.html'>
+<!-- 
+<div class="top">
+  <ul>
+    <li><a href="#">[切换城市]&nbsp;</a></li>
+    <li><a href="#">下单用户注册&nbsp;</a></li>
+    <li><a href="#">下单用户登录&nbsp;</a></li>
+    <li><a href="#">手机版&nbsp;</a></li>
+  </ul>
+  <ul>
+    <li class="fright"><a href="#">司机登录&nbsp;</a></li>
+    <li class="fright"><a href="#">司机注册&nbsp;</a></li>
+    <li class="fright"><a href="#">供应商登录&nbsp;</a></li>
+    <li class="fright"><a href="#">供应商注册&nbsp;</a></li>
+    <li class="fright"><a href="#">我的购物车(0)&nbsp;</a></li>
+  </ul>
+</div>
+ -->
+<div class="top_2">
+	<div class="title"><span>${(vo.mc)!}</span></div>
+</div>
+<#include 'inc/nav.html'>
+<!-- 幻灯片开始-->
+<#include 'inc/slider.html'>
+<!--幻灯片结束-->
+<div class="container">
+   <#include 'inc/left.html'>
+   
+   <div class="body_center">
+    <div class="body_center1">
+    <ul>
+     <li>运营路线</li>
+	 <@_mer_logline_list lid=lo.id id=vo.id>
+	 <#if list??>
+	 <#list list as t>
+	  <p>${(t.from)!}<img src="${CTX}/res/trans/img/jt.gif"/>${(t.to)!}&nbsp;&nbsp;&nbsp;&nbsp;${(t.from_time)!}-${(t.to_time)!}&nbsp;&nbsp;&nbsp;&nbsp;
+	  ${(t.weight_price)!}元/公斤；&nbsp;&nbsp;${(t.volumn_price)!}元/立方米&nbsp;&nbsp;&nbsp;&nbsp;
+	  <a href="${CTX}/ab/tc?zb=S&wp=${(t.weight_price)!}&vp=${(t.volumn_price)!}&id=${(lo.id)!}&lineid=${(t.id)!}"><span class="orderbutton">在线发货</span></a></p>
+	  </#list>
+	  </#if>
+	 </@_mer_logline_list>
+	 <!--
+     <p>直达城市：${(vo.city_name)!}<img src="${CTX}/res/trans/img/jt.gif"/>${(lo.maincity)!}&nbsp;&nbsp;<a href="${CTX}/ab/tc?zb="><span class="orderbutton">发货</span></a></p>
+     <p>周转城市：${(lo.mainline)!}</p>
+	 -->
+     <p></p>
+    </ul>
+    </div>
+    
+    <div class="body_center2">
+    	<ul>
+    		<li>联系我们</li>
+    		<p><strong>收货地址：</strong></p>
+    		<p>${(lo.recaddress)!}</p>
+    		<p><strong>卸货地址：</strong></p>
+    		<p>${(lo.disaddress)!}</p>
+    	</ul>
+    </div>
+    
+    <div class="body_center3">
+    <ul><li>公司简介</li>
+    	<p>${(lo.profile)!}</p>
+    </ul>
+    </div>
+   </div>
+   
+   <div class="body_right"> 
+    <div class="body_right1">
+     <ul><li>诚信档案</li>
+         <li style="float:right;"><a href="${CTX}/trans/faith/${loginid!}">更多>></a></li>
+     </ul>
+     <div class="imglist">
+     <#if (lo.id)??>
+     <@_mer_logimg_list lid=lo.id desc="faith">
+     	<#if list??>
+     	<#list list as x>
+     		<#if x?? && x_index lt 2><img alt="诚信档案${(x.seq_num)!}" src="${CTX}/upload/${(x.lager)!}"></#if>
+     	</#list>
+     	</#if>
+     </@_mer_logimg_list>
+     </#if>
+     </div>
+    </div>
+    <div class="body_right2">
+         <ul><li>企业荣誉</li>
+         <li style="float:right;"><a href="${CTX}/trans/honor/${loginid!}">更多>></a></li>
+     </ul>
+     <#if (lo.id)??>
+     <@_mer_logimg_list lid=lo.id desc="honor">
+     	<#if list??>
+     	<#list list as x>
+     		<#if x?? && x_index lt 2><img alt="企业荣誉${(x.seq_num)!}" src="${CTX}/upload/${(x.lager)!}"></#if>
+     	</#list>
+     	</#if>
+     </@_mer_logimg_list>
+     </#if>
+    </div>
+    <div class="body_right3 body_left1">            
+      <ul><li>服务评价</li>
+         <li style="float:right;"><a href="${CTX}/trans/pingjia/${loginid!}">更多>></a></li>
+     </ul>
+     <br/> 
+    	 <p class="bq xinxi"> 
+   		   客户评价：
+   		    <span class="color_01">
+	 	   <#if (vo.rate=="0")> ☆☆☆☆☆ </#if> 
+		   <#if (vo.rate=="1")> ★☆☆☆☆ </#if> 
+	       <#if (vo.rate=="2")> ★★☆☆☆ </#if>
+	       <#if (vo.rate=="3")> ★★★☆☆ </#if> 
+	       <#if (vo.rate=="4")> ★★★★☆ </#if> 
+	       <#if (vo.rate=="5")> ★★★★★ </#if> 
+	       </span>
+	   </p> 
+	  <p class="dh">评价分数：${(vo.rate)!}</p>  
+      <p class="dh">全部评价：(${(merchantMap.count_appall)!})</p>
+      <p class="dh">好评数量：(${(merchantMap.count_app1)!})</p>
+      <p class="dh">中评数量：(${(merchantMap.count_app2)!})</p>
+      <p class="dh">差评数量：(${(merchantMap.count_app3)!})</p> 
+      
+     
+    
+    </div>
+    </div>
+    
+    <div class="bottom1">
+    <p>&nbsp;&nbsp;实景拍摄 <a href="${CTX}/trans/scene/${loginid!}">更多>></a></p>
+       <div id="photo-list">  
+       		<ul id="scroll">
+       			<#if (lo.id)??>
+       			<@_mer_logimg_list lid=lo.id desc="scene">
+   			  	<#if list?? && list?size gt 0>
+     				<#list list as x>
+     				<#if x??><li><img alt="公司场景${(x.seq_num)!}" src="${CTX}/upload/${(x.lager)!}" width="330px" height="190px"></li></#if>
+     				</#list>					
+     			<#else>
+     			</#if>
+     			</@_mer_logimg_list>
+     			</#if>
+            </ul> 
+            <script type="text/javascript" src="${CTX}/res/trans/js/MoveEffect.js"></script>
+       </div>
+    </div>
+</div>
+<#include 'inc/footer.html'>
+</body>
+</html>

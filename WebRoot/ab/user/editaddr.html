@@ -1,0 +1,231 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<style>
+    .address-common {
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px #cac9c9;
+    left: 135;
+    position: absolute;
+    top: 130px;
+    width: 500px;
+    z-index: 2;
+}
+.address-common .address-common-list-wrap {
+    border-bottom: 1px solid #e5e5e5;
+}
+.address-common .address-common-list-wrap .address-common-list {
+    cursor: pointer;
+    font-size: 12px;
+    min-height: 50px;
+    position: relative;
+}
+.address-common .address-common-list-wrap .address-common-list-selected {
+    background-color: #f3f3f3;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-icon {
+    background: url("${CTX}/res/images/tc_icon.png") no-repeat scroll -320px 0 rgba(0, 0, 0, 0);
+    display: block;
+    height: 28px;
+    left: 20px;
+    position: absolute;
+    top: 12px;
+    width: 28px;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-address {
+    line-height: 20px;
+    padding-left: 62px;
+    padding-top: 5px;
+    width: 380px;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-address span {
+    display: block;
+    word-break: normal;
+    word-wrap: break-word;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-address span.address-common-detail-address {
+    color: #a3a6ab;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-name, .address-common .address-common-list-wrap .address-common-list .address-common-phone {
+    line-height: 50px;
+    position: absolute;
+    text-align: center;
+    top: 0;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-name {
+    left: 450px;
+    width: 150px;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-phone {
+    left: 600px;
+    width: 150px;
+}
+.address-common .address-common-type {
+    background-color: #f3f3f3;
+    height: 40px;
+    line-height: 40px;
+    overflow: hidden;
+    text-align: center;
+}
+.address-common .address-common-type .address-common-type-list {
+    cursor: pointer;
+    position: relative;
+    width: 50%;
+}
+.address-common .address-common-type .address-common-type-list-left {
+    float: left;
+}
+.address-common .address-common-type .address-common-type-list-right {
+    float: right;
+}
+.address-common .address-common-type .address-common-type-list-left p {
+    border-right: 1px solid #e5e5e5;
+}
+.address-common .address-common-type .address-common-type-list a {
+    display: none;
+}
+.address-common .address-common-type .address-common-type-list-selected {
+    background-color: #fff;
+}
+.address-common .address-common-type .address-common-type-list-selected .left, .address-common .address-common-type .address-common-type-list-selected .right {
+    cursor: pointer;
+    display: block;
+    height: 17px;
+    position: absolute;
+    top: 10px;
+    width: 10px;
+}
+
+    </style>
+    <script type="text/javascript" src="${CTX}/res/js/tc_address.js"></script>    
+    <script type="text/javascript">
+    	var currLoc = "${(currcity.mc)!}";
+    	function saveAddr(){
+    		//alert($("#addr").val());
+    		if($("#addr").val() == ''){
+    			alert("请从联想的下拉列表里选择详细地址，然后再继续！");
+    			return;
+    		}
+			$.ajax({
+				cache: false,
+				type: "POST",
+				url:'${CTX}/ab/tc/saveaddr',
+				data:$('#myform').serialize(),// 你的formid
+				async: false,
+				dataType: 'json',
+			    error: function(request) {
+			        alert("Connection error");
+			    },
+			    success: function(data) {
+					if(data && data["success"]){
+						alert('保存成功');
+						top.location.reload();
+					}
+			    }
+			});
+    		
+    	}
+    	
+    	$(function(){
+		    		addressSearch0 = new AddressSearch(currLoc,5, function(search_data){
+				        if (!search_data) {
+				            // 查询结果为空
+				            return;
+				        }
+				        if (search_keyword != search_data.keyword) {
+				            // 查询关键词与当前查询不匹配
+				            return;
+				        }
+				        select_data = search_data['data'];
+				        var html =  '<div class="address-common">'+
+				                    '   <div class="address-common-list-wrap">';
+				        for (var i = 0; i < search_data['data'].length; i++) {
+				            var item = search_data['data'][i];
+				            html += '       <div class="address-common-list" index="'+i+'">' +
+				                    '           <span class="address-common-icon"></span>' +
+				                    '           <p class="address-common-address">' +
+				                    '               <span class="address-common-title">'+item['title']+'</span>' +
+				                    '               <span class="address-common-detail-address"> 详细地址：<em>'+item['address']+'</em></span>' +
+				                    '               <span style="display:none;" class="lng">'+item['lng']+'</span>' +
+				                    '               <span style="display:none;" class="lat">'+item['lat']+'</span>' +
+				                    '           </p>' +
+				                    '       </div>';
+				        }
+				        html +=     '   </div>' +
+				                    '</div>';
+				        $("#addr_input_panel").html(html);
+				        $("#addr_input_panel .address-common-list").click(function(){
+				        	var theHtml = $(this).html();
+				        	$("#demo").html(theHtml);
+				        	$("#addr_input").val($("#demo").find("em").html());
+				        	$("#addr_input_panel").html('');
+				        	$("#addr").val($("#demo").find("em").html());
+				        	$("#jd").val($("#demo").find(".lng").html());
+				        	$("#wd").val($("#demo").find(".lat").html());
+				        });
+				    });    	
+				 $("#addr_input").on('focus', function(){
+			        var that = $(this);
+			        var last_val = that.val();
+			        clear_interval();
+			        address_interval = window.setInterval(function(){
+			            search_keyword = that.val();
+			            if (search_keyword && (search_keyword != last_val)) {
+			                addressSearch0.search(search_keyword);
+			                last_val = search_keyword;
+			            }
+			        }, 100);		        
+			    }).on('blur', function(){
+			        clear_interval();
+			    });
+    	});
+    	
+    	address_interval = null;
+   	 	var clear_interval = function(){
+	        if (address_interval) window.clearInterval(address_interval);
+	    };
+    </script>
+</head>
+  <body>
+  <div id="demo" style="visibility: hidden;"></div>
+  	<form action="${CTX}/ab/tc/saveaddr" method="post" id="myform">
+  	<input type="hidden" name="id" value="${(addr.id)!}"/>
+  	<input type="hidden" name="addr" id="addr" value="${(addr.addr)!}"/>
+  	<input type="hidden" name="jd" id="jd" value="${(addr.jd)!}"/>
+  	<input type="hidden" name="wd" id="wd" value="${(addr.wd)!}"/>
+  	<br>
+	<table class="input">
+		<tr>
+			<th align="right"><br>联系人：</th>
+			<td><br><input type="text" name="linkman" size="20" value="${(addr.linkman)!}"/></td>
+		</tr>
+		<tr>
+			<th align="right"><br>联系方式：</th>
+			<td><br><input type="text" name="mobile" size="20" value="${(addr.mobile)!}"/></td>
+		</tr>
+		<tr>
+			<th align="right">地址：</th>
+			<td><br>
+			<input type="text" id="addr_input" size="50" value="${(addr.addr)!}"/>
+			<div id="addr_input_panel"></div>
+			</td>
+		</tr>
+		<tr>
+			<th align="right"><br>排序数值：</th>
+			<td><br><input type="text" name="order_num" size="5" value="${(addr.order_num)!}"/></td>
+		</tr>
+		<tr>
+			<td colspan="2" align="center">
+				<br><input type="button" value="保存" onclick="saveAddr();"/><br>
+			</td>
+		</tr>
+	</table>
+	</form>
+	<div id="allmap" style="display: none;"></div>
+  </body>
+</html>
+

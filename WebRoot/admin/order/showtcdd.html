@@ -1,0 +1,450 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+    <script type="text/javascript">
+    	var opts = {
+    		width : 200,     // 信息窗口宽度
+    		height: 100,     // 信息窗口高度
+    		title : "信息窗口" , // 信息窗口标题
+    		enableMessage:true//设置允许信息窗发送短息
+        };
+    	var geoc = new BMap.Geocoder();
+    	var map;          // 创建地图实例    
+    	var point;// 创建点坐标    
+    	var CARARR = new Array();
+    	var iscenter="";
+    	var sjjd = "13.67311";
+    	var sjwd = "34.716755";
+    	var julitemp = "-1";
+    	var selectStr = '';
+    	var paotuiArr = new Array();
+    	$(function() {
+    		map = new BMap.Map("MblogMap");          // 创建地图实例    
+    		point = new BMap.Point(113.67311, 34.716755);  // 创建点坐标    
+    		map.centerAndZoom(point, 13); 
+    	 	map.addControl(new BMap.NavigationControl());    
+    		map.addControl(new BMap.ScaleControl());    
+    		map.addControl(new BMap.OverviewMapControl());  
+    		map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+    		MblogDotccMap();
+    		map.addEventListener("dragend", function(){
+    			searchFmCar();
+    		});
+    		map.addEventListener("zoomend", function(){
+    			searchFmCar();
+    		});
+    		$("#tb_city_id").change(function () {
+		        //所属群组
+		        $("#groupid").empty();
+		        $.getJSON("${CTX}/admin/order/getGroupByCityId",{cityid:$("#tb_city_id").find("option:selected").val()},function(data){
+		        	 //对请求返回的JSON格式进行分解加载
+		        	$("#groupid").append($("<option/>").text("选择群组").attr("value",""));
+		            $(data).each(function () {
+		                $("#groupid").append($("<option/>").text(this.groupname).attr("value",this.id));
+		            });
+		        });
+		    });
+    	})
+    	function MblogDotccMap(){
+    		 map.clearOverlays();
+    		 //添加缩放控件  
+    	}
+    	function searchStart(){
+    		sjjd = "${(to.send_addr_jd)!'13.67311'}";
+    		sjwd = "${(to.send_addr_wd)!'34.716755'}";
+    		point = new BMap.Point(sjjd, sjwd)
+    		if(!iscenter){
+				map.centerAndZoom(point, 13);
+			}
+			iscenter="77";
+			var maker = new BMap.Marker(point);
+			map.addOverlay(maker);
+			var content = "发货地址:" + "${(to.send_addr)!''}";
+			addClickHandler(content,maker);
+			
+			var label = new BMap.Label("起点",{position:point,offset:new BMap.Size(20,-10)});
+			label.setStyle({
+				  backgroundColor : "rgba(85, 157, 63, 1)", 
+		          color : "white",
+		          fontSize : "12px",
+		          height : "20px",
+		          lineHeight : "20px",
+		          fontFamily:"微软雅黑"
+		    });
+			maker.setLabel(label);
+    	}
+    	function addClickHandler(content,marker){
+    		marker.addEventListener("click",function(e){
+    			openInfo(content,e)}
+    		);
+    	}
+    	function openInfo(content,e){
+    		//执行查询跑腿人员方法
+    		//searchFmCar();
+    		var p = e.target;
+    		var point = new BMap.Point(p.point.lng, p.point.lat);
+    		var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
+    		map.openInfoWindow(infoWindow,point); //开启信息窗口
+    	}
+    	
+    			function searchFmCar(){
+    				MblogDotccMap();
+    				searchStart();
+    				$.each(paotuiArr, function(index, objVal){
+    		            var point = new BMap.Point(objVal["lng"],objVal["lat"]);
+    		            var pointCenter = new BMap.Point(sjjd,sjwd);
+	   					 var dis = map.getDistance(pointCenter,point);
+	   					 if(dis/1000 <= julitemp* 100 || julitemp <= 0){
+	   						 var carname = CARARR[index].type;
+	     					var url = "";
+	     					if(carname=="面包车"){url = "che_mianbao.png";}
+	     					if(carname=="大件车"){url = "che_dajian.png";}
+	     					if(carname=="高低板车"){url = "che_gaodiban.png";}
+	     					if(carname=="高栏车"){url = "che_gaolan.png";}
+	     					if(carname=="冷藏车"){url = "che_lengcang.png";}
+	     					if(carname=="平板车"){url = "che_pingban.png";}
+	     					if(carname=="面包车"){url = "che_tongyong.png";}
+	     					if(carname=="危险品车"){url = "che_weixianpin.png";}
+	     					if(carname=="厢车"){url = "che_xiang.png";}
+	     					var myIcon = new BMap.Icon("${CTX}/res/images/ordercar/" +url, new BMap.Size(80,90));
+	     					var marker1;
+	     					if(url==""){
+	     						marker1 = new BMap.Marker(point);
+	     					}else{
+	     						marker1 = new BMap.Marker(point,{icon:myIcon});  // 创建标注
+	     					}
+	     					map.addOverlay(marker1);
+	     					var label = new BMap.Label(objVal.mc,{position:point,offset:new BMap.Size(20,-20)});
+	     					var color = "";
+	     					if(objVal.zt && objVal.zt=='0'){
+	     						color = "rgba(108, 113, 105, 1)";
+	     					}
+	     					if(objVal.zt && objVal.zt=='1'){
+	     						color = "rgba(95, 134, 193, 1)";
+	     					}
+	     					if(objVal.zt && objVal.zt=='2'){
+	     						color = "rgba(85, 157, 63, 1)";
+	     					}
+	     					if(objVal.zt && objVal.zt=='3'){
+	     						color = "rgba(227, 106, 9, 1)";
+	     					}
+	     					if(objVal.zt && objVal.zt=='4'){
+	     						color = "rgba(187, 13, 173, 1)";
+	     					}
+	     					label.setStyle({
+	     						  backgroundColor : color, 
+	     				          color : "white",
+	     				          fontSize : "12px",
+	     				          height : "20px",
+	     				          lineHeight : "20px",
+	     				          fontFamily:"微软雅黑"
+	     				     });
+	     					marker1.setLabel(label);
+	     					var content;
+	     					//if(objVal.zt && objVal.zt=='2'){
+	     						content = "姓名:" + objVal.mc + "<br>电话：" + objVal.mobile + "<br><input type='button' class='button' value='选为接单人' onclick='choosejiedan(" + index + ")'>";
+	     					//}else{
+	     					//	content = "姓名:" + objVal.mc + "<br>电话：" + objVal.mobile + "<br>";
+	     					//}
+	     					addClickHandler(content,marker1);
+	   					 }
+    				})
+    	}
+    	//jdrjd,jdrwd
+    	function choosejiedan(i){
+    		var obj = CARARR[i];
+    		var point = new BMap.Point(obj["jd"],obj["wd"]);
+    		//将选中的跑腿人员的信息添加到左侧的from表单中
+    		$("#qdrname").html(obj.mc);//接单人，姓名
+    		$("#mobile1").html(obj.mobile);//接单人，手机
+    		$("#mobile").val(obj.mobile);//接单人ID
+    		var marker = new BMap.Marker(point);
+    		var label = new BMap.Label("接单人",{position:point,offset:new BMap.Size(20,-10)});
+			label.setStyle({
+				  backgroundColor : "rgba(85, 157, 63, 1)", 
+		          color : "white",
+		          fontSize : "12px",
+		          height : "20px",
+		          lineHeight : "20px",
+		          fontFamily:"微软雅黑"
+		        });
+			marker.setLabel(label);
+    	}
+    	
+
+    	//跑团人员的搜索工作
+		function searchPaoTui(){
+			var pointStart = new BMap.Point(sjjd,sjwd);
+			$.ajax({
+				url: "${CTX}/admin/order/getPaoTui",
+				type: "POST",
+				data: {
+					msg:'',
+					id:1,
+					zt:$("#zt").val(),
+					selectStr: selectStr,
+					sjjd: sjjd,
+					sjwd: sjwd,
+					kd: julitemp,
+					groupid: $("#groupid").val(),
+					tb_city_id: $("#tb_city_id").val()
+				},
+				dataType: "json",
+				cache: false,
+				success: function(data) {
+					paotuiArr = data.paotui_list;//跑腿人员信息
+					//CARARR = data.car_list;
+					$.each(data.paotui_list, function(index, objVal) {
+						var pointEnd = new BMap.Point(objVal["lng"],objVal["lat"]);
+						var disTancs = (map.getDistance(pointStart,pointEnd)/1000).toFixed(1);
+						objVal["juli"] = disTancs;
+					//	CARARR[index]["juli"] = disTancs;
+					})
+					paotuiArr = paotuiArr.sort(
+							function(a,b){
+								 return (a.juli - b.juli);  
+							}
+						);
+					if(paotuiArr.length > 200){
+						paotuiArr = paotuiArr.slice(0, 200);
+					}
+					
+					//CARARR = CARARR.sort(
+					//		function(a,b){
+					//			 return (a.juli - b.juli);  
+					//		}
+					//	);
+					CARARR = paotuiArr;
+					showSjTable();
+					//MblogDotccMap();
+					searchFmCar();
+				}
+			});
+		}
+		function showSjTable(paotuitable){
+			var msg_paotui = $("#msg_paotui").val();
+			var paotuitable = $("#paotuitable");
+			paotuitable.empty();
+			var tr = $("<tr>");
+			$("<th width='2px'>").html("序号").appendTo(tr); 
+			$("<th width='20px'>").html("工号").appendTo(tr); 
+			$("<th width='20px'>").html("姓名").appendTo(tr); 
+			$("<th width='20px'>").html("电话").appendTo(tr); 
+			$("<th width='20px'>").html("距离").appendTo(tr); 
+			$("<th width='20px'>").html("余额").appendTo(tr); 
+			$("<th width='40px'>").html("体积(立方米)").appendTo(tr); 
+			$("<th width='20px'>").html("状态").appendTo(tr); 
+			tr.appendTo(paotuitable);
+			//if(disTancs < kd * 100 || kd == "-1"){
+			$.each(paotuiArr, function(index, objVal) {
+				//tr = $("<tr>");
+				//if(objVal["zt"] == 2){
+				tr = $("<tr  style='cursor:pointer' onclick='choosejiedan(" + index + ")'>")
+				//}
+				$("<td align='left'>").html(index + 1).appendTo(tr);  
+		        $("<td align='left'>").html(objVal["loginid"]).appendTo(tr);  
+		        $("<td align='left'>").html(objVal["mc"]).appendTo(tr);  
+		        $("<td align='left'>").html(objVal["mobile"]).appendTo(tr); 
+		        $("<td align='left'>").html(objVal["juli"] + "公里").appendTo(tr);
+		        $("<td align='left'>").html(objVal["zhye"]).appendTo(tr);  
+		        $("<td align='left'>").html(objVal["vv"]).appendTo(tr);  
+		        if(0==objVal["zt"]){
+		        	$("<td align='left'>").html("离线").appendTo(tr);
+		        }else if(1==objVal["zt"]){
+		        	$("<td align='left'>").html("在线").appendTo(tr);
+		        }else if(2==objVal["zt"]){
+		        	$("<td align='left'>").html("空闲").appendTo(tr);
+		        }else if(3==objVal["zt"]){
+		        	$("<td align='left'>").html("忙碌").appendTo(tr);
+		        }else if(4==objVal["zt"]){
+		        	$("<td align='left'>").html("收工回家").appendTo(tr);
+		        }else{
+		            $("<td align='left'>").html("").appendTo(tr);
+		        }
+		        if(!msg_paotui){
+		        	tr.appendTo(paotuitable);
+		        }else{
+		        	if(objVal["mc"].indexOf(msg_paotui) > -1 ||
+		        	   objVal["loginid"].indexOf(msg_paotui) > -1||
+		        	   objVal["mobile"].indexOf(msg_paotui) > -1){
+		        		tr.appendTo(paotuitable);
+		        	}
+		        }
+			})
+		}
+		 function changeJuLi(){
+			 var inputs = document.getElementsByName("changeJuLi");//获取所有的input标签对象
+			  for(var i=0;i<inputs.length;i++){
+				  var obj = inputs[i];
+				  if(obj.type=='radio'){
+				   	if(obj.checked==true){
+				   		julitemp=obj.value;
+				    }
+				} 
+			}
+			 searchFmCar();
+		 }
+    </script>
+</head>
+  <body onload="searchStart();">
+  	<div style="float: left;width: 50%">
+	<table class="input">
+		<tr>
+			<th align="right">订单编号：</th>
+			<td>${(vo.sn)!}</td>
+			<th align="right">发货人：</th>
+			<td>${(to.send_name)!}</td>
+		</tr>
+		<tr>
+			<th align="right">发货人电话：</th>
+			<td>${(to.send_phone)!}</td>
+			<th align="right">发货地址：</th>
+			<td>${(to.send_addr)!}</td>
+		</tr>
+		
+		<tr>
+			<th align="right">支付状态：</th>
+			<td><#if vo.zfzt=='0'>未支付</#if><#if vo.zfzt=='1'>已支付</#if>
+				(支付方式：
+				<font color="red">
+					<#if strkit('1',(to.pay_type)!)>在线支付</#if>
+                    <#if strkit('2',(to.pay_type)!)>现付</#if>
+                    <#if strkit('3',(to.pay_type)!)>到付</#if>
+                </font>
+                )
+			</td>
+			<th align="right">支付时间：</th>
+			<td>${(vo.zfsj)!}</td>
+		</tr>
+		<tr>
+			<th align="right">下单时间：</th>
+			<td>${(vo.xdsj)!}</td>
+			<th align="right">订单状态：</th>
+			<td>
+				<#if strkit('0',(vo.ddzt)!)><font color="red">未提交</font></#if>
+               	<#if strkit('1',(vo.ddzt)!)>已受理</#if>
+               	<#if strkit('2',(vo.ddzt)!)>已预订</#if>
+               	<#if strkit('3',(vo.ddzt)!)>配货中</#if>
+               	<#if strkit('4',(vo.ddzt)!)>已送达</#if>
+               	<#if strkit('5',(vo.ddzt)!)>已签收</#if>
+               	<#if strkit('6',(vo.ddzt)!)><font color="red">拒单</font></#if>
+               	<#if strkit('7',(vo.ddzt)!)><font color="red">已退单</font></#if>
+               	<#if strkit('8',(vo.ddzt)!)><font color="red">已撤单</font></#if>
+               	
+               	<!-- [0-购物车、1-已提交、2-取货中、3-送货中、4-已送达、5-已签收、6-拒单、7-已退单、8-撤单] -->
+               	
+			</td>
+		</tr>
+		<tr>
+			<th align="right">商品总价：</th>
+			<td style="color: red">${(vo.spzj)?string("currency")}</td>
+			<th align="right">赠送积分：</th>
+			<td>${(vo.zsjf)!}</td>
+		</tr>
+		<tr>
+			<th align="right">优惠金额：</th>
+			<td style="color: red">${(vo.yhje)?string("currency")}</td>
+			<th align="right">跑腿费：</th>
+			<td>${(vo.ptf)!}</td>
+		</tr>
+		<tr>
+			<th align="right">订单总金额：</th>
+			<td style="color: red">${(vo.ddzje)?string("currency")}</td>
+			<th align="right">货物体积(立方米)：</th>
+			<td style="color: red">${(to.goods_volumn)!'0'}</td>
+		</tr>
+		<tr>
+			<th align="right">接单人：</th>
+			<td><input hidden="hidden" name="mobile" id="mobile"><span id="qdrname">${(vo.qdrname)!}</span></td>
+			<th align="right">接单时间：</th>
+			<td>${(vo.qdsj)!}</td>
+		</tr>
+		<tr>
+			<th align="right">接单人电话：</th>
+			<td><span id="mobile1">${(jdr.mobile)!}</span></td>
+			<th align="right">&nbsp;</th>
+			<td>&nbsp;</td>
+		</tr>
+	</table>
+	<table class="list" style="border: 0px;">
+	    <tr>
+			<th width="4%;">序号</th>
+			<th width="20%;">收货人</th>
+			<th width="">收货地址</th>
+			<th width="20%;">收货电话</th>
+		</tr>
+		<tr>
+			<td>1</td>
+	        <td>${(to["rcv_name"+1])!}</td>
+			<td>${(to["rcv_addr"+1])!}</td>
+			<td>${(to["rcv_phone"+1])!}</td>
+	     </tr>
+		<#list 2..5 as i>
+			<#if to["rcv_name"+i]??>
+	       	<tr>
+				<td>${i}</td>
+                <td>${(to["rcv_name"+i])!}</td>
+				<td>${(to["rcv_addr"+i])!}</td>
+				<td>${(to["rcv_phone"+i])!}</td>
+		     </tr>
+       		</#if>
+		</#list>
+     </table>
+     </div>
+     <div>
+     	<div style="width:650px;height:470px;border:1px solid gray;" id="MblogMap"></div>
+     	 <div id="paotuidiv">
+			<div>
+				 <input name="msg_paotui" id="msg_paotui" style="width: 80px" placeholder="工号/姓名/电话">
+					<select id="zt" name="zt">
+						<option value="">全部</option>
+					   	<option value="2">空闲</option>
+					   	<option value="-1">非空闲</option>
+					</select>
+					<#if user.id=='admin'>
+						<select name="tb_city_id" id="tb_city_id" >
+							<option value="">请选择城市</option>
+							<@_cityarea_list p_id='ROOT'>
+								<#list list as t>
+									<#if t.hassub==0>
+										 <option value="${(t.id)!}" <#if strkit((city_id)!,t.id)>selected</#if>>${(t.mc)!}</option>
+									<#else>
+									<optgroup label="${(t.mc)!}">
+										<@_cityarea_list p_id=t.id>
+											<#list list as sub>
+												<option value="${(sub.id)!}" <#if strkit((city_id)!,sub.id)>selected</#if>>${(sub.mc)!}</option>
+											</#list>
+										</@_cityarea_list>
+									</optgroup>
+									</#if>
+								</#list>
+							</@_cityarea_list>
+					</select>
+					</#if>
+					<#if user.id!='admin'><input type="hidden" name="tb_city_id" id="tb_city_id" value="${(tb_city_id)!''}"></#if>
+					
+					<select id="groupid" name="groupid"  style="width: 50px">
+						<option value="">选择群组</option>
+						<#if suglist ??>
+							<#list suglist as x>
+									<option value="${(x.id)!''}">${(x.groupname)!''}</option>
+							</#list>
+						</#if>
+					</select>
+					公里:
+					<label onclick="changeJuLi()"><input type="radio" name="changeJuLi" id="changeJuLi" value="0.05">5</label>
+					<label onclick="changeJuLi()"><input type="radio" name="changeJuLi" id="changeJuLi"  value="0.10">10</label>
+					<label onclick="changeJuLi()"><input type="radio" name="changeJuLi" id="changeJuLi" value="0.20">20</label>
+					<label onclick="changeJuLi()"><input type="radio" name="changeJuLi" id="changeJuLi" value="0.50">50</label>
+					<label onclick="changeJuLi()"><input type="radio" name="changeJuLi" id="changeJuLi" value="1.00">100</label>
+					<label onclick="changeJuLi()"><input type="radio" name="changeJuLi" id="changeJuLi"  checked="checked" value="-1">All</label>
+					<input type="button" class="button"  value="查找" onclick="searchPaoTui()">
+					<table class="list"  id="paotuitable"></table>
+			</div>
+		</div>  
+     </div>
+  </body>
+</html>
+

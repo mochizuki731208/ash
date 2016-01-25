@@ -1,0 +1,323 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+    <script type="text/javascript">
+    	
+    	$(function(){
+			$("a[_for]").mouseover(function(){
+				$(this).parents().children("a[_for]").removeClass("thisclass").parents().children("dd").hide();
+				$(this).addClass("thisclass").blur();
+				$("#"+$(this).attr("_for")).show();
+			});
+			
+			$("a[_for=flink_1]").mouseover();
+		});
+    	
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		
+		function uf_addtocart(mid,proid,addnumobj,userid){
+			if(''=='${(vo.business_status)!}' || '2'=='${(vo.business_status)!}'){
+				$.dialog.alert("所选商家正处于休息中，不能进行相关下单操作！");
+				return false;
+			}
+			
+			if(userid==''){
+				$.dialog.alert("请登录后进行选择！",function(){
+					window.location.href="${CTX}/ab/login";
+				});
+				return false;
+			}
+			
+			
+			if($('#klzj').is(':checked')==true || $('#zstr').is(':checked')==true){
+			 	//添加到购物车
+			 	//先检查是不是同一个商家
+			 	//alert(mid);
+			 	//alert(proid);
+			 	//alert($('#'+addnumobj).val());
+			 	//alert(userid);
+			 	
+			 	var yt ='';
+			 	if($('#klzj').is(':checked')==true){
+			 		yt = '0';
+			 	}else if($('#zstr').is(':checked')==true){
+			 		yt = '1';
+			 	}
+			 	
+			 	$.post("${CTX}/ab/order/addtocart",{mid:mid,proid:proid,addnum:$('#'+addnumobj).val(),yt:yt},function(data){
+                    if(data){
+						$.dialog.alert("添加购物车成功！",function () {
+							refresh();
+				        }).title('3秒后关闭').time(3);
+					}else{
+						$.dialog.alert("删除数据失败！");
+					}
+				});
+				
+			}else{
+				$.dialog.alert("请选择当前购物是犒劳自己还是赠送他人！");
+				return false;
+			}
+		}
+		
+		function uf_checkklzj(){
+			 $("[id='zstr']").removeAttr("checked");//取消全选
+		}
+		
+		function uf_checkzstr(){
+			 $("[id='klzj']").removeAttr("checked");//取消全选
+		}
+		
+		function uf_addnum(id){
+			$('#add_num'+id).attr("value",parseInt($('#add_num'+id).val())+1);
+		}
+		
+		function uf_reduce(id){
+			if(parseInt($('#add_num'+id).val())>1){
+				$('#add_num'+id).attr("value",parseInt($('#add_num'+id).val())-1);
+			}
+		}
+	</script>	
+</head>
+  <body>
+  	<#include 'inc/top.html'>
+  	<!-- 搜索栏 -->
+	<#include 'inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+	<#include 'inc/nav.html'>
+	<div class="blank10"></div>
+	<div class="merchantinfo">
+     	<div class="book">
+			<div class="booka">
+				<script type="text/javascript">
+				$(function() {
+					var sWidth = $("#focus").width(); //获取焦点图的宽度（显示面积）
+					var len = $("#focus ul li").length; //获取焦点图个数
+					var index = 0;
+					var picTimer;
+					
+					//以下代码添加数字按钮和按钮后的半透明条，还有上一页、下一页两个按钮
+					var btn = "<div class='btnBg'></div><div class='btn'>";
+					for(var i=0; i < len; i++) {
+						btn += "<span></span>";
+					}
+					btn += "</div><div class='preNext pre'></div><div class='preNext next'></div>";
+					$("#focus").append(btn);
+					$("#focus .btnBg").css("opacity",0.5);
+				
+					//为小按钮添加鼠标滑入事件，以显示相应的内容
+					$("#focus .btn span").css("opacity",0.4).mouseenter(function() {
+						index = $("#focus .btn span").index(this);
+						showPics(index);
+					}).eq(0).trigger("mouseenter");
+				
+					//上一页、下一页按钮透明度处理
+					$("#focus .preNext").css("opacity",0.2).hover(function() {
+						$(this).stop(true,false).animate({"opacity":"0.5"},300);
+					},function() {
+						$(this).stop(true,false).animate({"opacity":"0.2"},300);
+					});
+				
+					//上一页按钮
+					$("#focus .pre").click(function() {
+						index -= 1;
+						if(index == -1) {index = len - 1;}
+						showPics(index);
+					});
+				
+					//下一页按钮
+					$("#focus .next").click(function() {
+						index += 1;
+						if(index == len) {index = 0;}
+						showPics(index);
+					});
+				
+					//本例为左右滚动，即所有li元素都是在同一排向左浮动，所以这里需要计算出外围ul元素的宽度
+					$("#focus ul").css("width",sWidth * (len));
+					
+					//鼠标滑上焦点图时停止自动播放，滑出时开始自动播放
+					$("#focus").hover(function() {
+						clearInterval(picTimer);
+					},function() {
+						picTimer = setInterval(function() {
+							showPics(index);
+							index++;
+							if(index == len) {index = 0;}
+						},4000); //此4000代表自动播放的间隔，单位：毫秒
+					}).trigger("mouseleave");
+					
+					//显示图片函数，根据接收的index值显示相应的内容
+					function showPics(index) { //普通切换
+						var nowLeft = -index*sWidth; //根据index值计算ul元素的left值
+						$("#focus ul").stop(true,false).animate({"left":nowLeft},300); //通过animate()调整ul元素滚动到计算出的position
+						//$("#focus .btn span").removeClass("on").eq(index).addClass("on"); //为当前的按钮切换到选中的效果
+						$("#focus .btn span").stop(true,false).animate({"opacity":"0.4"},300).eq(index).stop(true,false).animate({"opacity":"1"},300); //为当前的按钮切换到选中的效果
+					}
+				});
+				
+				</script>
+
+				<div class="bookaboxb">
+					
+					<div id="focus">
+						<ul>
+						      	  <li><a href="javascript:void(0)" target="_blank"><img src="http://www.syuan.org/newsimg/201112271628610_23_2480.jpg" alt="" /></a></li>
+						      	  <li><a href="javascript:void(0)" target="_blank"><img src="http://www.zlzshn.com/upload/2014/12/18/69356e38214b46ee8dbe85106fc9258a-medium.jpg" alt="" /></a></li>
+						      	  <li><a href="javascript:void(0)" target="_blank"><img src="http://www.zlzshn.com/upload/2014/12/18/69356e38214b46ee8dbe85106fc9258a-medium.jpg" alt="" /></a></li>
+						      	  <li><a href="javascript:void(0)" target="_blank"><img src="http://www.zlzshn.com/upload/2014/12/18/69356e38214b46ee8dbe85106fc9258a-medium.jpg" alt="" /></a></li>
+						      	  <li><a href="javascript:void(0)" target="_blank"><img src="http://www.zlzshn.com/upload/2014/12/18/69356e38214b46ee8dbe85106fc9258a-medium.jpg" alt="" /></a></li>
+						      	  <li><a href="javascript:void(0)" target="_blank"><img src="http://www.zlzshn.com/upload/2014/12/18/69356e38214b46ee8dbe85106fc9258a-medium.jpg" alt="" /></a></li>
+						</ul>
+					</div>
+					
+					<div class="boxba">
+					<ul>
+						<li>名 称：<span>${(vo.mc)!}</span></li>
+						<li>地 址：${(vo.xxdz)!} </li>
+						<li>营业状态：
+							
+							<!-- <#if strkit('0',(vo.business_status)!)>休息中</#if><#if strkit('1',(vo.business_status)!)>营业中</#if> -->
+						
+							<#if strkit('true',(vo.iswork)!)>
+		  						营业中
+		  					<#else>
+		  						<#if strkit('1',(vo.chk_fgzrxd)!)>
+		  							可预订
+		  						<#else>
+		  							已打烊
+		  						</#if>
+		  					</#if>
+						</li>
+						<li>工作时间：${(vo.worktime)!''}</li>
+						<li>是否自送：<#if strkit('0',(vo.sfzs)!)>否</#if><#if strkit('1',(vo.sfzs)!)>是</#if></span></li>
+						<li>是否推荐：<#if strkit('0',(vo.is_recommend)!)>否</#if><#if strkit('1',(vo.is_recommend)!)>是</#if></li>
+						<li>评 级：★★★★☆☆</li>
+					</ul>
+					</div>
+					<div class="share">
+						<!-- Baidu Button BEGIN -->
+						<div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
+							<a class="bds_qzone"></a>
+							<a class="bds_tsina"></a>
+							<a class="bds_tqq"></a>
+							<a class="bds_renren"></a>
+							<a class="bds_t163"></a>
+							<span class="bds_more"></span>
+							<a class="shareCount"></a>
+						</div>
+						<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=0" ></script>
+						<script type="text/javascript" id="bdshell_js"></script>
+						<script type="text/javascript">
+						    document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date() / 3600000)
+						</script>
+						<!-- Baidu Button END -->
+					</div>
+					
+					
+				</div>
+				<div style="clear:both;"></div>
+			</div>
+			
+			<div class="flink">
+			    <div class="flink_tit">商户信息</div>
+			    <dl class="tbox">
+				       <dt> 
+						     <span class="linklabel">
+								<a href="#" _for="flink_1">商品</a> 
+								<a href="#" _for="flink_2">简介</a> 
+								<a href="#" _for="flink_3">活动</a> 
+								<a href="#" _for="flink_4">评论</a> 
+						     </span>
+					   </dt>
+			  
+					  <dd id="flink_1">
+					    <div class="bookd">
+							<div class="bookd_box_nobody">
+								<div class="cartinfo">
+									<input type="checkbox" value="0" id="klzj" name="klzj" onclick="uf_checkklzj();"/>犒劳自己
+									<input type="checkbox" value="1" id="zstr" name="zstr" onclick="uf_checkzstr();"/>赠送他人
+									<a href="${CTX}/ab/order/myshoppingcart" title="我的已添加到购物车的商品信息">我的购物车(${(cntcart)!'0'})</a>
+								</div>
+								<table class="list">
+									<tr>
+										<th width="4%">序号</th>
+										<th width="10%">图片</th>
+										<th width="15%">分类</th>
+										<th width="*%">名称</th>
+										<th width="10%">单价</th>
+										<th width="10%">门店价</th>
+										<th width="10%">赠送积分</th>
+										<th width="10%">增加数量</th>
+										<th width="10%">操作</th>
+									</tr>
+									<#if list_pro ??>
+										<#list list_pro as lst>
+								     	<tr>
+											<td>${lst_index+1}</td>
+											<td><#if lst.img_url??><img src="${CTX}/upload/${(lst.img_url)!}" style="width: 80px;height: 60px;"></#if></td>
+											<td>${(lst.sub_name)!}</td>
+											<td>${(lst.mc)!}</td>
+											<td class="red">${(lst.price)?string("currency")}</td>
+						                    <td>${(lst.mdprice)?string("currency")}</td>
+						                    <td>${(lst.jf)!''}</td>
+						                    <td>
+						                    	<a href="javascript:void(0);" id="btn_reduce${lst_index+1}" onclick="uf_reduce('${lst_index+1}')">-</a>
+						                    	<input type="text" class="text" id="add_num${lst_index+1}" name="add_num${lst_index+1}" value="1" style="height: 24px;width: 40px;text-align: center"/>
+						                    	<a href="javascript:void(0);" id="btn_add${lst_index+1}"  onclick="uf_addnum('${lst_index+1}')">+</a>
+						                    </td>
+						                    <td><a href="javascript:void(0);" onclick="uf_addtocart('${(vo.id)!}','${lst.id}','add_num${lst_index+1}','${(userid)!}');">添加购物车</a></td>
+										</tr>
+										</#list>
+									</#if>
+								</table>
+							</div>
+						</div>
+					  </dd>
+					  <dd id="flink_2">&nbsp;&nbsp;&nbsp;&nbsp;${(vo.brief)!}</dd>
+					  <dd id="flink_3">${(vo.brief)!}</dd>
+					  <dd id="flink_4">
+					    <div class="bookd">
+							<div class="bookd_box_nobody">
+								<table class="list">
+									<tr>
+										<th width="4%">序号</th>
+										<th width="10%">评论人</th>
+										<th width="10%">评分</th>
+										<th width="10%">标题</th>
+										<th width="15%">内容</th>
+										<th width="*%">评论时间</th>
+									</tr>
+									<#if list_comm ??>
+										<#list list_comm as lst>
+								     	<tr>
+											<td>${lst_index+1}</td>
+											<td>${(lst.username)!}</td>
+											<td>${(lst.grade)!}</td>
+											<td>${(lst.title)!}</td>
+											<td>${(lst.content)!}</td>
+						                    <td>${(lst.createtime)!}</td>
+										</tr>
+										</#list>
+									</#if>
+								</table>
+							</div>
+						</div>
+					  </dd>
+			  
+			  		</dl>
+			</div>
+			
+	</div>
+</div>
+	<div class="blank10"></div>
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</body>
+</html>

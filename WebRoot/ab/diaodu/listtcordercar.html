@@ -1,0 +1,292 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+  	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/dd.css"/>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_reset.css">
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/main.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/liuyan.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/page.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+    <link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/common.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-1.8.17.custom.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-zh-CN.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+    <script type="text/javascript">
+	function uf_addprice(orderid,driverid){
+		$.dialog.confirm('接受加价表示同意此司机接单，您确定要选择此司机并接受加价？', function(){
+			   $.ajax({
+					url: "${CTX}/diaodu/acceptAddPriceForOderByOwner",
+					type: "POST",
+					data: {orderid:orderid,driverid:driverid},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("操作成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("操作失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+   }
+    </script>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">调车中的订单记录</h2>
+			
+			<table class="list">
+            <tr>
+	            <th width="20px;">序号</th>
+	            <th width="50px;">订单号</th>
+	            <th width="50px;">总金额</th>
+	            <th width="50px;">意向价</th>
+	            <th width="50px;">保证金</th>
+	            <th width="50px;">联系人</th>
+	            <th width="70px;">联系电话</th>
+	            <th width="160px;">收货地址</th>
+	            <th width="50px;">订单状态</th>
+	            <th width="50px;">指派车号</th>
+	            <th width="50px;">司机姓名</th>
+	            <th width="50px;">司机电话</th>
+				<th width="120px;">报价</th>
+	        </tr>
+	        <#if list ??>
+      				<#list listordercar as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!} </td>
+                    <td>
+                    	<#if strkit('0',(lst.ddzt)!)>
+                    		<a href="${CTX}/ab/order/ddjs">${(lst.sn)!''}</a>
+                    	<#else>
+                    	<a href="javaScript:void(0);" onclick="uf_showdd('${(lst.id)!}')">${(lst.sn)!}</a>
+                    	</#if>
+                    	
+                    </td>
+                    <td class="red">
+                   
+                    <#if lst.style?exists && lst.style==2 && lst.min_price?exists && lst.max_price?exists>                    
+                    	￥${(lst.min_price)!}元 - ￥${(lst.max_price)!}元 
+                    <#else>
+                    ${(lst.ddzje)?string("currency")}
+                    </#if>
+                    </td>
+                     <td class="red">
+                    
+                   ￥ ${(lst.yxj)!'--'}
+                    </td>
+                    
+                     <td class="red">
+                    
+                   ￥ ${(lst.bzj)!'--'}
+                    </td>
+                    
+                    <td> ${(lst.lxr)!}</td>
+                    <td>${(lst.lxrdh)!}</td>
+                    <td>  ${(lst.shdz)!}</td>
+                    <td>
+                    	<#if strkit('0',(lst.ddzt)!)><span class="red">未提交</span></#if>
+						<#if strkit('1',(lst.ddzt)!)>已提交</#if>
+						<#if strkit('2',(lst.ddzt)!)>取货中</#if>
+						<#if strkit('3',(lst.ddzt)!)>送货中</#if>
+						<#if strkit('4',(lst.ddzt)!)>已送达</#if>
+						<#if strkit('5',(lst.ddzt)!)>已签收</#if>
+						<#if strkit('6',(lst.ddzt)!)>拒单</#if>
+						<#if strkit('7',(lst.ddzt)!)>已退单</#if>
+                    	<#if strkit('8',(lst.ddzt)!)><span class="red">已撤单</span></#if>
+                    </td>
+                    <td > 
+		               ${lst.car_no}
+                    </td>
+                    <td>${lst.driver}</td>
+                    <td>${lst.mobile}</td>
+                    <td><#if lst.price ??>${lst.price}></#if>
+                    </td>
+                  </tr>
+				</#list>
+			</#if>
+            </table>
+            
+		</div>
+	</div>
+	
+	
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	
+	
+	<div id="msgDiv" style="left: 50%; top: 191px; margin-left: -270px; display: none; position: fixed; z-index: 11000; opacity: 1;">
+	<div class="divTop">
+    	<h3>
+    		我要催单
+    	</h3>
+    	<a href="javascript:;" class="closebtn" alt="关闭" onclick="uf_leave_close()"></a>   
+    </div>
+    <div class="msg_cont clear">
+        <textarea placeholder="请输入内容" name="content" id="content"></textarea>
+    </div>
+    <div class="msg_op">
+    	<input id="captchaCode" name="captchaCode" class="fl" type="text" placeholder="请输入验证码" size="20"/>
+        <img  class="fl" class="msgcode" src="${CTX}/25console/imgcode" id="safecode" alt="点击刷新" onclick="refreshSafecode()"/>
+        <a href="javascript:;" class="fr msgbtn" onclick="uf_addleave('0', '${CTX}')"> 催单
+        </a>  
+    </div>
+    <div id="leaveMsg" class="message"/>
+	</div>
+	</div>
+	<div class="blank10"></div>
+	<div id="lean_overlay" style="display: none; opacity: 0.45;"></div>
+	
+	<!-- 退单弹出框 -->
+	<div id="backMsgDiv" style="left: 50%; top: 191px; margin-left: -270px; display: none; position: fixed; z-index: 11000; opacity: 1;">
+	<div class="divTop">
+    	<h3>
+    		我要申请退单
+    	</h3>
+    	<a href="javascript:;" class="closebtn" alt="关闭" onclick="uf_back_close()"></a>   
+    </div>
+    <div class="msg_cont clear">
+        <textarea placeholder="请输入内容" name="applyBackContent" id="applyBackContent"></textarea>
+    </div>
+    <div id="imga">
+    </div>
+    <div class="pic">
+    	<input type="file" name="applyimage" id="applyimage"  multiple="false"/>
+    </div>
+    <div class="msg_op">
+    	<input id="backCaptchaCode" name="backCaptchaCode" class="fl" type="text" placeholder="请输入验证码" size="20"/>
+        <img  class="fl" class="msgcode" src="${CTX}/25console/imgcode" id="backSafecode" alt="点击刷新" onclick="refreshBackSafecode()"/>
+        <a href="javascript:;" class="fr msgbtn" onclick="uf_addback('${CTX}')"> 申请退单
+        </a>  
+    </div>
+    <div id="backMsg" class="message"/>
+	</div>
+	</div>
+	<div class="blank10"></div>
+	
+	<form id="appraiseform" name="appraiseform" method="post" action="${CTX}/ab/appraise/addappraise">
+	<div class="appraise-box" style="display: none">
+		<input type="hidden" id="appraise_orderid" name="appraise_orderid"> 
+		<input type="hidden" id="appmid" name="appmid">
+		<input type="hidden" id="tcflag" name="tcflag" value="2">
+		<input type="hidden" id="mah" name="mah">
+		<input type="hidden" id="ser" name="ser">
+		<input type="hidden" id="spd" name="spd">
+		<div class="appraise-box-top">
+			商品评价<a href="javascript:void(0)" class="close"><img
+				src="${CTX}/res/css/ab/images/del.png" /></a>
+		</div>
+		<div class="appraise-box-body">
+			<div class="appraise-box-body-conent">
+				<div class="appraise-box-body-conent-left">
+					<div id="logopic" class="logopic">
+					</div>
+					<div class=lh24>
+						<span></span>
+					</div>
+				</div>
+				<div class="appraise-box-body-conent-right">
+					<div class="lh24 h24 appraise-box-body-conent-right-hua">
+						<input type="radio" name="appraisetype" checked="checked" value="1"/>
+						<img src="${CTX}/res/css/ab/images/img2.png" /> 
+						<input type="radio" name="appraisetype" value="2"/>
+						<img src="${CTX}/res/css/ab/images/img3.png" /> 
+						<input type="radio" name="appraisetype" value="3"/>
+						<img src="${CTX}/res/css/ab/images/img4.png" />
+					</div>
+					<div class="appraise-box-body-conent-right-text">
+						<textarea name="appraisecontent" id="appraisecontent">
+						</textarea>
+						<div class="pic">
+						<span id="limitMsg" class="message" style="font-color:red;"></span>
+						<input type="file" name="appraiseimage" id="appraiseimage"  multiple="true"/>
+							 <span class="ca6adb3">限5张</span>
+							&nbsp;&nbsp;
+							<div class="private">
+								<input type="radio" name="private" checked="checked" value="1"/><span
+									class="c494947">公开</span><input type="radio" name="private"  value="2"/><span
+									class="c494947">匿名</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class=cl></div>
+			</div>
+			<div class="appraise-box-body-bottom">
+				<div class="appraise-box-body-bottom-left">
+					<span>店铺动态评分</span>
+				</div>
+				<div class="appraise-box-body-bottom-right">
+					<div class="item mt5">
+						<div class="c36353a service-item">宝贝与描述相符</div>
+						<div class="score-box" id="dyncmah">
+							<div class="score1 trends-score" score="1"></div>
+							<div class="score2 trends-score" score="2"></div>
+							<div class="score3 trends-score" score="3"></div>
+							<div class="score4 trends-score" score="4"></div>
+							<div class="score5 trends-score" score="5"></div>
+						</div>
+						<div class=cl></div>
+					</div>
+					<div class="item">
+						<div class="c36353a service-item">卖家的服务态度</div>
+						<div class="score-box" id="dyncser">
+							<div class="score1 trends-score" score="1"></div>
+							<div class="score2 trends-score" score="2"></div>
+							<div class="score3 trends-score" score="3"></div>
+							<div class="score4 trends-score" score="4"></div>
+							<div class="score5 trends-score" score="5"></div>
+						</div>
+						<div class=cl></div>
+					</div>
+					<div class="item">
+						<div class="c36353a service-item">卖家的发货速度</div>
+						<div class="score-box" id="dyncspd">
+							<div class="score1 trends-score" score="1"></div>
+							<div class="score2 trends-score" score="2"></div>
+							<div class="score3 trends-score" score="3"></div>
+							<div class="score4 trends-score" score="4"></div>
+							<div class="score5 trends-score" score="5"></div>
+						</div>
+						<div class=cl></div>
+					</div>
+				</div>
+				<div class=cl></div>
+			</div>
+		</div>
+		<div class="appraise-box-bottom">
+			<a href=# class="save">保 存</a> <a href=#
+				class=cancel>取 消</a>
+		</div>
+	</div>
+	</form>
+	</body>
+</html>

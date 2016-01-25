@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/reset.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/style-ms.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_addtocart(id,userid){
+			if(userid==''){
+				alert("请登录后进行购买VIP卡！");
+				window.location.href="${CTX}/ab/login";
+				return false;
+			}else{
+				window.location.href="${CTX}/ab/card/hykorder/"+id;
+			}
+		}
+	</script>
+</head>
+  <body>
+  	<#include '../inc/top.html'>
+  	<!-- 搜索栏 -->
+	<#include '../inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+	<#include '../inc/nav.html'>
+	<div class="blank10"></div>
+	
+	<div class="red-banner" style="background:url(${CTX}/res/css/ab/images/card_head.jpg) center top no-repeat;"></div>
+	<div class="red-contain c_1000">
+	<ul class="cardlist">
+		<#if cardtypes ??>
+      		<#list cardtypes as ct>
+				<li>
+					<h3 class="red-tit"><strong>${(ct.name)!}</strong></h3>
+				    <div class="clearfix card-block">
+				    	<div class="card-left floatl">${(ct.title)!}
+				    	<p><a href="javascript:void(0);" onclick="uf_addtocart('${(ct.id)!}','${(userid)!}');">在线购买</a></p></div>
+				        <div class="card-img floatr">
+				        <#if ct.img_url??>
+							<#if ct.img_url?substring(0,4) == 'res/'>
+								<img src="${CTX}/${(ct.img_url)!''}">
+							<#else>
+								<img src="${CTX}/upload/${(ct.img_url)!''}">
+							</#if>
+						</#if>
+				        </div>
+				    </div>
+				</li>
+			</#list>
+		</#if>
+	</ul>
+	<div class="rhbl">
+		<h4>如何办理：</h4>
+	    <p>1.货到付款时，询问送餐员现场办理。</p>
+	    <p>1.直接网站上在线购买。</p>
+	</div>
+	<ul class="cardlist">
+	<li>
+	    <div class="clearfix card-block">
+	    	<div class="card-left hbsm floatl">
+	        <h4>红包说明：</h4>
+	    <p>1.红包将于办理贵宾卡时当场送出；</p>
+	    <p>2.刮开红包上的涂层，即为抵用相应金额的电子代码；</p>
+	    <p>3.电子代码仅限易生活网站或者APP使用；</p></div>
+	        <div class="card-img floatr"><img src="${CTX}/res/css/ab/images/card4.jpg"/></div>
+	    </div></li>
+	</ul>
+	 </div>
+	
+	<div class="blank10"></div>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

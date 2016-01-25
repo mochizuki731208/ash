@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../../admin/inc/meta.html'>
+</head>
+  <body>
+	<table class="input">
+		<tr>
+			<th align="right">订单编号：</th>
+			<td>${(vo.sn)!}</td>
+			<th align="right">发货人：</th>
+			<td>${(to.send_name)!}</td>
+		</tr>
+		<tr>
+			<th align="right">发货人电话：</th>
+			<td>${(to.send_phone)!}</td>
+			<th align="right">发货地址：</th>
+			<td>${(to.send_addr)!}</td>
+		</tr>
+		
+		<tr>
+			<th align="right">支付状态：</th>
+			<td>未支付
+						(支付方式：
+						<font color="red">
+						<#if strkit('1',(to.pay_type)!)>在线支付</#if>
+                    	<#if strkit('2',(to.pay_type)!)>现付</#if>
+                    	<#if strkit('3',(to.pay_type)!)>到付</#if>
+                    	</font>
+                    	)
+			</td>
+			<th align="right">支付时间：</th>
+			<td>${(vo.zfsj)!}</td>
+		</tr>
+		<tr>
+			<th align="right">下单时间：</th>
+			<td>${(vo.xdsj)!}</td>
+			<th align="right">订单状态：</th>
+			<td>
+				<#if strkit('0',(vo.ddzt)!)><font color="red">未提交</font></#if>
+               	<#if strkit('1',(vo.ddzt)!)>已受理</#if>
+               	<#if strkit('2',(vo.ddzt)!)>已预订</#if>
+               	<#if strkit('3',(vo.ddzt)!)>配货中</#if>
+               	<#if strkit('4',(vo.ddzt)!)>已送达</#if>
+               	<#if strkit('5',(vo.ddzt)!)>已签收</#if>
+               	<#if strkit('6',(vo.ddzt)!)><font color="red">拒单</font></#if>
+               	<#if strkit('7',(vo.ddzt)!)><font color="red">已退单</font></#if>
+               	<#if strkit('8',(vo.ddzt)!)><font color="red">已撤单</font></#if>
+               	
+               	<!-- [0-购物车、1-已提交、2-取货中、3-送货中、4-已送达、5-已签收、6-拒单、7-已退单、8-撤单] -->
+               	
+			</td>
+		</tr>
+		<tr>
+			<th align="right">商品总价：</th>
+			<td style="color: red">${(vo.spzj)}</td>
+			<th align="right">赠送积分：</th>
+			<td>${(vo.zsjf)!}</td>
+		</tr>
+		<tr>
+			<th align="right">优惠金额：</th>
+			<td style="color: red"><#if (vo.yhje)??>${(vo.yhje)?string("currency")}</#if></td>
+			<th align="right">跑腿费：</th>
+			<td>${(vo.ptf)!}</td>
+		</tr>
+		<tr>
+			<th align="right">司机竞价：</th>
+			<td>${(to.min_price)!} - ${(to.max_price)!}</td>
+			<th align="right">我的出价：</th>
+			<td>${(to.one_price)!}</td>
+		</tr>
+		<tr>
+			<th align="right">订单总金额：</th>
+			<td style="color: red" colspan="3">${(vo.ddzje)?string("currency")}</td>
+		</tr>
+		<tr>
+			<th align="right">接单人：</th>
+			<td>${(vo.qdrname)!}</td>
+			<th align="right">接单时间：</th>
+			<td>${(vo.qdsj)!}</td>
+		</tr>
+		<tr>
+			<th align="right">接单人电话：</th>
+			<td>${(jdr.modile)!}</td>
+			<th align="right">预约送货时间</th>
+			<td>${(to.send_time)!}</td>
+		</tr>
+		<tr>
+			<th align="right">货物类型：</th>
+			<td>${(to.goods_type)!}</td>
+			<th align="right">货物重量</th>
+			<td>${(to.weight)!}公斤</td>
+		</tr>
+		<tr>
+			<th align="right">货物体积：</th>
+			<td>${(to.goods_volumn)!}立方米</td>
+			<th align="right">货物数量</th>
+			<td>${(to.goods_mount)!}件</td>
+		</tr>
+	</table>
+	<table class="list" style="border: 0px;">
+	    <tr>
+			<th width="4%;">序号</th>
+			<th width="20%;">收货人</th>
+			<th width="">收货地址</th>
+			<th width="20%;">收货电话</th>
+		</tr>
+		<tr>
+			<td>1</td>
+	              <td>${(to["rcv_name"+1])!}</td>
+			<td>${(to["rcv_addr"+1])!}</td>
+			<td>${(to["rcv_phone"+1])!}</td>
+	     </tr>
+		<#list 2..5 as i>
+			<#if to["rcv_name"+i]??>
+	       	<tr>
+				<td>${i}</td>
+                <td>${(to["rcv_name"+i])!}</td>
+				<td>${(to["rcv_addr"+i])!}</td>
+				<td>${(to["rcv_phone"+i])!}</td>
+		     </tr>
+       		</#if>
+		</#list>
+     </table>
+  </body>
+</html>
+

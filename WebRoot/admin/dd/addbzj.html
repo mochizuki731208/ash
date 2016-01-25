@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+<head><#include '../inc/meta.html'>
+
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/common.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-1.8.17.custom.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-zh-CN.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript">
+		function uf_qsorder(){
+		var price1=$("#price").val();
+		var price2=0;//$("#ddzje").val();
+		if(price1==null){
+		price1=0;
+		}
+		
+		if(price2==null){
+		price2=0;
+		}
+		var price=(price1-0)+(price2-0);
+		var id=$("#id").val();
+			   $.ajax({
+					url: "${CTX}/admin/dd/updatebzj",
+					type: "POST",
+					data: {id:id,price:price},//"{price:'" + price + "',id:'" + id + "'}", 
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$("#result").html("修改保证金成功，如不再修改保证金请关闭本窗口！")
+						}else{
+							$("#result").html("修改保证金失败，请重试！")
+						}
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        $("#result").html("服务器异常，请稍后重试！")
+                    },
+                    complete: function(XMLHttpRequest, textStatus) {
+                        this; // 调用本次AJAX请求时传递的options参数
+                    }
+				});
+		}
+</script>
+</head>
+<body>
+	<table  >
+	<tr>
+		<th>保证金：</th>
+		<td>
+		<span style="color: red">￥</span>
+		<input  type="hidden" id="id" value="${id}"/>
+		<input type="hidden" id="ddzje" value="${vo.ddzje}"/>
+		<input type='text' id='price' name='SYS_PAGE_JumpPage' size='3' maxlength='5' onkeyup='this.value=this.value.replace(/[^0-9]\D*$/,"")' ondragenter="return false" onpaste="return !clipboardData.getData('text').match(/\D/)"" style="ime-mode:disabled;">
+		</td>
+		<td>
+		<button onclick="uf_qsorder()">确定</button></td>
+		</tr>
+		<tr><td colspan="2"><span style="color: red" id="result"></span></td></tr>
+		</table>
+</body>
+</html>
+

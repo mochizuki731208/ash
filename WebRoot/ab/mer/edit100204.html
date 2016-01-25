@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+	function refresh(){
+		window.location.href="${CTX}/ab/mer/${edit_action}?curPage="+document.all.curPage.value;
+	}
+	
+	function del(tid) {
+		$.post("${CTX}/ab/mer/${delete_action}",{id:tid},function(data){
+			console.log(data);
+            if(data){
+            	$.dialog.alert("删除成功！",function () {
+					window.location.href="${CTX}/ab/mer/${edit_action}?curPage="+$("#curPage").val();
+			    }).time(0.5);
+            } else {
+            	alert("删除失败！");
+            }
+		});
+	}
+	
+function clearline() {
+		$.post("${CTX}/ab/mer/${clear_action}","",function(data){
+			console.log(data);
+            if(data){
+            	$.dialog.alert("删除成功！",function () {
+					window.location.href="${CTX}/ab/mer/${edit_action}?curPage="+$("#curPage").val();
+			    }).time(0.5);
+            } else {
+            	alert("删除失败！");
+            }
+		});
+	}
+	
+	function addline() {
+	window.location.href="${CTX}/ab/mer/edit1002lineone";
+	}
+	
+	$().ready(function() {
+		//$("#btn_save").click(function(){});
+	});
+	</script>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">${title!}</h2>
+			<input type="button" id="btn_return" class="button" value="添加" onclick="addline();">
+			<input type="button" id="btn_return" class="button" value="清空" onclick="clearline();">
+			<table class="list">
+            <tr>
+	            <th width="40px;">序号</th>
+	            <th width="15%;">出发地</th>
+	            <th width="10%;">目的地</th>
+	            <th>出发时间</th>
+				<th>到达时间</th>
+				<th>按重量计价</th>
+				<th>按体积计价</th>
+	          	<th width="10%;">操作</th> 
+	        </tr>
+	        <#if listpage ??>
+      				<#list listpage.list as lst>
+                  <tr>
+                  	<td>${(listpage.curPage - 1) * 2 + (lst_index+1)!}</td>
+                  	<td>${(lst.from)!}</td>
+                  	<td>${(lst.to)!}</td>
+                  	<td>${(lst.from_time)!}</td>
+					<td>${(lst.to_time)!}</td>
+					<td>${(lst.weight_price)!}</td>
+					<td>${(lst.volumn_price)!}</td>
+                  	<td><a href="javascript:void(0)" onclick="del('${(lst.id)!}')">删除</a>
+					<a href="${CTX}/ab/mer/${modify_action}?id=${(lst.id)!}">编辑</a></td>
+                  </tr>
+				</#list>
+				<tr>
+					<td colspan="9">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+			</#if>
+            </table>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+    <script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/highcharts-4.0.3/js/highcharts.js"></script>
+    <script type="text/javascript">
+    	function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function refresh_day(){
+			$('#queryType').val("day");
+			$("#kssj").val("");
+			$("#jzsj").val("");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function refresh_week(){
+			$('#queryType').val("week");
+			$("#kssj").val("");
+			$("#jzsj").val("");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function refresh_month(){
+			$('#queryType').val("month");
+			$("#kssj").val("");
+			$("#jzsj").val("");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function uf_currDate(){
+			$('#currDate').attr('value','yes');
+			$('#lastDate').attr('value','');
+			$('#myform').attr('action',"");
+			$('#myform').attr('target',"_self");
+			$('#myform').submit();
+		}
+		
+		function uf_lastDate(){
+			$('#currDate').attr('value','');
+			$('#lastDate').attr('value','yes');
+			$('#myform').attr('action',"");
+			$('#myform').attr('target',"_self");
+			$('#myform').submit();
+		}
+		function by_monthWeekQuery() {
+			$("#kssj").hide();
+			$("#jzsj").hide();
+			$("#query_year_begin").show();
+			$("#query_month_begin").show();
+			$("#query_year_end").show();
+			$("#query_month_end").show();
+			$("#queryType").val("monthWeekQuery");
+		}
+		function by_dayQuery() {
+			$("#query_year_begin").hide();
+			$("#query_month_begin").hide();
+			$("#query_year_end").hide();
+			$("#query_month_end").hide();
+			$("#kssj").show();
+			$("#jzsj").show();
+			$("#queryType").val("dayQuery");
+		}
+		$(document).ready(function(){
+			<#if strkit('monthWeekQuery',queryType!)>by_monthWeekQuery();return</#if>
+			by_dayQuery();
+		});
+    </script>
+ </head>
+  <body>
+  <form id="myform" name="myform" method="post" action="">
+  	<input type="hidden" id="currDate" name="currDate"/>
+  	<input type="hidden" id="lastDate" name="lastDate"/>
+  	<input type="hidden" id="queryType" name="queryType"/>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">商品销售统计</h2>
+			<div style="height: 80px;line-height: 40px;">
+			<input type="button" class="button" value="当 天" onclick="refresh_day();"/>
+			<input type="button" class="button" value="本 周" onclick="refresh_week();"/>
+			<input type="button" class="button" value="本 月" onclick="refresh_month();"/>
+			<input type="button" class="button" value="按月查询" onclick="by_monthWeekQuery();"/>
+			<input type="button" class="button" value="按天查询" onclick="by_dayQuery();"/>
+			<br>
+			&nbsp;开始时间:<input type="text" class="text Wdate" name="kssj" id="kssj" value="${(kssj)!}" onFocus="WdatePicker({})" style="width: 100px;">
+			<select id="query_year_begin" name="query_year_begin">
+  						<option value="2014" <#if strkit('2014',query_year_begin!)>selected</#if>>2014年</option>
+  						<option value="2015" <#if strkit('2015',query_year_begin!)>selected</#if>>2015年</option>
+  						<option value="2016" <#if strkit('2016',query_year_begin!)>selected</#if>>2016年</option>
+  						<option value="2017" <#if strkit('2017',query_year_begin!)>selected</#if>>2017年</option>
+  					</select>
+  					<select id="query_month_begin" name="query_month_begin">
+  						<option value="01" <#if strkit('01',query_month_begin!)>selected</#if>>1月</option>
+  						<option value="02" <#if strkit('02',query_month_begin!)>selected</#if>>2月</option>
+  						<option value="03" <#if strkit('03',query_month_begin!)>selected</#if>>3月</option>
+  						<option value="04" <#if strkit('04',query_month_begin!)>selected</#if>>4月</option>
+  						<option value="05" <#if strkit('05',query_month_begin!)>selected</#if>>5月</option>
+  						<option value="06" <#if strkit('06',query_month_begin!)>selected</#if>>6月</option>
+  						<option value="07" <#if strkit('07',query_month_begin!)>selected</#if>>7月</option>
+  						<option value="08" <#if strkit('08',query_month_begin!)>selected</#if>>8月</option>
+  						<option value="09" <#if strkit('09',query_month_begin!)>selected</#if>>9月</option>
+  						<option value="10" <#if strkit('10',query_month_begin!)>selected</#if>>10月</option>
+  						<option value="11" <#if strkit('11',query_month_begin!)>selected</#if>>11月</option>
+  						<option value="12" <#if strkit('12',query_month_begin!)>selected</#if>>12月</option>
+  					</select>
+			&nbsp;截止时间:<input type="text" class="text Wdate" name="jzsj" id="jzsj" value="${(jzsj)!}" onFocus="WdatePicker({})" style="width: 100px;">
+			<select id="query_year_end" name="query_year_end">
+  						<option value="2014" <#if strkit('2014',query_year_end!)>selected</#if>>2014年</option>
+  						<option value="2015" <#if strkit('2015',query_year_end!)>selected</#if>>2015年</option>
+  						<option value="2016" <#if strkit('2016',query_year_end!)>selected</#if>>2016年</option>
+  						<option value="2017" <#if strkit('2017',query_year_end!)>selected</#if>>2017年</option>
+  					</select>
+  					<select id="query_month_end" name="query_month_end">
+  						<option value="01" <#if strkit('01',query_month_end!)>selected</#if>>1月</option>
+  						<option value="02" <#if strkit('02',query_month_end!)>selected</#if>>2月</option>
+  						<option value="03" <#if strkit('03',query_month_end!)>selected</#if>>3月</option>
+  						<option value="04" <#if strkit('04',query_month_end!)>selected</#if>>4月</option>
+  						<option value="05" <#if strkit('05',query_month_end!)>selected</#if>>5月</option>
+  						<option value="06" <#if strkit('06',query_month_end!)>selected</#if>>6月</option>
+  						<option value="07" <#if strkit('07',query_month_end!)>selected</#if>>7月</option>
+  						<option value="08" <#if strkit('08',query_month_end!)>selected</#if>>8月</option>
+  						<option value="09" <#if strkit('09',query_month_end!)>selected</#if>>9月</option>
+  						<option value="10" <#if strkit('10',query_month_end!)>selected</#if>>10月</option>
+  						<option value="11" <#if strkit('11',query_month_end!)>selected</#if>>11月</option>
+  						<option value="12" <#if strkit('12',query_month_end!)>selected</#if>>12月</option>
+  					</select>
+			<input type="button" class="button" value="查 询" onclick="refresh();"/>
+			</div>
+			<table class="list">
+            <tr>
+	            <th width="40px;">序号</th>
+	            <th width="*%">日期</th>
+	            <th width="25%">数量</th>
+				<th width="25%">金额</th>
+	        </tr>
+	        <#if list??>
+      			<#list list_pro as s>
+                  <tr>
+                  	<td>${(s_index+1)!}</td>
+                  	<td>${(s.xdsj)!}</td>
+                    <td>${(s.cnt)}</td>
+                    <td>${(s.ddzje)?string("currency")}</td>
+                  </tr>
+				</#list>
+			</#if>
+				<tr>
+                  	<td colspan="4" align="left" class="bold red">总订单金额：${(r.totalmoney)?string("currency")} ，总订单数：${(r.totleorder)!}</td>
+                </tr>
+            </table>
+            <div id=container></div>
+            <script type="text/javascript">
+			$(function () {
+				Highcharts.setOptions({colors: ['#058DC7', '#FF8C00']}); 
+		        $('#container').highcharts({
+		            title: {
+		                text: '商品销售信息统计',
+		                x: -20 //center
+		            },
+		            xAxis: {
+		            	labels: {
+		                    rotation: -45,
+		                    style: {
+		                        fontSize: '13px',
+		                        fontFamily: 'Verdana, sans-serif'
+		                    }
+		                },
+		                categories: [
+		                    <#if list??>
+				      			<#list list_pro as s>
+				      			['${(s.xdsj)!}'],
+				                </#list>
+							</#if>
+		                    ]
+		                
+		            },
+		            yAxis: {
+		                title: {
+		                    text: '订单数及总销售金额数据'
+		                },
+		                plotLines: [{
+		                    value: 0,
+		                    width: 1,
+		                    color: '#808080'
+		                }]
+		            },
+		            tooltip: {
+		                valueSuffix: ''
+		            },
+		            legend: {
+		                layout: 'vertical',
+		                align: 'right',
+		                verticalAlign: 'middle',
+		                borderWidth: 0
+		            },
+		            series: [{
+		                name: '订单数量',
+		                
+		                data: [
+		                	<#if list??>
+				      			<#list list_pro as s>
+				      			[${(s.cnt)!}],
+				                </#list>
+							</#if>
+		                ]
+		            }, {
+		                name: '订单总金额',
+		                data: [
+		                	<#if list??>
+				      			<#list list_pro as s>
+				      			[${(s.ddzje)!}],
+				                </#list>
+							</#if>
+		                ]
+		            }]
+		        });
+		    });
+    
+            </script>
+		</div>
+	</div>
+	</form>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

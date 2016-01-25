@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../../ab/inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/logi/css/style.css" />
+</head>
+  <body>
+  	<#include '../../ab/inc/top.html'>
+	<#include '../../ab/inc/header.html'>
+	<#include '../../ab/inc/nav.html'>
+	<div class="cm">
+	<div class="leftmenu fl">
+		<#include '../../ab/inc/leftmenu.html'>
+	</div>
+	<div class="rightcon fr">
+		<form name="alipayment" class="form-inline" id="alipayment" action="${CTX}/ab/tc/bxd">
+			<div id="tablist_tx">
+	<table class="list">
+		<tr>
+			<td colspan="4" style="text-align:center;font-weight:bold;font-size:15px;">保单信息</td>
+		</tr>
+		<tr>
+			<th width="25%">保单号：</th>
+			<td width="25%" style="text-align:left;">${(vo.policy_sn)!}</td>
+			<th width="25%">险种名称：</th>
+			<td width="25%" style="text-align:left;">
+				<#if strkit('1',(vo.type_insurant)!)>公路货运险</#if>
+			</td>
+		</tr>
+		<tr>
+			<th >投保人：</th>
+			<td style="text-align:left;">${(vo.insurant)!}</td>
+			<th >保单状态：</th>
+			<td style="text-align:left;">
+				<#if strkit('01',(vo.policy_status)!)>未支付</#if>
+				<#if strkit('02',(vo.policy_status)!)>已支付</#if>
+				<#if strkit('03',(vo.policy_status)!)>已完成</#if>
+			</td>
+		</tr>
+		<tr>
+			<th >保险时间：</th>
+			<td colspan="3" style="text-align:left;">${(vo.opt_date)!}</td>
+		</tr>
+		<tr>
+			<td colspan="4" style="text-align:center;font-weight:bold;font-size:15px;">货运信息</td>
+		</tr>
+		<tr>
+			<th >起运日期：</th>
+			<td style="text-align:left;">${(vo.start_time)!}</td>
+			<th >运输方式：</th>
+			<td style="text-align:left;">
+				<#if strkit('4',(vo.transport_type)!)>公路</#if>
+				<#if strkit('11',(vo.transport_type)!)>集装箱陆运</#if>
+				<#if strkit('9',(vo.transport_type)!)>其他</#if>
+			</td>
+		</tr>
+		<tr>
+			<th >运输工具：</th>
+			<td style="text-align:left;">${(vo.transport_name)!}</td>
+			<th >航次/车牌号：</th>
+			<td style="text-align:left;">${(vo.car_no)!}</td>
+		</tr>
+		<tr>
+			<th >起运地：</th>
+			<td style="text-align:left;">${(vo.start_site_province)!}
+				<#if vo.start_site_city?has_content>
+					/${(start_site_city)!}
+				</#if>
+				<#if vo.start_site_country?has_content>
+					/${(start_site_country)!}
+				</#if>
+			</td>
+			<th >目的地：</th>
+			<td style="text-align:left;">${(vo.end_site_province)!}
+				<#if vo.end_site_city?has_content>
+					/${(vo.end_site_city)!}
+				</#if>
+				<#if vo.end_site_country?has_content>
+					/${(vo.end_site_country)!}
+				</#if>
+			</td>
+		</tr>
+		<tr>
+			<th >标记/运单号/发票号：</th>
+			<td style="text-align:left;">${(vo.order_sn)!}</td>
+			<th >货物名称：</th>
+			<td style="text-align:left;">${(vo.goods_name)!}</td>
+		</tr>
+		<tr>
+			<th >包装及数量：</th>
+			<td colspan="3" style="text-align:left;">
+				<#if strkit('01',(vo.packing)!)>箱装</#if>
+				<#if strkit('02',(vo.packing)!)>袋装</#if>
+				<#if strkit('03',(vo.packing)!)>托盘</#if>
+				<#if strkit('04',(vo.packing)!)>散装</#if>
+				<#if strkit('05',(vo.packing)!)>裸装</#if>
+				<#if strkit('06',(vo.packing)!)>桶装</#if>
+				<#if strkit('07',(vo.packing)!)>罐装</#if>
+				<#if strkit('08',(vo.packing)!)>盘卷包装</#if>
+				/${(vo.goods_num)!}</td>
+		</tr>
+		<tr>
+			<td colspan="4" style="text-align:center;font-weight:bold;font-size:15px;">保单信息</td>
+		</tr>
+		<tr>
+			<th >主险条款：</th>
+			<td colspan="3" style="text-align:left;">
+				<#if strkit('ZH',(vo.zxtk)!)>国内水陆路综合险</#if>
+				<#if strkit('JB',(vo.zxtk)!)>国内水陆路基本险</#if>
+			</td>
+		</tr>
+		<tr>
+			<th >附加条款：</th>
+			<td colspan="3" style="text-align:left;">
+				<#if strkit('Z000001C',(vo.fjtk)!)>偷窃、提货不着险</#if>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="4" style="text-align:center;font-weight:bold;font-size:15px;">保单信息</td>
+		</tr>
+		<tr>
+			<th >签单日期：</th>
+			<td colspan="3" style="text-align:left;">${(vo.opt_date)!}</td>
+		</tr>
+		<tr>
+			<th >保险金额：</th>
+			<td style="text-align:left;">¥&nbsp;${(vo.policy_quota)!}</td>
+			<th >保险费用：</th>
+			<td style="text-align:left;">¥&nbsp;${(vo.policy_cost)!}</td>
+		</tr>
+		<tr>
+			<td style="text-align:center;font-weight:bold;font-size:15px;">保险名称</td>
+			<td style="text-align:center;font-weight:bold;font-size:15px;">保额</td>
+			<td style="text-align:center;font-weight:bold;font-size:15px;">保费</td>
+			<td style="text-align:center;font-weight:bold;font-size:15px;">币种</td>
+		</tr>
+		<tr>
+			<td style="text-align:left;"><#if strkit('1',(vo.type_insurant)!)>国内公路货运险</#if></td>
+			<td style="color:red;font-weight:bold;text-align:left;">¥&nbsp;${(vo.policy_quota)!}</td>
+			<td style="text-align:left;">按约定（SDFKQA）</td>
+			<td style="text-align:left;">人民币</td>
+		</tr>
+		<tr>
+			<td style="text-align:left;">总计</td>
+			<td style="text-align:left;">¥&nbsp;${(vo.policy_quota)!}</td>
+			<td style="text-align:left;">按约定（SDFKQA）</td>
+			<td style="text-align:left;">人民币</td>
+		</tr>
+		<tr>
+			<td colspan="4" style="text-align:center;font-weight:bold;font-size:15px;">投保人信息</td>
+		</tr>
+		<tr>
+			<th >被保人名称：</th>
+			<td colspan="3" style="text-align:left;">${(vo.insurant)!}</td>
+		</tr>
+		<tr>
+			<td colspan="4" style="text-align:center;font-weight:bold;font-size:15px;">
+				<input class="button" type="submit" id="submit_btn" value="返回" />
+			</td>
+		</tr>
+	</table>
+	</div>
+	</form>
+	</div>
+	</div>
+  </body>
+</html>
+

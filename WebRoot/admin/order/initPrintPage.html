@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+  	<title>打印测试</title>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript">
+		$().ready(function(){
+			$("#printbtn").bind("click",function(){
+				if(!$("#msg").val()){
+					alert("请输入要打印的内容！");
+					return false;
+				}
+				$.ajax({
+					url: "${CTX}/admin/order/doPrint",
+					type: "POST",
+					data: {msg: $("#msg").val()},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						alert("打印成功！");
+					}
+				})
+			});
+		})
+	</script>	
+ </head>
+  <body>
+	<h1>请输入要打印的内容：</h1>
+	<textarea rows="10" cols="10" name="msg" id="msg"></textarea>
+	<h1><input type="button" id="printbtn" value="执行打印"></h1>
+  </body>
+</html>

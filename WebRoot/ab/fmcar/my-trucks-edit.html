@@ -1,0 +1,119 @@
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel3">添加熟车</h4>
+			</div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="formImportCarS2" method="post">
+                	<input type="hidden" value="${(car.id)!''}"  name="abFmcar_id"/>
+                    <div class="form-group">
+                        <label for="carPhone" class="col-sm-2 control-label">电话号码</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="carPhone" placeholder="电话号码"  name="abFmcar_mobile" value="${(mobile)!''}"/>
+                        </div>
+                    </div>
+
+                	
+                    <div class="form-group">
+                        <label for="carNo" class="col-sm-2 control-label">车牌号</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="carNo" placeholder="车牌号" name="abFmcar_car_no" maxlength="7" value="${(car.car_no)!''}"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="driver" class="col-sm-2 control-label">司机姓名</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="driver" placeholder="司机姓名" name="abFmcar_driver" value="${(car.driver)!''}"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="carLengthAdd" class="col-sm-2 control-label">车长</label>
+                        <div class="col-sm-10">
+                            <select name="abFmcar_length" class="form-control" id="carLengthAdd">
+                                <option value="">请选择车长</option>
+                            	<option value="1.8米" <#if strkit('1.8米',(car.length)!)>selected</#if> >1.8米</option>
+	                        	<option value="2.6米" <#if strkit('2.6米',(car.length)!)>selected</#if> >2.6米</option>
+	                           	<option value="3.2米" <#if strkit('3.2米',(car.length)!)>selected</#if> >3.2米</option>
+	                        	<option value="4.2米" <#if strkit('4.2米',(car.length)!)>selected</#if> >4.2米</option>
+	                       		<option value="5.2米" <#if strkit('5.2米',(car.length)!)>selected</#if> >5.2米</option>
+	                            <option value="5.8米" <#if strkit('5.8米',(car.length)!)>selected</#if> >5.8米</option>
+	                            <option value="6.2米" <#if strkit('6.2米',(car.length)!)>selected</#if> >6.2米</option>
+	                       		<option value="6.5米" <#if strkit('6.5米',(car.length)!)>selected</#if> >6.5米</option>
+	                      		<option value="6.8米" <#if strkit('6.8米',(car.length)!)>selected</#if> >6.8米</option>
+	                        	<option value="7.2米" <#if strkit('7.2米',(car.length)!)>selected</#if> >7.2米</option>
+	                          	<option value="8米" <#if strkit('8米',(car.length)!)>selected</#if> >8米</option>
+	                         	<option value="9.6米" <#if strkit('9.6米',(car.length)!)>selected</#if> >9.6米</option>
+	                        	<option value="13米" <#if strkit('13米',(car.length)!)>selected</#if> >13米</option>
+	                    		<option value="15米" <#if strkit('15米',(car.length)!)>selected</#if> >15米</option>
+	                         	<option value="16.5米" <#if strkit('16.5米',(car.length)!)>selected</#if> >16.5米</option>
+	                          	<option value="17.5米" <#if strkit('17.5米',(car.length)!)>selected</#if> >17.5米</option>
+	                          	<option value="18.5米" <#if strkit('18.5米',(car.length)!)>selected</#if> >18.5米</option>
+	                        	<option value="20米" <#if strkit('20米',(car.length)!)>selected</#if> >20米</option>
+	                     		<option value="22米" <#if strkit('22米',(car.length)!)>selected</#if> >22米</option>
+	                         	<option value="24米" <#if strkit('24米',(car.length)!)>selected</#if> >24米</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="carClassAdd" class="col-sm-2 control-label">车型</label>
+                        <div class="col-sm-10">
+                            <select name="abFmcar_type" class="form-control" id="carClassAdd">
+                                <option value="">请选择车型</option>
+                                 <option value="三轮车" <#if strkit('三轮车',(car.type)!)>selected</#if> >三轮车</option>
+	                             <option value="面包车" <#if strkit('面包车',(car.type)!)>selected</#if> >面包车</option>
+	                             <option value="厢车" <#if strkit('厢车',(car.type)!)>selected</#if> >厢车</option>
+	                             <option value="平板车" <#if strkit('平板车',(car.type)!)>selected</#if> >平板车</option>
+	                             <option value="高低板车" <#if strkit('高低板车',(car.type)!)>selected</#if> >高低板车</option>
+	                             <option value="高栏车" <#if strkit('高栏车',(car.type)!)>selected</#if> >高栏车</option>
+	                             <option value="冷藏车" <#if strkit('冷藏车',(car.type)!)>selected</#if> >冷藏车</option>
+	                             <option value="危险品车" <#if strkit('危险品车',(car.type)!)>selected</#if> >危险品车</option>
+	                             <option value="大件车" <#if strkit('大件车',(car.type)!)>selected</#if> >大件车</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="carTuijianhao" class="col-sm-2 control-label">推荐号</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="carTuijianhao" placeholder="如果有推荐号，请输入" name="abFmcar_recommend_no" value="${(car.recommend_no)!''}" />
+                        </div>
+                    </div>
+                     <div class="form-group">
+                        <label for="carVV" class="col-sm-2 control-label">车体积</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="carVV" placeholder="车体积，默认40立方米" name="abFmcar_vv" value="${(car.vv)!''}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="carChangpao" class="col-sm-2 control-label">常跑城市</label>
+                        <div class="col-sm-10">
+                            <input type="hidden" id="s2id_FromName" class="form-control select2-offscreen" tabindex="-1" name="runcity" value="${(carcity)!''}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"  id="is_protect" /> 熟车保护
+                                    <input type="hidden" value="${(car.is_protect)!''}" name="abFmcar_is_protect" id="abFmcar_is_protect"/>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <!--  
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" checked="checked" id="is_locate"/> 立即开通车辆定位
+                                    <input type="hidden" value="1" name="abFmcar_is_locate" />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="addKnowYes">加为熟车</button>
+            </div>

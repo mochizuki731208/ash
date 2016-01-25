@@ -1,0 +1,339 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>商品显示</title>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/main.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css"/>
+	<link href="${CTX}/res/pro/css/base.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/pro/css/index.css" />
+	<script type="text/javascript" src="${CTX}/res/pro/js/jquery-1.4.2.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/pro/js/jquery.jqzoom.js"></script>
+	<script type="text/javascript" src="${CTX}/res/pro/js/base.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+    
+    
+<script type="text/javascript">
+	function uf_addtocart(mid,proid,addnumobj,userid){
+		if(userid==''){
+			$.dialog.alert("请登录后进行选择！",function(){
+				window.location.href="${CTX}/ab/login";
+			});
+			return false;
+		}
+		
+		<#if strkit('ztyy',(vo.iswork)!)>
+			$.dialog.alert("所选商家暂停营业，不能进行相关下单操作！");
+			return false;
+		<#elseif strkit('ydy',(vo.iswork)!)>
+			$.dialog.alert("所选商家已打烊，不能进行相关下单操作！");
+			return false;
+		</#if>
+		
+		$.post("${CTX}/ab/order/addtocart",{mid:mid,proid:proid,addnum:$('#'+addnumobj).val()},function(data){
+                  if(data){
+				$.dialog.alert("添加购物车成功！",function () {
+					refresh();
+		        }).time(0.5);
+			}else{
+				$.dialog.alert("添加购物车失败！");
+			}
+		});
+	}
+	
+	function uf_sc(fkid){
+		if($('#userid').val()==''){
+			$.dialog.alert("请登录后进行选择！",function(){
+				window.location.href="${CTX}/ab/login";
+			});
+			return false;
+		}
+		
+		$.post("${CTX}/ab/mer/save_sc",{lx:'1',fkid:fkid},function(data){
+                  if(data){
+				$.dialog.alert("收藏成功！").time(0.5);
+			}else{
+				$.dialog.alert("收藏失败，请重新登录系统后进行收藏！");
+			}
+		});
+	}
+	function uf_addnum(orderid,itemid,buynum,userid){
+		if(userid==''){
+			$.dialog.alert("请登录后进行选择！",function(){
+				window.location.href="${CTX}/ab/login";
+			});
+			return false;
+		}
+		
+		//对数值进行修改
+		$.ajax({
+			url: "${CTX}/ab/order/updateorderitemnum",
+			type: "POST",
+			data: {orderid:orderid,proid:itemid,pronum:parseInt(buynum)+1},
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				if(data){
+					refresh();
+				}else{
+					$.dialog.alert("修改数量失败，请刷新页面重新操作！");
+				}
+			}
+		});
+	}
+	
+	function uf_reduce(orderid,itemid,buynum,userid){
+		if(userid==''){
+			$.dialog.alert("请登录后进行选择！",function(){
+				window.location.href="${CTX}/ab/login";
+			});
+			return false;
+		}
+		if(parseInt(buynum)>1){
+			//对数值进行修改
+			$.ajax({
+				url: "${CTX}/ab/order/updateorderitemnum",
+				type: "POST",
+				data: {orderid:orderid,proid:itemid,pronum:parseInt(buynum)-1},
+				dataType: "json",
+				cache: false,
+				success: function(data) {
+					if(data){
+						refresh();
+					}else{
+						$.dialog.alert("修改数量失败，请刷新页面重新操作！");
+					}
+				}
+			});
+		}
+	}
+	function uf_delpro(itemid){
+		$.ajax({
+			url: "${CTX}/ab/order/delproduct",
+			type: "POST",
+			data: {id:itemid},
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				if(data){
+					$.dialog.alert("删除所选商品数据成功！",function(){
+						refresh();
+					}).time(0.3);
+				}else{
+					$.dialog.alert("删除所选商品数据失败！");
+				}
+			}
+		});
+	}
+	
+	function uf_klzj(userid){
+		if(userid==''){
+			$.dialog.alert("请登录后进行操作！",function(){
+				window.location.href="${CTX}/ab/login";
+			});
+			return false;
+		}
+		if('${(r.procnt)!}'=='0'){
+			$.dialog.alert("请添加商品后再进行操作！");
+			return false;
+		}
+		window.location.href="${CTX}/ab/order/ddjs/0";
+	}
+	function refresh(){
+		$('#myform').submit();
+		$('#myform').action = "";
+		$('#myform').target = "_self";
+	}
+ 
+$().ready(function(){
+	$(".jianPro").click(function(){
+		var buyNum = $(this).siblings(".shuliangPro").val();
+		if(buyNum>0){
+			buyNum--;
+			$(this).siblings(".shuliangPro").attr('value',buyNum);
+		}
+	});
+	$(".jiaPro").click(function(){
+		var buyNum = $(this).siblings(".shuliangPro").val();
+		if(buyNum<100){
+			buyNum++;
+			$(this).siblings(".shuliangPro").attr('value',buyNum);
+		}else{
+			alert("最大数量只能增加到100");
+		}
+		
+	});
+	$('#btn_addcart').click(function(){
+		
+		if($('#userid').val()==''){
+			$.dialog.alert("请登录后进行选择！",function(){
+				window.location.href="${CTX}/ab/login";
+			});
+			return false;
+		}
+		
+		<#if strkit('ztyy',(vo.iswork)!)>
+			$.dialog.alert("所选商家暂停营业，不能进行相关下单操作！");
+			return false;
+		<#elseif strkit('ydy',(vo.iswork)!)>
+			$.dialog.alert("所选商家已打烊，不能进行相关下单操作！");
+			return false;
+		</#if>
+		
+		var buyNum = parseInt($("#sumId").val())+parseInt($("#pcnt").val());
+		if(buyNum<100){
+			$.post("${CTX}/ab/order/addtocart",{mid:$('#mid').val(),proid:$('#proid').val(),addnum:buyNum},function(data){
+                if(data){
+					$.dialog.alert("添加购物车成功！",function () {
+						refresh();
+			        }).time(0.3);
+				}else{
+					$.dialog.alert("添加购物车失败！");
+				}
+			});
+		}
+		
+	});
+	
+	
+})
+</script>
+</head>
+<body>
+	<#include 'inc/top.html'>
+	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+	<div class="blank10"></div>
+<form id="myform" name="myform" method="post">
+	<input type="hidden" id="mid" name="mid" value="${(vo.id)!}"/>
+	<input type="hidden" id="proid" name="proid" value="${(p.id)!}"/>
+	<input type="hidden" id="pcnt" name="pcnt" value="${(pcnt)!}"/>
+	<#if abuser?? >
+		<input type="hidden" id="userid" value="${(abuser.id)!}"/>
+	<#else>
+		<input type="hidden" id="userid" value=""/>
+	</#if>
+	<!--header-->
+	 <div id="header_down">
+    	<div class="header_down_cen">
+    		<div class="headerImg">
+                <div id="preview" class="spec-preview"><span class="jqzoom"><img style="max-height: 340px;max-width: 330px;" jqimg="${CTX}/upload/${(p.img_url)!}" src="${CTX}/upload/${(p.img_url)!}" /></span> </div>
+                <!--缩图开始-->
+                <div class="spec-scroll"> <a class="prev">&lt;</a> <a class="next">&gt;</a>
+                    <div class="items">
+                        <ul>
+                          <#if list_img ??>
+							<#list list_img as lst>
+								<li><img alt="${(p.mc)!}" bimg="${CTX}/upload/${(lst.lager)!}" src="${CTX}/upload/${(lst.lager)!}" onmousemove="preview(this);"></li>
+				   			</#list>
+						</#if>
+                        </ul>
+                    </div>
+                </div>
+                <!--缩图结束-->
+        	</div><!--headerImg-->
+            <div class="xinxi" style="height: 360px;">
+                <p>
+                	<span  class="shop_title">${(p.mc)!} </span>
+                    <#if sfsc==true>
+	            		<a href="javascript:void(0);">已收藏</a>
+	            	<#else>
+	            		<a href="javascript:void(0);" onclick="uf_sc('${(p.id)!}');"><img src="${CTX}/res/css/ab/images/shoucang.png" style="margin-top:6px;width:55px; height:55px;" title="添加收藏" /></a>
+	            	</#if>
+                </p>
+                <dl>
+                    <dt>门店价</dt>
+                    <dd>${(p.mdprice)?string("currency")}</dd>               
+                </dl>
+                <dl>
+                    <dt>现价</dt>
+                    <dd>${(p.price)?string("currency")}</dd>
+                </dl>
+                <dl>
+                    <dt>数量</dt>
+                    <dd>
+                    	<input class="jianPro" type="button" /><input id="sumId" class="shuliangPro" type="text" value="1" /><input class="jiaPro" type="button" />
+                    </dd>
+                </dl>
+                <dl>
+                	<dt></dt>
+                    <dd><a href="javascript:void(0);"><input id="btn_addcart" class="cart" type="button" /></a></dd>
+                </dl>
+                <span style="font-size: 16px;">分享到：</span>
+                <div class="bshare-custom icon-medium"><a title="分享到QQ空间" class="bshare-qzone"></a><a title="分享到新浪微博" class="bshare-sinaminiblog"></a><a title="分享到人人网" class="bshare-renren"></a><a title="分享到腾讯微博" class="bshare-qqmb"></a><a title="分享到网易微博" class="bshare-neteasemb"></a><a title="更多平台" class="bshare-more bshare-more-icon more-style-addthis"></a><span class="BSHARE_COUNT bshare-share-count">0</span></div><script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/buttonLite.js#style=-1&amp;uuid=&amp;pophcol=2&amp;lang=zh"></script><script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/bshareC0.js"></script>
+            </div><!--xinxi-->
+            <div class="shop_cart">
+            	<div class="shop_store">
+                	<a href="${CTX}/ab/detail/${(vo.id)!}">
+                		<img src="${CTX}/res/pro/images/shoproom.jpg" />
+                    </a>
+                </div>
+                   <div id="myordercart" style="width:258px;">
+						<div style="min-height: 150px;width: 250px;">
+							<table style="width: 250px;margin-left: 2px;">
+									<tr style="height: 36px;">
+											<td width="*" align="center">商品</td>
+											<td width="40px;" align="center">数量</td>
+											<td width="60px;" align="center">价格</td>
+											<td width="60px;" align="center">操作</td>
+										</tr>
+								<#if list_order ??>
+							      	<#list list_order as lst>
+							      		<tr style="height: 28px;line-height: 28px;">
+											<td width="*" align="left" colspan="4">商家名称:${(lst.mname)!}</td>
+										</tr>
+										<tr style="height: 28px;line-height: 28px;">
+											<td width="*" align="left" colspan="4">(优惠：${(lst.yhje)?string("currency")}，跑腿费：${(lst.ptf)?string("currency")})</td>
+										</tr>
+										<#if lst.list_item ??>
+									      	<#list lst.list_item as sub>
+									     	<tr>
+					                            <td><span>${(sub.itemname)!}</span></td>
+					                            <td align="center">
+					                                <a class="subtract" href="javascript:void(0);" onclick="uf_reduce('${(sub.orderid)!}','${(sub.itemid)!}','${(sub.quantity)}','${(userid)!}')">-</a>
+					                                <span>${(sub.quantity)}</span>
+					                                <a class="plus" href="javascript:void(0);" onclick="uf_addnum('${(sub.orderid)!}','${(sub.itemid)!}','${(sub.quantity)}','${(userid)!}')">+</a>
+					                            </td>
+					                            <td align="center"><span class="cd48543">${(sub.price)?string("currency")}</span></td>
+					                            <td  align="center">
+					                           	 	<a href="javascript:void(0);" onclick="uf_delpro('${(sub.id)!}','${(userid)!}');">删除</a>
+					                            </td>
+					                        </tr>
+											</#list>
+										</#if>
+									</#list>
+								</#if>
+							</table>
+						</div>
+						<div style="line-height: 18px;padding-left: 5px;min-height: 100px;margin-top: 10px;">
+							餐品总价：<#if r??>${(r.spzj)?string("currency")}<#else>0.00</#if><br/>
+							跑腿费：<#if r??>${(r.ptf)?string("currency")}<#else>0.00</#if><br/>
+							优惠金额：<#if r??>${(r.yhje)?string("currency")}<#else>0.00</#if><br/>
+							订单总金额：<#if r??>${(r.ddzje)?string("currency")}<#else>0.00</#if>
+						</div>
+						<div style="height: 32px;line-height: 32px;padding-left: 5px;">
+							<a href="javascript:void();" onclick="uf_klzj('${(userid)!}')" style="font-size:16px;padding:10px 100px 10px 100px;background-color:#FF7F24;text-decoration:none;color: white;">去结算</a>
+						</div>
+					</div>
+            </div>
+    	</div><!--header_down_cen-->
+    </div><!--header_down-->
+    <div class="productDes">
+    	<div class="productTip">
+        	<a href="javascript:void(0);">
+            	<img src="${CTX}/res/pro/images/commodityDetail.jpg" />
+            </a>
+        </div>
+        <img src="${CTX}/upload/${(p.img_url)!}" />
+        <div>
+            <dl class="productInfo">
+            	<dt>相关介绍</dt>
+                <dd>${(p.productinfo)!}</dd>
+            </dl>
+        </div>
+    </div>
+</form>
+<!-- foot页 -->
+<#include 'inc/foot.html'>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+</head>
+  <body>
+  	 <form id="myform" name="myform" action="${CTX}/ab/reg/saveywyrz" method="post">
+		<table class="input">
+		<tr>
+			<th align="right">头像：</th>
+			<td colspan="3">
+				<#if strkit('',(vo.logo)!)>
+					<img src="${CTX}/upload/${(vo.logo)!}" style="max-width: 60px;max-height: 60px;">
+				<#else>无
+				</#if>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">真实姓名：</th>
+			<td>${(vo.mc)!}</td>
+			<th align="right">手机号：</th>
+			<td>${(vo.mobile)!}</td>
+		</tr>
+		<tr>
+			<th align="right">身份证号：</th>
+			<td>${(vo.idcard)!}</td>
+			<th align="right">联系电话：</th>
+			<td>${(vo.mobile)!}</td>
+		</tr>
+		<tr>
+			<th align="right">所属城市：</th>
+			<td>${(vo.city_name)!}</td>
+			<th align="right">所属商圈：</th>
+			<td>${(vo.area_name)!}</td>
+		</tr>
+		<tr>
+			<th align="right">地址：</th>
+			<td colspan="3">${(vo.xxdz)!}</td>
+		</tr>
+		<tr>
+			<td class="td1">
+				身份证照片(正面)
+			</td>
+			<td>
+				<#if (vo.sfzzpzm)??>
+					<img src="${CTX}/upload/${(vo.sfzzpzm)!}"  width= "150px" style="width: 160px;height:120px;" id="img_sfzzpzm"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/sf.png" width= "150px" style="width: 160px;height:120px;" id="img_sfzzpzm"/>
+				</#if>
+			</td>
+			<td class="td1">
+				身份证照片(背面)
+			</td>
+			<td>
+				<#if (vo.sfzzpbm)??>
+					<img src="${CTX}/upload/${(vo.sfzzpbm)!}"  width= "150px" style="width: 160px;height:120px;" id="img_sfzzpbm"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/sf.png" width= "150px" style="width: 160px;height:120px;" id="img_sfzzpbm"/>
+				</#if>
+			</td>
+		</tr>
+	</table>
+  </body>
+</html>
+

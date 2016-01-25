@@ -1,0 +1,1024 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/lrtk1.css"/>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/main.css"/>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/index.css"/>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/reset.css"/>
+
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_reset.css">
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_style.css">
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/tc_order.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/easySlider1.5.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<style type="text/css">	
+/* Easy Slider */
+	#container{	
+		margin:0 auto;
+		position:relative;
+		text-align:left;
+		width:999px;
+		background:#fff;		
+		margin-bottom:2em;
+		}	
+	#content{
+		margin: 10px auto;
+		position:relative;
+		}	
+	#slider{}	
+	#slider ul.sul, #slider li.sli{
+		margin:0;
+		padding:0;
+		list-style:none;
+		}
+	#slider li.sli{ 
+		/* 
+			define width and height of list item (slide)
+			entire slider area will adjust according to the parameters provided here
+		*/ 
+		width:999px;
+		height:500px;
+		overflow:hidden; 
+		}	
+	#prevBtn, #nextBtn{ 
+		display:block;
+		width:30px;
+		height:77px;
+		position:absolute;
+		left:-30px;
+		top:210px;
+		}	
+	#nextBtn{ 
+		left:1001px;
+		}														
+	#prevBtn a, #nextBtn a{  
+		display:block;
+		width:30px;
+		height:77px;
+		background:url(${CTX}/res/images/slider/btn_prev.gif) no-repeat 0 0;	
+		}	
+	#nextBtn a{ 
+		background:url(${CTX}/res/images/slider/btn_next.gif) no-repeat 0 0;	
+		}												
+/* // Easy Slider */
+</style>	
+	<script type="text/javascript">
+		var zb = '${(zb)!}';
+		var carsLen = ${cars.size()};
+		var currLoc = "${(currcity.mc)!}";
+		var selIndex = -1;
+		var carNames = [<#list cars as c>"${(c['name'])!}",</#list>""];
+		var basePrice = [<#list cars as c>"${(c['起步价'])!}",</#list>""];
+		var overPrice = [<#list cars as c>"${(c['超公里费'])!}",</#list>""];
+		var baseKilo = [<#list cars as c>"${(c['起步公里'])!}",</#list>""];
+		var nightPrice = [<#list cars as c>"${(c['夜间服务'])!}",</#list>""];
+		var carLong = [<#list cars as c>"${(c['车长'])!}",</#list>""];
+		var currKilo = -1;	//当前正在计算的路段, 0:from-to, 1:to-to2, 2:to2-to3...
+		var maxKilo = 100; //当大于100公里，则另外输入一个悬赏金额
+		
+		var info = {};
+		$(function() {
+			if(carsLen > 4){
+				$("#slider").easySlider({
+					auto: false,
+					continuous: false 
+				});
+			}
+			//addSendAC();
+			//addRcvAC("");
+			//for(var i=2;i<=5;i++){
+			//	addRcvAC(i);
+			//}
+			$(".carImg").click(function(){
+				selIndex = $(".carImg").index(this);
+				$(".carImg .icon").css("background-position","1px 1px");
+				$(".carImg .icon").eq(selIndex).css("background-position","1px -41px");
+				calcCar();		
+			});
+			$("input[name='orderStyle']").eq(0).attr("checked", true);
+			$("input[name='orderStyle']").change(chooseStyle);
+			$("input[name='moreMoney']").change(calcTotal);
+			if(zb == 'Y'){
+				$("#zb_div1").show();
+				$("#xs_div").hide();
+			}
+		});
+		function addRcv(){
+			var arr = $(".more_rcv");
+			for(var i=0;i<arr.length;i++){
+				if($(arr[i]).css("display") == 'none'){
+					$(arr[i]).show();
+					return;
+				}
+			}
+		}
+		function removeRcv(a){
+			info['to' + a] = undefined;
+			var i = a - 2;
+			$("#rcvAddr"+a).val("");
+			$("#rcvName"+a).val("");
+			$("#rcvPhone"+a).val("");
+			$(".more_rcv").eq(i).hide();
+			tryDrive();
+		}
+		function calcCar(){
+			if(selIndex < 0) return;
+			info['carType'] = carNames[selIndex];
+			info['basePrice'] = parseInt(basePrice[selIndex]);
+			info['overPrice'] = parseInt(overPrice[selIndex]);
+			info['nightPrice'] = parseInt(nightPrice[selIndex]);
+			$("#carRst").html(info['carType']);
+			//选择车长
+			if(carLong[selIndex] != ''){
+				var radioStr = '';
+				var ccArr = carLong[selIndex].split(",");
+				for(var i=0;i<ccArr.length;i++){
+					var tmpChecked = 'checked="checked"';
+					radioStr += '&nbsp;<input type="radio" name="cc" value="'+ccArr[i]+'" '+(info['cc']==ccArr[i]?tmpChecked:'')+'/>&nbsp;'+ccArr[i]+'米&nbsp;&nbsp;';
+				}
+				$.dialog({
+					title:'选择车长',
+					content: radioStr,
+				    lock:true,
+				    resize: false,
+				    width : 300,
+					height : 100,
+					cover:true,
+					max:false,
+					min:false,
+					cancel:true,
+					button: [{
+		            	name: '确定',
+			            callback: function(){
+			            	if($("input[name='cc']:checked").length == 0){
+			            		alert("请选择车长!");
+			            		return false;
+			            	}
+			            	info['cc'] = $("input[name='cc']:checked").val();
+			            	$(".carImg").eq(selIndex).find("li:last").html("车长：&nbsp;"+info['cc']+"米");
+			            	
+			            	//直接走物流专线的流程
+			            	zb = 'Y';
+			            	$("#zb_div1").show();
+							$("#xs_div").hide();
+			            },
+	           			focus: true
+			        }],
+			        cancelVal:'关 闭'
+				});//弹出框
+			}else{
+				zb = '${(zb)!}';
+			}
+			tryDrive();
+		}
+		function calcTotal(){
+			if(zb == 'Y' && $("#isXS:checked").length>0){//物流专线或超过100公里的物流，悬赏模式
+				info['sum'] = parseFloat($("#xsMoney").val());
+				$("#total").html(info['sum']);
+				if(info['kilo']){
+					$("#kiloRst").html(info['kilo']);
+				}
+				return;
+			}else if(zb == 'Y' && $("#isXS:checked").length==0){//物流专线或超过100公里的物流，招标模式
+				info['sum'] = 0;
+				$("#total").html($("#min_price").val() + " - " + $("#max_price").val());
+				if(info['kilo']){
+					$("#kiloRst").html(info['kilo']);
+				}
+				return;
+			}
+			if(selIndex<0) return;
+			var sum = 0;
+			if(info['basePrice']){
+				sum += info['basePrice'];
+			}
+			if(info['kilo'] && info['overPrice']){
+				sum += (info['kilo']<=10?0:info['kilo']-10) * info['overPrice'];
+			}
+			if(info['kilo']){
+				$("#kiloRst").html(info['kilo']);
+			}
+			info['sum'] = sum;
+			if($("#isXS:checked").length>0 && $("input[name='moreMoney']:checked").length>0){
+				var more = $("input[name='moreMoney']:checked").val();
+				info['sum'] += parseInt(more);
+			}
+			$("#total").html(info['sum']);
+		}
+		function next(){
+			if(selIndex < 0){
+				alert("请选择车型！");
+				return;
+			}
+			if(!info['from']){
+				//alert('请通过联想提示选入发货地址！');
+				//return;
+				info['from'] = $("#sendAddr").val();
+			}
+			if(!info['to']){
+				//alert('请通过联想提示选入收货地址！');
+				//return;
+				info['to'] = $("#rcvAddr").val();
+			}
+			if(!info['kilo']){
+				manKilo();
+				return;
+			}
+			calcTotal();
+			info['sendName'] = $("#sendName").val();
+			info['sendPhone'] = $("#sendPhone").val();
+			info['rcvName'] = $("#rcvName").val();
+			info['rcvPhone'] = $("#rcvPhone").val();
+			info['orderStyle'] = $("input[name='orderStyle']:checked").val();
+			//console.log(info['sendPhone']);
+			info['minPrice'] = $("#minPrice").val();
+			info['maxPrice'] = $("#maxPrice").val();
+			for(var i=2;i<=5;i++){
+				info['rcvName'+i] = $("#rcvName"+i).val();
+				info['rcvPhone'+i] = $("#rcvPhone"+i).val();	
+				info['rcvAddr'+i] = $("#rcvAddr"+i).val();	
+			}
+			if(!/^\d{11}$/.test(info['sendPhone'])){
+				alert("请填写正确的11位发货人电话号码");
+				return;
+			}
+			if(!/^\d{11}$/.test(info['rcvPhone'])){
+				alert("请填写正确的11位收货人电话号码");
+				return;
+			}
+			if(!info['sum'] || info['sum']<=0){
+				alert("请填入悬赏或竞标的价格");
+				return;
+			}
+			$.post('${CTX}/ab/tc/saveStep1',info,function(data){
+				if(data && data.success){
+					self.location.href = '${CTX}/ab/tc/prepare?zb=${(zb)!}';
+				}else{
+					alert("操作失败，请稍后再试");
+				}
+			});
+		}
+		function tryDrive(){
+			if(info['from'] && info['to']){
+				//driving.search("天府广场", "广福桥北街");
+				info['kilo'] = 0;
+				currKilo = 0;
+				try{
+					driving.search(new BMap.Point(info['from_lng'], info['from_lat']), new BMap.Point(info['to_lng'], info['to_lat']));
+				}catch(e){
+					manKilo();
+				}
+				console.log("tryDrive: "+info['kilo']);
+			}else{
+				calcTotal();
+			}			
+		}
+		function manKilo(){//手动录入公里数
+			alert('由于您的地址无法自动识别，请手动录入大约的公里数');
+			$.dialog({
+				title:'大约的公里数',
+				content: '<input name="dkilo" id="dkilo" />公里',
+			    lock:true,
+			    resize: false,
+			    width : 300,
+				height : 100,
+				cover:true,
+				max:false,
+				min:false,
+				cancel:true,
+				button: [{
+	            	name: '确定',
+		            callback: function(){
+		            	if(!/^\d+$/.test($("#dkilo").val().trim())){
+		            		alert("请输入正整数的公里数！");
+		            		return false;
+		            	}
+		            	info['kilo'] = $("#dkilo").val().trim();
+		            	calcTotal();
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		function set100Kilo(){
+			if(info['kilo'] >= maxKilo){
+				zb = 'Y';
+				$("#zb_div1").show();
+				$("#xs_div").hide();
+				//alert("您的行驶里程超过"+maxKilo+"公里，请直接输入一个悬赏价格作为订单价格！");
+				
+			}
+			calcTotal();
+		}
+		function chooseStyle(){
+			var val = $("input[name='orderStyle']:checked").val();
+			if(val == 1){
+				$("#zb_div2").hide();
+				$("#xs_div").show();
+				$("#minPrice").val("");
+				$("#maxPrice").val("");
+				$("#someInfo").show();
+				if(zb == 'Y'){
+					$("#zb_div1").show();
+					$("#xs_div").hide();
+				}
+			}else if(val == 2){
+				$("input[name='moreMoney']").attr("checked",false);
+				$("#zb_div2").show();
+				$("#xs_div").hide();
+				$("#someInfo").hide();
+				if(zb == 'Y'){
+					$("#zb_div1").hide();
+					$("#zb_div1").val('');
+				}
+			}
+		}
+		$(function(){
+			$(".vname").blur(function(){
+				if(!/^\S{2,10}$/.test($(this).val().trim()))
+					addPmt(this, null, '名称为长度为2-10的非空字符');
+				else
+					addPmt(this, null);
+			});	
+			$(".vphone").blur(function(){
+				if(!/^\d{11}$/.test($(this).val().trim()))
+					addPmt(this, null, '电话为长度为11的数字');
+				else
+					addPmt(this, null);
+			});
+			$(".vmoney").blur(function(){
+				if(!/^\d+(\.\d{1,2})?$/.test($(this).val().trim()))
+					addPmt(this, $(this).next(".pmt"), '金额为整型或小数点后2位的浮点型');
+				else
+					addPmt(this, $(this).next(".pmt"));
+			});
+		});
+		function addPmt(o, p, msg){
+			if(!msg){
+				if(p)
+					$(p).html('');
+				else{
+					$(o).next().remove();
+					$(o).parent().append('<span style="color:red; font-size:14px; padding-left: 15px;"><img src="${CTX}/res/images/gou.jpg" width="25" height="25"/></span>');
+				}
+			}else if($(o).parent().html().indexOf(msg)<0){
+				if(p)
+					$(p).html('<span style="color:red; font-size:14px; padding-left: 15px;">'+msg+'</span>');
+				else{
+					$(o).parent().append('<span style="color:red; font-size:14px; padding-left: 15px;">'+msg+'</span>');
+				}
+			}
+		}
+	</script>	
+	<style>
+		.more_rcv{
+			display: none;
+		}
+	</style>
+	<style>
+    .address-common {
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px #cac9c9;
+    left: 135;
+    position: absolute;
+    top: 76px;
+    width: 500px;
+    z-index: 2;
+}
+.address-common .address-common-list-wrap {
+    border-bottom: 1px solid #e5e5e5;
+}
+.address-common .address-common-list-wrap .address-common-list {
+    cursor: pointer;
+    font-size: 12px;
+    min-height: 50px;
+    position: relative;
+}
+.address-common .address-common-list-wrap .address-common-list-selected {
+    background-color: #f3f3f3;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-icon {
+    background: url("${CTX}/res/images/tc_icon.png") no-repeat scroll -320px 0 rgba(0, 0, 0, 0);
+    display: block;
+    height: 28px;
+    left: 20px;
+    position: absolute;
+    top: 12px;
+    width: 28px;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-address {
+    line-height: 20px;
+    padding-left: 62px;
+    padding-top: 5px;
+    width: 380px;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-address span {
+    display: block;
+    word-break: normal;
+    word-wrap: break-word;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-address span.address-common-detail-address {
+    color: #a3a6ab;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-name, .address-common .address-common-list-wrap .address-common-list .address-common-phone {
+    line-height: 50px;
+    position: absolute;
+    text-align: center;
+    top: 0;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-name {
+    left: 450px;
+    width: 150px;
+}
+.address-common .address-common-list-wrap .address-common-list .address-common-phone {
+    left: 600px;
+    width: 150px;
+}
+.address-common .address-common-type {
+    background-color: #f3f3f3;
+    height: 40px;
+    line-height: 40px;
+    overflow: hidden;
+    text-align: center;
+}
+.address-common .address-common-type .address-common-type-list {
+    cursor: pointer;
+    position: relative;
+    width: 50%;
+}
+.address-common .address-common-type .address-common-type-list-left {
+    float: left;
+}
+.address-common .address-common-type .address-common-type-list-right {
+    float: right;
+}
+.address-common .address-common-type .address-common-type-list-left p {
+    border-right: 1px solid #e5e5e5;
+}
+.address-common .address-common-type .address-common-type-list a {
+    display: none;
+}
+.address-common .address-common-type .address-common-type-list-selected {
+    background-color: #fff;
+}
+.address-common .address-common-type .address-common-type-list-selected .left, .address-common .address-common-type .address-common-type-list-selected .right {
+    cursor: pointer;
+    display: block;
+    height: 17px;
+    position: absolute;
+    top: 10px;
+    width: 10px;
+}
+
+    </style>
+    <script type="text/javascript" src="${CTX}/res/js/tc_address.js"></script>
+    <script>
+    	address_interval = null;
+    	 var clear_interval = function(){
+	        if (address_interval) window.clearInterval(address_interval);
+	    };
+    	$(function(){
+    	     addressSearch0 = new AddressSearch(currLoc,5, function(search_data){
+			        if (!search_data) {
+			            // 查询结果为空
+			            console.log("查询结果为空");
+			            return;
+			        }
+			        if (search_keyword != search_data.keyword) {
+			            // 查询关键词与当前查询不匹配
+			            console.log("查询关键词与当前查询不匹配");
+			            return;
+			        }
+			        select_data = search_data['data'];
+			        var html =  '<div class="address-common">'+
+			                    '   <div class="address-common-list-wrap">';
+			        for (var i = 0; i < search_data['data'].length; i++) {
+			            var item = search_data['data'][i];
+			            html += '       <div class="address-common-list" index="'+i+'">' +
+			                    '           <span class="address-common-icon"></span>' +
+			                    '           <p class="address-common-address">' +
+			                    '               <span class="address-common-title">'+item['title']+'</span>' +
+			                    '               <span class="address-common-detail-address"> 详细地址：<em>'+item['address']+'</em></span>' +
+			                    '               <span style="display:none;" class="lng">'+item['lng']+'</span>' +
+			                    '               <span style="display:none;" class="lat">'+item['lat']+'</span>' +
+			                    '           </p>' +
+			                    '       </div>';
+			        }
+			        html +=     '   </div>' +
+			                    '</div>';
+			        $("#sendAddr_panel").html(html);
+			        $("#sendAddr_panel .address-common-list").click(function(){
+			        	$("#sendAddr").val($(this).find("em").html());
+			        	$("#sendAddr_panel").html('');
+			        	info['from'] = $(this).find("em").html();
+			        	info['from_lng'] = $(this).find(".lng").html();
+			        	info['from_lat'] = $(this).find(".lat").html();
+			        	console.log(info['from']+", "+info['from_lng']+", "+info['from_lat']);
+			        	tryDrive();
+			        });
+			    });    	
+    		 $("#sendAddr").on('focus', function(){
+		        var that = $(this);
+		        var last_val = that.val();
+		        clear_interval();
+		        address_interval = window.setInterval(function(){
+		            search_keyword = that.val();
+		            console.log("sendAddr search : "+search_keyword);
+		            if (search_keyword && (search_keyword != last_val)) {
+		                addressSearch0.search(search_keyword);
+		                last_val = search_keyword;
+		            }
+		        }, 100);		        
+		    }).on('blur', function(){
+		        clear_interval();
+		    });
+		    
+		    
+		    addressSearch1 = new AddressSearch(currLoc,5, function(search_data){
+			        if (!search_data) {
+			            // 查询结果为空
+			            return;
+			        }
+			        if (search_keyword != search_data.keyword) {
+			            // 查询关键词与当前查询不匹配
+			            return;
+			        }
+			        select_data = search_data['data'];
+			        var html =  '<div class="address-common">'+
+			                    '   <div class="address-common-list-wrap">';
+			        for (var i = 0; i < search_data['data'].length; i++) {
+			            var item = search_data['data'][i];
+			            html += '       <div class="address-common-list" index="'+i+'">' +
+			                    '           <span class="address-common-icon"></span>' +
+			                    '           <p class="address-common-address">' +
+			                    '               <span class="address-common-title">'+item['title']+'</span>' +
+			                    '               <span class="address-common-detail-address"> 详细地址：<em>'+item['address']+'</em></span>' +
+			                    '               <span style="display:none;" class="lng">'+item['lng']+'</span>' +
+			                    '               <span style="display:none;" class="lat">'+item['lat']+'</span>' +
+			                    '           </p>' +
+			                    '       </div>';
+			        }
+			        html +=     '   </div>' +
+			                    '</div>';
+			        $("#rcvAddr_panel").html(html);
+			        $("#rcvAddr_panel .address-common-list").click(function(){
+			        	$("#rcvAddr").val($(this).find("em").html());
+			        	$("#rcvAddr_panel").html('');
+			        	info['to'] = $(this).find("em").html();
+			        	info['to_lng'] = $(this).find(".lng").html();
+			        	info['to_lat'] = $(this).find(".lat").html();
+			        	tryDrive();
+			        });
+			    });    	
+    		 $("#rcvAddr").on('focus', function(){
+		        var that = $(this);
+		        var last_val = that.val();
+		        clear_interval();
+		        address_interval = window.setInterval(function(){
+		            search_keyword = that.val();
+		            if (search_keyword && (search_keyword != last_val)) {
+		                addressSearch1.search(search_keyword);
+		                last_val = search_keyword;
+		            }
+		        }, 100);		        
+		    }).on('blur', function(){
+		        clear_interval();
+		    });
+		    
+		    
+		    
+		    <#list 2..5 as a>
+		    addressSearch${a} = new AddressSearch(currLoc,5, function(search_data){
+			        if (!search_data) {
+			            // 查询结果为空
+			            return;
+			        }
+			        if (search_keyword != search_data.keyword) {
+			            // 查询关键词与当前查询不匹配
+			            return;
+			        }
+			        select_data = search_data['data'];
+			        var html =  '<div class="address-common" style="top:'+(280 + (${a}-2)*200)+'px">'+
+			                    '   <div class="address-common-list-wrap">';
+			        for (var i = 0; i < search_data['data'].length; i++) {
+			            var item = search_data['data'][i];
+			            html += '       <div class="address-common-list" index="'+i+'">' +
+			                    '           <span class="address-common-icon"></span>' +
+			                    '           <p class="address-common-address">' +
+			                    '               <span class="address-common-title">'+item['title']+'</span>' +
+			                    '               <span class="address-common-detail-address"> 详细地址：<em>'+item['address']+'</em></span>' +
+			                    '               <span style="display:none;" class="lng">'+item['lng']+'</span>' +
+			                    '               <span style="display:none;" class="lat">'+item['lat']+'</span>' +
+			                    '           </p>' +
+			                    '       </div>';
+			        }
+			        html +=     '   </div>' +
+			                    '</div>';
+			        $("#rcvAddr${a}_panel").html(html);
+			        $("#rcvAddr${a}_panel .address-common-list").click(function(){
+			        	$("#rcvAddr${a}").val($(this).find("em").html());
+			        	$("#rcvAddr${a}_panel").html('');
+			        	info['rcvAddr${a}'] = $(this).find("em").html();
+			        	info['rcvAddr${a}_lng'] = $(this).find(".lng").html();
+			        	info['rcvAddr${a}_lat'] = $(this).find(".lat").html();
+			        	tryDrive();
+			        });
+			    });    	
+    		 $("#rcvAddr${a}").on('focus', function(){
+		        var that = $(this);
+		        var last_val = that.val();
+		        clear_interval();
+		        address_interval = window.setInterval(function(){
+		            search_keyword = that.val();
+		            if (search_keyword && (search_keyword != last_val)) {
+		                addressSearch${a}.search(search_keyword);
+		                last_val = search_keyword;
+		            }
+		        }, 100);		        
+		    }).on('blur', function(){
+		        clear_interval();
+		    });
+		    </#list>
+    	});
+    	
+    	
+    	var oldAddrArr = [];
+    	function selOldAddr(){
+    		$.getJSON('${CTX}/ab/tc/selOldAddr',function(data){
+    			if(!data || data['fail'] || !data.length || data.length < 1){
+    				alert('暂无常用地址');
+    				return false;
+    			}
+    			oldAddrArr = data;
+    			var addrStr = '';
+				for(var i=0;i<data.length;i++){
+					addrStr += '<br/><input type="radio" name="oldAddr" value="'+data[i]['addr']+'" '+(i==0?'checked="checked"':'')+'/>&nbsp;'+data[i]['addr']+'<br/><br/>';
+				}
+    			//alert(data.length);
+    			$.dialog({
+					title:'选择常用地址',
+					content: addrStr,
+				    lock:true,
+				    resize: true,
+				    width : 600,
+					height : 200,
+					cover:true,
+					max:true,
+					min:false,
+					cancel:true,
+					button: [{
+		            	name: '确定',
+			            callback: function(){
+			            	//alert('callback submit');
+			            	var index = $("input[name='oldAddr']").index($("input[name='oldAddr']:checked"));
+			            	var addr = $("input[name='oldAddr']:checked").val();
+			            	var jd = oldAddrArr[index]['jd'];
+			            	var wd = oldAddrArr[index]['wd'];
+			            	$("#sendAddr").val(addr);
+			            	info['from'] = addr;
+				        	info['from_lng'] = jd;
+				        	info['from_lat'] = wd;
+				        	//alert(addr+'_'+jd+'_'+wd);
+				        	tryDrive();
+			            },
+	           			focus: true
+			        }],
+			        cancelVal:'关 闭'
+				});//弹出框
+    		});
+    	}
+    	function selShAddr(num){
+    		$.getJSON('${CTX}/ab/tc/selOldAddr',function(data){
+    			if(!data || data['fail'] || !data.length || data.length < 1){
+    				alert('暂无常用地址');
+    				return false;
+    			}
+    			oldAddrArr = data;
+    			var addrStr = '';
+				for(var i=0;i<data.length;i++){
+					addrStr += '<br/><input type="radio" name="oldAddr'+num+'" value="'+data[i]['addr']+'" '+(i==0?'checked="checked"':'')+'/>&nbsp;'+data[i]['addr']+'<br/><br/>';
+				}
+    			//alert(data.length);
+    			$.dialog({
+					title:'选择常用地址',
+					content: addrStr,
+				    lock:true,
+				    resize: true,
+				    width : 600,
+					height : 200,
+					cover:true,
+					max:true,
+					min:false,
+					cancel:true,
+					button: [{
+		            	name: '确定',
+			            callback: function(){
+			            	//alert('callback submit');
+			            	var index = $("input[name='oldAddr"+num+"']").index($("input[name='oldAddr"+num+"']:checked"));
+			            	var addr = $("input[name='oldAddr"+num+"']:checked").val();
+			            	var jd = oldAddrArr[index]['jd'];
+			            	var wd = oldAddrArr[index]['wd'];
+			            	$("#rcvAddr"+num).val(addr);
+			            	info['rcvAddr' + num] = addr;
+				        	info['rcvAddr'+num+'_lng'] = jd;
+				        	info['rcvAddr'+num+'_lat'] = wd;
+				        	//alert(addr+'_'+jd+'_'+wd);
+				        	tryDrive();
+			            },
+	           			focus: true
+			        }],
+			        cancelVal:'关 闭'
+				});//弹出框
+    		});
+    	}
+    </script>
+ </head>
+  <body>
+<!-- 最顶层的内容 -->
+	<#include '../inc/top.html'>
+  	<!-- 搜索栏 -->
+	<#include '../inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+
+<!-- 导航 开始 -->
+	<#include '../inc/nav_ps.html'>
+<!-- 导航 结束 -->
+	
+	<!-- 在线下单，同城快递，基础信息 -->
+<!--============================================= content begin =========================================-->
+<div class="con-wrap order1">
+  <div class="order-t" data-unuse="1"></div>
+  	<div id="container"><div id="content"><div id="slider">
+  	<ul class="sul">
+  		<#list carsLoop as l>
+	  	<li class="sli">
+	  	<div id="carImgBj" class="order-info" car_type="" data-unuse="1">
+		  	<#list l as c>
+		    <div class="carImg img2" style="display:block;" car_type="3" data-unuse="1">
+		      <div class="car_wrap" data-unuse="1">
+		        <div class="t" data-unuse="1">
+		          <h2>${c.name}</h2>
+		          <p class="tip">本次服务：</p>
+		          <p class="price"><span>￥<em>${(c['起步价'])!}</em><b>起</b></span></p>
+		        </div>
+		        <div class="icon" data-unuse="1"></div>
+		        <div class="img" data-unuse="1">
+		        	<!-- <img src="${CTX}/upload/${(c['封面'])!}" height="224" width="230"/> -->
+		        </div>
+		        <div class="c" data-unuse="1">
+		          <ul>
+		            <h3>&nbsp;</h3>
+		            <li>起步价格：${(c['起步价'])!}元（含${(c['起步公里'])!}公里）</li>
+		            <li>运输体积：${(c['运输体积'])!}</li>
+		            <li>长*宽*高：${(c['长宽高'])!}</li>
+		            <li>重量限制：${(c['重量限制'])!}</li>
+		            <li>超公里费：${(c['超公里费'])!}元/公里</li>
+		            <#if (c['车长'])?exists><li>车长：可选（${(c['车长'])!}）米</li></#if>
+		          </ul>
+		        </div>
+		      </div>
+		    </div>
+			</#list>
+	  	</div>
+	  	</li>
+	  	</#list>	  	
+  	</ul></div></div></div>
+  <!--  成都 begin --> 
+</div>
+<!--=============================================== 订单信息 over =========================================--> 
+		
+<!--========================================= 发货信息  收货信息  begin ======================================-->
+
+<div class="info-order-wrap">
+  <div class="info-order" data-unuse="1">
+    <div class="info" data-unuse="1"> 
+      <!--====发货信息 begin ======-->
+      <div class="info-list" data-unuse="1">
+        <div class="info-t" data-unuse="1">发货信息:</div>
+        <div class="tab2 takeGoods-js pickup" address-info-x="" address-info-y="" address-info-province="" address-info-city="" address-info-id="" data-unuse="1">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tbody>
+              <tr>
+                <th>发货地址：</th>
+                <td><div class="address-wrap" data-unuse="1">
+                    <div class="address" data-unuse="1">
+                      <input type="text" placeholder="请输入发货地址" class="l address-info-address vaddr" value="" id="sendAddr" name="sendAddr">
+                      <a href="javascript:selOldAddr();">常用地址</a>
+                    </div>
+                    <div id="sendAddr_panel"></div>
+                  </div></td>
+              </tr>
+              <tr>
+                <th>联系人姓名：</th>
+                <td><p>
+                    <input autocomplete="off" type="text" placeholder="请输入姓名" class="address-info-name vname" value="${(abuser.mc)!}" id="sendName" name="sendName">
+                  </p></td>
+              </tr>
+              <tr>
+                <th>联系电话：</th>
+                <td><p>
+                    <input autocomplete="off" type="text" placeholder="请输入联系电话" class="address-info-phone vphone" value="${(abuser.mobile)!}" id="sendPhone" name="sendPhone">
+                  </p></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!--====发货信息 over ======--> 
+      <!--====收货信息 begin ======-->
+      <div class="info-list" data-unuse="1">
+        <div class="info-t" data-unuse="1">收货信息:</div>
+        <!--====tab2 begin ======-->
+        <div class="tab2 tab-js takeGoods-js" address-info-x="" address-info-y="" address-info-province="" address-info-city="" address-info-id="" data-unuse="1">
+          <div class="receipt-address-num num1" data-unuse="1" style="display: none;"></div>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tbody>
+              <tr>
+                <th>收货地址(选填)：</th>
+                <td><div class="address-wrap" data-unuse="1">
+                    <div class="address" data-unuse="1">
+                      <input autocomplete="off" type="text" placeholder="请输入收货地址" class="l address-info-address vaddr" value="" id="rcvAddr" name="rcvAddr">
+                      <br>
+                      <a href="javascript:selShAddr('');">常用地址</a>
+                    </div>
+                    <div id="rcvAddr_panel"></div>
+                  </div></td>
+                <td rowspan="3" width="47" class="sed-operation"><a href="javascript:void(0);" class="plus" onclick="addRcv();"></a></td>
+              </tr>
+              <tr>
+                <th>联系姓名(选填)：</th>
+                <td><p>
+                    <input autocomplete="off" type="text" placeholder="请输入姓名" class="address-info-name vname" value="" id="rcvName" name="rcvName">
+                  </p></td>
+              </tr>
+              <tr>
+                <th>联系电话(选填)：</th>
+                <td><p>
+                    <input autocomplete="off" type="text" placeholder="请输入联系电话" class="address-info-phone vphone" value="" id="rcvPhone" name="rcvPhone">
+                  </p></td>
+              </tr>
+            </tbody>
+          </table>
+          	<#list 2..5 as a>
+			<table width="100%" cellpadding="0" cellspacing="0" class="more_rcv">
+            <tbody>
+              <tr>
+                <th>收货地址${a}：</th>
+                <td><div class="address-wrap" data-unuse="1">
+                    <div class="address" data-unuse="1">
+                      <input autocomplete="off" type="text" placeholder="请输入收货地址" class="l address-info-address vaddr" value="" id="rcvAddr${a}" name="rcvAddr${a}">
+                      <br>
+                      <a href="javascript:selShAddr(${a});">常用地址</a>
+                    </div>
+                    <div id="rcvAddr${a}_panel"></div>
+                  </div></td>
+                <td rowspan="3" width="47" class="sed-operation"><a href="javascript:void(0);" class="reduction" onclick="removeRcv(${a});"></a></td>
+              </tr>
+              <tr>
+                <th>联系人姓名${a}：</th>
+                <td><p>
+                    <input autocomplete="off" type="text" placeholder="请输入姓名" class="address-info-name vname" value="" id="rcvName${a}" name="rcvName${a}">
+                  </p></td>
+              </tr>
+              <tr>
+                <th>联系电话${a}：</th>
+                <td><p>
+                    <input autocomplete="off" type="text" placeholder="请输入联系电话" class="address-info-phone vphone" value="" id="rcvPhone${a}" name="rcvPhone${a}">
+                  </p></td>
+              </tr>
+            </tbody>
+          </table>			
+			</#list>
+        </div>
+        <!--====tab2 over ======-->
+        <div class="info-tip">最多可添加五个收货人，请按照卸货顺序填写，以遍准确估算价格</div>
+      </div>
+      <!--====收货信息 over ======--> 
+      <div class="info-list" data-unuse="1">
+        <div class="info-t" data-unuse="1">订单模式:</div>
+        <div class="tab2 takeGoods-js pickup" address-info-x="" address-info-y="" address-info-province="" address-info-city="" address-info-id="" data-unuse="1">
+          <table width="100%" cellpadding="0" cellspacing="0" class="">
+				<tr>
+                  <td align="left" colspan="2">
+                  	&nbsp;&nbsp;
+					<label><input type="radio" name="orderStyle" value="1" id="isXS" style="width:20px"/>我要悬赏</label>
+					<label><input type="radio" name="orderStyle" value="2" style="width:20px"/>司机竞标报价</label>&nbsp;&nbsp;
+					<br>
+					<span class=cff5801>&nbsp;&nbsp;
+						<img src=${CTX}/res/css/ab/images/img11.png />&nbsp;
+						招标模式：跑腿人员（司机）竞标，您选择其中一位为您服务； 悬赏模式：一口价，可以额外加悬赏金额哟！
+					</span>
+              	  </td>
+              	</tr>
+              	<tr id="zb_div1" style="display: none;">
+                    <td align="left" height="50">
+                        <span class="fb f12 c646464">&nbsp;&nbsp;&nbsp;&nbsp;悬赏价格：</span>
+                    </td>
+                    <td align="left">
+                    <input autocomplete="off" type="text" placeholder="悬赏金额" class="address-info-name vmoney" value="" id="xsMoney" name="xsMoney" onblur="calcTotal();">
+                    <br>
+                    <p class="pmt"></p>
+                    </td>
+                </tr>
+              	<tr id="xs_div" style="display: ;">
+                    <td align="left" height="50">
+                        <span class="fb f12 c646464">&nbsp;&nbsp;&nbsp;&nbsp;额外悬赏金额：</span>
+                    </td>
+                    <td align="left">
+                    <label><input type=radio name="moreMoney" onchange="calcTotal()" value="10" style="width:20px"/>&nbsp;10元</label>&nbsp;&nbsp;
+                    <label><input type=radio name="moreMoney" onchange="calcTotal()" value="20" style="width:20px"/>&nbsp;20元</label>&nbsp;&nbsp;
+                    <label><input type=radio name="moreMoney" onchange="calcTotal()" value="30" style="width:20px"/>&nbsp;30元</label>&nbsp;&nbsp;
+                    <label><input type=radio name="moreMoney" onchange="calcTotal()" value="50" style="width:20px"/>&nbsp;50元</label>&nbsp;&nbsp;
+                    <label><input type=radio name="moreMoney" onchange="calcTotal()" value="100" style="width:20px"/>&nbsp;100元</label>
+                    </td>
+                </tr>
+                <tr id="zb_div2" style="display: none;">
+                    <td align="left" height="50">
+                        <span class="fb f12 c646464">&nbsp;&nbsp;&nbsp;&nbsp;价格区间：</span>
+                    </td>
+                    <td align="left">
+                    <input autocomplete="off" type="text" placeholder="最低价格" class="address-info-name vmoney" value="" id="minPrice" name="minPrice">
+                    -
+                    <input autocomplete="off" type="text" placeholder="最高价格" class="address-info-name vmoney" value="" id="maxPrice" name="maxPrice">
+                    <br>
+                    <p class="pmt"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left" colspan="2">
+                   		<span class=cff5801>&nbsp;&nbsp;
+							特别提醒：如果您的物流距离超过100公里，您可以选择直接录入一个悬赏价格或招标一个价格区间！
+						</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+      </div>
+      <!--====信息统计 下一步 begin ======-->
+      <div class="info-last-wrap">
+        <div class="info-last" id="someInfo">
+          <p> <span class="t">预计行驶里程：</span><span class="range c"><em class="order_distance" id="kiloRst">0</em>公里</span></p>
+          <p><span class="t">车型：</span><span class="c"><em class="order_car_type" id="carRst">...</em></span></p>
+          <p><span class="t">订单基本费用：</span><span><strong class="order_fare" id="total">0</strong>元</span></p>
+        </div>
+        <div class="info-last">
+          <p>
+            <button type="button" id="saveInfo" class="next-btn tc_button_next" onclick="next();">下一步</button>
+          </p>
+        </div>
+      </div>
+      <!--====信息统计 下一步  over ======--> 
+    </div>
+  </div>
+</div>
+<!--===================================== 发货信息  收货信息  over ====================================-->
+
+	<div id="allmap" style="display: none;"></div>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>
+<script type="text/javascript">
+	// 百度地图API功能
+	var map = new BMap.Map("allmap");
+	map.centerAndZoom(currLoc, 11);
+	var options = {
+		onSearchComplete: function(results){
+			if (driving.getStatus() == BMAP_STATUS_SUCCESS){
+				// 获取第一条方案
+				var plan = results.getPlan(0);
+				// 获取方案的驾车线路
+				var route = plan.getRoute(0);
+				//var meter = route.vf;
+				var meter = route.getDistance(false);
+				//alert(meter + "米" + (Math.floor(meter/1000) + 1) + "公里");	
+				var k = 	(Math.floor(meter/1000) + 1);
+				info['kilo'] += k;
+				//alert(k);
+				
+				currKilo++;
+				if(currKilo == 1 && info['rcvAddr2'] && info['rcvAddr2']!=''){
+					//driving.search(info['to'], info['rcvAddr2']);
+					driving.search(new BMap.Point(info['to_lng'], info['to_lat']), new BMap.Point(info['rcvAddr2_lng'], info['rcvAddr2_lat']));
+					return;
+				}else if(currKilo >= 2 && info['rcvAddr'+(currKilo+1)] && info['rcvAddr'+(currKilo+1)]!=''){
+					//driving.search(info['to' + currKilo], info['to'+(currKilo+1)]);
+					driving.search(new BMap.Point(info['rcvAddr'+currKilo+'_lng'], info['rcvAddr'+currKilo+'_lat']), 
+						new BMap.Point(info['rcvAddr'+(currKilo+1)+'_lng'], info['rcvAddr'+(currKilo+1)+'_lat']));
+					return;
+				}
+				currKilo = -1;
+				set100Kilo();		
+			}else{
+				manKilo();
+			}
+		}
+	};
+	var driving = new BMap.DrivingRoute(map, options);
+</script>

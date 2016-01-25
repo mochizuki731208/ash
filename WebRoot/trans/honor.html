@@ -1,0 +1,46 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<#include '../ab/inc/meta.html'>
+<title>公司荣誉-${(vo.mc)!'物流企业'}</title>
+<link href="${CTX}/res/trans/css/mystyle.css" type="text/css" rel="stylesheet" />
+<link href="${CTX}/res/trans/css/jqhdp.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+<#include '../ab/inc/top.html'>
+<div class="top_2">
+	<div class="title"><span>${(vo.mc)!}</span></div>
+</div>
+<#include 'inc/nav.html'>
+<!-- 幻灯片开始-->
+<#include 'inc/slider.html'>
+<!--幻灯片结束-->
+<div class="container">
+   <#include 'inc/left.html'>
+   
+   <div class="body_content">
+    <div class="body_content1">
+    <ul>
+    	<li>企业荣誉</li>
+     </ul>
+     <p>
+	 <#if (lo.id)??>
+     <@_mer_logimg_list lid=lo.id desc="honor">
+     	<#if list??>
+     	<#list list as x>
+     		<#if x??><img alt="企业荣誉${(x.seq_num)!}" src="${CTX}/upload/${(x.lager)!}"></#if>
+     	</#list>
+     	</#if>
+     </@_mer_logimg_list>
+	 </#if>
+     </p>
+    </div>
+   </div>
+
+	<div class="bottom"></div>    
+</div>
+
+<#include 'inc/footer.html'>
+</body>
+</html>

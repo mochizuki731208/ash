@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>易生活网</title>
+    <#include '../inc/meta.html'>
+     <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/login.css"/>
+    <style type="text/css">
+	    .mainreg{text-align: center;margin: 40px 200px 40px 200px;}
+	    .mainreg span{font-size: 20px}
+	    .red{color: red; padding: 3px 15px 0 15px}
+	    .mainreg select {width: 200px;font-size: 18px;border-color: #FF7F24}
+	    .form{text-align: center;width: 800px;border: 1px #FF7F24;min-height: 100px;}
+	    .summitbtn #summitbtn{width: 100px;margin: 20px;padding: 5px}
+    </style>
+    <script type="text/javascript">
+    $(function(){
+    	$("#userSubType").empty();
+    	$("#userType").bind("change",function(){
+    		changeUserSubType($("#userType").val());
+    	})
+    	$("#summitbtn").bind("click",function(){
+    		var userType = $("#userType").val();
+    		var userSubType = $("#userSubType").val();
+    		if(!userType || !userSubType){
+    			alert("请选择用户类型或子类型");
+    		}else{
+    			window.location.href="${CTX}/ab/reg/reguser?userSubType=" +userSubType + "&userType=" +　userType;
+    		}
+    	})
+    })
+    function changeUserSubType(userType){
+    	var userSubType = $("#userSubType");
+    	userSubType.empty();
+    	if(userType==""){
+    		return;
+    	}
+    	$.post("${CTX}/ab/subject/getSubSubject",{userType: userType},function(data){
+            $.each(data,function(i,o){
+            	userSubType.append($("<option value='" + o.id + "'>" + o.mc + "</option>"))
+            })
+		});
+    }
+    </script>
+  </head>
+  
+  <body>
+	  	<#include '../inc/top.html'>
+		<#include '../inc/header.html'>
+		<div class="blank10"></div>
+		<#include '../inc/nav.html'>
+		<div class="blank10"></div>
+		
+		<div class="mainreg">
+			<span>用户类型:</span><span class="red">*</span>
+			<select name="userType" id="userType">
+				<option value="">请选择用户类型</option>
+				<#list subList as l>
+					<option value="${(l.id)!''}">${(l.mc)!''}</option>
+				</#list>
+			</select>
+			<select name="userSubType" id="userSubType">
+				<option value=""></option>
+			</select>
+			<div class="summitbtn">
+				<input type="button" value="下一步" id="summitbtn" class="fsubmit vm">
+			</div>
+		</div>
+		
+		
+		
+		<div class="blank10"></div>
+		<#include '../inc/foot.html'>
+  </body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules: {
+					rzm: {required:true,stringMinLength:6,equalTo:"#checkcode"}
+				},
+				messages:{
+					rzm:{required:"认证码不能为空！",stringMinLength:"认证码长度不正确，为6位数字",equalTo:"认证码输入不正确或已过期！"}
+				}
+			});
+			
+			/* 表单验证*/
+			$("#myformmoney").validate({
+				rules:{
+					certificatemoney: {required:true,number:true,min:0}
+				}
+			});
+			
+			$("#btn_send").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$("#btn_send").attr('disabled',true);
+					$("#btn_send").val("开始认证...")
+					$.post("${CTX}/ab/certiMobileSend",$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("手机号认证成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("手机号认证失败！");
+						}
+					});
+				}
+			});
+		});
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+ </head>
+  <body>
+  	<#include 'inc/top.html'>
+	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include 'inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">手机认证</h2>
+			<div class="editinfo">
+			<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+				<input type="hidden" id="id" name="id" class="text" value="${(abuser.id)!''}">
+				<input type="hidden" id="checkcode" name="checkcode" value=""/>
+				<table class="input">
+						<tr>
+							<th align="right">手机号码：</th>
+							<td><input type="text" class="text" id="sjh" name="sjh" readonly value="${(vo.mobile)!}"></td>
+						</tr>
+						<#if !(strkit('1',(vo.certificatemobile)!))>
+						<tr>
+							<th align="right">短信认证码：</th>
+							<td><input type="text" class="text" name="rzm" id="rzm" value=""><input type="button" id="btn_sendrzm" value="发送验证码"/></td>
+						</tr>
+						</#if>
+						<tr>
+							<th align="right">认证状态：</th>
+							<td>
+								<#if strkit('0',(vo.certificatemobile)!)>
+									未认证
+								<#elseif strkit('1',(vo.certificatemobile)!)>
+									认证通过
+								<#elseif strkit('2',(vo.certificatemobile)!)>
+									<span class="red bold">认证中</span>
+								</#if>
+							</td>
+						</tr>
+						<tr>
+							<th align="right"></th>
+							<td>
+								<#if strkit('0',(vo.certificatemobile)!)>
+									<input type="button" id="btn_send" class="button" value="提交" />
+								</#if>
+							</td>
+						</tr>
+				</table>
+			</form>
+			</div>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	<script type="text/javascript">
+		var wait=60;
+		
+		//获取6位随机验证码
+		function random() {
+		    var num = "";
+		    for (i = 0; i < 6; i++) {
+		        num = num + Math.floor(Math.random() * 10);
+		    }
+		    return num;
+		}
+		function time(o) {
+	        if (wait == 0) {
+	        	$("#checkcode").attr("value",'');
+	            o.removeAttribute("disabled");            
+	            o.value="免费获取验证码";
+	            wait = 60;
+	        } else {
+	        	if(wait==60){
+	        		$("#checkcode").attr("value",random());//填充内容
+	        		$.ajax({
+					      type: "POST",
+					      url: "${CTX}/ab/reg/sendSmsMsg?phone=" + $("#sjh").val() + "&smsCodeRand=" + $("#checkcode").val(),
+					      dataType:"json",
+					      success: function(data) {
+					          if (data) {
+					             	o.setAttribute("disabled", true);
+						            o.value="重新发送(" + wait + ")";
+						            wait--;
+						            setTimeout(function() {
+						                time(o)
+						            },
+						            1000);
+					          }
+					          else {
+					              alert("验证码获取失败！请重新获取");
+					          }
+					       },
+					       error: function() { alert("error"); }
+					  });
+	        	}else{
+	        		o.setAttribute("disabled", true);
+		            o.value="重新发送(" + wait + ")";
+		            wait--;
+		            setTimeout(function() {
+		                time(o)
+		            },
+		            1000);
+	        	}
+	        }
+	    }
+		document.getElementById("btn_sendrzm").onclick=function(){time(this);}
+	</script>
+	</body>
+</html>

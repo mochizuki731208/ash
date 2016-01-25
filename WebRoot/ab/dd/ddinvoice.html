@@ -1,0 +1,216 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<#include '../inc/meta.html'>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">    
+	<title>申请发票</title>
+	<link href="${CTX}/ab/dd/css/invoiceAll.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+    <script type="text/javascript">
+/**
+	$().ready(function() {
+		// 表单验证
+		$("#myform").validate({
+			rules: {
+				lxr: {required:true,stringMaxLength:20},
+				lxrdh: {required:true,stringMaxLength:20},
+				shdz: {required:true,stringMaxLength:50},
+				memo: {stringMaxLength:100},
+				yqsdsj: {stringMaxLength:20}
+			}
+		});
+	});
+		**/
+	function refresh(){
+		$('#myform').submit();
+		$('#myform').action = "";
+		$('#myform').target = "_self";
+	}
+		
+	var info = {};
+	function validate_form(){
+		
+		info['sys_invoice_address_mobile'] = $("#sys_invoice_address_mobile").val();
+		info['sys_invoice_address_name'] = $("#sys_invoice_address_name").val();
+		info['sys_invoice_address_address'] = $("#sys_invoice_address_address").val();
+		info['sys_invoice_money'] = $("#sys_invoice_money").val();
+		info['sys_invoice_type'] = $('input[name="sys_invoice_type"]:checked').val();;
+		info['company_name']=$("#company_name").val();
+		info['sys_invoice_content'] = $("#sys_invoice_content").val();
+		info['support_money'] = ${(totalMoney)!};
+		info['area_id']=${(area_id)!};
+
+		if(info['support_money'] == 0){
+			alert("可申请发票的订单金额为0，可在【查看申请记录】中查看申请明细");
+			return false;
+		}
+		
+		if(info['sys_invoice_money'] ==''){
+			alert("请填写金额");
+			return false;
+		}
+		if(info['sys_invoice_money'] > info['support_money']){
+			alert("超出可开发票额度");
+			return false;
+		}
+		if(!/^\d{11}$/.test(info['sys_invoice_address_mobile'])){
+			alert("请填写正确的11位收货人电话号码");
+			return false;
+		}
+
+		if(info['sys_invoice_address_name'] ==''){
+			$.dialog.alert("请填写收件人");
+			return false;
+		}
+		if(info['sys_invoice_address_address'] ==''){
+			$.dialog.alert("请填写收件人地址");
+			return false;
+		}
+		$.post('${CTX}/ab/invoice/submitInvoice',info,function(data){
+			if(data && data.msg=="success"){
+				alert("发票申请成功");
+				refresh();
+			}else{
+				alert("申请失败，请稍后再试");
+			}
+		});
+	}
+	
+	</script>
+    
+ </head>
+<body>
+	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="cm">
+	<div class="leftmenu fl">
+		<#include '../inc/leftmenu.html'>
+	</div>
+    <!--内容-->
+    <div class="rightcon fr" >
+    	<form id="myform" name="myform" method="post" action="">
+	        <div class="percenter">
+	            <div class="perc_c">
+	                <div class="perc_right" >
+	                    <span>您已经申请了<a href="javascript:void(0);">${(record.count)!}</a>张发票</span>
+	                    <a href="${CTX}/ab/invoice/userListInvoice" class="btn" target="view_window">查看申请记录</a>
+	                </div>
+	                <h2>申请发票</h2>
+	                <input type="hidden"  name="sys_invoice_order_id" value="${(orderid)!}"></input>
+					<input type="hidden"  name="area_id" value="${(area_id)!}"></input>
+	                <div class="coupon invoice">
+	                    <table cellspacing="0" cellpadding="0" width="100%" >
+	                        <tbody>
+	                            <tr>
+	                                <th><span>可申请发票金额：</span></th>
+	                                <td>
+	                                    <span>
+	                                        <em class="strong f-14">
+	                                            ${(totalMoney)!}
+	                                        </em>元
+	                                    </span>
+	                                </td>
+	                            </tr>
+	                            <tr>
+	                                <th class="border-b"><span>本次申请发票金额：</span></th>
+	                                <td class="border-b">
+	                                    <div>
+	                                        <input type="text" class="money-inp" style="width:140px; height:20px;" id="sys_invoice_money" name="sys_invoice_money"  value="${(totalMoney)!}">&nbsp;&nbsp;元
+	                                        <span class="invoiceError" style="display:none;">
+	                                            <em class="icon"></em><b>
+	                                                		发票金额不正确
+	                                            </b>
+	                                        </span>
+	                                    </div>
+	                                    <span class="tip">注：您所需要的发票将由【${(region_name_company)!}】为您开具，500元以上免费寄送</span>
+	                                </td>
+	                            </tr>
+	                        </tbody>
+	                        <tbody>
+	                            <tr>
+	                                <th><span>发票抬头：</span></th>
+	                                <td>
+	                                    <label for="personal">
+	                                        <input type="radio" name="sys_invoice_type"  value="personal" >
+	                                        <span>个人</span>
+	                                    </label>
+	                                    <label for="company" class="company">
+	                                        <input checked="checked" type="radio" name="sys_invoice_type"  value="company" >
+	                                        <span>公司</span>
+	                                    </label>
+	                                    <input type="text" class="companyName"  id= "company_name" name="company_name">
+	                                    <span class="invoiceError" style="display:none;">
+	                                        <em class="icon"></em><b>
+	                                            公司名称不能为空
+	                                        </b>
+	                                    </span>
+	                                </td>
+	                            </tr>
+	                            <tr>
+	                                <th class="border-b"><span>发票内容：</span></th>
+	                                <td class="border-b">
+	                                    <select class="invoice-con" name="sys_invoice_content" id="sys_invoice_content">
+	                                        <option value="服务费">服务费</option>
+	                                        <option value="代理费">代理费</option>
+	                                        <option value="货物运输代理费">货物运输代理费</option>
+	                                    </select>
+	                                </td>
+	                            </tr>
+	                        </tbody>
+	                        <tbody>
+	                            <tr>
+	                                <th><span>收件人信息：</span></th>
+	                                <td>
+	                                    <div class="address-defalut">
+	                                        <label for="address-new">
+	                                            <input id="address-new" type="radio" name="address" value="0" checked="checked"><span>使用新地址</span>
+	                                        </label>
+	                                    </div>
+	                                    <div class="address-add" style="">
+	                                        <p>
+	                                            <span class="t">收件人：</span>
+	                                            <input type="text" value="" class="inp" id="sys_invoice_address_name" name="sys_invoice_address_name" >
+	                                            <a href="javascript:void(0);" style="display:none;" class="myself">本人</a>
+	                                            <span class="invoiceError" style="display:none;">
+	                                                <em class="icon"></em><b>
+	                                                    收件人不能为空
+	                                                </b>
+	                                            </span>
+	                                        </p>
+	                                        <p>
+	                                            <span class="t">手机号码：</span>
+	                                            <input type="text" value="" class="inp"   id="sys_invoice_address_mobile" name="sys_invoice_address_mobile">
+	                                            <span class="invoiceError" style="display:none;">
+	                                                <em class="icon"></em><b>
+	                                                    手机号格式不正确
+	                                                </b>
+	                                            </span>
+	                                        </p>
+	                                        <p>
+	                                            <span class="t">详细地址：</span>
+	                                            <input type="text" value="" class="inp inpl" id="sys_invoice_address_address" name="sys_invoice_address_address">
+	                                            <span class="invoiceError" style="display:none;">
+	                                                <em class="icon"></em><b>
+	                                                    收件地址不能完全为空
+	                                                </b>
+	                                            </span>
+	                                            <input type="hidden" value="" class="inp inpl" id="add_address_id">
+	                                        </p>
+	                                    </div>
+	                                </td>
+	                            </tr>
+	                            <tr>
+	                                <th><span>&nbsp;</span></th>
+	                                <td><a href="javascript:void(0)"  id="invoice_confirm" class="confirm-btn" onclick="validate_form()">确认申请</a></td>
+	                            </tr>
+	                        	</tbody>
+	                    	</table>
+	                	</div>
+	            	</div>
+	        	</div>
+	        </form>
+	    </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,181 @@
+ <table  class="input">
+  <tr>
+  <td width="45%" style="vertical-align: top;">
+    <form id="inputForm" name="inputForm" action="${CTX}${NAME_SPACE}/save" method="post" >
+	 <table class="input">
+	 	<tr>
+			<th align="right">商品类型</th>
+			<td>
+				<label><input name="is_type" id ="is_type" type="radio" value="0" checked="checked"/>货物类</label>&nbsp;
+				<label><input name="is_type" id ="is_type " type="radio" value="1"/>服务类</label>&nbsp;
+			</td>
+			<th align="right">用途</th>
+			<td>
+				<label><input name="yt" id ="yt" type="radio" value="0"/>犒劳自己</label>&nbsp;
+				<label><input name="yt" id ="yt" type="radio" value="1"/>赠送他人</label>&nbsp;
+			</td>
+		</tr>
+		<tr>
+			<th align="right">商圈</th>
+			<td>
+				<select id="area_id" name="area_id" style="width:150px;" onchange="getMerchant()">
+					<option value="">请选择</option>
+					<#if list_cityarea ??>
+						<#list list_cityarea as x>
+					   		<option value="${(x.id)!''}" <#if strkit((x.id)!'',(cityid)!)>selected</#if>>${(x.mc)!''}</option>
+						</#list>
+					</#if>
+				</select>
+			</td>
+			<th align="right">商家信息</th>
+			<td>
+				<select id="merchant_id" name="merchant_id" style="width:150px;">
+					<option value="">请选择</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">优惠金额</th>
+			<td><input type="text" name="yhje" id="yhje" class="text" value="${(order.yhje)!}"></td>
+			<th align="right">下单时间</th>
+			<td><input type="text" id="xdsj" disabled="disabled" name="xdsj" class="Wdate" value="${(order.xdsj)!}" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss'})"/></td>
+		</tr>
+		<tr>
+			<th align="right">下单人名称</th>
+			<td><input type="text" id="xdrmc" name="xdrmc" class="text" value="${(userNew.mc)!}"></td>
+			<th align="right">下单人电话</th>
+			<td><input type="text" id="xdrdh" name="xdrdh" class="text" value="${(tel)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">收货人邮政编码</th>
+			<td><input type="text" id="yzbm" name="yzbm" class="text" value="${(order.yzbm)!}"></td>
+			<th align="right">收货联系人</th>
+			<td><input type="text" id="lxr" name="lxr" class="text" value="${(order.lxr)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">收货联系人电话</th>
+			<td><input type="text" id="lxrdh" name="lxrdh" class="text" value="${(order.lxrdh)!}"></td>
+			<th align="right">收货地址</th>
+			<td>
+				<input type="text" id="shdz" onmousedown="shiftNavTag('0')" name="shdz" class="text" value="${(order.shdz)!}"/>
+				<input type="hidden" id="shdzjd" name="shdzjd" value="${(order.shdzjd)!}"/>
+				<input type="hidden" id="shdzwd" name="shdzwd" value="${(order.shdzwd)!}"/>
+				<span id="shdzjd_shdzwd" style="color: red;"></span>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">司机</th>
+			<td>
+				<input type="text" id="qdrname" readonly="readonly" name="qdrname" class="text" placeholder="请从右侧地图中选择跑腿人员" value="${(order.qdrname)!}">
+				<input id="qdrid" type="hidden" name="qdrid" value="${(order.qdrid)!}"/>
+				<input id="jdrjd" type="hidden" name="jdrjd" value="${(order.jdrjd)!}"/>
+				<input id="jdrwd" name="jdrwd" type="hidden" value="${(order.jdrwd)!}"/>
+				<span id="jdrjd_jdrwd" style="color: red;"></span>
+			</td>
+			<th align="right">接单人位置</th>
+			<td><input type="text" onmousedown="shiftNavTag('0')" id="startdz" name="startdz" class="text"></td>
+		</tr>
+		<tr>
+			<th align="right">发货地点</th>
+			<td>
+				<input type="text" id="xxdz" onmousedown="shiftNavTag('0')" name="xxdz" class="text" value="${(ac.xxdz)!}">
+				<input type="hidden" id="sjjd" name="sjjd" value="${(order.sjjd)!}"/>
+				<input type="hidden" id="sjwd" name="sjwd" value="${(order.sjjd)!}"/>
+				<input type="hidden" id="mapbusiness" name="mapbusiness" value="${(order.mapbusiness)!}">
+				<span id="xxdz_msg" style="color: red;"></span>
+			</td>
+			<th align="right">公里数</th>
+			<td><input type="text" id="jl" name="jl" class="text" readonly="readonly" placeholder="自动计算得出"></td>
+		</tr>
+		<tr>
+			 <td colspan="4" align="center">
+			 	<table  class="list" id="selectProducts">
+					<tr>
+						<th align="center">编号</th>
+						<th align="center">品名</th>
+						<th align="center">单价</th>
+						<th align="center">数量</th>
+						<th align="center">单位</th>
+						<th align="center">操作</th>
+					</tr>
+				</table>
+				<span id="msg" style="color: red;font-size: 20px"></span>
+			 </td>
+		</tr>
+		<tr>
+		<td colspan="4" align="center">
+			<input type="button" id="btn_save" class="button" value="提交" onclick="save()"/>
+			<input type="button" id="btn_return" class="button" value="清空" onclick="javascript:window.location.href='${CTX}/admin/order/addUpPage'"/>
+		</td>
+		</tr>
+	</table>
+	</form>
+	
+	</td>
+	<td width="10%" valign="top">
+		<div id="sqsp1">
+			<div>请选购该店铺下的商品</div>
+			<table>
+				<tr><td>类型</td><td>商品</td></tr>
+				<tr>
+					<td style="vertical-align: top;">
+						<div id="tleft" style="width: 80px;overflow: auto;">
+							<ul>
+								<li><a href="javascript:void(0)" onclick="initproduct('')">所有</a></li>
+								<#list list_subject as vo>
+							    	 <li><a href="javascript:void(0)" onclick="initproduct('${(vo.id)}')"> ${(vo.mc)!''}</a></li>
+								</#list>
+							</ul>
+						</div>
+					</td>
+					<td style="vertical-align: top;">
+						<div style="width: 70px;">
+							<ul id="tright">
+								<li><a href="javascript:void(0)">所有</a></li>
+							</ul>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</td>
+	<td  width="45%" style="vertical-align: top;">
+		<div id="tablist">
+		 <div id="NavTagContainer">
+			<label onClick="shiftNavTag(0)" id="NavTag0" class="currentLabel">本公司地图</label>
+			<label onClick="shiftNavTag(1)" id="NavTag1" class="normalLabel">货物类产品</label>
+		</div>
+		<div id="NavTagContent">
+			<div id="MapContainer" style="margin: 3px 0px 3px 0px; display: block;height:400px">
+				<div style="width:650px;height:400px;border:1px solid gray; float:right" id="MblogMap"></div>
+				<div id="paotuidiv">
+					<div>
+						搜索（工号，姓名，电话）<input name="msg_paotui" id="msg_paotui">
+						<input type="button" class="button"  value="查找" onclick="searchPaoTui()">
+						<table class="list"  id="paotuitable"></table>
+					</div>
+				</div>  
+			</div>
+			<div id="MemberCustomerListContainer" style="display: none;height:400px">
+				<div style="margin: 3px 0px 3px 0px;">
+					商品名称：<input type="text" id="sname" size="8">单价：<input type="text" id="sprice" size="8">
+					<input type="button" value="查询" onClick="initrightproduct('','')" class="button">
+				</div>
+				<div id="MemberCustomerList">
+					<table  class="list" id="productlist">
+					  <tbody>
+						<tr>
+							<th align="center">编号</th>
+							<th align="center">品名</th>
+							<th align="center">单价</th>
+							<th align="center">单位</th>
+							<th align="center">操作</th>
+						</tr>
+					 </tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</td>
+	</tr>
+	</table>

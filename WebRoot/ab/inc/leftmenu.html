@@ -1,0 +1,338 @@
+	<#if abuser??>
+		<#if abuser.role_id=='105'>
+		<!--商家-->
+			<h2 class="box_title"><a href="${CTX}/ab/mainmer">管理首页</a></h2>
+			<#if !iswl??>
+			<div class="boxbox">
+				<h2 class="box_title">企业信息管理</h2>
+				<ul>
+					<li><a href="${CTX}/ab/mer/editmerinfo">企业信息登记</a></li>
+					<li><a href="${CTX}/ab/mer/editmerrcyy">日常营业管理</a></li>
+					<li><a href="${CTX}/ab/mer/list_yysj">营业时间管理</a></li>
+					<li><a href="${CTX}/ab/mer/listproduct">商品信息管理</a></li>
+					<li><a href="${CTX}/ab/mer/listprint">打印机管理</a></li>
+				</ul>
+			</div>
+			</#if>
+			<#if iswl?? &&iswl=='1'>
+				<div class="boxbox">
+				<h2 class="box_title">物流企业信息管理</h2>
+				<ul>
+<!-- 					<li><a href="${CTX}/ab/mer/editmerinfo">企业基本信息登记</a></li>
+ -->					<li><a href="${CTX}/ab/mer/edit1002company">物流企业登记</a></li>
+					<li><a href="${CTX}/ab/mer/edit1002line">物流线路登记</a></li>
+					<li><a href="${CTX}/ab/mer/edit1002scene">公司场景管理</a></li>
+					<li><a href="${CTX}/ab/mer/edit1002honor">公司荣誉管理</a></li>
+					<li><a href="${CTX}/ab/mer/edit1002faith">诚信档案管理</a></li>
+					<li><a href="${CTX}/ab/mer/edit1002tousu">投诉建议管理</a></li>
+				</ul>
+				</div>
+			</#if>
+			<div class="boxbox">
+				<h2 class="box_title">物流配送订单</h2>
+				<ul>
+					<li><a href="${CTX}/ab/tc/?zb=">我要发货</a></li>
+					<li><a href="${CTX}/ab/user/uploadTcOrder">批量上传</a></li>
+					<li><a href="${CTX}/ab/user/listtcorder?sf=f">发货记录</a></li>
+					<li><a href="${CTX}/ab/user/listtcorder?sf=s">收货记录</a></li>
+					<!-- <li><a href="${CTX}/ab/logi/queryaskprice">询价单查询</a></li> -->
+					<li><a href="${CTX}/ab/ywy/list_order_cxtj">接单查询统计</a></li>
+					<li><a href="${CTX}/ab/tc/cydz">常用地址</a></li>
+					<li><a href="${CTX}/ab/tc/bxd">我的保单</a></li>
+				</ul>
+			</div>
+            <div class="boxbox">
+            	<h2 class="box_title">调车发货</h2>
+                <ul>
+					<li><a href="${CTX}/diaodu/initZhiPai">调车发货</a></li>
+					<li><a href="${CTX}/diaodu/showOrdersAlloc">调车记录</a></li>
+                </ul>
+            </div>
+			<div class="boxbox">
+				<h2 class="box_title">我的熟车</h2>
+				<ul>
+					<li><a href="${CTX}/ab/fmcargroup">添加车队</a></li>
+						<li>我的车队</li>
+						<li style="list-style:none; text-indent:30px;"><a href="${CTX}/ab/fmcar">全部车辆</a></li>
+                        <#if cargroup??>
+                        <ul>
+                        	<#list cargroup as lst>
+                            	<li style="list-style:none; text-indent:30px;"><a href="${CTX}/ab/fmcar?group=${lst.id}">${lst.groupname}</a></li>
+                            </#list>
+                            </ul>
+                        </#if>
+<!-- 					<li><a href="${CTX}/ab/fmcarorders">我要用车</a></li> -->
+					<li><a href="${CTX}/ab/user/listtcorder?way=3">熟车订单</a></li>
+					<li><a href="${CTX}/ab/fmcar/initBlankMobile">黑名单设置</a></li>
+				</ul>
+			</div>
+			<div class="boxbox">
+				<h2 class="box_title">订单确定</h2>
+				<ul>
+					<li><a href="${CTX}/ab/order/listordershsh">客户订单确认</a></li>
+					<li><a href="${CTX}/ab/order/listabfmcarordershsh">熟车订单确认</a></li>
+				</ul>
+			</div>
+<!--			<div class="boxbox">
+				<h2 class="box_title">订单统计</h2>
+				<ul>
+					<li><a href="${CTX}/ab/order/listmerorder">订单信息查询</a></li>
+					<li><a href="${CTX}/ab/order/listxstj">商家销售统计</a></li>
+					<li><a href="${CTX}/ab/order/listspxstj">按商品查询统计</a></li>
+					<li><a href="${CTX}/ab/order/listspxstjfl">按分类查询统计</a></li>
+				</ul>
+			</div>
+-->			<div class="boxbox">
+				<h2 class="box_title">我的维权</h2>
+				<ul>
+					<li><a href="${CTX}/ab/chargeback/listcbformer">我的维权列表</a></li>
+					<li><a href="${CTX}/ab/chargeback/listmerordercb">商户维权申请</a></li>
+				</ul>
+			</div>
+			<div class="boxbox">
+				<h2 class="box_title">财务管理</h2>
+				<ul>
+					<li><a href="${CTX}/ab/mer/listczjl">充值记录</a></li>
+					<li><a href="javascript:void(0);">帮助中心</a></li>
+					<li><a href="${CTX}/ab/user/tx">我要提现</a></li>
+					<li><a href="${CTX}/ab/user/yhcz">我要充值</a></li>
+					<li><a href="${CTX}/ab/user/txcz">资金记录</a></li>
+				</ul>
+			</div>
+			<div class="boxbox">
+				<h2 class="box_title">账号设置</h2>
+				<ul>
+					<li><a href="${CTX}/ab/certiCompanyIdentity">身份认证</a></li>
+					<li><a href="${CTX}/ab/certiMobile">手机认证</a></li>
+					<li><a href="${CTX}/ab/certiEmail">邮箱认证</a></li>
+					<li><a href="${CTX}/ab/certiCard">银行卡认证</a></li>
+					<!-- <li><a href="${CTX}/ab/logochange">头像修改</a></li>-->
+					<li><a href="${CTX}/ab/modifyMobile">手机号修改</a></li>
+					<li><a href="${CTX}/ab/editpwd">密码修改</a></li>
+					<li><a href="${CTX}/ab/zfpwd">支付密码设置</a></li>
+					<li><a href="${CTX}/ab/user/invite">邀请好友</a></li>
+				</ul>
+			</div>	
+			<div class="boxbox">
+				<h2 class="box_title">订单管理</h2>
+				<ul>
+					<li><a href="${CTX}/ab/leave/listleave">回复留言</a></li>
+					<li><a href="${CTX}/ab/appraise/listappraise">评价管理</a></li>
+					<li><a href="${CTX}/ab/tc/cydz">我的常用地址</a></li>
+					<!-- <li><a href="${CTX}/ab/tc/cylxr">我的常用收货人</a></li> -->
+				</ul>
+			</div>	
+		<#elseif abuser.role_id=='106'>
+		<!--业务员-->
+<!--		<div class="boxbox">
+			<h2 class="box_title">抢单管理</h2>
+			<ul>
+				<li><a href="${CTX}/diaodu/showCanQiangDanOrders">客户订单确认</a></li>
+			</ul>
+			</div>
+-->			
+			<div class="boxbox">
+			<h2 class="box_title">订单管理</h2>
+			<ul>
+				<li><a href="${CTX}/diaodu/showCanQiangDanOrders">客户订单确认</a></li>
+<!--				<li><a href="${CTX}/ab/order/listordershsh">客户订单确认</a></li>
+				<li><a href="${CTX}/ab/order/listabfmcarordershsh">熟车订单确认</a></li>
+--><!-- 				<li><a href="${CTX}/ab/chargeback/listcbforser">我的维权列表</a></li> -->
+				<li><a href="${CTX}/ab/chargeback/listserordercb">我的维权申请</a></li>
+				<li><a href="${CTX}/ab/ywy/list_order_cxtj">接单查询统计</a></li>
+				<li><a href="${CTX}/ab/leave/listleave">回复留言</a></li>
+				<li><a href="${CTX}/ab/order/ddjs">我的购物车</a></li>
+				<li><a href="${CTX}/ab/user/listorder">店铺订单</a></li>
+				<li><a href="${CTX}/ab/chargeback/listcbforuser">我的维权列表</a></li>
+				<li><a href="${CTX}/ab/appraise/listappraise">评价管理</a></li>
+			</ul>
+			</div>
+            <!--
+			<div class="boxbox">
+			<h2 class="box_title">服务信息管理</h2>
+			<ul>
+				<li><a href="${CTX}/ab/fmcar/ywyIndex">车辆信息管理</a></li>
+			</ul>
+			</div>
+            -->
+            <!-- add begin changbaijian 2015-10-11 司机回单管理 -->
+			<div class="boxbox">
+			<h2 class="box_title">回单管理</h2>
+			<ul>
+				<li><a href="${CTX}/ab/invoice/driverSign">我的回单</a></li>
+			</ul>
+			</div>
+			<!-- add end changbaijian 2015-10-11 司机回单管理 -->
+			<div class="boxbox">
+			<h2 class="box_title">财务管理</h2>
+			<ul>
+				<li><a href="${CTX}/ab/mer/listczjl">充值记录</a></li>
+				<li><a href="${CTX}/ab/user/tx">我要提现</a></li>
+				<li><a href="${CTX}/ab/user/yhcz">我要充值</a></li>
+				<li><a href="${CTX}/ab/user/txcz">资金记录</a></li>
+			</ul>
+		</div>
+		<div class="boxbox">
+			<h2 class="box_title">账号设置</h2>
+			<ul>
+<!-- 				<li><a href="${CTX}/ab/mainywy">基本信息</a></li> -->
+<!--				<li><a href="${CTX}/ab/certiYwyIdentity">身份认证</a></li>-->
+				<li><a href="${CTX}/ab/fmcar/ywyIndex">身份认证</a></li>
+				<li><a href="${CTX}/ab/certiMobile">手机认证</a></li>
+				<li><a href="${CTX}/ab/certiEmail">邮箱认证</a></li>
+				<li><a href="${CTX}/ab/certiCard">银行卡认证</a></li>
+				<!--<li><a href="${CTX}/ab/logochange">头像修改</a></li>-->
+				<li><a href="${CTX}/ab/modifyMobile">手机号修改</a></li>
+				<li><a href="${CTX}/ab/editpwd">密码修改</a></li>
+				<li><a href="${CTX}/ab/zfpwd">支付密码设置</a></li>
+				<li><a href="${CTX}/ab/user/invite">邀请好友</a></li>
+			</ul>
+			</div>
+		<#elseif abuser.role_id=='107'>
+		<!--会员-->
+			<div class="user_left">
+				<div class="group">
+					<div class="title1">订单中心</div>
+					<ul>
+						<li><a href="${CTX}/ab/order/ddjs">我的购物车</a></li>
+						<li><a href="${CTX}/ab/user/listorder">店铺订单</a></li>
+						<li><a href="${CTX}/ab/tc?zb=">我要发货</a></li>
+						<li><a href="${CTX}/ab/user/uploadTcOrder">批量上传</a></li>
+						<li><a href="${CTX}/ab/user/listtcorder?sf=f">发货记录</a></li>
+						<li><a href="${CTX}/ab/user/listtcorder?sf=s">收货记录</a></li>
+						<!-- <li><a href="${CTX}/ab/logi/queryaskprice">询价单查询</a></li> -->
+						<li><a href="${CTX}/ab/chargeback/listcbforuser">维权列表</a></li>
+						<li><a href="${CTX}/ab/appraise/listappraise">评价管理</a></li>
+						<li><a href="${CTX}/ab/tc/cydz">常用地址</a></li>
+						<!-- <li><a href="${CTX}/ab/tc/cylxr">我的常用收货人</a></li> -->
+						<li><a href="${CTX}/ab/tc/bxd">我的保单</a></li>
+					</ul>
+				</div>
+				<div class="group">
+					<div class="title1">我的收藏</div>
+					<ul>
+						<li><a href="${CTX}/ab/user/listuserstore/0">我收藏的店铺</a></li>
+						<li><a href="${CTX}/ab/user/listuserstore/1">我收藏的商品</a></li>
+					</ul>
+				</div>
+                <div class="group">
+            		<div class="title1">调车发货</div>
+                		<ul>
+							<li><a href="${CTX}/diaodu/initZhiPai">调车发货</a></li>
+							<li><a href="${CTX}/diaodu/showOrdersAlloc">调车记录</a></li>
+                		</ul>
+            	</div>
+
+				<div class="group">
+					<div class="title1">我的车队</div>
+					<ul>
+						<li><a href="${CTX}/ab/fmcargroup">添加车队</a></li>
+						<li>车队分组</li>
+						<li style="list-style:none; text-indent:30px;"><a href="${CTX}/ab/fmcar">全部车辆</a></li>
+                        <#if cargroup??>
+                        	<#list cargroup as lst>
+                            	<li style=" list-style:none; text-indent:30px;"><a href="${CTX}/ab/fmcar?group=${lst.id}">${lst.groupname}</a></li>
+                            </#list>
+                        </#if>
+<!-- 						<li><a href="${CTX}/ab/fmcarorders">我要用车</a></li> -->
+						<li><a href="${CTX}/ab/user/listtcorder?way=3">熟车订单</a></li>
+						<li><a href="${CTX}/ab/user/listtcorder?way=4">外部调车订单</a></li>
+						<li><a href="${CTX}/ab/fmcar/initBlankMobile">黑名单设置</a></li>
+					</ul>
+				</div>
+				<!-- add begin changbaijian 2015-10-06 -->
+				<div class="group">
+					<h2 class="title1">发票回单</h2>
+					<ul>
+						<li><a href="${CTX}/ab/invoice/invoice">我的发票</a></li>
+						<li><a href="${CTX}/ab/invoice/sign">我的回单</a></li>
+					</ul>
+			    </div>
+			    <!-- add end changbaijian 2015-10-06 -->
+				<div class="group">
+					<div class="title1">VIP中心</div>
+					<ul>
+						<li><a href="${CTX}/ab/card/purchasesend">购买送餐卡</a></li>
+						<li><a href="${CTX}/ab/card/purchaseexpense">购买消费卡</a></li>
+						<li><a href="${CTX}/ab/card/activeusercard">激活会员卡</a></li>
+						<li><a href="${CTX}/ab/card/listusercards">会员卡查询</a></li>
+						<li><a href="${CTX}/ab/card/listcardexpense">会员卡消费记录</a></li>
+					</ul>
+				</div>
+				<div class="group">
+					<div class="title1">积分管理</div>
+					<ul>
+						<li><a href="${CTX}/ab/exc/listscore">查看积分</a></li>
+						<li><a href="${CTX}/ab/exc/listexchange">积分兑换记录</a></li>
+					</ul>
+				</div>
+				<div class="group">
+					<div class="title1">财务管理</div>
+					<ul>
+						<li><a href="${CTX}/ab/user/tx">我要提现</a></li>
+						<li><a href="${CTX}/ab/user/yhcz">我要充值</a></li>
+						<li><a href="${CTX}/ab/user/txcz">资金记录</a></li>
+					</ul>
+				</div>
+				<div class="group">
+					<div class="title1">安全中心</div>
+					<ul>
+						<li><a href="${CTX}/ab/editpwd">密码修改</a></li>
+						<li><a href="${CTX}/ab/zfpwd">支付密码设置</a></li>
+					</ul>
+				</div>
+				<div class="group">
+					<div class="title1">个人基本信息</div>
+					<ul>
+						<li><a href="${CTX}/ab/user_info">个人信息</a></li>
+						<#if strkit('0',(abuser.zhlx)!)>
+						<li><a href="${CTX}/ab/certiCompanyIdentity">身份认证</a></li>
+						<#else>
+						<li><a href="${CTX}/ab/certiUserIdentity">身份认证</a></li>
+						</#if>
+						<li><a href="${CTX}/ab/certiMobile">手机认证</a></li>
+						<li><a href="${CTX}/ab/certiEmail">邮箱认证</a></li>
+						<li><a href="${CTX}/ab/certiCard">银行卡认证</a></li>
+						<!--<li><a href="${CTX}/ab/logochange">头像修改</a></li>-->
+						<li><a href="${CTX}/ab/modifyMobile">手机号修改</a></li>
+						<li><a href="${CTX}/ab/editpwd">密码修改</a></li>
+						<li><a href="${CTX}/ab/user/invite">邀请好友</a></li>
+					</ul>
+				</div>
+			</div>
+		</#if>
+	</#if>
+	
+<script type="text/javascript">
+<!--
+$(function(){
+	$(".group .title1").bind("click",function(){
+		var obj = $(".group:hover ul");
+		if(obj.attr("style")=="display:none"){
+			obj.attr("style","display:");
+			$(".group:hover").removeClass("bottom");
+		}else{
+			obj.attr("style","display:none");
+			$(".group:hover").addClass("bottom");
+		}
+	});
+	$(".boxbox .box_title").bind("click",function(){
+		var obj = $(".boxbox:hover ul");
+		if(obj.attr("style")=="display:none"){
+			obj.attr("style","display:");
+			$(".boxbox:hover").removeClass("bottom");
+		}else{
+			obj.attr("style","display:none");
+			$(".boxbox:hover").addClass("bottom");
+		}
+	});
+})
+//-->
+</script>
+<style>
+<!--
+/**左侧菜单大标题的颜央视等**/
+.title1{font-size: 20px;font-weight: 700px}
+.bottom{padding-bottom: 20px}
+-->
+</style>

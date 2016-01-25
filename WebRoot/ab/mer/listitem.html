@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">本商家订单列表</h2>
+			<table class="list">
+            <tr>
+	            <th width="30px;">序号</th>
+	            <th width="90px;">商品名称</th>
+	            <th width="60px;">商品图</th>
+	            <th width="70px;">数量</th>
+	            <th width="60px;">价格</th>
+	            <th width="120px;">金额</th>
+	            <th width="50px;">总金额</th>
+	            <th width="50px;">支付状态</th>
+	            <th width="*">特殊说明</th>
+				<th width="120px;">创建时间</th>
+	        </tr>
+	        <#if listitem??>
+      			<#list listitem as s>
+                  <tr>
+                  	<td>${(s_index+1)!''}</td>
+                    <td><a href="${CTX}/ab/mer/listitem/${(s.id)!}">${(s.sn)!''}</a></td>
+                    <td>${(s.linkman)!''}</td>
+                    <td>${(s.phone)!''}</td>
+                    <td>${(s.zipcode)!''}</td>
+                    <td>${(s.address)!''}</td>
+                    <td>${(s.totalmoney)!''}</td>
+                    <td>${(s.pay_status)!''}</td>
+                    <td style="text-align: left;">${(s.memo)!''}</td>
+                    <td>${(s.createtime)!''}</td>
+                  </tr>
+				</#list>
+			</#if>
+            </table>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

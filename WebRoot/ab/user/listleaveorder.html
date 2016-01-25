@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/liuyan.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/custom.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/common.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		
+		function refreshSafecode() {
+			var d = new Date();
+			document.getElementById("safecode").src = "${CTX}/25console/imgcode?t="
+					+ d.toString(40);
+		}
+	</script>	
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+  <#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<form id="myform" name="myform" method="post" action="">
+	<input type="hidden" name="mid" id="mid"/>
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">可催订单</h2>
+			<div style="height: 40px;line-height: 40px;"/>
+			<table class="list">
+            <tr>
+	            <th width="30px;">序号</th>
+	            <th width="90px;">订单号</th>
+	            <th width="60px;">总金额</th>
+	            <th width="60px;">联系人</th>
+	            <th width="70px;">联系电话</th>
+	            <th width="160px;">收货地址</th>
+	            <th width="60px;">订单状态</th>
+	            <th width="60px;">支付状态</th>
+	            <th width="60px;">商家是否确认</th>
+	            <th width="60px;">是否接单</th>
+				<th width="120px;">创建时间</th>
+				<th width="60px;"></th>
+	        </tr>
+	        <#if listpage ??>
+      				<#list listpage.list as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!}</td>
+                    <td>${(lst.sn)!}</td>
+                    <td class="red">${(lst.ddzje)?string("currency")}</td>
+                    <td>${(lst.lxr)!}</td>
+                    <td>${(lst.lxrdh)!}</td>
+                    <td>${(lst.shdz)!}</td>
+                    <td>
+                    		<!-- 订单状态[0-购物车、1-已受理、2-已预定、3-配送中、4-已完成、5-已退单 -->
+	                    <#if strkit('0',(lst.ddzt)!)>购物车</#if>
+	                    <#if strkit('1',(lst.ddzt)!)>已受理</#if>
+	                    <#if strkit('2',(lst.ddzt)!)>已预定</#if>
+	                    <#if strkit('3',(lst.ddzt)!)>配送中</#if>
+	                    <#if strkit('4',(lst.ddzt)!)>已完成</#if>
+	                    <#if strkit('5',(lst.ddzt)!)>已退单</#if>
+	                </td>
+                    <td><#if strkit('0',(lst.zfzt)!)>未支付</#if><#if strkit('1',(lst.zfzt)!)>已支付</#if></td>
+                    <td><#if strkit('0',(lst.sjqrzt)!)>未确认</#if><#if strkit('1',(lst.sjqrzt)!)>已确认</#if></td>
+                    <td><#if strkit('0',(lst.sfjd)!)>未接单</#if><#if strkit('1',(lst.sfjd)!)>已接单</#if><#if strkit('2',(lst.sfjd)!)>已撤单</#if></td>
+                    <td>${(lst.xdsj)!''}</td>
+                    <td> 
+                    <#if <#if lst.mer_id?exists || lst.qdr_id?exists>
+                    <a href="javascript:void(0);" onclick="uf_leave_show('${(lst.mid)!}', '')">催单</a>
+                    </#if>
+					</td>
+                  </tr>
+				</#list>
+				<tr>
+					<td colspan="12">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+			</#if>
+            </table>
+		</div>
+	</div>
+	</form>
+	<div id="msgDiv" style="left: 50%; top: 191px; margin-left: -270px; display: none; position: fixed; z-index: 11000; opacity: 1;">
+	<div class="divTop">
+    	<h3>
+    		我要催单
+    	</h3>
+    	<a href="javascript:;" class="closebtn" alt="关闭" onclick="uf_leave_close()"></a>   
+    </div>
+    <div class="msg_cont clear">
+        <textarea placeholder="请输入内容" name="content" id="content"></textarea>
+    </div>
+    <div class="msg_op">
+    	<input id="captchaCode" name="captchaCode" class="fl" type="text" placeholder="请输入验证码" size="20"/>
+        <img  class="fl" class="msgcode" src="${CTX}/25console/imgcode" id="safecode" alt="点击刷新" onclick="refreshSafecode()"/>
+        <a href="javascript:;" class="fr msgbtn" onclick="uf_addleave('0', '${CTX}')"> 催单
+        </a>  
+    </div>
+    <div id="leaveMsg" class="message"/>
+	</div>
+	</div>
+	<div class="blank10"></div>
+	<div id="lean_overlay" style="display: none; opacity: 0.45;"></div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

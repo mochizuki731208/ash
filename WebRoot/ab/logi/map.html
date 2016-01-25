@@ -1,0 +1,238 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/logi/css/style.css" />
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript">
+		function tolist() {
+			$("#myform").attr("action", "${CTX}/ab/logi");
+			document.myform.submit();
+		}
+		
+		function tomap() {
+			$("#myform").attr("action", "${CTX}/ab/logi/map");
+			document.myform.submit();
+		}
+		//-------------------------------------------------------------
+		function refreshMap() {
+			$.post("${CTX}/ab/logi/ajax",$("#myform").serializeArray(),function(data){
+				reset(data);
+			});
+		}
+		
+		$().ready(function() {
+			refreshMap();
+			$("#searchmap").click(function(){
+				refreshMap();
+			});
+			// 询价
+			$("#askPrice").click(function() {
+				$("#myform").attr("action","${CTX}/ab/logi/askPrice").submit();
+			});
+		});
+		
+		//---------------------------------------------
+		function setAreaAllColor() {
+			var vlen = $("input[name='cityarea']").length;
+			var clen = $("input[name='cityarea']:checked").length;
+			if(vlen==clen) {
+				$("#area_all").css("backgroundColor","#ff7f24");
+			} else {
+				$("#area_all").removeAttr("style");
+			}
+		}
+		
+		function setSubjectAllColor() {
+			var vlen = $("input[name='subject']").length;
+			var clen = $("input[name='subject']:checked").length;
+			if(vlen==clen) {
+				$("#subject_all").css("backgroundColor","#ff7f24");
+			} else {
+				$("#subject_all").removeAttr("style");
+			}
+		}
+		
+		$(document).ready(function(){
+			//默认排序
+			$("input[name='mrorder']").attr("checked", true);
+		
+			$("input[name='cityarea']").change(setAreaAllColor);
+			
+			$("#area_all").click(function(){
+				//	第二次修改状态使用prop
+				$("input[name='cityarea']").prop("checked", true);
+				setAreaAllColor();
+			});
+			
+			$("input[name='subject']").change(setSubjectAllColor);
+			
+			$("#subject_all").click(function(){
+				$("input[name='subject']").prop("checked", true);
+				setSubjectAllColor();
+			});
+		});
+    </script>
+</head>
+<body>    
+    <#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+          <article>
+          	<form id="myform" name="myform">
+			<#if listpage ??>
+			<input type="hidden" id="curPage" name="curPage" value="${(listpage.curPage)!}"/>
+			</#if>
+          	<div class="selecter">
+               	<ul>
+                    	<li class="fl"><label>起始地：</label><input class="txt" type="text" id="from" name="from" value="${(from)!}"/></li>
+                    	<li class="fl"><label>到达地：</label><input class="txt" type="text" id="to" name="to" value="${(to)!}" /></li>
+                    	<input class="btn cp fr hand" type="button" onclick="tolist()"  value="返回列表形式查看" />
+                    	<input class="btn cp fr" type="button" id="searchmap" value="搜索>>" />
+                    </ul>
+               	<ul>
+                    	<li class="fl"><label>物流公司：</label><input class="txt" type="text" id="loginame" name="loginame" value="${(loginame)!}" /></li>
+                    	<li class="fl"><label>关键词：</label><input class="txt" type="text" id="keywords" name="keywords" value="${(keywords)!}" /></li>
+                    	<input class="btn cp fr hand" type="button" onclick="tomap()" value="返回地图形式查看" />
+                    	<input class="btn cp fr" type="button" id="askPrice" value="询价>>" />
+                    </ul>
+					<ul>
+					<li><span class="icon icon-marker-pt"></span>
+					</ul>
+					<ul>
+                    	<li class="tsela fl"><label>所属商圈：</label><input class="select_all" type="button" id="area_all" value="全部" />
+						<#if listcity?? >
+						<#list listcity as c>
+							${(c.mc)!}<input class="tsel" type="checkbox" id="cityarea" name="cityarea" value="${(c.id)!}" <#if cityarea??>${cityarea?seq_contains("${(c.id)!}")?string("checked='checked'","")}</#if>/>
+						</#list>
+						</#if>
+						</li>
+               
+                    	<li class="tsela fl"><label>服务分类：</label><input class="select_all" type="button" id="subject_all" value="全部" />
+							<#if logis?? >
+						<#list logis as c>
+							${(c.mc)!}<input class="tsel" type="checkbox" id="subject" name="subject" value="${(c.id)!}" <#if subject??>	${subject?seq_contains("${(c.id)!}")?string("checked='checked'","")}</#if>/>
+						</#list>
+						</#if>
+						</li>
+						<!--
+                    	<li class="tsela fl"><label>排序方式：</label><input class="selall" type="button" value="默认排序" />
+							<input class="tsel" type="checkbox" id="mrorder" name="mrorder" value="ASC"/>
+							按销量[<input class="tsel" type="radio" id="zxlorder" name="zxlorder" value="ASC"/>升<input class="tsel" type="radio" id="zxlorder" name="zxlorder" value="DESC"/>降]&nbsp;&nbsp;
+							按价格[<input class="tsel" type="radio" id="avgpriceorder" name="avgpriceorder" value="ASC"/>升<input class="tsel" type="radio" id="avgpriceorder" name="avgpriceorder" value="DESC"/>降]&nbsp;&nbsp;
+							按好评[<input class="tsel" type="radio" id="hpsorder" name="hpsorder" value="ASC"/>升<input class="tsel" type="radio" id="hpsorder" name="hpsorder" value="DESC"/>降]&nbsp;&nbsp;
+						</li>
+						-->
+                 </ul>
+               </div>
+			    </form>
+               <div class="body">
+               	 <div id="allmap"></div>
+               </div>
+          </article>
+           <!-- foot页 -->
+	<#include '../inc/foot.html'>
+     </body>
+</html>
+<script type="text/javascript">
+//  标注点数组  
+//{title:"西城区图书馆",content:"北京市西城区后广平胡同26号",point:"116.368099|39.942332",isOpen:0,icon:"${CTX}/res/logi/images/map_marker.png"}  
+var bcenter = false;
+     
+//创建和初始化地图函数：  
+function initMap(){  
+    window.map = new BMap.Map("allmap");  // 创建地图实例
+    map.enableScrollWheelZoom();  
+    map.addControl(new BMap.NavigationControl());  //添加默认缩放平移控件
+    <#if currcity??>
+    	<#if currcity.mc??>
+    	map.centerAndZoom("${(currcity.mc)!}", 11);
+		bcenter = true;
+    	</#if>
+    </#if>
+    
+}  
+   
+//创建marker  
+window.addMarker = function (data){  
+    map.clearOverlays();  
+    for(var i=0;i<data.length;i++){  
+        var json = data[i];  
+        var p0 = json.lng;  
+        var p1 = json.lat;  
+        var point = new BMap.Point(p0,p1);  
+        var iconImg = new BMap.Icon("${CTX}/res/logi/images/map_marker.png", new BMap.Size(22, 22));    
+        var marker = new BMap.Marker(point,{icon:iconImg});  
+        var iw = createInfoWindow(i);  
+        var label = new BMap.Label(json.mc,{"offset":new BMap.Size(22, 22)});  
+        marker.setLabel(label);  
+        map.addOverlay(marker);  
+        label.setStyle({  
+                    borderColor:"#808080",  
+                    color:"#333",  
+                    cursor:"pointer"  
+        });  
+  
+        (function(){  
+			var _json = json;  
+			var _iw = createInfoWindow(_json);  
+			var _marker = marker;  
+			_marker.addEventListener("click",function(){  
+				this.openInfoWindow(_iw);  
+			});  
+			_iw.addEventListener("open",function(){  
+				_marker.getLabel().hide();  
+			})  
+			_iw.addEventListener("close",function(){  
+				_marker.getLabel().show();  
+			})  
+			label.addEventListener("click",function(){  
+				_marker.openInfoWindow(_iw);  
+			})  
+			/*
+			if(!!json.isOpen){  
+				label.hide();  
+				_marker.openInfoWindow(_iw);  
+			}  
+			*/
+		})() 
+    }  
+}  
+
+//创建InfoWindow  
+function createInfoWindow(json){  
+    var iw = new BMap.InfoWindow(
+    		"<a href='${CTX}/trans/"+json.mobile+"'><b class='iw_poi_title' title='" 
+    		+ json.mc + "'>" + json.mc + "</b></a><div class='iw_poi_content'>所在位置："+(json.city_name  || '') +"-"+ (json.maincity  || '') 
+    		+ "<br />辐射范围：" + (json.mainline || '') + "....<br />联系电话：" + (json.mobile || '') +"</div>");  
+    return iw;  
+}  
+
+//创建一个Icon  
+function createIcon(json){  
+    var icon = new BMap.Icon("http://dev.baidu.com/wiki/static/map/API/img/ico-marker.gif", new BMap.Size(json.w,json.h),{imageOffset: new BMap.Size(-json.l,-json.t),infoWindowAnchor:new BMap.Size(json.lb+5,1),offset:new BMap.Size(json.x,json.h)})  
+    return icon;  
+}  
+
+function reset(data) {
+	if(data.length > 0) {
+		var json = data[0];  
+		var p0 = json.lng;  
+        var p1 = json.lat;  
+		if(!bcenter) {
+			var point = new BMap.Point(p0,p1);  // 创建点坐标
+			map.centerAndZoom(point, 15);                 // 初始化地图，设置中心点坐标和地图级别
+		}
+		addMarker(data);//向地图中添加marker 
+	} else {
+		if(!bcenter) {
+			var point = new BMap.Point(116.404485,39.913662);  // 创建点坐标
+			map.centerAndZoom(point, 15);                 // 初始化地图，设置中心点坐标和地图级别
+		}
+		map.clearOverlays();  
+	}
+}
+  
+
+initMap();//创建和初始化地图  
+</script>

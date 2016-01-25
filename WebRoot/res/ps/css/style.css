@@ -1,0 +1,48 @@
+﻿/* CSS Document */
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,p,blockquote,th,td{margin:0;padding:0;}
+h1,h2,h3,h4,h5,h6{font-size:100%;}
+img{border:0; font-size:0;}
+button,input,select,textarea{font-size:100%; font-family:inherit}
+ul,ol{list-style:none;}
+html,body{ font:14px/22px "微软雅黑","Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif; color:#333; background:#fff; -webkit-text-size-adjust:none;}
+a{text-decoration:none;}
+/*全局样式*/
+.clear{ clear:both; height:0; margin:0; padding:0; font-size:0; overflow:hidden;}
+.clearfix:after{ content:".";display:block;height:0;clear:both;visibility:hidden;}
+.clearfix{*zoom:1;}
+.float_left { float: left;}
+.float_right { float: right;}
+.block { display: block;}
+
+ .banner { position: fixed; top: 0px; left: 0px; width: 100%; border: 1px solid #E4E4E4;background-color: #FFF; height: 80px; line-height: 80px; text-align: center;}
+ .banner .logo, .banner .nav  { width: 50%;}
+ .big_banner { text-align: center; margin-top:81px; background:url(../images/banner_bg.jpg);}
+ .block .content { margin: 0px auto;  width: 1000px;}
+ .block {font-size: 16px; color: #444;  min-height: 180px;  text-align: center;  padding: 50px 0px;}
+ .block .content > P { margin: 20px auto; line-height: 28px;}
+.content > .advantages { margin: 20px auto;  line-height: 28px;}
+ .block .content .advantages li { width: 25%;}
+ .block .content .advantages li a {  margin: 0px auto;}
+.black,  .block .content .advantages li a { color: #333;}
+ .block .content .advantages a strong { margin-top: 10px; padding: 0px 15px;  color: #333;font-size:14px;}
+ .block .content .advantages a em,  .block .content .advantages a strong { display: block; text-overflow: ellipsis; font-weight: normal;}
+ .block .content .advantages img { padding: 2px; vertical-align: middle;}
+ .block .content .advantages a em { margin-top: 20px; color: #E33125;}
+ .float_left em{   font-size: 28px;
+    font-style: normal;}
+	 .float_left a:hover{text-decoration: none;}
+.foot {width: 100%;border-top: 2px solid #eee;color: #A2A2A2;height:80px;}
+.foot .flink {margin: 0 auto;width:1002px;height: 32px;line-height: 32px;text-align: center;}
+.foot .flink a{color: #A2A2A2;}
+.foot .flink a:hover{color:#808080;}
+
+/*导航*/
+.nav { height: 28px; line-height: 28px; margin-top:30px; text-align:left;}
+.nav  a { display:inline-block; padding: 0 15px;font-size: 16px;font-weight: 600; color: #696969; font-weight:bold;}
+.nav  a:hover,.nav .active{ color:#c00; }
+
+.logReg{ position:absolute; right:50px;}
+.loginSta{width:74px; height:40px; color:#FFFFFF; font-size:16px; border:none; margin-top:8px; background:url(../images/login.jpg) no-repeat;}
+.loginChange{width:74px; height:40px; color:#FFFFFF; font-size:16px; border:none; margin-top:8px; background:url(../images/login_over.jpg) no-repeat;}
+.registerSta{width:74px; height:40px; color:#EF9433; font-size:16px; border:none; margin-top:8px; background:url(../images/register.jpg) no-repeat;}
+.registerChange{width:74px; height:40px; color:#F99526; font-size:16px; border:none; margin-top:8px; background:url(../images/register.jpg) no-repeat;}

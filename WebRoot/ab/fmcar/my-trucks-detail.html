@@ -1,0 +1,38 @@
+			<input type="hidden" value="${(type)!''}" id="detailType"/>
+			<input type="hidden" value="${(car.id)!''}" id="detailCarId"/>
+			<div class="modal-header" style="padding: 5px;">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel3">熟车信息</h4>
+            </div>
+            <div class="modal-body" style="padding: 5px;"> 
+                    <h4 style="margin-top: 5px;margin-bottom: 5px;">${(car.driver)!''}<span class="glyphicon glyphicon-ok green" aria-hidden="true"></span></h4>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <img src="${CTX}/res/images/fmcar/${car.car_no?substring(0,1)}1.png" alt="" class="mg-tb-5" height="140px" width="140px" style="margin: 5px;">
+                            <p><button class="btn btn-success btn-sm">${(car.car_no)!''}</button></p>
+                            <p>
+                                <button class="btn btn-primary btn-sm" >${(car.length)!''}</button>
+                                <button class="btn btn-primary btn-sm">${(car.type)!''}</button>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="well well-sm">
+                                <ul class="list-unstyled mg-0">
+                                    <li><span class="glyphicon glyphicon-globe"></span> 常跑城市：<span class="blue">${(carcity)!''}</span></li>
+                                    <li><span class="glyphicon glyphicon-phone"></span> 抢单次数：<span class="blue">0</span></li>
+                                    <li><span class="glyphicon glyphicon-thumbs-up"></span> 获好评数：<span class="blue">12</span></li>
+                                    <li><span class="glyphicon glyphicon-map-marker"></span> 最近定位：<span class="blue">${(car.location)!''}</span></li>
+                                    <li><span class="glyphicon glyphicon-time"></span> 定位时间：<span class="blue">${(car.location_time)!''}</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <div class="modal-footer" style="padding: 5px;">
+                <button type="button" class="btn btn-primary" id="addKnowYesExistBtn" style="display: none;">加为熟车</button>
+                <button type="button" class="btn btn-success" id="existCarBtn" style="display: none;">已经是你的熟车</button>
+            </div>

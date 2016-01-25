@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<link rel="stylesheet" type="text/css"	href="${CTX}/res/css/admin/admin.css" />
+<script type="text/javascript">
+$().ready(function() {
+})
+function SeeGui(id){
+	$.dialog({
+		title:'订单轨迹',
+		content: 'url:${CTX}/ab/fmcarorders/guiji?id=' + id,
+	    lock:true,
+	    resize: true,
+	    width : 1440,
+		height : 480,
+		cover:true,
+		max:true,
+		min:true,
+		cancel:true
+	}).max();//
+}
+function showPrice(id){
+	$.dialog({
+		title:'熟车报价',
+		content: 'url:${CTX}/ab/order/initBaoJia?id=' + id,
+	    lock:true,
+	    resize: true,
+	    width : 300,
+		height : 80,
+		cover:true,
+		max:true,
+		min:true,
+		button:[{
+			name: '保 存',
+			callback:function(){
+					$.post("${CTX}/ab/order/saveBaoJia",this.content.$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("报价成功，请等待下单人选择是否中标！");
+	                    	refresh();
+						}
+					});
+				return false;
+			},
+			focus: true
+		}],
+        cancelVal:'关 闭'
+	});//
+}
+
+function acceptOrRejectFmCarOrder(id,flag){
+	var msg = "";
+	if(flag=="1"){
+		msg = "确认接受该订单吗？";
+	}
+	if(flag=="0"){
+		msg = "确认拒绝该订单吗？";
+	}
+	if(flag=="2"){
+		msg = "确认开始送货吗？";
+	}
+	if(flag=="3"){
+		msg = "确认已送达了吗？";
+	}
+	if(flag=="4"){
+		msg = "确认收货人已签收了吗？";
+	}
+	if(!window.confirm(msg)){
+		return;
+	}
+	$.ajax({
+		url: "${CTX}/ab/order/acceptOrRejectFmCarOrder",
+		data:{id:id,flag: flag},
+		type: "POST",
+		dataType: "json",
+		cache: false,
+		success: function(data) {
+			if(data){
+				alert("操作成功！");
+				refresh();
+			}else{
+				alert("操作失败！");
+			}
+		}
+	});
+}
+function refresh(){
+	$('#myform').submit();
+	$('#myform').action = "";
+	$('#myform').target = "_self";
+}
+</script>
+</head>
+<body>
+	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<form id="myform" name="myform" method="post" action="">
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">熟车订单确认</h2>
+			<div style="height: 40px;line-height: 40px;margin-left: 10px">
+				<select id="ddzt" name="ddzt">
+					<option value="-1">--请选择--</option>
+					<option value="1" <#if strkit('1',(ddzt)!)>selected="selected"</#if>>已提交</option>
+					<option value="2" <#if strkit('2',(ddzt)!)>selected="selected"</#if>>取货中</option>
+					<option value="3" <#if strkit('3',(ddzt)!)>selected="selected"</#if>>送货中</option>
+					<option value="4" <#if strkit('4',(ddzt)!)>selected="selected"</#if>>已送达</option>
+					<option value="5" <#if strkit('5',(ddzt)!)>selected="selected"</#if>>已签收</option>
+					<option value="6" <#if strkit('6',(ddzt)!)>selected="selected"</#if>>拒单</option>
+					<option value="7" <#if strkit('7',(ddzt)!)>selected="selected"</#if>>已退单</option>
+				</select>
+				<input type="button" id="btn_to_cx" class="button" value="查询" onclick="refresh()"/>
+			</div>
+			<table class="list">
+				<tr>
+		            <th>序号</th>
+		            <th>起始地</th>
+		            <th>目的地</th>
+		            <th>车长</th>
+		            <th>车型</th>
+		            <th>装车时间</th>
+		            <th>创建时间</th>
+		            <th>联系电话</th>
+		            <th>价格</th>
+		            <th>订单状态</th>
+		            <th>支付状态</th>
+		            <th>支付方式</th>
+		            <th>操作</th>
+		        </tr>
+		        <#if listpage ??>
+      				<#list listpage.list as lst>
+      				<tr>
+      					<td>${(lst_index+1)!}</td>
+      					<td>
+      						${(lst.start_province_name)!}
+      						${(lst.start_city_name)!}
+      						${(lst.start_county_name)!}
+      						${(lst.start_addr)!}
+      					</td>
+      					<td>
+      						${(lst.arr_province_name)!}
+      						${(lst.arr_city_name)!}
+      						${(lst.arr_county_name)!}
+      						${(lst.arr_addr)!}
+      					</td>
+      					<td>${(lst.car_length)!}</td>
+      					<td>${(lst.car_type)!}</td>
+      					<td>${(lst.load_time)!}</td>
+      					<td>${(lst.create_time)!}</td>
+      					<td>${(lst.mobile)!}</td>
+      					<td style="color: red">${(lst.zje)!}</td>
+      					<td>
+							<#if strkit('1',(lst.ddzt)!)><font color="red">已提交</font></#if>
+							<#if strkit('2',(lst.ddzt)!)><font color="red">取货中</font></#if>
+							<#if strkit('3',(lst.ddzt)!)><font color="red">送货中</font></#if>
+							<#if strkit('4',(lst.ddzt)!)><font color="red">已送达</font></#if>
+							<#if strkit('5',(lst.ddzt)!)><font color="red">已签收</font></#if>
+							<#if strkit('6',(lst.ddzt)!)><font color="red">拒单</font></#if>
+							<#if strkit('7',(lst.ddzt)!)><font color="red">已退单</font></#if>
+      					</td>
+      					<td>
+							<#if strkit('0',(lst.zfzt)!)><font color="red">未支付</font></#if>
+							<#if strkit('1',(lst.zfzt)!)><font color="red">已支付</font></#if>
+      					</td>
+      					<td>
+							<#if strkit('1',(lst.zffs)!)><font color="red">充值直扣</font></#if>
+							<#if strkit('2',(lst.zffs)!)><font color="red">支付宝</font></#if>
+							<#if strkit('3',(lst.zffs)!)><font color="red">货到付款</font></#if>
+      					</td>
+      					<td>
+      						<#if strkit('1',(lst.ddzt)!)>
+      							<button type="button" class="button" onclick="acceptOrRejectFmCarOrder('${(lst.id)!}','1')">接受</button>
+      							<button type="button" class="button" onclick="acceptOrRejectFmCarOrder('${(lst.id)!}','0')">拒单</button>
+      							<button type="button" class="button" onclick="showPrice('${(lst.id)!}','0')">
+      								<#if lst.flag??>已报价<#else>报价</#if>
+      							</button>
+      						</#if>
+      						<#if strkit('2',(lst.ddzt)!)>
+      							<button type="button" class="button" onclick="acceptOrRejectFmCarOrder('${(lst.id)!}','2')">开始送货</button>
+      							<button type="button" class="button" onclick="SeeGui('${(lst.id)!}')">跟踪</button>
+      						</#if>
+      						<#if strkit('3',(lst.ddzt)!)>
+      							<button type="button" class="button" onclick="acceptOrRejectFmCarOrder('${(lst.id)!}','3')">确认送达</button>
+      							<button type="button" class="button" onclick="SeeGui('${(lst.id)!}')">跟踪</button>
+      						</#if>
+      						<#if strkit('4',(lst.ddzt)!)>
+      							<button type="button" class="button" onclick="SeeGui('${(lst.id)!}')">跟踪</button>
+      							<button type="button" class="button" onclick="acceptOrRejectFmCarOrder('${(lst.id)!}','4')">签收</button>
+      						</#if>
+      						<#if strkit('5',(lst.ddzt)!)>
+      							<button type="button" class="button" onclick="SeeGui('${(lst.id)!}')">跟踪</button>
+      						</#if>
+      					</td>
+      				</tr>
+      				</#list>
+      				<tr>
+						<td colspan="13">
+							<#include '../../common/_paginate.html'>
+						</td>
+					</tr>
+      			</#if>
+			</table>
+		</div>
+	</div>
+	</form>
+	<#include '../inc/foot.html'>
+</body>
+</html>

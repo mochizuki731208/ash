@@ -1,0 +1,221 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+    <script type="text/javascript">
+		function uf_showdd(id){
+			$.dialog({
+				title:'订单明细',
+				content: 'url:${CTX}/admin/dd/showdd?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function refresh_day(){
+			$('#queryType').val("day");
+			$("#kssj").val("");
+			$("#jzsj").val("");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function refresh_week(){
+			$('#queryType').val("week");
+			$("#kssj").val("");
+			$("#jzsj").val("");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function refresh_month(){
+			$('#queryType').val("month");
+			$("#kssj").val("");
+			$("#jzsj").val("");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function doPrintAgin(id,mid){
+			$.post("${CTX}/admin/order/doPrintAgin",{id: id, mid: mid},function(data){
+	            if(data){
+					$.dialog.alert("发送打印数据成功！",function () {
+						//refresh();
+			        }).time(0.5);
+				}else{
+					$.dialog.alert("发送打印数据失败！");
+				}
+			});
+		}
+		function by_monthWeekQuery() {
+			$("#kssj").hide();
+			$("#jzsj").hide();
+			$("#query_year_begin").show();
+			$("#query_month_begin").show();
+			$("#query_year_end").show();
+			$("#query_month_end").show();
+			$("#queryType").val("monthWeekQuery");
+		}
+		function by_dayQuery() {
+			$("#query_year_begin").hide();
+			$("#query_month_begin").hide();
+			$("#query_year_end").hide();
+			$("#query_month_end").hide();
+			$("#kssj").show();
+			$("#jzsj").show();
+			$("#queryType").val("dayQuery");
+		}
+		$(document).ready(function(){
+			<#if strkit('monthWeekQuery',queryType!)>by_monthWeekQuery();return</#if>
+			by_dayQuery();
+		});
+	</script>
+ </head>
+  <body>
+  <form id="myform" name="myform" method="post" action="">
+  	<input type="hidden" id="queryType" name="queryType"/>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">本商家订单列表</h2>
+			<div style="height: 70px;line-height: 35px;">
+			<input type="button" id="btn_return" class="button" value="当 天" onclick="refresh_day();"/>
+			<input type="button" id="btn_return" class="button" value="本 周" onclick="refresh_week();"/>
+			<input type="button" id="btn_return" class="button" value="本 月" onclick="refresh_month();"/>
+			<input type="button" class="button" value="按月查询" onclick="by_monthWeekQuery();"/>
+			<input type="button" class="button" value="按天查询" onclick="by_dayQuery();"/>
+			<br>
+			&nbsp;开始时间:<input type="text" class="text Wdate" name="kssj" id="kssj" value="${(kssj)!}" onFocus="WdatePicker({})" style="width:180px;">
+			<select id="query_year_begin" name="query_year_begin">
+  						<option value="2014" <#if strkit('2014',query_year_begin!)>selected</#if>>2014年</option>
+  						<option value="2015" <#if strkit('2015',query_year_begin!)>selected</#if>>2015年</option>
+  						<option value="2016" <#if strkit('2016',query_year_begin!)>selected</#if>>2016年</option>
+  						<option value="2017" <#if strkit('2017',query_year_begin!)>selected</#if>>2017年</option>
+  					</select>
+  					<select id="query_month_begin" name="query_month_begin">
+  						<option value="01" <#if strkit('01',query_month_begin!)>selected</#if>>1月</option>
+  						<option value="02" <#if strkit('02',query_month_begin!)>selected</#if>>2月</option>
+  						<option value="03" <#if strkit('03',query_month_begin!)>selected</#if>>3月</option>
+  						<option value="04" <#if strkit('04',query_month_begin!)>selected</#if>>4月</option>
+  						<option value="05" <#if strkit('05',query_month_begin!)>selected</#if>>5月</option>
+  						<option value="06" <#if strkit('06',query_month_begin!)>selected</#if>>6月</option>
+  						<option value="07" <#if strkit('07',query_month_begin!)>selected</#if>>7月</option>
+  						<option value="08" <#if strkit('08',query_month_begin!)>selected</#if>>8月</option>
+  						<option value="09" <#if strkit('09',query_month_begin!)>selected</#if>>9月</option>
+  						<option value="10" <#if strkit('10',query_month_begin!)>selected</#if>>10月</option>
+  						<option value="11" <#if strkit('11',query_month_begin!)>selected</#if>>11月</option>
+  						<option value="12" <#if strkit('12',query_month_begin!)>selected</#if>>12月</option>
+  					</select>
+			&nbsp;截止时间:<input type="text" class="text Wdate" name="jzsj" id="jzsj" value="${(jzsj)!}" onFocus="WdatePicker({})" style="width:180px;">
+			<select id="query_year_end" name="query_year_end">
+  						<option value="2014" <#if strkit('2014',query_year_end!)>selected</#if>>2014年</option>
+  						<option value="2015" <#if strkit('2015',query_year_end!)>selected</#if>>2015年</option>
+  						<option value="2016" <#if strkit('2016',query_year_end!)>selected</#if>>2016年</option>
+  						<option value="2017" <#if strkit('2017',query_year_end!)>selected</#if>>2017年</option>
+  					</select>
+  					<select id="query_month_end" name="query_month_end">
+  						<option value="01" <#if strkit('01',query_month_end!)>selected</#if>>1月</option>
+  						<option value="02" <#if strkit('02',query_month_end!)>selected</#if>>2月</option>
+  						<option value="03" <#if strkit('03',query_month_end!)>selected</#if>>3月</option>
+  						<option value="04" <#if strkit('04',query_month_end!)>selected</#if>>4月</option>
+  						<option value="05" <#if strkit('05',query_month_end!)>selected</#if>>5月</option>
+  						<option value="06" <#if strkit('06',query_month_end!)>selected</#if>>6月</option>
+  						<option value="07" <#if strkit('07',query_month_end!)>selected</#if>>7月</option>
+  						<option value="08" <#if strkit('08',query_month_end!)>selected</#if>>8月</option>
+  						<option value="09" <#if strkit('09',query_month_end!)>selected</#if>>9月</option>
+  						<option value="10" <#if strkit('10',query_month_end!)>selected</#if>>10月</option>
+  						<option value="11" <#if strkit('11',query_month_end!)>selected</#if>>11月</option>
+  						<option value="12" <#if strkit('12',query_month_end!)>selected</#if>>12月</option>
+  					</select>
+			&nbsp;支付状态
+  			<select name="zfzt" id="zfzt" style="width: 80px;">
+					<option value="">全部</option>
+					<option value="0" <#if (((zfzt)!) == '0')>selected="selected"</#if> >未支付</option>
+					<option value="1" <#if (((zfzt)!) == '1')>selected="selected"</#if> >已支付</option>
+			</select>
+			&nbsp;订单状态
+  			<select name="ddzt" id="ddzt" style="width: 80px;">
+					<option value="">全部</option>
+					<option value="1" <#if (((ddzt)!) == '1')>selected="selected"</#if> >已提交</option>
+					<option value="2" <#if (((ddzt)!) == '2')>selected="selected"</#if> >取货中</option>
+					<option value="3" <#if (((ddzt)!) == '3')>selected="selected"</#if> >送货中</option>
+					<option value="4" <#if (((ddzt)!) == '4')>selected="selected"</#if> >已送达</option>
+					<option value="5" <#if (((ddzt)!) == '5')>selected="selected"</#if> >已签收</option>
+					<option value="6" <#if (((ddzt)!) == '6')>selected="selected"</#if> >拒单</option>
+					<option value="7" <#if (((ddzt)!) == '7')>selected="selected"</#if> >已退单</option>
+					<option value="8" <#if (((ddzt)!) == '8')>selected="selected"</#if> >已撤单</option>
+			</select>
+			<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+			</div>
+			<table class="list">
+            <tr>
+	            <th width="40px;">序号</th>
+	            <th width="15%;">订单号</th>
+	            <th width="10%;">总金额</th>
+	            <th width="10%;">联系人</th>
+	            <th width="10%;">联系电话</th>
+	            <th width="*;">收货地址</th>
+	            <th width="15%;">支付状态</th>
+	            <th width="10%;">订单状态</th>
+	          <!--  <th width="10%;">操作</th>--> 
+	        </tr>
+	        <#if listpage ??>
+      				<#list listpage.list as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!}</td>
+                    <td><a href="JavaScript:void(0);" onclick="uf_showdd('${(lst.id)!}')">${(lst.sn)!}</a></td>
+                    <td class="red">${(lst.ddzje)?string("currency")}</td>
+                    <td><#if strkit('1',(lst.ddzt)!)>***<#else>${(lst.lxr)!}</#if></td>
+                    <td><#if strkit('1',(lst.ddzt)!)>***<#else>${(lst.lxrdh)!}</#if></td>
+                    <td><#if strkit('1',(lst.ddzt)!)>***<#else>${(lst.shdz)!}</#if></td>
+                    <td><#if strkit('0',(lst.zfzt)!)>未支付</#if><#if strkit('1',(lst.zfzt)!)>已支付</#if></td>
+                    <td>
+                    	<#if strkit('0',(lst.ddzt)!)><span class="red">未提交</span></#if>
+                    	<#if strkit('1',(lst.ddzt)!)>已提交</#if>
+                    	<#if strkit('2',(lst.ddzt)!)>取货中</#if>
+                    	<#if strkit('3',(lst.ddzt)!)>送货中</#if>
+                    	<#if strkit('4',(lst.ddzt)!)>已送达</#if>
+                    	<#if strkit('5',(lst.ddzt)!)>已签收</#if>
+                    	<#if strkit('6',(lst.ddzt)!)><span class="red">拒单</span></#if>
+                    	<#if strkit('7',(lst.ddzt)!)><span class="red">已退单</span></#if>
+                    	<#if strkit('8',(lst.ddzt)!)><span class="red">已撤单</span></#if>
+                    </td>
+                   <!-- <td><a href="javascript:void(0)" onclick="doPrintAgin('${(lst.id)!}','${(lst.mid)!}')">打印</a></td>-->
+                  </tr>
+				</#list>
+				<tr>
+					<td colspan="9">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+			</#if>
+            </table>
+		</div>
+	</div>
+	</form>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

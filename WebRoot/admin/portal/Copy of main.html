@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>${SYSNAME}</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link href="${CTX}/res/css/admin/mainhome.css" rel="stylesheet" type="text/css" />
+		<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	</head>
+	<body style="overflow:hidden;">
+			<div class=headerTops>
+				<!-- 
+				<div class=headerLogo><img src="${CTX}/res/css/admin/images/logo.png"/></div>
+				 -->
+				<ul class=headerMenus>
+					<#list list as vo>
+						<#if vo_index==0>
+						<#assign firstmenu=vo.id/>
+						</#if>
+					     <li class="${(vo.css)!''}"><a href="${CTX}/25console/left/${(vo.id)!''}" target=left>${(vo.mc)!''}</a></li>
+					</#list>
+					<li class="homepage" style="display: none;"><a href="${CTX}" target="_blank">网站首页</a></li>
+					<li class="homepage"><a href="javascript:void(0)" onclick="showTLLog('')">语音盒</a></li>
+					<li class="home"><a href="${CTX}/25console/loginout">退出系统</a></li>
+				</ul>
+			</div>
+			
+			<div id="framecontentLeft" style="display: block;">
+				<iframe id="left" name="left" src="${CTX}/25console/left/${(firstmenu)!}" scrolling="auto" marginwidth="0" marginheight="0" width="100%" height="100%" frameborder="0"></iframe>
+			</div>
+			<div id="maincontent">
+				<div id="uccontainer"><iframe id="content" name="content" src="" scrolling="auto" marginwidth="0" marginheight="0" width="100%" height="100%" frameborder="0"></iframe></div>
+			</div>
+			<div id="callLayer" style="position: absolute; z-index: 9998;display:none;left:300px;top:110px;width:720px">
+				  <iframe src="${CTX}/admin/order/recall.html" id="callIframe" name="callIframe" style="width: 700px; height: 180px;" scrolling="no"></iframe>
+			</div>
+			<input type="hidden" id="logValue" value="0">
+			<div id="myordercart" style="width:250px;height:160px;border: 1px solid #EE7621;background-color: #F4F4F4;z-index: 10;">
+				<div style="height: 28px;background-color: #EE7621;width: 250px;line-height: 28px;color: white;font-weight: bold;">
+					<img src="${CTX}/res/images/laba.gif"/>系统提醒
+				</div>
+				<div style="height: 150px;width: 250px;">
+					<span style="line-height: 50px;font-size: 13px;font-weight: bold;padding-left: 10px;">
+						敬请期待。。。
+					</span>
+				</div>
+			</div>
+			<script language="javascript">
+			    $('#maincontent').width($(window).width()-190);
+			    $('#uccontainer').height( $('#maincontent').height());
+			    $('#uccontainer').find('iframe').height( $('#maincontent').height());
+			    $(window).resize(function(){
+			        $('#maincontent').width($(window).width()-190);
+			        $('#uccontainer').height( $('#maincontent').height());
+			        $('#uccontainer').find('iframe').height( $('#maincontent').height());
+			    });
+			    function showTLLog(value) {
+			    	var obj = "";
+			    	if(value=="" || null==value){
+			    		obj=document.getElementById("logValue").value;
+			    	}else{
+			    		obj = value;
+			    	}
+			    	if(obj=="0" || obj==0) {
+			    		document.getElementById("logValue").value="1";
+			    		document.getElementById("callLayer").style.display="block";
+			    	}else if(obj=="1") {
+			    		document.getElementById("logValue").value="0";
+			    		document.getElementById("callLayer").style.display="none";
+			    	}
+			    }
+			    
+			    function scroll(p){
+			        var d = document,w = window,o = d.getElementById(p.id),ie6 = /msie 6/i.test(navigator.userAgent);
+			        if(o){
+			   	      o.style.cssText +=";position:"+(p.f&&!ie6?'fixed':'absolute')+";"+(p.r?'left':"right")+":0;"+(p.t!=undefined?'top:'+p.t+'px':'bottom:20;right: 10px;');
+			   	      if(!p.f||ie6){
+			   	       -function(){
+			   	           var t = 500,st = d.documentElement.scrollTop||d.body.scrollTop,c;
+			   	                 c = st  - o.offsetTop + (p.t!=undefined?p.t:(w.innerHeight||d.documentElement.clientHeight)-o.offsetHeight);//如果你是html 4.01请改成d.body,这里不处理以减少代码
+			   	              c!=0&&(o.style.top = o.offsetTop + Math.ceil(Math.abs(c)/10)*(c<0?-1:1) + 'px',t=10);
+			   	              setTimeout(arguments.callee,t)
+			   	          }() 
+			   	      }
+			   	     }  
+			    }
+			    
+			    $(function(){
+			   		scroll({id:'myordercart'});
+			    });
+			</script>
+	</body>
+</html>

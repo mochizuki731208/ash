@@ -1,0 +1,152 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+    <script type="text/javascript">
+		$().ready(function() {
+            $('.tab_header > li').each(function () {
+                $(this).bind('click', function () {
+                    var $self = $(this);
+                    $self.siblings().removeClass('active');
+                    $self.addClass('active');
+                    var index = $self.attr('index');
+                    $('.tab_body').find('div').hide();
+                    $('.tab_body').find('div[index="' + index + '"]').show();
+                });
+            });
+		});
+	    
+		function showmessage(id){
+			$.dialog({
+				title:'消息盒子',
+				content: 'url:${CTX}/admin/dd/showmessage?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function goToChongZhi(){
+			window.location.href="${CTX}/ab/user/yhcz";
+		}
+	</script>
+    <style type="text/css">
+		.content-inner{}
+		.account-status{ width:920px; height:138px; border:solid 1px #BDBDBD; background-color:#F2F2F2; padding:15px 20px; margin-left:auto; margin-right:auto}
+		.col-left{ width:284px; height:50px}
+		.col-left .avatar{position: relative;float: left;margin-right: 15px;width: 48px;height: 48px;border: 1px solid #ccc;background: url(${CTX}/res/images/sprites.png) no-repeat 0 -230px;}
+		.account-status .avatar a {display: none;position: absolute;top: 0;left: 0;width: 48px;height: 42px;padding-top: 6px;background-color: rgba(0,0,0,0.3);color: white;text-align: center;}
+		.user-safety-level.low {background-position: 0 -90px;color: #f00;}
+		.user-safety-level.center {background-position: 0 -100px;color: #f00;}
+		.user-safety-level.high {background-position: 0 -120px;color: #f00;}
+		.account-status .safety-level-wrapper {margin-left: 65px;width: 235px;}
+		.account-status .money-level-wrapper {margin-left: 300px;width: 235px;}
+		.account-status .safety-level-wrapper h5 {font-size: 18px;line-height: 1.5;margin-bottom: 5px; color:#555}
+		.account-status .money-level-wrapper h5 {font-size: 18px;line-height: 1.5;margin-bottom: 5px; color:#555}
+		.user-safety-level {display: inline-block;padding-left: 82px;height: 10px;line-height: 10px;background: url(${CTX}/res/images/sprites.png) no-repeat 0 0;}
+		.account-status .related-info {margin: 30px 0 0 0;}
+		.account-status .related-info li {float: left;width: 280px;margin: 0 20px 10px 0; line-height:18px;display: list-item;}
+		.account-status .related-info li i.icon-point {background-position: 0 -170px;vertical-align: text-top;}
+		.account-status .related-info li i.icon-order {background-position: 0 -190px;vertical-align: text-top;}
+		.account-status .related-info li i.icon-star {background-position: 0 -210px;vertical-align: text-top;}
+		.account-status .related-info li i {margin-right: 5px;width: 14px;height: 14px;background: url(${CTX}/res/images/sprites.png) no-repeat 0 0;display: inline-block;}
+		.account-status .related-info li a{color:#08c;display: inline; line-height:18px}
+		
+		.latest-orders { width:960px; margin-left:auto; margin-right:auto; margin-top:20px}
+		.tab_wrapper .tab_header {margin: 0;display:block; color:#555; height:30px; line-height:30px;}
+		.tab_wrapper .tab_header li {position: relative;float: left;display: block;margin-right: 5px;padding: 5px 15px;background: #fff;border:1px solid #bdbdbd;font-weight: bold;cursor: pointer;border-radius: 3px 3px 0 0; height:18px; line-height:18px}
+		.tab_wrapper .tab_header .active{background-color: #eee;border-bottom-color: #eee;}
+		.tab_wrapper .tab_body {background-color: #fff;}
+		.tab_body .food-orders{color: rgb(85, 85, 85);display: block;font-size: 13px;height: 58px;line-height: 18px;position: relative;word-break: break-all;}
+		.tab_body .deal-orders{color: rgb(85, 85, 85);display: block;font-size: 13px;height: 58px;line-height: 18px;position: relative;word-break: break-all;}
+		.latest-orders .empty {background-color: #eee;margin: 0;padding: 20px 0;text-align: center;}
+		.hide{display: none !important;}
+	</style>	
+  </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 消息中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+            <h2 class="box_title">消息中心</h2>
+		    <div class="content-inner profile-index">
+		        <div class="latest-orders tab_wrapper">
+		            <div class="tab_body">
+                        <div class="food-orders" index=0>
+                            <form id="myform" name="myform" method="post" action="${CTX}/ab/deletemes">
+                                
+                                
+                                <input class="tab_header" type="submit" value="删除">
+                                
+                        	    <table class="list">
+					                <tr>
+					                    <th width="80px;">标记</th>
+					                    <th width="80px;">状态</th>
+						                <th width="160px;">日期</th>
+						                <th width="120px;">类型</th>
+									    <th width="150px;">操作</th>
+						            </tr>
+						            <#if listpage ??>
+      								    <#list listpage.list as lst>
+						            <tr>
+						                <td>
+						                    <input type="checkbox" value="${(lst.id)}" name="chooseid"/>
+						                </td>
+						                <td>
+						                    <#if strkit('0',(lst.isread)!)>
+						                                                                       未读
+						                    <#else>
+						                                                                      已读
+						                    </#if>                                                                                                     
+						                </td>
+						                <td>
+						                    ${(lst.send_date)!}
+						                </td>
+						                <td>
+						                    <#if strkit('0',(lst.mes_type)!)>系统消息 </#if>                                                
+						                    <#if strkit('1',(lst.mes_type)!)>雇佣消息 </#if>  
+						                    <#if strkit('2',(lst.mes_type)!)>订单消息 </#if>
+						                    <#if strkit('3',(lst.mes_type)!)>其他消息 </#if>                                                                                      
+						                </td>
+						                <td>
+						                    <a href="javascript:void(0);" onclick="showmessage('${(lst.id)}')">查看</a>
+						                </td>
+						            </tr>
+						                </#list>
+            						<tr>
+										<td colspan="9">
+										<#include '../../common/_paginate.html'>
+										</td>
+									</tr>
+								    </#if>
+						        </table>
+                            </form>   
+                        </div>
+                    </div>
+                </div>
+            </div>
+	    </div>
+	</div>    
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>   

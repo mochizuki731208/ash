@@ -1,0 +1,392 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>输入订单信息</title>
+	 <link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/lrtk1.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/main.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/index.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/reset.css"/>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_reset.css">
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_style.css">
+	<link rel="stylesheet" href="${CTX}/res/tc/css/style.css" />
+	<link rel="stylesheet" href="${CTX}/res/tc/css/state.css" />
+	<link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+    <link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+  
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-1.8.17.custom.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-zh-CN.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/tc/js/param.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript">
+	var zb = '${(zb)!}';
+	//var carsLen = ${cars.size()};
+	var currLoc = "${(currcity.mc)!}";
+	var typeSelIndex = -1;
+	var selIndex = -1;
+	//var carNames = [<#list cars as c>"${(c['name'])!}",</#list>""];
+/*	var basePrice = [<#list cars as c>"${(c['起步价'])!}",</#list>""];
+	var overPrice = [<#list cars as c>"${(c['超公里费'])!}",</#list>""];
+	var baseKilo = [<#list cars as c>"${(c['起步公里'])!}",</#list>""];
+	var nightPrice = [<#list cars as c>"${(c['夜间服务'])!}",</#list>""];
+	var carLong = [<#list cars as c>"${(c['车长'])!}",</#list>""];
+*/	var currKilo = -1;	//当前正在计算的路段, 0:from-to, 1:to-to2, 2:to2-to3...
+	var maxKilo = 100; //当大于100公里，则另外输入一个悬赏金额
+	var webctx = '${CTX}';
+	var info = {};
+	
+	//保存、提交订单
+	function saveOrderForm(action) {
+		if(!resetInfo())
+			return;
+		info['action'] = action;
+		$.post('${CTX}/admin/order/saveOrderForm', info, function(data) {
+
+			if (data == '1') {
+				alert('熟车订单，已完成！');
+				if (action == "save") {
+					self.location.href = '${CTX}';
+				} else {
+					self.location.href = '${CTX}/ab/tc/pay?isok=1';
+				}
+			} else if (data == '0') {//余额不足以支付
+				if (action == "save") {
+					self.location.href = '${CTX}';
+				} else {
+					alert('熟车订单，已完成，但是您的账户余额不足，请使用支付宝在线支付！');
+					self.location.href = '${CTX}/ab/tc/pay';
+					//self.location.href = '${CTX}/ab/card/zhyefail';
+				}
+			} else {
+				alert('订单保存失败，请稍候再试！');
+			}
+		});
+	}
+	//预览
+	function preview() {
+//		resetInfo();
+		if(!resetInfo())
+			return;
+		$.dialog({
+			title : '订单明细',
+			content : 'url:${CTX}/admin/order/previewOrder?' + parseParam(info),
+			lock : true,
+			resize : false,
+			width : 900,
+			height : 480,
+			cover : true,
+			max : true,
+			min : true,
+			cancel : true,
+			fixed : true,
+			cancelVal : '关 闭'
+		});//弹出框
+	}
+	</script>
+	<script type="text/javascript" src="${CTX}/res/js/tc_address.js"></script>
+	<script type="text/javascript" src="${CTX}/res/tc/js/tcfm.js"></script>
+    <style type="text/css">
+		.suggest-container{border:1px solid #C1C1C1;visibility:hidden;background-color:#fff;}
+		.suggest-item{padding:3px 2px;}
+		.suggest-active {background:#33CCFF;color:white;padding:3px 2px;}			
+	</style>
+	
+</head>
+<body>
+<!-- 最顶层的内容 -->
+	<#include '../inc/top.html'>
+  	<!-- 搜索栏 -->
+	<#include '../inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+
+<!-- 导航 开始 -->
+	<#include '../inc/nav_ps.html'>
+<!-- 导航 结束 -->
+	
+	<!-- 在线下单，同城快递，基础信息 -->
+<!--============================================= content begin =========================================-->
+
+<div class="contain">
+  
+  <div class="mid-main">
+     <div class="mid-top">
+       <ul>
+         <li>我要发货</li>
+         <li>一步下单</li>
+         <li>让物流共轻松</li>
+       </ul>
+     </div>
+     <div class="main-biao">
+     
+       <div class="b3" id="b2">
+		<p class="np1">车辆信息</p>
+        <p class="np2">
+          	<input type="hidden" id="way" name="way" value="${way}">
+                         <label for="carLengthAdd" class=" control-label">车长</label>
+                           <select name="carlength" class="form-control" id="carlength"  <#if strkit('3',(way)!)> disabled</#if>>
+                                <option value="">请选择车长</option>
+                            	<option value="1.8米" <#if strkit('1.8米',(car.length)!)>selected</#if> >1.8米</option>
+	                        	<option value="2.6米" <#if strkit('2.6米',(car.length)!)>selected</#if> >2.6米</option>
+	                           	<option value="3.2米" <#if strkit('3.2米',(car.length)!)>selected</#if> >3.2米</option>
+	                        	<option value="4.2米" <#if strkit('4.2米',(car.length)!)>selected</#if> >4.2米</option>
+	                       		<option value="5.2米" <#if strkit('5.2米',(car.length)!)>selected</#if> >5.2米</option>
+	                            <option value="5.8米" <#if strkit('5.8米',(car.length)!)>selected</#if> >5.8米</option>
+	                            <option value="6.2米" <#if strkit('6.2米',(car.length)!)>selected</#if> >6.2米</option>
+	                       		<option value="6.5米" <#if strkit('6.5米',(car.length)!)>selected</#if> >6.5米</option>
+	                      		<option value="6.8米" <#if strkit('6.8米',(car.length)!)>selected</#if> >6.8米</option>
+	                        	<option value="7.2米" <#if strkit('7.2米',(car.length)!)>selected</#if> >7.2米</option>
+	                          	<option value="8米" <#if strkit('8米',(car.length)!)>selected</#if> >8米</option>
+	                         	<option value="9.6米" <#if strkit('9.6米',(car.length)!)>selected</#if> >9.6米</option>
+	                        	<option value="13米" <#if strkit('13米',(car.length)!)>selected</#if> >13米</option>
+	                    		<option value="15米" <#if strkit('15米',(car.length)!)>selected</#if> >15米</option>
+	                         	<option value="16.5米" <#if strkit('16.5米',(car.length)!)>selected</#if> >16.5米</option>
+	                          	<option value="17.5米" <#if strkit('17.5米',(car.length)!)>selected</#if> >17.5米</option>
+	                          	<option value="18.5米" <#if strkit('18.5米',(car.length)!)>selected</#if> >18.5米</option>
+	                        	<option value="20米" <#if strkit('20米',(car.length)!)>selected</#if> >20米</option>
+	                     		<option value="22米" <#if strkit('22米',(car.length)!)>selected</#if> >22米</option>
+	                         	<option value="24米" <#if strkit('24米',(car.length)!)>selected</#if> >24米</option>
+                            </select>
+                            
+                            <label for="cartype" class="control-label">车型</label>
+                            <select name="cartype" class="form-control" id="cartype" <#if strkit('3',(way)!)> disabled</#if>>
+                                <option value="">请选择车型</option>
+                                 <option value="三轮车" <#if strkit('三轮车',(car.type)!)>selected</#if> >三轮车</option>
+	                             <option value="面包车" <#if strkit('面包车',(car.type)!)>selected</#if> >面包车</option>
+	                             <option value="厢车" <#if strkit('厢车',(car.type)!)>selected</#if> >厢车</option>
+	                             <option value="平板车" <#if strkit('平板车',(car.type)!)>selected</#if> >平板车</option>
+	                             <option value="高低板车" <#if strkit('高低板车',(car.type)!)>selected</#if> >高低板车</option>
+	                             <option value="高栏车" <#if strkit('高栏车',(car.type)!)>selected</#if> >高栏车</option>
+	                             <option value="冷藏车" <#if strkit('冷藏车',(car.type)!)>selected</#if> >冷藏车</option>
+	                             <option value="危险品车" <#if strkit('危险品车',(car.type)!)>selected</#if> >危险品车</option>
+	                             <option value="大件车" <#if strkit('大件车',(car.type)!)>selected</#if> >大件车</option>
+                            </select>
+
+	        <#if car??>
+            <ul>
+            <li>车牌号：${car.car_no}</li><li>  司机姓名：${car.driver}</li><li>  联系电话：${car.mobile}</li>
+          		<input type="hidden" id="carid" name="carid" value="${car.id}">
+                </ul>
+        	</#if>  
+        </p>
+        <div class="clear"></div>
+       </div> 
+         
+       <div class="b3">
+          <p class="np1">用车时间</p>
+          
+          <p class="np2"><input type="text" id="sendTime" class="time_input" autocomplete="off" placeholder="点击选择用车时间！" onblur="calcTotal()"/></p>
+          <div class="clear"></div>
+       </div>
+       
+       <!--================================ 地址  =========================================-->
+       
+       <div class="b4">
+          <p class="np1">始发地</p>
+          <p class="np2"><input type="text" placeholder="自动获取地址信息" class="l address-info-address vaddr" value="" id="sendAddr" name="sendAddr"/>
+          <br/><a href="javascript:selOldAddr();"><span>常用地址</span></a></p>
+          <p class="np3"><img src="${CTX}/res/tc/images/tubiao.png" /></p>
+          <p class="np4">姓名</p>
+          <p class="np5"><input type="text" placeholder="必填" class="address-info-name vname" id="sendName" name="sendName" value="${(abuser.mc)!}"/></p>
+          <p class="np6">联系电话</p>
+          <p class="np7"><input type="text" placeholder="必填" class="address-info-phone vphone" id="sendPhone" name="sendPhone" value="${(abuser.mobile)!}"/></p>
+          <div class="clear"></div>
+       </div>
+        <div id="sendAddr_panel"></div>
+		
+       <div class="b5 sendtype">
+          <p class="np1">到达地</p>
+          <p class="np2"><input type="text" placeholder="最多可添加五个地址" class="l address-info-address vaddr" value="" id="rcvAddr" name="rcvAddr"/>
+          	<a href="javascript:void(0);" class="plus" onclick="addRcv();"></a>
+          </p>
+          <p class="np3"><img src="${CTX}/res/tc/images/tubiao.png" /></p>
+          <p class="np4">姓名</p>
+          <p class="np5"><input type="text" placeholder="必填" class="address-info-name vname" value="" id="rcvName" name="rcvName" /></p>
+          <p class="np6">联系电话</p>
+          <p class="np7"><input type="text" placeholder="必填" class="address-info-phone vphone" value="" id="rcvPhone" name="rcvPhone"/></p>
+          <div class="clear"></div>
+       </div>
+	   <div id="rcvAddr_panel"></div>
+       
+		<!--================================ 地址  end =========================================-->
+
+       <div class="b6">
+         <p class="np1">货物类型</p>
+          <p class="np2"> 
+          <select id="goodsType" class="selectbox">
+             <option value="">请选择...</option>
+			 <#list goodsList as g>
+			 <option value="${g.value}">${g.value}</option>
+			 </#list>
+         </select></p>
+         <!-- 
+          <p>姓名</p>
+          <p><input type="text" placeholder="选填" /></p>
+           -->
+          <div class="clear"></div>
+       </div>
+       
+       <div class="b7">
+         <p class="np1">货物重量</p>
+          <p class="np2"><input type="text" placeholder="选填" id="weight" class="text_input"/></p>
+          <p class="np3"> 
+          <select id="wt_unit">
+             <option value="1">公斤</option>
+             <option value="2">吨</option>
+         </select>
+         </p>
+          <div class="clear"></div>
+       </div>
+
+       <div class="b8">
+         <p class="np1">货物体积</p>
+         <p class="np2"><input type="text" placeholder="选填" id="goods_volumn" class="text_input"/></p>
+         <p class="np3">立方米</p>
+          <div class="clear"></div>
+       </div>       
+
+       <div class="b9">
+         <p class="np1">货物数量</p>
+          <p class="np2"><input type="text" placeholder="选填" id="goods_mount" class="text_input"/></p>
+          <p class="np3">件</p>
+          <div class="clear"></div>
+       </div>           
+       <div class="b10">
+         <p class="np1">我要出价</p>
+         <p class="np2"><input type="text" placeholder="出价金额" class="vmoney" id="onePrice" name="onePrice"/></p>
+			<div class="clear"></div>
+            
+       </div>
+       <!--<div class="b10">
+         <p class="np1">订单模式</p>
+         <p class="np2">
+                <input type="radio" name="orderStyle" value="1" id="isXS" onclick="chooseStyle()" />我要悬赏
+                <input type="radio" name="orderStyle" value="2" onclick="chooseStyle()" />司机竞标报价
+               <input name="orderStyle" type="radio" onclick="chooseStyle()" value="3" checked id="wycj" />我要出价
+            </p>
+			<div class="clear"></div>
+			<p class="np3" id="zb_div1" style="display: none;">
+				<span>悬赏价格：</span>
+				 <input autocomplete="off" type="text" placeholder="悬赏金额" class="address-info-name vmoney" value="" id="xsMoney" name="xsMoney" onblur="calcTotal();">
+			</p>
+			<div class="clear"></div>
+			<p class="np4" id="xs_div" style="display: none;">
+				<span>额外悬赏金额：</span>
+				<label><input type=radio name="moreMoney" onchange="calcTotal()" value="10" style="width:20px"/>&nbsp;10元</label>&nbsp;&nbsp;
+                <label><input type=radio name="moreMoney" onchange="calcTotal()" value="20" style="width:20px"/>&nbsp;20元</label>&nbsp;&nbsp;
+                <label><input type=radio name="moreMoney" onchange="calcTotal()" value="30" style="width:20px"/>&nbsp;30元</label>&nbsp;&nbsp;
+                <label><input type=radio name="moreMoney" onchange="calcTotal()" value="50" style="width:20px"/>&nbsp;50元</label>&nbsp;&nbsp;
+                <label><input type=radio name="moreMoney" onchange="calcTotal()" value="100" style="width:20px"/>&nbsp;100元</label>
+			</p>
+			<div class="clear"></div>
+			<p class="np5" id="zb_div2" style="display: none;">
+				<span>价格区间：</span>
+				<input autocomplete="off" type="text" placeholder="最低价格" class="address-info-name vmoney" value="" id="minPrice" name="minPrice">
+                    -
+                <input autocomplete="off" type="text" placeholder="最高价格" class="address-info-name vmoney" value="" id="maxPrice" name="maxPrice">
+			</p>
+			<div class="clear"></div>
+			<p class="np6" id="zb_div3" style="display: none;">
+				<span>出价金额：</span>
+				 <input autocomplete="off" type="text" placeholder="出价金额" class="address-info-name vmoney" value="" id="onePrice" name="onePrice" onblur="calcTotal();">
+			</p>
+            <div class="clear"></div>
+       </div>-->  
+       
+       <div class="b11">
+         <p class="np1">额外需求</p>
+         <p class="np2">需要小推车？ <input type="checkbox" id="cart" value="1" onchange="needCart(this)" /></p>
+         <div class="clear"></div>
+         <p class="np4">回单：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="huidan_price" value="3" id="huidan_price" onchange="calcTotal();checkIt(this)" /></p>
+         <p class="hong">&nbsp;&nbsp;<img src="${CTX}/res/css/ab/images/img11.png" />&nbsp;3元/次，回单周期：自货物到达收货地址获得回单之日起，7日以内。</p>
+         <div class="clear"></div>
+         <p class="np7">代收贷款: <input type="checkbox" name="service_price" value="10" id="service_price" onchange="calcTotal();checkIt(this)" /></p>
+         <p class="hong">&nbsp;&nbsp;<img src="${CTX}/res/css/ab/images/img11.png" />&nbsp;10元/次，回款周期：自货物到达收货地址获得回单之日起，2个工作日以内。</p>
+         <div class="clear"></div>              
+         <p class="np10">搬运：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="lift" value="1" onchange="calcTotal();checkIt(this)" /></p>
+         <p class="hong">&nbsp;&nbsp;<img src="${CTX}/res/css/ab/images/img11.png" />&nbsp;有电梯需要搬运的收费40元，无电梯的收费70元。</p>
+         <div class="clear"></div>
+         <p class="np13">拆装：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="dismounting" value="1" onchange="calcTotal();checkIt(this)" /></p>
+         <p class="hong">&nbsp;&nbsp;<img src="${CTX}/res/css/ab/images/img11.png" />&nbsp;3元/次。</p>
+          <div class="clear"></div>
+       </div>
+       
+       <div class="b12">
+         <p class="np1">备注</p>
+          <p class="np2"><input type="text" placeholder="选填" name="remark" id="remark" /></p>
+          <div class="clear"></div>
+       </div>  
+       
+       
+       <div class="b14">
+         <p class="np1">支付类型</p>
+          <p class="np2">
+                <input type="radio" name="payType" value="1" checked="checked" id="RadioGroup2_0" />在线支付&nbsp;&nbsp;
+                <input type="radio" name="payType" value="2" id="RadioGroup2_1" />现付&nbsp;&nbsp;
+                <input type="radio" name="payType" value="3" id="RadioGroup2_2" />到付&nbsp;&nbsp;
+                <input type="radio" name="payType" value="4" id="RadioGroup2_3" />回单付&nbsp;&nbsp;
+         </p>
+         <div class="clear"></div>
+       </div> 
+       
+       <div class="b15">
+         <p class="np1"></p>
+          <p class="np2">
+          <input type="button" id="saveInfo" class="next-btn" onclick="preview();" value="预览" />
+          <input type="button" id="saveInfo" class="next-btn" onclick="saveOrderForm('save');" value="保存"/>
+          <input type="button" id="saveInfo" class="next-btn" onclick="saveOrderForm('submit');" value="提交"/>
+          <div class="clear"></div>
+         </p>
+       </div>
+       
+     </div>
+  </div>
+</div>
+ 
+ <div id="allmap" style="display: none;"></div>
+ 
+  </body>
+</html>
+
+<script type="text/javascript">
+//百度地图API功能
+var map = new BMap.Map("allmap");
+map.centerAndZoom(currLoc, 11);
+var options = {
+	onSearchComplete: function(results){
+		if (driving.getStatus() == BMAP_STATUS_SUCCESS){
+			// 获取第一条方案
+			var plan = results.getPlan(0);
+			// 获取方案的驾车线路
+			var route = plan.getRoute(0);
+			//var meter = route.vf;
+			var meter = route.getDistance(false);
+			console.log(meter + "米" + (Math.floor(meter/1000) + 1) + "公里");	
+			//alert(meter + "米" + (Math.floor(meter/1000) + 1) + "公里");	
+			var k = 	(Math.floor(meter/1000) + 1);
+			info['kilo'] += k;
+			//alert(k);
+			
+			currKilo++;
+			if(currKilo == 1 && info['rcvAddr2'] && info['rcvAddr2']!=''){
+				//driving.search(info['to'], info['rcvAddr2']);
+				driving.search(new BMap.Point(info['to_lng'], info['to_lat']), new BMap.Point(info['rcvAddr2_lng'], info['rcvAddr2_lat']));
+				return;
+			}else if(currKilo >= 2 && info['rcvAddr'+(currKilo+1)] && info['rcvAddr'+(currKilo+1)]!=''){
+				//driving.search(info['to' + currKilo], info['to'+(currKilo+1)]);
+				driving.search(new BMap.Point(info['rcvAddr'+currKilo+'_lng'], info['rcvAddr'+currKilo+'_lat']), 
+					new BMap.Point(info['rcvAddr'+(currKilo+1)+'_lng'], info['rcvAddr'+(currKilo+1)+'_lat']));
+				return;
+			}
+			currKilo = -1;
+			set100Kilo();		
+		}else{
+			manKilo();
+		}
+	}
+};
+var driving = new BMap.DrivingRoute(map, options);
+</script>

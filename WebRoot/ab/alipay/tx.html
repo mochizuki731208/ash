@@ -1,0 +1,220 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<link rel="stylesheet" type="text/css"	href="${CTX}/res/css/admin/admin.css" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/tab/style.css"/>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/bootstrap.min.css" />
+<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+
+<script type="text/javascript">
+	$().ready(function() {
+		shiftNavTag(0);
+	});
+	function checkValues(){
+		var WIDtotal_fee = $("#WIDtotal_fee").val();
+		if(!WIDtotal_fee){
+			$.dialog.alert("请输入提现金额",function(){
+				$("#WIDtotal_fee").focus();
+			});
+			$("#WIDtotal_fee").focus();
+			return false;
+		}
+		var exp = /^([1-9][\d]{0,7}|0)(\.[\d]{1,2})?$/;    
+		if(!exp.test(WIDtotal_fee)){    
+			$.dialog.alert("您输入的金额不正确！",function(){
+				$("#WIDtotal_fee").focus();
+			}); 
+			$("#WIDtotal_fee").val('');
+			$("#WIDtotal_fee").focus();
+			return false;
+		}
+		if(!$("#zfpwd").val()){
+			$.dialog.alert("支付密码不可为空！！",function(){
+				$("#zfpwd").focus();
+			}); 
+			return false;
+		}
+		var zzfs = $("#zzfs").val();
+		var yhkid = $("#yhkid").val();
+		if(zzfs==0){
+			if(!$("#zfbzh").val()){
+				$.dialog.alert("请填写正确的支付宝账号!",function(){
+					$("#zfbzh").focus();
+				});
+			}else{
+				TableSumit();
+			}
+		}else{
+			if(yhkid==null || yhkid==''){
+				$.dialog.alert("请选择提款银行",function(){
+					$("#yhkid").focus();
+				});
+			}else{
+				if(!$("#yhknum").val()){
+					$.dialog.alert("请输入银行卡卡号",function(){
+						$("#yhknum").focus();
+					});
+				}else{
+					TableSumit();
+				}
+			}
+		}
+	}
+	function shiftNavTag(which) 
+	{
+		var t0 = document.getElementById("MapContainer");
+		var t1 = document.getElementById("MemberCustomerListContainer");
+		var NavTag0 = document.getElementById("NavTag0"); // Map
+		var NavTag1 = document.getElementById("NavTag1");
+
+		if (which==0)
+		{ // Map
+			t0.style.display="";
+			t1.style.display="none";
+			NavTag0.className="currentLabel";
+			NavTag1.className="normalLabel";
+		} 
+
+		if (which==1) // 货物
+		{
+			t0.style.display="none";
+			t1.style.display="";
+			NavTag0.className="normalLabel";
+			NavTag1.className="currentLabel";
+		}
+		$("#zzfs").val(which);
+	}
+	function TableSumit(){
+		$.ajax({
+			url: "${CTX}/ab/order/initTx",
+			type: "POST",
+			data:{
+				WIDout_trade_no:$("#WIDout_trade_no").val(),
+				WIDsubject:$("#WIDsubject").val(),
+				WIDbody:$("#WIDbody").val(),
+				zzfs:$("#zzfs").val(),
+				WIDtotal_fee:$("#WIDtotal_fee").val(),
+				yhkid:$("#yhkid").val(),
+				type:$("#type").val(),//yhknum
+				zfbzh:$("#zfbzh").val(),
+				yhknum:$("#yhknum").val(),
+				mc:$("#mc").val(),
+				zfpwd:$("#zfpwd").val()
+			},
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				if(data.result == "yebz"){
+					$.dialog.alert("账户余额不足！",function(){
+						$("#WIDtotal_fee").focus();
+					});
+				}if(data.result == "zfpwderror"){
+					$.dialog.alert("支付密码错误！",function(){
+						$("#zfpwd").focus();
+					});
+				}else{
+					$.dialog.tips("提现申请已经提交，约7个工作日内到账，请您耐心等待！",3,'success.gif',function () {
+						window.location.href="${CTX}/";
+				    }).title("提现提示：");
+				}
+			},
+			error:function(){
+				$.dialog.alert("系统错误，请稍后重试！",function(){
+					window.location.reload(true);
+				});
+			}
+		});
+	}
+</script>
+</head>
+<body>
+		<#include '../inc/top.html'>
+		<#include '../inc/header.html'>
+		<#include '../inc/nav.html'>
+		<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">我要提现</h2>
+			<div class="modal-body"  style="margin-left: 100px">
+			<form name="alipayment" class="form-inline" id="alipayment">
+				<input name="WIDout_trade_no" id="WIDout_trade_no" type="hidden" value="${(WIDout_trade_no)!''}"/> 
+				<input name="WIDsubject" id="WIDsubject" value="${(WIDsubject)!''}" type="hidden"/> 
+				<input name="WIDbody" id="WIDbody" type="hidden" value="${(WIDbody)!''}"/>
+				<input name="zzfs" type="hidden" id="zzfs"/>
+				<input name="type" type="hidden" id="type" value="${(type)!''}"/>
+				<div class="form-group">
+					<label>1.账户余额：${(zhye)!'0'}</label>元
+				</div>
+				<br><br>
+				<div class="form-group">
+					<label for="WIDtotal_fee">2.${(type_name)!''}金额：</label>
+					<input name="WIDtotal_fee" id="WIDtotal_fee"  type="text" class="form-control"/>元
+				</div>
+				<br><br>
+				<div class="form-group">
+					<label for="zfpwd">3.支付密码：</label>
+					<input name="zfpwd" id="zfpwd"  type="password" class="form-control"/>
+				</div>
+				<br><br>
+				<div class="form-group">
+					<label for="zzfs">4.请选择${(type_name)}入口：</label>
+				</div>
+				<br><br>
+				<div id="tablist_tx">
+					 <div id="NavTagContainer">
+						<label onClick="shiftNavTag(0)" id="NavTag0" class="currentLabel">&nbsp;&nbsp;支付宝&nbsp;&nbsp;</label>
+						<label onClick="shiftNavTag(1)" id="NavTag1" class="normalLabel">&nbsp;&nbsp;银行卡&nbsp;&nbsp;</label>
+					</div>
+					<div id="NavTagContent" style="width: 100%;">
+						<div id="MapContainer" style="margin: 3px 0px 3px 0px; display: block;">
+							<div class="form-group">
+								<label for="zfbzh">支付宝账号：</label>
+								<input name="zfbzh" id="zfbzh"  type="text" class="form-control"/>
+							</div>
+							<br><br>
+							<div class="form-group">
+								<label for="mc">收款人姓名：</label>
+								<input name="mc" id="mc" value="${(mc)!''}" disabled="disabled" type="text" class="form-control"/>
+							</div>
+						</div>
+						<div id="MemberCustomerListContainer" style="display: none;"><br>
+							<div class="form-group">
+								<label for="yhkid">收款银行：</label>
+								<select id="yhkid" name="yhkid" class="form-control">
+									<option value="">==请选择银行==</option>
+									<option value="1">中国工商银行</option>
+									<option value="2">中国农业银行</option>
+									<option value="3">中国建设银行</option>
+									<option value="4">招商银行</option>
+								</select>
+								<br><br>
+								<div class="form-group">
+									<label for="yhknum">银行卡号：</label>
+									<input name="yhknum" id="yhknum"  type="text" class="form-control"/>
+								</div>
+								<br><br>
+								<div class="form-group">
+									<label for="mc">开户姓名：</label>
+									<input name="mc" id="mc"  type="text"  value="${(mc)!''}" disabled="disabled" class="form-control"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<button type="button" class="btn btn-primary" onclick="checkValues()" id="carSearchYes">
+					&nbsp;&nbsp;提&nbsp;&nbsp;交&nbsp;&nbsp;
+				</button>
+			</form>
+			</div>
+			</div>
+		</div>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+</body>
+</html>
+

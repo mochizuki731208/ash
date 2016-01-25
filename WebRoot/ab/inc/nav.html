@@ -1,0 +1,148 @@
+<!-- 2015年08月05日开始的新导航 -->
+<script type="text/javascript">
+<!--
+$(function(){
+	$(".nav-serv-in-menu").bind("mouseover",function(){
+		$(".nav-serv-in-menu:hover .serv-in").attr("style","display: block;");
+	})
+	$(".nav-serv-in-menu").bind("mouseout",function(){
+		$(".nav-serv-in-menu .serv-in").attr("style","display: none;");
+	})
+	$(".serv-in li").bind("mouseover",function(){
+		$(".serv-in li:hover").addClass("serv-in-licur");
+	})
+	$(".serv-in li").bind("mouseout",function(){
+		$(".serv-in li").removeClass("serv-in-licur");
+	})
+})
+//-->
+</script>
+<div class="dh2015">
+	<div class="dh-in">
+		<div class="warpper2015">
+			<div class="menu2015">
+				<ul>
+					<li class="">
+						<a href="${CTX}/" >首页</a>
+					</li>
+					<li class="nav-serv-in-menu" style="border-left-color: rgb(247, 116, 0);">
+						<a href="${CTX}/ab/tc/?zb=">我要发货</a>
+						<div class="serv-in" style="display: none;">
+							<ul>
+								<li class="serv-in-licur">
+									<a href="${CTX}/ab/tc?zb=">市内配送</a>
+								</li>
+								<li class="">
+									<a href="${CTX}/ab/tc?zb=Y">城际直达</a>
+								</li>
+								<li class="">
+									<a href="${CTX}/ab/user/uploadTcOrder">批量导入</a>
+								</li>
+							</ul>
+						</div>
+					</li>
+					<li class="nav-serv-in-menu">
+						<a href="${CTX}/ab/logi/index">物流公司</a>
+						<div class="serv-in" style="display: none;">
+							<ul>
+								<li class="serv-in-licur">
+									<a href="${CTX}/ab/logi/index1">列表查询</a>
+								</li>
+								<li class="">
+									<a href="${CTX}/ab/logi/map">地图查询</a>
+								</li>
+								<li class="">
+									<a href="${CTX}/diaodu/initZhiPai"">调车发货</a>
+								</li>
+							</ul>
+						</div>
+					</li>
+					<li class="nav-serv-in-menu">
+						<a href="${CTX}/ab/order/mapTrucks">同城找车</a>
+						<div class="serv-in" style="display: none;">
+							<ul>
+								<li class="serv-in-licur">
+									<a href="${CTX}/ab/order/mapTrucks">同城找车</a>
+								</li>
+								<li class="">
+									<a href="${CTX}/ab/user/listtcorder?way=4">外部调车单</a>
+								</li>
+							</ul>
+						</div>
+					</li>
+					<li class="nav-serv-in-menu">
+						<a href="${CTX}/ab/fmcar">我的车队</a>
+						<div class="serv-in" style="display: none;">
+							<ul>
+								<li class="serv-in-licur">
+									<a href="${CTX}/ab/fmcar">我的熟车</a>
+								</li>
+								<li class="">
+									<a href="${CTX}/ab/fmcar">熟车下单</a>
+								</li>
+								<li class="">
+									<a href="${CTX}/ab/user/listtcorder?way=3">熟车订单</a>
+								</li>
+								<li class="">
+									<a href="${CTX}/ab/order/mapTrucks?ismyfmcar=1">车辆跟踪</a>
+								</li>
+							</ul>
+						</div>
+					</li>
+					<li class="nav-serv-in-menu">
+						<a href="${CTX}/ab/order/ordermap">货物跟踪</a>
+						<div class="serv-in" style="display: none;">
+							<ul>
+								<li class="serv-in-licur">
+									<a href="${CTX}/ab/order/ordermap">订单查询</a>
+								</li>
+								<li class="">
+									<a href="${CTX}/ab/user/listtcorder/">订单管理</a>
+								</li>
+								<li class="">
+									<a href="${CTX}/diaodu/initZhiPai"">调车发货</a>
+								</li>
+								<li class="">
+									<a href="${CTX}/ab/user/listtcorder/">地图跟踪</a>
+								</li>
+							</ul>
+						</div>
+					</li>
+					 <#if currcity?? >
+		        	<#if strkit('1',(currcity.is_display_sjlm)!) >
+		        		<li class="nav-serv-in-menu">
+							<a href="${CTX}/ab/">联盟商城</a>
+							<div class="serv-in" style="display: none;">
+								<ul>	
+									<li class="">
+										<a href="${CTX}/ab/">所有商城</a>
+									</li>
+									<@_subject_list p_id='ROOT' cityid=currcity.id is_enable='1' is_display='1'>
+										<#list list as t>
+											<li class=""><a href="${CTX}/ab/listitem/${currcity.id}-${(t.id)!}">${(t.mc)!''}</a></li>
+							      		</#list>
+									</@_subject_list>
+								</ul>
+							</div>
+						</li>
+		        	</#if>
+		    	 </#if>
+					
+					<li class="nav-serv-in-menu">
+						<a href='${CTX}/ab/order/indexKf'>开放平台</a>
+						<div class="serv-in" style="display: none;">
+							<ul>
+								<li class="serv-in-licur">
+									<a href="${CTX}/ab/order/indexKf" >开放平台</a>
+								</li>
+								<li class="serv-in-licur">
+									<a href="${CTX}/ab/jfsc" >手机端下载</a>
+								</li>
+							</ul>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

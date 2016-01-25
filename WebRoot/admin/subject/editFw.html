@@ -1,0 +1,77 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-ajaxfileupload.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/global-upload.js"></script>
+	<script type="text/javascript">
+		var rooturl = "${CTX}/";
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					pro_mc: {required:true,stringMaxLength:50},
+					pro_price: {required:true,decimal:true},
+					pro_order_num: {required:true,integer:true,min:1},
+					pro_remark: {stringMaxLength:200}
+				}
+			});		
+			$('#file_upload').uploadFile({},function(data){
+	            //alert(data);
+	            $("#pro_img_url").val(data);
+	            $("#imgb").prepend('<img src="${CTX}/upload/'+data+'"/>');
+	        },"file_upload");
+		});
+	</script>
+	<style>
+	.upload_btn_over { position: relative;  cursor: pointer; text-decoration: none;  background: url('${CTX}/res/images/sel_file.gif') no-repeat scroll 0px 0px transparent;   display: block; height:35px;}
+    .upload_btn {position:absolute; left: 0px; width: 117px;  height: 36px; background-color: #00F;opacity: 0;cursor: pointer;}
+	</style>
+</head>
+  <body>
+    <form id="myform" name="myform" action="${CTX}${NAME_SPACE}/saveFw" method="post">
+    <input type="hidden" name="m" id="m" value="${(method)!}">
+    	<input type="hidden" id="pro_id" name="pro_id" class="text" value="${(vo.id)!}">
+    	<input type="hidden" id="pro_subject_id" name="pro_subject_id" class="text" value="${(p_id)!}">
+		<table class="input">
+			<tr>
+				<td style="width: 150px;" align="right">商品名称：</td>
+				<td><input type="text" name="pro_mc" id="pro_mc" class="text" value="${(vo.mc)!''}"></td>
+			</tr>
+			<tr>
+				<td align="right">价格：</td>
+				<td>
+					<input type="text" name="pro_price" id="pro_price" class="text" value="${(vo.price)!''}">
+				</td>
+			</tr>
+			<tr>
+				<td align="right">图片：</td>
+				<td>
+					<div id="imgb">
+					<#if vo.img_url??>
+						<img src="${CTX}/upload/${vo.img_url}" width="60" height="60"/>
+					</#if>
+					</div>
+					<input type="hidden" name="pro_img_url" value="${(vo.img_url)!''}" id="pro_img_url" />&nbsp;
+                    <a href="javascript:void(0)" class="upload_btn_over" style="top:0px ;left:0;width:112px; float:left">
+                        <input hidefocus=""  name="file_upload" id="file_upload" class="upload_btn" style="width:129px" type="file" value="">
+                    </a>
+					(建议尺寸：120*120)
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 150px;" align="right">排序号：</td>
+				<td><input type="text" name="pro_order_num" id="pro_order_num" class="text" value="${(vo.order_num)!''}"></td>
+			</tr>
+			<tr>
+				<td style="width: 150px;" align="right">描述：</td>
+				<td><textarea style="width: 80%;height: 60px;" name="pro_remark" id="pro_remark" class="text">${(vo.remark)!''}</textarea></td>
+			</tr>
+		</table>
+	</form>
+	
+  </body>
+</html>
+

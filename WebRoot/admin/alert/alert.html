@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<base href="${CTX}/">
+<#include '../inc/meta.html'>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<script type="text/javascript"
+	src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="${CTX}/res/css/fmcar/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="${CTX}/res/css/fmcar/bootstrapValidator.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="${CTX}/res/css/fmcar/common.css" />
+<link rel="stylesheet" type="text/css"
+	href="${CTX}/res/css/fmcar/my-trucks.css" />
+<link rel="stylesheet" type="text/css"
+	href="${CTX}/res/js/uploadify/uploadify.css" />
+<script type="text/javascript">
+	$(function() {
+		var uploadExcel = $("#uploadExcel");
+		uploadExcel.uploadify({
+			swf:'${CTX}/res/js/uploadify/uploadify.swf',
+			uploader:'${CTX}/ab/fmcar/uploadCars',
+			auto: false, //是否自动上传 
+			multi: false,
+			buttonText :'选择文件',
+			width: '75', //按钮宽度  
+			height: '24', //按钮高度
+			fileExt:'*.xls;*.xlsx;',
+			queueID: 'fileQueue',//队列id,用来展示上传进度的
+			fileObjName: 'uploadExcel', //<input type="file"/>的name  
+			method: 'post',
+			removeCompleted: true,//上传完成后自动删除队列  
+			onUploadSuccess:function(file,data,response){
+				var result = eval("(" + data + ")");
+				if(result.totalNum != null){
+					alert("操作成功，共"+result.totalNum+"辆，成功"+result.successNum+"辆.\r\n"+"失败的手机号是:"+result.errorMobile+",\r\n" + "具体原因:"+ result.errorMsg);
+					window.location.reload();
+				}else{
+					alert(data);
+				}
+	         }
+		});
+		
+		$("#importCarYes").off("click").on("click",function(){
+			var recommendNo = $("#marketCode").val();
+			uploadExcel.uploadify('settings', 'uploader','${CTX}/ab/fmcar/uploadCars?recommendNo='+recommendNo);
+			uploadExcel.uploadify('upload', '*');
+		});
+	});
+    $( document ).ready( function(){ 
+        //2,3设置成默认 
+        $( 'select' ).val( '' ); 
+    } ); 
+	</script>
+</head>
+<body>
+	<#if abuser?? && !user??> <#include '../inc/top.html'>
+	<!-- 搜索栏 -->
+	<!-- 导航 -->
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	</#if> <#if abuser?? && !user??>
+	<div class="cm">
+		<div class="leftmenu fl"><#include '../inc/leftmenu.html'></div>
+		<div class="rightcon fr">
+			</#if>
+
+			<div class="container" style="height: 750px; width: 100%">
+				<div class="row mg-tb-20">
+					<div class="col-xs-2">
+						<h3 class="title-h3 mg-0">订单铃声管理</h3>
+					</div>
+					<div class="col-xs-10">
+						<div class="navbar-collapse collapse">
+							<form class="navbar-form navbar-right mg-0"
+								action="${CTX}/ab/fmcar/searchFmcar" id="searchFmcarForm"
+								method="post">
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+					<form class="form-horizontal" id="formImportCarS1" action="${CTX}/admin/orderalert/change">
+					
+					
+					<div class="form-group has-feedback">
+						 <label for="carLength">当前铃声：</label>
+						 <label for="curalert">${(alert)!''}</label>
+                        </div>
+					
+					<div class="form-group has-feedback">
+						 <label for="carLength">订单铃声：</label>
+						 
+                        <select name="name" class="form-control" id="carLength">
+                            <option value="alert1">1</option>
+                            <option value="alert2">2</option>
+                            <option value="alert3">3</option>
+                            <option value="alert4">4</option>
+                        </select>
+                        </div>
+                        <div class="modal-footer">
+								<button type="submit" class="btn btn-primary" id="add">确认</button>
+							</div>
+                        	</form>
+                    </div>
+					</div>
+				</div>
+
+
+				<!-- 筛选条件 弹窗 -->
+				<div class="modal fade" id="myModalFilter" tabindex="-1"
+					role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+
+				<!-- 添加 弹窗 -->
+				<div class="modal fade" id="myModalAddKnow" tabindex="-1"
+					role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal"
+									aria-label="Close">
+									<span aria-hidden="true">×</span>
+								</button>
+								<h4 class="modal-title" id="myModalLabel3">添加公众号</h4>
+							</div>
+							<div class="modal-body">
+								<form class="form-horizontal fv-form fv-form-bootstrap" action="${CTX}/admin/pnumber/add"
+									id="formImportCa" method="post" novalidate="novalidate">
+									<div class="form-group has-feedback">
+										<label for="carNo" class="col-sm-2 control-label">名称</label>
+										<div class="col-sm-10">
+											<input type="text" class="form-control" id="name"
+												placeholder="名称" name="sys_pnumber_name"
+												value="" data-fv-field="abFmcar_car_no"><i
+												class="form-control-feedback"
+												data-fv-icon-for="abFmcar_car_no" style="display: none;"></i>
+										</div>
+									</div>
+									<div class="form-group has-feedback">
+										<label for="carNo" class="col-sm-2 control-label">Token</label>
+										<div class="col-sm-10">
+											<input type="text" class="form-control" id="token"
+												placeholder="Token" name="sys_pnumber_token" maxlength="7"
+												value="" data-fv-field="abFmcar_car_no"><i
+												class="form-control-feedback"
+												data-fv-icon-for="abFmcar_car_no" style="display: none;"></i>
+										</div>
+									</div>
+
+									<div class="form-group has-feedback">
+										<label for="carNo" class="col-sm-2 control-label">原始id</label>
+										<div class="col-sm-10">
+											<input type="text" class="form-control" id="origin_id"
+												placeholder="原始id" name="sys_pnumber_origin_id" maxlength="7"
+												value="" data-fv-field="abFmcar_car_no"><i
+												class="form-control-feedback"
+												data-fv-icon-for="abFmcar_car_no" style="display: none;"></i>
+										</div>
+									</div>
+
+									<div class="form-group has-feedback">
+										<label for="driver" class="col-sm-2 control-label">公众号类型</label>
+										<div class="col-sm-10">
+											<input type="text" class="form-control" id="type"
+												placeholder="公众号类型" name="sys_pnumber_type" value=""
+												data-fv-field="abFmcar_driver"><i
+												class="form-control-feedback"
+												data-fv-icon-for="abFmcar_driver" style="display: none;"></i>
+										</div>
+									</div>
+									<div class="form-group has-feedback">
+										<label for="carNo" class="col-sm-2 control-label">邮箱</label>
+										<div class="col-sm-10">
+											<input type="text" class="form-control" id="email"
+												name="sys_pnumber_email"   value=""
+												data-fv-field="abFmcar_car_no"><i
+												class="form-control-feedback"
+												data-fv-icon-for="abFmcar_car_no" style="display: none;"></i>
+										</div>
+									</div>
+									<div class="form-group has-feedback">
+										<label for="carNo" class="col-sm-2 control-label">公众号描述</label>
+										<div class="col-sm-10">
+											<input type="text" class="form-control" id="describle"
+												name="sys_pnumber_describle"  value=""
+												data-fv-field="abFmcar_car_no"><i
+												class="form-control-feedback"
+												data-fv-icon-for="abFmcar_car_no" style="display: none;"></i>
+										</div>
+									</div>
+									<div class="form-group has-feedback">
+										<label for="carNo" class="col-sm-2 control-label">APPID</label>
+										<div class="col-sm-10">
+											<input type="text" class="form-control" id="appid"
+												name="sys_pnumber_appid" maxlength="64" value=""
+												data-fv-field="abFmcar_car_no"><i
+												class="form-control-feedback"
+												data-fv-icon-for="abFmcar_car_no" style="display: none;"></i>
+										</div>
+									</div>
+									<div class="form-group has-feedback">
+										<label for="carNo" class="col-sm-2 control-label">APPSecrect</label>
+										<div class="col-sm-10">
+											<input type="text" class="form-control" id="appsecret"
+												name="sys_pnumber_appsecret" maxlength="64" value=""
+												data-fv-field="abFmcar_car_no"><i
+												class="form-control-feedback"
+												data-fv-icon-for="abFmcar_car_no" style="display: none;"></i>
+										</div>
+									</div>
+									<!--  
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" checked="checked" id="is_locate"/> 立即开通车辆定位
+                                    <input type="hidden" value="1" name="abFmcar_is_locate" />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    --><div class="modal-footer">
+								<button type="submit" class="btn btn-primary" id="add">添加</button>
+							</div>
+								</form>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+
+
+				<!-- 删除 弹窗 -->
+				<div class="modal fade" id="myModalDel" tabindex="-1" role="dialog"
+					aria-labelledby="myModalLabelDel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal"
+									aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+								<h4 class="modal-title" id="myModalLabelDel">删除</h4>
+							</div>
+							<div class="modal-body">
+								<p>确定删除吗？</p>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">取 消</button>
+								<button type="button" class="btn btn-primary"
+									id="myModalLabelDelYes">确 定</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 短信 弹窗 -->
+				<div class="modal fade" id="myModalMsg" tabindex="-1" role="dialog"
+					aria-labelledby="myModalLabelMsg" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal"
+									aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+								<h4 class="modal-title" id="myModalLabelMsg">免费开通短信定位</h4>
+							</div>
+							<div class="modal-body"></div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-primary"
+									data-dismiss="modal">确 定</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 栏目页 -->
+			<#if abuser?? && !user??>
+		</div>
+	</div>
+	<div class="blank10"></div>
+	<#include '../inc/foot.html'> </#if>
+
+	<script type="text/javascript"
+		src="${CTX}/res/js/fmcar/plugins/require.js"></script>
+	<script>
+    require(['./res/js/fmcar/boot'], function () {
+        require(['my-trucks']);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+    <script type="text/javascript">
+		function refresh(){
+			querykeyword();
+		}
+	</script>	
+	<style type="text/css">
+		.tbquery{};
+		.protitle{height: 40px;line-height: 40px;font-size:14px;font-weight:bold; margin-left: 10px;};
+	</style>
+</head>
+  <body>
+  	<#include 'inc/top.html'>
+  	<!-- 搜索栏 -->
+	<#include 'inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+	<#include 'inc/nav.html'>
+	<div class="blank10"></div>
+	<script type="text/javascript">
+  		function uf_search_info_rt(){
+  			document.getElementById("findtype").value = "rt";
+  			querykeyword();
+  		}
+  		function uf_search_info_fd(){
+  			document.getElementById("findtype").value = "fd";
+  			querykeyword();
+  		}
+  	</script>
+	<div class="c" style="border: 0px;">
+		<table style="width: 120px;">
+			<tr>
+			<#if strkit(findtype,'fd')>
+				<td id="rt" onclick="uf_search_info_rt();" style="border-bottom: 2px solid #BFBFBF;font-size: 18px;font-weight: bold;height: 36px;">商家</td>
+				<td id="fd" onclick="uf_search_info_fd();" style="border-bottom: 2px solid #FF7F24;font-size: 18px;font-weight: bold;height: 36px;">商品</td>
+			<#else>
+				<td id="rt" onclick="uf_search_info_rt();" style="border-bottom: 2px solid #FF7F24;font-size: 18px;font-weight: bold;height: 36px;">商家</td>
+				<td id="fd" onclick="uf_search_info_fd();" style="border-bottom: 2px solid #BFBFBF;font-size: 18px;font-weight: bold;height: 36px;">商品</td>
+			</#if>
+			</tr>
+		</table>
+	</div>
+	<div class="c" style="height: 40px;line-height: 40px;font-size: 14px;border: 0px;">搜索"${(keyword)!}"的
+	<#if strkit(findtype,'fd')>
+		商品
+	<#else>
+		商家
+	</#if>
+	结果</div>
+	<div class="c" style="border: 0px;">
+	<!-- 栏目页 -->
+     <#if listpage??>
+     	<table class="tbquery" style="width: 100%;">
+      	<#list listpage.list as lst>
+      		<#if strkit(findtype,'fd')>
+	     		<tr style="border-bottom: 1px solid #EEE9E9">
+	     			<td width="*" align="center" style="height: 40px;line-height: 40px;font-size:14px;margin-left: 10px;font-weight: bold">商品</td>
+	     			<td width="300px;" align="center" style="height: 40px;line-height: 40px;font-size:14px;margin-left: 10px;font-weight: bold">所属商家</td>
+	     			<td width="200px;" align="center" style="height: 40px;line-height: 40px;font-size:14px;margin-left: 10px;font-weight: bold">单价</td>
+	     			<td width="200px;" align="center" style="height: 40px;line-height: 40px;font-size:14px;margin-left: 10px;font-weight: bold">订购</td>
+	     			<td width="150px;" align="center" style="height: 40px;line-height: 40px;font-size:14px;margin-left: 10px;font-weight: bold">人气</td>
+	     		</tr>
+	     		<tr style="border-bottom: 1px solid #EEE9E9">
+	     			<td align="center" style="height: 40px;line-height: 40px;font-size:14px;margin-left: 10px;">${(lst.mc)!}</td>
+	     			<td align="center" style="height: 40px;line-height: 40px;font-size:14px;margin-left: 10px;">${(lst.mname)!}</td>
+	     			<td align="center" style="height: 40px;line-height: 40px;font-size:14px;margin-left: 10px;">${(lst.price?string("currency"))!}</td>
+	     			<td align="center" style="height: 40px;line-height: 40px;font-size:14px;margin-left: 10px;"><a href="${CTX}/ab/prodetail/${(lst.id)!}" style="padding:4px 10px 4px 10px;background-color:#FF7F24;color: white;">购买</a></td>
+	     			<td align="center" style="height: 40px;line-height: 40px;font-size:14px;margin-left: 10px;">月销售${lst.cnt}单</td>
+	     		</tr>
+     		<#else>
+     		
+     		<tr>
+	     		<td class="limg" rowspan="3" style="width: 142px;">
+	     			<a href="${CTX}/ab/detail/${lst.id}"><#if lst.img_url??><img src="${CTX}/upload/${(lst.img_url)!}" style="max-height: 80px;max-width: 140px;"/></#if>
+	     		</td>
+	     		<td style="height:40px; line-height: 40px;">
+	     			<span style="font-size:14px;font-weight:bold;color: #FF7F24;">商家名称：${(lst.mc)!}</span>
+	     			<span>
+	     			<#if strkit('1',(lst.chk_sdsj)!)><span title="超过${(lst.sdsj)!}分钟，赔偿${(lst.cspf)!}元" style="padding:4px 4px 4px 4px;background-color:#1E90FF;color: white;">赔</span></#if>
+     				<#if strkit('1',(lst.is_recommend)!)><span title="推荐开始时间：${(lst.tjkssj)!}-截止时间：${(lst.tjjzsj)!}" style="padding:4px 4px 4px 4px;background-color:#EE2C2C;color: white;">荐</span></#if>
+     				<#if strkit('1',(lst.chk_yhhd)!)><span title="买${(lst.mds)!}、送${(lst.jds)!}" style="padding:4px 4px 4px 4px;background-color:#458B00;color: white;">惠</span></#if>
+	     			<#if strkit('1',(lst.chk_tgfp)!)><span style="padding:4px 4px 4px 4px;background-color:#FF7F24;color: white;" title="提供发票">票</span></#if>
+     				</span>
+     				&nbsp;&nbsp;&nbsp;
+	     			<span style="font-size: 14px;font-weight: bold;padding:4px 4px 4px 4px;background-color:#1E90FF;color: white;">
+	     			${(lst.avghour)}分钟
+	     			</span>
+	     			<span style="float: right;padding-right: 20px;">月销售${lst.cnt}单</span>
+	     		</td>
+	     	</tr>
+	     	<tr>
+	     		<td>
+	     			<span style="color: #5C5C5C">信息地址：${(lst.xxdz)!}</span>
+	     		</td>
+	     	</tr>
+	     	<tr style="border-bottom: 1px solid #EEE9E9">
+	     		<td>
+	     			<span style="color: #5C5C5C;line-height: 24px;">客户评价：★★★★☆☆☆</span>
+	     			<span style="float: right;padding-right: 20px;"><a href="${CTX}/ab/detail/${(lst.id)!}" style="padding:4px 10px 4px 10px;background-color:#FF7F24;color: white;">详细信息</a></span>
+	     		</td>
+	     	</tr>
+      	</#if>
+		</#list>
+		</table>
+	</#if>
+	<div class="pageinfo"><#include '../../../common/_abpaginate.html'></div>
+	</div>
+	<div class="blank10"></div>
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</body>
+</html>

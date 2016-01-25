@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_savelxrxx(id){
+			$.dialog.confirm('确定收货地址信息正确无误，并提交信息吗？', function(){
+			   $.post("${CTX}/ab/order/saveorderlxrxx",$("#myform").serializeArray(),function(data){
+                   if(data){
+						$.dialog.alert("收货地址保存成功！",function () {
+							window.location.href = "${CTX}/ab"
+				        });
+					}else{
+						$.dialog.alert("收货地址保存失败！");
+					}
+				});
+			}, function(){
+			    $.dialog.tips('执行取消操作');
+			});
+		}
+		//获取经纬度坐标信息
+		function uf_getzbxx(){
+			$.post("${CTX}/ab/order/getzbwz",$("#myform").serializeArray(),function(data){
+				if(data==''){
+					$.dialog.alert("无法获得送货地图坐标！");
+				}else{
+		             $('#shdzjd').val(data.result.location.lat);
+		             $('#shdzwd').val(data.result.location.lng);
+				}
+			});
+		}
+		
+		function refresh(){
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+			$('#myform').submit();
+		}
+	</script>	
+ </head>
+  <body>
+  	<form id="myform" name="myform">
+  	<input type="hidden" class="text" id="id" name="id" value="${(vo.id)!}"/>
+  	<input type="hidden" class="text" id="lxr" name="lxr" value="${(vo.lxr)!}"/>
+  	<input type="hidden" class="text" id="lxrdh" name="lxrdh" value="${(vo.lxrdh)!}"/>
+  	<#include '../inc/top.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="rightcon" style="width: 100%">
+			<h2 class="box_title">请输入地址信息</h2>
+            <table class="input">
+            	<#if strkit('1',(vo.yt)!)>
+	             <tr>
+		            <th>城市</th>
+		            <td><input type="text" class="text" id="city" name="city" readonly="readonly" value="${(currcity.mc)!}"/></td>
+		        </tr>
+		        <tr>
+		            <th>精度</th>
+		            <td><input type="text" class="text" id="shdzjd" name="shdzjd" value="${(vo.shdzjd)!}"/></td>
+		        </tr>
+		        <tr>
+		            <th>纬度</th>
+		            <td><input type="text" class="text" id="shdzwd" name="shdzwd" value="${(vo.shdzwd)!}"/></td>
+		        </tr>
+	            <tr>
+		            <th>收货邮政编码</th>
+		            <td><input type="text" class="text" id="yzbm" name="yzbm" value="${(vo.yzbm)!}"/></td>
+		        </tr>
+		        <tr>
+		            <th>收货通讯地址</th>
+		            <td>
+		            	<input type="text" class="text" id="shdz" name="shdz" value="${(vo.shdz)!}"/>
+		            	<input type="button" onclick="uf_getzbxx();" value="获取坐标"/>
+		            </td>
+		        </tr>
+		         </#if>
+		        <tr>
+		            <th></th>
+		            <td><input type="button" value="保存并提交" onclick="uf_savelxrxx('${(vo.id)!}');"/></td>
+		        </tr>
+            </table>
+           
+            
+		</div>
+	</div>
+	</form>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

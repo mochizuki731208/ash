@@ -1,0 +1,721 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>在线叫车</title>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/lrtk1.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/main.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/index.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/reset.css"/>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_reset.css">
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_style.css">
+	<link rel="stylesheet" href="${CTX}/res/tc/css/style.css" />
+	<link rel="stylesheet" href="${CTX}/res/tc/css/state.css" />
+	<link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+    <link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+  
+  
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-1.8.17.custom.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-zh-CN.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/tc/js/param.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<!--jQuery文件-->
+	<!--<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>-->
+	<!--noty主文件-->
+	<script type="text/javascript" src="${CTX}/res/js/jquery.noty.js"></script>
+	<!--noty提示信息位置的文件, 需要哪些位置就引入对应的脚本,这里为center,可以添加多个布局文件-->
+	<script type="text/javascript" src="${CTX}/res/js/bottomright.js"></script>
+	<!--noty主题样式文件,-->
+	<script type="text/javascript" src="${CTX}/res/js/default.js"></script>
+	<script type="text/javascript">
+	var zb = '${(zb)!}';
+	var carsLen = ${cars.size()};
+	var currLoc = "${(currcity.mc)!}";
+	var typeSelIndex = -1;
+	var selIndex = -1;
+	var carNames = [<#list cars as c>"${(c['name'])!}",</#list>""];
+	var basePrice = [<#list cars as c>"${(c['起步价'])!}",</#list>""];
+	var overPrice = [<#list cars as c>"${(c['超公里费'])!}",</#list>""];
+	var baseKilo = [<#list cars as c>"${(c['起步公里'])!}",</#list>""];
+	var nightPrice = [<#list cars as c>"${(c['夜间服务'])!}",</#list>""];
+	var carLong = [<#list cars as c>"${(c['车长'])!}",</#list>""];
+	var currKilo = -1;	//当前正在计算的路段, 0:from-to, 1:to-to2, 2:to2-to3...
+	var maxKilo = 100; //当大于100公里，则另外输入一个悬赏金额
+	var webctx = '${CTX}';
+	var info = {};
+	
+	</script>
+	<script type="text/javascript" src="${CTX}/res/js/tc_address.js"></script>
+	<script type="text/javascript" src="${CTX}/res/tc/js/tc.js"></script>
+	 <script>
+	 //提交订单
+	 //保存、提交订单
+	function saveOrderForm(action) {
+	 i=0;
+		if(resetInfo()==false){
+		  return ;
+		};
+		info['action'] = action;
+		//判断所传的值是否是有键值对问题
+		if($("#total").html().indexOf("-")>0){
+		sumPrice=0;
+		}else{
+			//传递金钱参数
+		var sumPrice=$("#total").html();
+		}
+	
+		$.post('${CTX}/admin/order/saveOrderForm?sumPrice='+sumPrice, info, function(data) {
+               
+			if (data == '1') {
+			
+				if (action == "save") {
+				 alert("into this  step");
+					self.location.href = '${CTX}';
+				} else {
+					self.location.href = '${CTX}/ab/tc/pay?isok=1';
+				}
+			} else if (data == '0') {//余额不足以支付
+				if (action == "save") {
+					self.location.href = '${CTX}';
+				} else {
+					alert('同城快递订单，已完成，但是您的账户余额不足，请使用支付宝在线支付！');
+					self.location.href = '${CTX}/ab/tc/pay';
+					//self.location.href = '${CTX}/ab/card/zhyefail';
+				}
+			} 
+		});
+	}
+	//预览
+	function preview() {
+		resetInfo();
+		$.dialog({
+			title : '订单明细',
+			content : 'url:${CTX}/ab/tc/previewOrder?' + parseParam(info),
+			lock : true,
+			resize : false,
+			width : 900,
+			height : 480,
+			cover : true,
+			max : true,
+			min : true,
+			cancel : true,
+			fixed : true,
+			cancelVal : '关 闭'
+		});//弹出框
+	}
+	 
+	 
+	 //我要报价添加
+	 
+   var standard;
+ //保存价格
+ var savePrice;
+ 
+ //保存我要出家的报价
+ var offerPrice=0;
+  
+  function updatePrice(e){
+  
+  var numberPrice=document.getElementById("outPrice").value;
+
+  if(numberPrice<standard){
+
+  document.getElementById("outPrice").value=standard;
+ 
+   return ;
+  }
+  
+  
+  if(numberPrice==standard&&e.value=='-'){
+  document.getElementById("errorPrice").style.display="inline";
+  document.getElementById("downPrice").style.display="none"; 
+  return;
+  }
+  document.getElementById("errorPrice").style.display="none";
+   document.getElementById("downPrice").style.display="inline"; 
+  document.getElementById("outPrice").value=eval(numberPrice+e.value+1);
+  $("#total").html(eval(numberPrice+e.value+1));
+  }
+  //司机选择报价
+  function checkDriverPrice(e){
+//判断是否选择了我要出价
+  
+  if(offerPrice!=0){
+  
+  $("#onePrice").val(""); 
+
+  }
+
+  
+ var standarPrice= (sysOrder)/($("#kiloRst").html())*100;
+   if(e.value<standarPrice){
+    document.getElementById("errorDriverPrice").style.display="inline"; 
+	return;
+   }
+  
+    document.getElementById("errorDriverPrice").style.display="none"; 
+	
+	
+	if($("#minPrice").val()==""&&$("#maxPrice").val()!=""){
+	 	$("#total").html( $("#maxPrice").val());
+	  return ;
+	}
+	
+	if($("#maxPrice").val()==""&&$("#minPrice").val()!=""){
+	 	$("#total").html( $("#minPrice").val());
+	  return ;
+	}
+	if($("#maxPrice").val()==""&&$("#minPrice").val()==""){
+	 	$("#total").html("_");
+	  return ;
+	}
+	
+	if($("#maxPrice").val()<$("#minPrice").val()){
+	$("#total").html($("#maxPrice").val() + " - " + $("#minPrice").val());
+	return ;
+	}
+	
+	
+	$("#total").html($("#minPrice").val() + " - " + $("#maxPrice").val());
+	
+  }
+
+  
+	 //保存价格
+	 function savePricefun(){
+	 savePrice= $("#total").html();
+	 }
+	 
+	 //我要出价的时候保存价格
+	 function saveOffer(){
+	 offerPrice=$("#onePrice").val();
+	 
+	 $("#total").html($("#onePrice").val());
+	 }
+	 
+	 
+	 
+	 
+	 //小推车计算
+	/* function addPrice(e){
+	 
+	 alert(e.value);
+	 //总价格
+	 var priceArr;
+	 //开关判断
+	 var flag=$("#total").html().indexOf("-");
+	 //判断是否选择了我要出价
+    if(flag>0){
+   priceArr=$("#total").html().split("-");
+ 
+		}else{
+			
+		priceArre=$("#total").html();
+		}
+	 
+	 //判断是否选中
+	 var checked=$(this).attr("checked");
+	 //加减号
+	 var equal;
+	 
+	 if(checked==true){
+	 equal=+;
+	 
+	 }else{
+	 equal=-;
+	 }
+	 
+	 //有无电梯的选择
+	 if(e.value==3){
+	 
+	 if(flag>0){
+	  $("#total").html((eval(priceArr[0]+equal+40))+"-"+eval(priceArr[1]+equal+40)));
+	  }else{
+	  $("#total").html(priceArre+equal+40);
+	  }
+	  
+	  
+	 } else{
+	 
+	 if(flag>0){
+	  $("#total").html((eval(priceArr[0]+equal+70))+"-"+eval(priceArr[1]+equal+70)));
+	  }else{
+	  $("#total").html(priceArre+equal+70);
+	  }
+	 
+	 }
+	 
+	 
+	 
+	 
+	 //遍历谁选中
+	 switch(e.value){
+	  case 1:
+	  if(flag>0){
+	  $("#total").html((eval(priceArr[0]+equal+3))+"-"+eval(priceArr[1]+equal+3)));
+	  }else{
+	 $("#total").html(priceArre+equal+3);
+	  }
+	 break ;
+	 
+	  case 2:
+	  if(flag>0){
+	  $("#total").html((eval(priceArr[0]+equal+10))+"-"+eval(priceArr[1]+equal+10)));
+	  }else{
+	  $("#total").html(priceArre+equal+10);
+	  }
+	 break ;
+	 
+	 case 4:
+	  if(flag>0){
+	  $("#total").html((eval(priceArr[0]+equal+3))+"-"+eval(priceArr[1]+equa+3)));
+	  }else{
+	  $("#total").html(priceArre+equal+3);
+	  }
+	 
+	 
+	
+	 
+	 }
+	
+	 
+	 
+	 }
+	*/ 
+	 
+	 
+	 
+	 
+	 
+    $(function(){
+		    <#list 2..5 as a>
+			/*
+		    var recSuggest${a} = new InputSuggest({
+					input: document.getElementById('rcvAddr${a}'),
+					aid: ${a}
+				});
+				*/
+		    addressSearch${a} = new AddressSearch(currLoc,5, function(search_data){
+			        if (!search_data) {
+			            // 查询结果为空
+			            return;
+			        }
+			        if (search_keyword != search_data.keyword) {
+			            // 查询关键词与当前查询不匹配
+			            return;
+			        }
+			        //select_data${a} = search_data['data'];
+					//recSuggest${a}.refresh(select_data${a});
+			        var html =  '<div id="address-common">'+
+			                    '   <div class="address-common-list-wrap">';
+			        for (var i = 0; i < search_data['data'].length; i++) {
+			            var item = search_data['data'][i];
+			            html += '       <div class="address-common-list" index="'+i+'">' +
+			                    '           <span class="address-common-icon"></span>' +
+			                    '           <p class="address-common-address">' +
+			                    '               <span class="address-common-title">'+item['title']+'</span>' +
+			                    '               <span class="address-common-detail-address"> 详细地址：<em>'+item['address']+'</em></span>' +
+			                    '               <span style="display:none;" class="lng">'+item['lng']+'</span>' +
+			                    '               <span style="display:none;" class="lat">'+item['lat']+'</span>' +
+			                    '           </p>' +
+			                    '       </div>';
+			        }
+			        html +=     '   </div>' +
+			                    '</div>';
+			        $("#rcvAddr${a}_panel").html(html);
+					setPos("#rcvAddr${a}_panel #address-common", "#rcvAddr${a}");
+			        $("#rcvAddr${a}_panel .address-common-list").click(function(){
+			        	$("#rcvAddr${a}").val($(this).find("em").html());
+			        	$("#rcvAddr${a}_panel").html('');
+			        	info['rcvAddr${a}'] = $(this).find("em").html();
+			        	info['rcvAddr${a}_lng'] = $(this).find(".lng").html();
+			        	info['rcvAddr${a}_lat'] = $(this).find(".lat").html();
+			        	tryDrive();
+			        });
+			    });    	
+    		 $("#rcvAddr${a}").on('focus', function(){
+		        var that = $(this);
+		        var last_val = that.val();
+		        clear_interval();
+		        address_interval = window.setInterval(function(){
+		            search_keyword = that.val();
+		            if (search_keyword && (search_keyword != last_val)) {
+		                addressSearch${a}.search(search_keyword);
+		                last_val = search_keyword;
+		            }
+		        }, 100);		        
+		    }).on('blur', function(){
+		        clear_interval();
+		    });
+			
+			$("input[name!='rcvAddr${a}']").on('focus', function() {
+				$("#rcvAddr${a}_panel").html("");
+			});
+		    </#list>
+    	});		
+    </script>
+    <style type="text/css">
+		.suggest-container{border:1px solid #C1C1C1;visibility:hidden;background-color:#fff;}
+		.suggest-item{padding:3px 2px;}
+		.suggest-active {background:#33CCFF;color:white;padding:3px 2px;}			
+	</style>
+	
+</head>
+<body>
+<!-- 最顶层的内容 -->
+	<#include '../inc/top.html'>
+  	<!-- 搜索栏 -->
+	<#include '../inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+
+<!-- 导航 开始 -->
+	<#include '../inc/nav_ps.html'>
+<!-- 导航 结束 -->
+	
+	<!-- 在线下单，同城快递，基础信息 -->
+<!--============================================= content begin =========================================-->
+
+<div class="contain">
+  
+  <div class="mid-main">
+     <div class="mid-top">
+       <ul>
+         <li>我要发货</li>
+         <li>一步下单</li>
+         <li>让物流共轻松</li>
+       </ul>
+     </div>
+     <div class="main-biao">
+     
+     	<!--================================ 类型的选择  =========================================-->
+       <div class="b1">
+	   
+        <ul class="transselect">
+         <li class="nfirstli">类型的选择</li>
+         <li class="nborderli" onclick="transtype(this,false,0)"><span class="nspan1">零担</span><span class="nspan2">按体积计费<br/>多点配送</span></li>
+         <li class="nborderli" onclick="transtype(this,true,1)"><span class="nspan1">直达</span><span class="nspan2">单点直达<br/>快速高效</span></li>
+         <li class="nborderli" onclick="transtype(this,true,2)"><span class="nspan1">智送</span><span class="nspan2">多点智配<br/>成本最优</span></li>
+          <div class="clear"></div>
+        </ul>
+       </div>
+       
+       <div class="b2" id="b2">
+        <ul class="carselect">
+		<li class="nfirstli">车型选择</li>
+        <#list cars as c>
+        <li class="nborderli" onclick="cartype(this,${c_index})"><span class="nspan1"><img src="${CTX}/upload/${(c['封面'])!}" /><br/>${c.name}</span><span class="nspan2">&radic;</span></li>
+        </#list>
+        <!-- 
+         <li onclick="cartype(this,0)"><span><img src="${CTX}/res/tc/images/b2-1.png" /><br/>人工直达</span><span>&radic;</span></li>
+         <li onclick="cartype(this,1)"><span><img src="${CTX}/res/tc/images/b2-2.png" /><br/>三轮车</span><span>&radic;</span></li>
+         <li onclick="cartype(this,2)"><span><img src="${CTX}/res/tc/images/b2-3.png" /><br/>面包车</span><span>&radic;</span></li>
+         <li onclick="cartype(this,3)"><span><img src="${CTX}/res/tc/images/b2-3.png" /><br/>微卡</span><span>&radic;</span></li>
+         <li onclick="cartype(this,4)"><span><img src="${CTX}/res/tc/images/b2-6.png" /><br/>箱货</span><span>&radic;</span></li>
+         <li onclick="cartype(this,5)"><span><img src="${CTX}/res/tc/images/b2-5.png" /><br/>平板车</span><span>&radic;</span></li>
+         <li onclick="cartype(this,6)"><span><img src="${CTX}/res/tc/images/b2-6.png" /><br/>高栏车</span><span>&radic;</span></li>
+          -->
+          <div class="clear"></div>
+        </ul>
+       </div> 
+        <!--================================ 类型的选择 end  =========================================--> 
+         
+       <div class="b3">
+          <p class="np1">用车时间</p>
+          <p class="np2"><input type="text" id="sendTime" class="time_input" autocomplete="off" placeholder="点击选择用车时间！"/></p>
+          <div class="clear"></div>
+       
+       </div>
+       <!--================================ 地址  =========================================-->
+       
+       <div class="b4">
+          <p class="np1">始发地</p>
+          <p class="np2"><input type="text" placeholder="自动获取地址信息" class="l address-info-address vaddr" value="" id="sendAddr" onblur="savePricefun()" name="sendAddr"/>
+          <br/><a href="javascript:selOldAddr();"><span>常用地址</span></a></p>
+          <p class="np4">姓名</p>
+          <p class="np5"><input type="text" placeholder="必填" class="address-info-name vname" id="sendName" name="sendName" value="${(abuser.mc)!}"/></p>
+          <p class="np6">联系电话</p>
+          <p class="np7"><input type="text" placeholder="必填" class="address-info-phone vphone" id="sendPhone" name="sendPhone" value="${(abuser.mobile)!}"/></p>
+          <div class="clear"></div>
+       </div>
+        <div id="sendAddr_panel"></div>
+		
+       <div class="b5 sendtype" >
+         <p class="np1">到达地</p>
+          <p class="np2"><input type="text" placeholder="最多可添加五个地址" class="l address-info-address vaddr" onblur="savePricefun()" value="" id="rcvAddr" name="rcvAddr"/>
+          	<a href="javascript:void(0);" class="plus" onclick="addRcv();"></a>
+          </p>
+          <p class="np4">姓名</p>
+          <p class="np5"><input type="text" placeholder="必填" class="address-info-name vname" value="" id="rcvName" name="rcvName" /></p>
+          <p class="np6">联系电话</p>
+          <p class="np7"><input type="text" placeholder="必填" class="address-info-phone vphone" value="" id="rcvPhone" name="rcvPhone"/></p>
+          <div class="clear"></div>
+       </div>
+	   <div id="rcvAddr_panel"></div>
+       
+       <#list 2..5 as a>
+       	<div class="b5 more_rcv sendtype">
+          <p class="np1">到达地${a}</p>
+          <p class="np2"><input type="text" placeholder="请输入收货地址" class="l address-info-address vaddr" value="" id="rcvAddr${a}" name="rcvAddr${a}" />
+          	<a href="javascript:void(0);" class="reduction" onclick="removeRcv(${a});"></a></p>
+          <p class="np3"><img src="${CTX}/res/tc/images/tubiao.png" /></p>
+          <p class="np4">姓名</p>
+          <p  class="np5"><input type="text" placeholder="必填" class="address-info-name vname" value="" id="rcvName${a}" name="rcvName${a}" /></p>
+          <p class="np6">联系电话</p>
+          <p class="np7"><input type="text" placeholder="必填" class="address-info-phone vphone" value="" id="rcvPhone${a}" name="rcvPhone${a}"/></p>
+          <div class="clear"></div>
+       </div>
+	   <div id="rcvAddr${a}_panel"></div>
+		</#list>
+
+		<!--================================ 地址  end =========================================-->
+
+       <div class="b6">
+         <p class="np1">货物类型</p>
+          <p class="np2"> 
+          <select id="goodsType" class="selectbox">
+             <option value="">请选择...</option>
+			 <#list goodsList as g>
+			 <option value="${g.value}">${g.value}</option>
+			 </#list>
+         </select></p>
+         <!-- 
+          <p>姓名</p>
+          <p><input type="text" placeholder="必填" /></p>
+           -->
+          <div class="clear"></div>
+       </div>
+       
+       <div class="b7">
+         <p class="np1">货物重量</p>
+          <p class="np2"><input type="text" placeholder="必填" id="weight" class="text_input"/></p>
+          <p class="np3"> 
+          <select id="wt_unit">
+             <option value="1">公斤</option>
+             <option value="2">吨</option>
+         </select>
+         </p>
+          <div class="clear"></div>
+       </div>
+
+       <div class="b8">
+         <p class="np1">货物体积</p>
+         <p class="np2"><input type="text" placeholder="必填" id="goods_volumn" class="text_input"/></p>
+         <p class="np3">立方米</p>
+          <div class="clear"></div>
+       </div>       
+
+       <div class="b9">
+         <p class="np1">货物数量</p>
+          <p class="np2"><input type="text" placeholder="必填" id="goods_mount" class="text_input"/></p>
+          <p class="np3">件</p>
+          <div class="clear"></div>
+       </div>           
+
+       <div class="b10">
+         <p class="np1">订单模式</p>
+          <p class="np2">
+                <span  id="systemOrder"><input type="radio" name="orderStyle" value="1" id="isXS" onclick="chooseStyle()" />系统定价</span>
+              <span  id="dirverOrder"> <input type="radio" name="orderStyle" value="2" onclick="chooseStyle()"  />司机竞标报价</span>
+                <input type="radio" name="orderStyle" value="3"  onclick="chooseStyle()" id="myOrder"  />我要出价
+            </p>
+			<div class="clear"></div>
+			<p class="np3" id="zb_div1" style="display: none;">
+				<span>悬赏价格：</span>
+				 <input autocomplete="off" type="text" placeholder="悬赏金额" class="address-info-name vmoney" value="" id="xsMoney" name="xsMoney" onblur="calcTotal();">
+			</p>
+			<div class="clear"></div>
+			<p class="np4" id="xs_div" style="display: none;">
+				<span>额外悬赏金额：</span>
+				<label><input type=radio name="moreMoney" onchange="calcTotal()" value="10" style="width:20px"/>&nbsp;10元</label>&nbsp;&nbsp;
+                <label><input type=radio name="moreMoney" onchange="calcTotal()" value="20" style="width:20px"/>&nbsp;20元</label>&nbsp;&nbsp;
+                <label><input type=radio name="moreMoney" onchange="calcTotal()" value="30" style="width:20px"/>&nbsp;30元</label>&nbsp;&nbsp;
+                <label><input type=radio name="moreMoney" onchange="calcTotal()" value="50" style="width:20px"/>&nbsp;50元</label>&nbsp;&nbsp;
+                <label><input type=radio name="moreMoney" onchange="calcTotal()" value="100" style="width:20px"/>&nbsp;100元</label>
+			</p>
+			<div class="clear"></div>
+			<p class="np5" id="zb_div2" style="display: none;">
+				<span>价格区间：</span>
+				<input autocomplete="off" type="text" placeholder="最低价格" class="address-info-name vmoney" value="" id="minPrice" onblur="checkDriverPrice(this)" name="minPrice">
+                    -
+                <input autocomplete="off" type="text" placeholder="最高价格" class="address-info-name vmoney" value="" id="maxPrice"  onblur="checkDriverPrice(this)"  name="maxPrice">
+			</p>
+			 <span style="display:none;color:red" id="errorDriverPrice">您输入的价格已经低于100公里的预算费用,请重新输入!!</span>
+			<div class="clear"></div>
+				<p class="np6 unit-detail-amount-control" id="zb_div3" style="display: none;">
+				 
+					<span >出价金额：</span>
+				    <a rel="nofollow" hidefocus="true" trace="adjust1" class="amount-down" href="javascript:" target="_self">-</a>
+				            
+				         <input autocomplete="off" type="text" readonly="readonly" placeholder="出价金额" class="address-info-name vmoney amount-input"  value="1" id="onePrice" name="onePrice" onblur="calcTotal();">
+				        <a rel="nofollow" hidefocus="true" trace="adjust1" class="amount-up" href="javascript:" target="_self" data-spm-anchor-id="a261y.7663282.0.0">+</a>
+				   
+				 <span style="display:none;color:red" id="errorPrice">您输入的价格已经低于系统估算的10%,不可再将!!</span>
+				 
+				<!--  <input autocomplete="off" type="text" placeholder="出价金额" class="address-info-name vmoney" value="" id="onePrice" name="onePrice" onblur="saveOffer();">-->
+				 <span class="order_distance" id="errorMoney"></span>
+			</p>
+            <div class="clear"></div>
+       </div>  
+       
+       <div class="b11">
+         <p class="np1">额外需求</p>
+         <p class="np2">需要小推车？ <input type="checkbox" id="cart" value="1" onchange="needCart(this)" /></p>
+         <div class="clear"></div>
+         <p class="np4">回单：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="huidan_price" value="1" id="huidan_price" onchange="addPrice(this);checkIt(this)" /></p>
+         <p class="hong">&nbsp;&nbsp;<img src="${CTX}/res/css/ab/images/img11.png" />&nbsp;3元/次，回单周期：自货物到达收货地址获得回单之日起，7日以内。</p>
+         <div class="clear"></div>
+         <p class="np7">代收贷款: <input type="checkbox" name="service_price" value="2" id="service_price" onchange="addPrice(this);checkIt(this)" /></p>
+         <p class="hong">&nbsp;&nbsp;<img src="${CTX}/res/css/ab/images/img11.png" />&nbsp;10元/次，回款周期：自货物到达收货地址获得回单之日起，2个工作日以内。</p>
+         <div class="clear"></div>              
+         <p class="np10">搬运：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="lift" value="3" onchange="addPrice(this);checkIt(this)" /></p>
+         <p class="hong">&nbsp;&nbsp;<img src="${CTX}/res/css/ab/images/img11.png" />&nbsp;有电梯需要搬运的收费40元，无电梯的收费70元。</p>
+         <div class="clear"></div>
+         <p class="np13">拆装：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="dismounting" value="4" onchange="addPrice(this);checkIt(this)" /></p>
+         <p class="hong">&nbsp;&nbsp;<img src="${CTX}/res/css/ab/images/img11.png" />&nbsp;3元/次。</p>
+          <div class="clear"></div>
+       </div>
+       
+       <div class="b12">
+         <p class="np1">备注</p>
+          <p class="np2"><input type="text" placeholder="选填" name="remark" id="remark" /></p>
+          <div class="clear"></div>
+       </div>  
+       
+       <div class="b13">
+         <p class="np1">总里程约<span class="order_distance" id="kiloRst">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+         	公里, 预计费用约<span class="order_fare" id="total">&nbsp;&nbsp;&nbsp;&nbsp;</span>元</p>
+       </div> 
+    
+       <div class="b14">
+         <p class="np1">支付类型</p>
+          <p class="np2">
+                <input type="radio" name="payType" value="1" checked="checked" id="RadioGroup2_0" />在线支付&nbsp;&nbsp;
+                <input type="radio" name="payType" value="2" id="RadioGroup2_1" />现付&nbsp;&nbsp;
+                <input type="radio" name="payType" value="3" id="RadioGroup2_2" />到付&nbsp;&nbsp;
+                <input type="radio" name="payType" value="4" id="RadioGroup2_3" />回单付&nbsp;&nbsp;
+         </p>
+         <div class="clear"></div>
+       </div> 
+       
+       <div class="b15">
+         <p class="np1"></p>
+          <p class="np2">
+          <input type="button" id="saveInfo" class="next-btn" onclick="preview();" value="预览" />
+          <input type="button" id="saveInfo" class="next-btn" onclick="saveOrderForm('save');" value="保存"/>
+          <input type="button" id="saveInfo" class="next-btn" onclick="saveOrderForm('submit');" value="提交"/>
+          <div class="clear"></div>
+         </p>
+       </div>
+       
+     </div>
+  </div>
+</div>
+ 
+ <div id="allmap" style="display: none;"></div>
+ 
+  </body>
+</html>
+
+<script type="text/javascript">
+
+
+
+//百度地图API功能
+var map = new BMap.Map("allmap");
+map.centerAndZoom(currLoc, 11);
+var options = {
+	onSearchComplete: function(results){
+		if (driving.getStatus() == BMAP_STATUS_SUCCESS){
+			// 获取第一条方案
+			var plan = results.getPlan(0);
+			// 获取方案的驾车线路
+			var route = plan.getRoute(0);
+			//var meter = route.vf;
+			var meter = plan.getDistance(false);
+			console.log(meter + "米" + (Math.floor(meter/1000) + 1) + "公里");	
+			//alert(meter + "米" + (Math.floor(meter/1000) + 1) + "公里");	
+			var k = 	(Math.floor(meter/1000) + 1);
+			info['kilo'] += k;
+			//alert(k);
+			
+			currKilo++;
+			if(currKilo == 1 && info['rcvAddr2'] && info['rcvAddr2']!=''){
+				//driving.search(info['to'], info['rcvAddr2']);
+				driving.search(new BMap.Point(info['to_lng'], info['to_lat']), new BMap.Point(info['rcvAddr2_lng'], info['rcvAddr2_lat']));
+				return;
+			}else if(currKilo >= 2 && info['rcvAddr'+(currKilo+1)] && info['rcvAddr'+(currKilo+1)]!=''){
+				//driving.search(info['to' + currKilo], info['to'+(currKilo+1)]);
+				driving.search(new BMap.Point(info['rcvAddr'+currKilo+'_lng'], info['rcvAddr'+currKilo+'_lat']), 
+					new BMap.Point(info['rcvAddr'+(currKilo+1)+'_lng'], info['rcvAddr'+(currKilo+1)+'_lat']));
+				return;
+			}
+			currKilo = -1;
+			set100Kilo();	
+			
+	
+	
+     
+			
+		
+			
+			
+			
+       //判断是否大于100公里，如果是则将显示我要出价去掉
+    if(k<100){
+      document.getElementById("dirverOrder").style.display="none";
+    }else{
+	   		
+      //给定距离防止价格的值消失
+	  
+       //零担
+	 if(typeSelIndex==0){
+	 //计算货物价格
+		var volumn=$("#goods_volumn").val();
+		
+		var km=$("#kiloRst").html();
+		if(eval(volumn-0.5)<=0){
+				 tmpSum =parseInt(km*2*0.5+28);
+			    $("#total").html(tmpSum.toFixed(2));
+			return;
+			  }
+			  
+			
+			 
+			 if(eval(volumn-1)>=0){
+				 
+			var less=volumn-1;
+				tmpSum =parseInt(km*2*less+km*3.5*1+28)
+			 $("#total").html(tmpSum.toFixed(2));
+			 return;
+			}
+		
+		if(eval(volumn-0.6)>0&&eval(volumn-1)<0){
+				tmpSum=parseInt(km*3.5*volumn+28);
+			  $("#total").html(tmpSum.toFixed(2));
+			 return;
+			 }
+			 
+			 }else if(typeSelIndex==1||typeSelIndex==2){
+	
+	       $("#total").html("请出价");
+	     document.getElementById("systemOrder").style.display="none";
+	     document.getElementById("myOrder").style.checked="true";
+	
+	}else{
+	 $("#total").html("_");
+	}
+	
+     }
+			
+		}else{
+		
+			manKilo();
+		}
+	}
+};
+var driving = new BMap.DrivingRoute(map, options);
+</script>

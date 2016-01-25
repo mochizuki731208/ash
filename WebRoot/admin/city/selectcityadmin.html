@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>后台管理系统</title>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/admin.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript">
+		function deletebyid(id){
+			if(confirm("确认要删除当前选择的数据吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/city/delete",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("操作成功！");
+							refresh();
+						}else{alert("操作失败！");return false;}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>	
+</head>
+  <body>
+	<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+	  <table class="list">
+                  <tr>
+                    <th width="4%">选择</th>
+                    <th width="10%">姓名</th>
+					<th width="10%">用户名</th>
+					<th width="10%">邮箱</th>
+					<th width="10%">手机号</th>
+					<th width="10%">电话</th>
+					<th width="10%">QQ</th>
+					<th width="10%">是否禁用</th>
+                  </tr>
+      		<#if list ?? && (list.size()>0)>
+      			<#list list as lst>
+                  <tr>
+                  	<td><input type="radio" id="ids_${(lst.id)!}" name="ids" value="${(lst.id)!}"/></td>
+                    <td>${(lst.mc)!}</td>
+                    <td>${(lst.loginid)!}</td>
+                    <td>${(lst.email)!}</td>
+                    <td>${(lst.mobile)!}</td>
+                    <td>${(lst.tel)!}</td>
+                    <td>${(lst.qq)!}</td>
+                    <td>
+                    	<#if lst.is_account_enabled=="0">
+						禁用
+						<#elseif lst.is_account_enabled=="1">
+						启用
+						</#if>
+					</td>
+                  </tr>
+				</#list>
+			</#if>
+            </table>
+	</form>
+  </body>
+</html>

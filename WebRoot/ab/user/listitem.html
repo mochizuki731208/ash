@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+ </head>
+  <body>
+			<table class="list">
+            <tr>
+	            <th width="30px;">序号</th>
+	            <th width="100px;">商品图</th>
+	            <th width="*;">商家</th>
+	            <th width="150px;">商品名称</th>
+	            <th width="70px;">数量</th>
+	            <th width="60px;">价格</th>
+	            <th width="100px;">金额</th>
+				<th width="130px;">创建时间</th>
+	        </tr>
+	        <#if listitem??>
+      			<#list listitem as s>
+                  <tr>
+                  	<td>${(s_index+1)!''}</td>
+                    <td><#if s.img_url??><img src="${CTX}/upload/${(s.img_url)!}" style="width: 80px;height: 60px;"></#if></td>
+                    <td>${(s.mname)!''}</td>
+                    <td>${(s.itemname)!''}</td>
+                    <td>${(s.quantity)!''}</td>
+                    <td>${(s.price)!''}</td>
+                    <td>${(s.price*s.quantity)?string("currency")}</td>
+                    <td>${(s.createtime)!''}</td>
+                  </tr>
+				</#list>
+			</#if>
+            </table>
+	</body>
+</html>

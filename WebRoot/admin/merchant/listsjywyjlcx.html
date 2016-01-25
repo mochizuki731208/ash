@@ -1,0 +1,112 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_sptg(id){
+			if(confirm("是否将此商家审核通过吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/merchant/sptg",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("此商家信息审核通过成功！");
+							refresh();
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		
+		function uf_create(id){
+			$.ajax({
+				url: "${CTX}/admin/merchant/saveSjywyjl",
+				type: "POST",
+				data: {},
+				dataType: "json",
+				cache: false,
+				success: function(data) {
+					if(data){
+						$.dialog.alert("生成数据成功！",function () {
+							refresh();
+				        }).time(0.8);
+					}else{
+						$.dialog.alert("生成数据失败！");
+					}
+				}
+			});
+		}
+		
+		function uf_show(id){
+	    	$.dialog({
+				title:'商家信息',
+				content: 'url:${CTX}/admin/merchant/showmerchant/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 500,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});
+	    }
+	    
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+  <body>
+  	  <form id="myform" name="myform" method="post" action="">
+			商家名称：<input type="text" name="mname" id="mname" class="text" value="${(mname)!}" style="width: 120px;"/>
+			<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+			<input type="button" id="btn_return" class="button" value="生 成" onclick="uf_create();"/>
+	  		<table class="list">
+            <tr>
+	            <th width="4%">序号</th>
+	            <th width="8%">城市</th>
+	            <th width="*%">商家</th>
+	            <th width="10%">商家分类</th>
+	            <th width="12%">经度</th>
+	            <th width="12%">纬度</th>
+				<th width="8%">业务员</th>
+				<th width="12%">经度</th>
+				<th width="12%">纬度</th>
+				<th width="10%">距离<span style="font-weight: bold;color: red">（千米）</span></th>
+	        </tr>
+      		<#if listpage ??>
+      			  <#list listpage.list as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!''}</td>
+                  	<td>${(lst.citymc)!''}</td>
+                  	<td>${(lst.mname)!''}</td>
+                    <td>${(lst.subject_name)!''}</td>
+                    <td>${(lst.sjjd)}</td>
+                    <td>${(lst.sjwd)}</td>
+                    <td>${(lst.ywymc)!''}</td>
+                    <td>${(lst.ywyjd)!''}</td>
+                    <td>${(lst.ywywd)!}</td>
+                    <td style="font-weight: bold;color: red">${(lst.lzjl)?number/1000}</td>
+                  </tr>
+				</#list>
+				</#if>
+				<tr>
+					<td colspan="10">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+            </table>
+   
+			</form>
+  </body>
+</html>

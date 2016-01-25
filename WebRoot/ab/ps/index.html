@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <#include '../inc/meta.html'>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/lrtk1.css"/>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/main.css"/>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/index.css"/>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/reset.css"/>
+
+<script src="${CTX}/res/ps/js/jquery-1.11.0.js"></script>
+<script type="text/javascript" src="${CTX}/res/ps/js/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="${CTX}/res/ps/js/lrtk.js"></script>
+<script type="text/javascript" src="${CTX}/res/ps/js/jquery.min.js"></script>
+<script type="text/javascript" src="${CTX}/res/ps/js/jquery.devrama.slider.js"></script>
+<script type="text/javascript">
+    $(document).ready(
+            function () {
+                $(".fot_hd ul li.liuchen0 p").mouseenter(
+                        function () {
+                            $(this).siblings("h3").stop().fadeIn(1000);
+                        }
+                );
+                $(".fot_hd ul li.liuchen0 p").mouseleave(
+                        function () {
+                            $(this).siblings("h3").stop().fadeOut(500);
+                        }
+                );
+            }
+    );
+</script>
+</head>
+<body>
+<!-- 最顶层的内容 -->
+	<#include '../inc/top.html'>
+  	<!-- 搜索栏 -->
+	<#include '../inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+
+<!-- 导航 开始 -->
+	<#include '../inc/nav_ps.html'>
+<!-- 导航 结束 -->
+
+<!-- bannar 开始 -->
+<div class="example-animation">
+	<div data-lazy-background="${CTX}/res/ps/images/1.jpg">
+		<h3 data-pos="['25%', '110%', '25%', '24%']" data-duration="700" data-effect="move">
+			<img data-lazy-src="${CTX}/res/ps/images/lo3.png"/>
+		</h3>
+		<div data-pos="['-30%', '25%', '55%', '24%']" data-duration="700" data-effect="move">
+			<img data-lazy-src="${CTX}/res/ps/images/lo4.png"/>
+		</div>
+		<div data-pos="['90%', '-40%', '90%', '33%']" data-duration="700" data-effect="move" class="kd1">
+			<img data-lazy-src="${CTX}/res/ps/images/lo1.png"/>
+		</div>
+		<div data-pos="['15%', '110%', '0%', '80%']" data-duration="700" data-effect="move">
+			<img data-lazy-src="${CTX}/res/ps/images/renzh.png"/>
+		</div>
+	</div>
+	<div data-lazy-background="${CTX}/res/ps/images/2.jpg">
+		<h3 data-pos="['25%', '24%']" data-duration="1000" data-effect="fadein">
+			<img data-lazy-src="${CTX}/res/ps/images/lo5.png"/>
+		</h3>
+		<div data-pos="['55%', '24%']" data-duration="700" data-effect="fadein">
+			<img data-lazy-src="${CTX}/res/ps/images/lo6.png"/>
+		</div>
+		<div data-pos="['90%', '33%']" data-duration="700" data-effect="fadein">
+			<img data-lazy-src="${CTX}/res/ps/images/lo1.png"/>
+		</div>
+		<div data-pos="['0%', '80%']" data-duration="700" data-delay="500" data-effect="fadein">
+			<img data-lazy-src="${CTX}/res/ps/images/guiji.png"/>
+		</div>
+	</div>	 
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	$('.example-animation').DrSlider(); //Yes! that's it!
+});
+</script>
+<!-- bannar结束 -->
+
+<div class="content">
+    <ul>
+        <li class="neir1">
+            <div class="left"><img width="357" height="475" src="${CTX}/res/ps/images/qw1.jpg"></div>
+            <div class="right">
+			<h2><img src="${CTX}/res/ps/images/qw2.jpg" /></h2>
+                <h3>司机100%认证，保障货物安全送达</h3>
+
+                <p>严格的车辆审核认证，司机系统培训，创新服务评价机制，为货主提供专业贴心服务，赠送平安货物保险和提供正规发票，全面保障货物安全</p>
+            </div>
+        </li>
+        <li class="neir2">
+            <div class="left">
+			<h2><img src="${CTX}/res/ps/images/qw4.jpg" /></h2>
+                <h3>价格透明，低于市场平均价30%</h3>
+
+                <p>透明化计费标准，优化运输路径，根据所选车型和公里数，智能计算运费，低于市场平均价格 30% 左右，发货还赠送高额积分</p>
+            </div>
+            <div class="right"><img width="439" height="479" src="${CTX}/res/ps/images/qw3.jpg"></div>
+        </li>
+        <li class="neir1">
+            <div class="left"><img width="426" height="496" src="${CTX}/res/ps/images/qw5.jpg"></div>
+            <div class="right">
+			<h2><img src="${CTX}/res/ps/images/qw6.jpg" /></h2>
+                <h3>2分钟响应订单，最快半小时送达</h3>
+
+                <p>智能推送就近车辆，全程优化路线，保障运输流畅，通过运单跟踪系统，随时掌控货物位置，同城最快 半 小时送达</p>
+            </div>
+        </li>
+        <li class="neir2">
+            <div class="left">
+			<h2><img src="${CTX}/res/ps/images/qw9.jpg" /></h2>
+                <h3>车型丰富，满足您的各种运输需求</h3>
+
+                <p>中型面包车、依维柯、金杯、卡车等多款车型供您选择，提供立即服务和预约服务，各款车型车源充足、覆盖全城，让您找车更轻松</p>
+            </div>
+            <div class="right"><img width="400" height="477" src="${CTX}/res/ps/images/qw7.gif"></div>
+        </li>
+        
+    </ul>
+	
+</div>
+<div class="fot_hd">
+
+        <ul class="banxin">
+            <li class="liuchen0 liuchen1">
+                <h3 class="xiazaibiaoti" style="display: none; opacity: 1;">下载手机 App, 随时随地即享轻松发货</h3>
+
+                <p class="tutu0 tutu1"></p>
+                <span class="xiazai">免费下载</span>
+            </li>
+            <li class="liuchen0 liuchen2">
+                <h3 class="fahuobiaoti">填写货物信息和收发货地址，选择发货时间，等待司机取货</h3>
+
+                <p class="tutu0 tutu2"></p>
+                <span class="fahuo">立即发货</span>
+            </li>
+            <li class="liuchen0 liuchen3">
+                <h3 class="jiedanbiaoti" style="display: none; opacity: 1;">司机接收发货信息，前往取货</h3>
+
+                <p class="tutu0 tutu3"></p>
+                <span class="jiedan">司机接单</span>
+            </li>
+            <li class="liuchen0 liuchen4">
+                <h3 class="daodabiaoti" style="display: none; opacity: 1;">车辆 GPS 时时定位，智能优化路线，货物及时送达</h3>
+
+                <p class="tutu0 tutu4"></p>
+                <span class="daoda">成功到达</span>
+            </li>
+        </ul>
+
+    </div>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+</body>
+</html>

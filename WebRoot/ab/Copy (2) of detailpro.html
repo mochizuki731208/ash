@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>商品显示</title>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/main.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css"/>
+	<link href="${CTX}/res/pro/css/base.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/pro/css/index.css" />
+	<script type="text/javascript" src="${CTX}/res/pro/js/jquery-1.4.2.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/pro/js/jquery.jqzoom.js"></script>
+	<script type="text/javascript" src="${CTX}/res/pro/js/base.js"></script>
+	<script type="text/javascript" src="${CTX}/res/pro/js/index.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+    
+    
+<script type="text/javascript">
+	function uf_sc(fkid){
+		if($('#userid').val()==''){
+			$.dialog.alert("请登录后进行选择！",function(){
+				window.location.href="${CTX}/ab/login";
+			});
+			return false;
+		}
+		
+		$.post("${CTX}/ab/mer/save_sc",{lx:'1',fkid:fkid},function(data){
+                  if(data){
+				$.dialog.alert("收藏成功！").time(0.5);
+			}else{
+				$.dialog.alert("收藏失败，请重新登录系统后进行收藏！");
+			}
+		});
+	}
+</script>
+</head>
+<body>
+	<#if abuser?? >
+		<input type="hidden" id="userid" value="${(abuser.id)!}"/>
+	<#else>
+		<input type="hidden" id="userid" value=""/>
+	</#if>
+	<div class="header">
+	  	<div class="header_cen">
+		    <div class="logo"> <img src="${CTX}/res/pro/images/logo.png" width="182" height="48"></div>
+		    <a href="${CTX}/ab"><div class="button_zhu">注册</div></a> 
+		    <a href="${CTX}/ab/login"><div class="button_deng">登陆</div></a>
+	    </div>
+	</div>
+	<!--header-->
+	 <div id="header_down">
+    	<div class="header_down_cen">
+    		<div class="headerImg">
+                <div id="preview" class="spec-preview"><span class="jqzoom"><img src="${CTX}/upload/${(vo.img_url)!}" /></span> </div>
+                <!--缩图开始-->
+                <div class="spec-scroll"> <a class="prev">&lt;</a> <a class="next">&gt;</a>
+                    <div class="items">
+                        <ul>
+                          <#if list_img ??>
+							<#list list_img as lst>
+								<li><img alt="${(vo.mc)!}" bimg="${CTX}/upload/${(lst.lager)!}" src="${CTX}/upload/${(lst.lager)!}" onmousemove="preview(this);"></li>
+				   			</#list>
+						</#if>
+                        </ul>
+                    </div>
+                </div>
+                <!--缩图结束-->
+        	</div><!--headerImg-->
+            <div class="xinxi">
+                <p>
+                	<span  class="shop_title">${(vo.mc)!} </span>
+                    <#if sfsc==true>
+	            		<a href="javascript:void(0);">已收藏</a>
+	            	<#else>
+	            		<a href="javascript:void(0);" onclick="uf_sc('${(vo.id)!}');"><img src="${CTX}/res/css/ab/images/shoucang.png" style="margin-top:6px;width:55px; height:55px;" title="添加收藏" /></a>
+	            	</#if>
+                </p>
+                <dl>
+                    <dt>门店价</dt>
+                    <dd>${(vo.mdprice)?string("currency")}</dd>               
+                </dl>
+                <dl>
+                    <dt>现价</dt>
+                    <dd>${(vo.price)?string("currency")}</dd>
+                </dl>
+                <dl>
+                    <dt>数量</dt>
+                    <dd>
+                    	<input class="jianPro" type="button" /><input id="sumId" class="shuliangPro" type="text" value="1" /><input class="jiaPro" type="button" />
+                    </dd>
+                </dl>
+                <dl>
+                	<dt></dt>
+                    <dd><a href="javascript:void(0);"><input class="cart" type="button" /></a></dd>
+                </dl>
+                <ul>
+                	<li>
+                    	<a class="bshare-qzone" title="分享到QQ">
+                        	<img src="${CTX}/res/pro/images/fx1.jpg" />
+                        </a>
+                    </li>
+                    <li>
+                    	<a class="bshare-weixin" title="分享到微信">
+                        	<img src="${CTX}/res/pro/images/fx2.jpg" />
+                        </a>
+                    </li>
+                    <li>
+                    	<a class="bshare-sinaminiblog" title="分享到新浪微博">
+                        	<img src="${CTX}/res/pro/images/fx3.jpg" />
+                        </a>
+                    </li>
+                </ul>
+            </div><!--xinxi-->
+            <div class="shop_cart">
+            	<div class="shop_store">
+                	<a href="${CTX}/ab/detail/${(vo.mid)!}">
+                		<img src="${CTX}/res/pro/images/shoproom.jpg" />
+                    </a>
+                </div>
+                <div class="mycart">
+                	<div class="cart_top">
+                    	<div class="cartTopConent">
+                        	<img src="${CTX}/res/pro/images/flag.jpg" />
+                            <span class="shopMyCart">购物车</span>
+                            <span class="clearContent">[清空]</span>
+                        </div>
+                    </div>
+                    	<div class="myshop">
+                    	
+                    	
+                    	
+                    	
+	                    <#if list_order ??>
+					      	<#list list_order as lst>
+				            <div class="myshopContent">
+	                        	<dl>
+	                            	<dt>${(lst.itemname)!}</dt>
+	                            	<dd>
+		                            	<input type="button" class="jianCart" onclick="uf_reduce('${(lst.orderid)!}','${(lst.itemid)!}','${(lst.quantity)}','${(userid)!}')"/>
+		                            	<input class="shuliangCart" type="text" value="${(lst.quantity)}" />
+		                            	<input type="button" class="jiaCart" onclick="uf_addnum('${(lst.orderid)!}','${(lst.itemid)!}','${(lst.quantity)}','${(userid)!}')"/>
+		                            </dd>
+	                                <dd style="width: 20px;">${(lst.price)?string("currency")}</dd>
+	                            </dl>
+	                        </div>
+							</#list>
+						</#if>
+                    </div>
+                    <div class="accountList">
+                    	<dl class="listContent">
+                        	<dt>餐品总价：</dt>
+                            <dd><#if r ??>${(r.spzj)?string("currency")}<#else>0.00</#if></dd>
+                        </dl> 
+                        <dl class="listContent">
+                        	<dt>配送费：</dt>
+                            <dd><#if r ??>${(r.ptf)?string("currency")}<#else>0.00</#if></dd>
+                        </dl> 
+                        <dl class="listContent">
+                        	<dt>优惠金额：</dt>
+                            <dd><#if r ??>${(r.yhje)?string("currency")}<#else>0.00</#if></dd>
+                        </dl>  
+                    </div>
+                    <div class="total">
+                    	<div class="totalContent">
+                        	<dl class="listContent">
+                                <dt>订单总金额：</dt>
+                                <dd><#if r ??>${(r.ddzje)?string("currency")}<#else>0.00</#if></dd>
+                        	</dl>    
+                        </div>
+                    </div>
+                    <div class="account">
+                    	<a class="accButton" href="javascript:void(0);">
+                        	<img src="${CTX}/res/pro/images/accBut01.jpg" />
+                        </a>
+                        <a class="accButton" href="javascript:void(0);">
+                        	<img src="${CTX}/res/pro/images/accBut02.jpg" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+    	</div><!--header_down_cen-->
+    </div><!--header_down-->
+    <div class="productDes">
+    	<div class="productTip">
+        	<a href="javascript:void(0);">
+            	<img src="${CTX}/res/pro/images/commodityDetail.jpg" />
+            </a>
+        </div>
+        <img src="${CTX}/upload/${(vo.img_url)!}" />
+        <div>
+            <dl class="productInfo">
+            	<dt>相关介绍</dt>
+                <dd>${(vo.productinfo)!}</dd>
+            </dl>
+        </div>
+    </div>
+<!-- foot页 -->
+<#include 'inc/foot.html'>
+</body>
+</html>

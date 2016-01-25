@@ -1,0 +1,271 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <base href="${CTX}/">
+	<#include '../inc/meta.html'>
+	   <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/bootstrapValidator.min.css">
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/common.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/lrtk.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/select-city.min.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/my-trucks.css" />
+   <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+   <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+	
+</head>
+<body>
+<#include '../inc/top.html'>
+<#include '../inc/header.html'>
+<#include '../inc/nav.html'>
+<!-- 搜索栏 -->
+<!-- 导航 -->
+<div class="blank5"></div>
+<div class="cm">
+<div class="leftmenu fl">
+	<#include '../inc/leftmenu.html'>
+</div>
+<div class="rightcon fr">
+	
+<div class="container" style="width:100%">
+    <div class="row mg-tb-20">
+        <div class="col-xs-3"><h3 class="title-h3 mg-0">我要用车</h3></div>
+        <div class="col-xs-9" style="display: none;">
+	        <div class="navbar-collapse collapse" >
+	            <form class="navbar-form navbar-right mg-0" id="chakancheliang">
+	                <button type="button" class="btn btn-success daichengjiao" data-toggle="modal" data-target="#myModalAddKnow">待成交用车
+	                    <span class="badge">${(waiting)!''}</span>
+	                </button>
+	                <button type="button" class="btn btn-info jinxingzhong" data-toggle="modal" data-target="#myModalKnow">进行中的车辆
+	                    <span class="badge">${(working)!''}</span>
+	                </button>
+	            </form>
+	        </div>
+    	</div>
+    </div>
+    <div class="row">
+        <div class="">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <form class="form-horizontal" action="${CTX}/ab/fmcarorders/save" method="post" id="editForm">
+                    	<div style="display: none">
+                    		<input type="text" class="form-control"  name="order_id" value="${(order.id)!''}">
+	                        <input type="text" class="form-control"  name="order_car_id" value="${(order.car_id)!''}">
+	                        <input type="text" class="form-control"  name="order_create_id" value="${(order.create_id)!''}">
+	                        <input type="text" class="form-control"  name="order_create_time" value="${(order.create_time)!''}">
+	                        <input type="text" class="form-control"  name="order_status" value="${(order.status)!''}">
+                    	</div>
+                    
+                        <div class="form-group">
+                            <label for="startPlace" class="col-sm-2 control-label">起始地</label>
+                            <div class="col-sm-10">
+                                <div class="row">
+                                    <!-- <div class="col-xs-4"><input type="text" class="form-control" name="order_start_city_name" value="${(order.start_city_name)!''}" id="startPlace" placeholder="请选择"></div>
+                                    <div class="col-xs-8"><input type="text" class="form-control" name="order_start_addr"  value="${(order.start_addr)!''}" placeholder="请补充详细起始地址"></div> -->
+                                    
+                                    <div class="col-xs-4 addrselector">
+                                        <input data-val="true" data-val-number="字段 ToProvinceCode 必须是一个数字。" data-val-required="ToProvinceCode 字段是必需的。" id="depProvinceCode" name="order_start_province_code" value="${(order.start_province_code)!''}" type="hidden">
+                                        <input id="depProvinceName"  name="order_start_province_name" value="${(order.start_province_name)!''}"  type="hidden">
+                                        <input data-val="true" data-val-number="字段 ToCityCode 必须是一个数字。" data-val-required="ToCityCode 字段是必需的。" id="depCityCode"  name="order_start_city_code" value="${(order.start_city_code)!''}"  type="hidden">
+                                        <input id="depCityName"  name="order_start_city_name" value="${(order.start_city_name)!''}"   type="hidden">
+                                        <input data-val="true" data-val-number="字段 ToCountyCode 必须是一个数字。" id="depCountyCode"  name="order_start_county_code" value="${(order.start_county_code)!''}"   type="hidden">
+                                        <input id="depCountyName"  name="order_start_county_name" value="${(order.start_county_name)!''}"  type="hidden" value="">
+                                    </div>
+                                    
+                                    <div class="col-xs-8 map-result-container">
+                                        <input type="text" class="form-control" id="startPlaceDetail"  name="order_start_addr"  value="${(order.start_addr)!''}" placeholder="请补充详细起始地址">
+                                        <div id="result1" name="result1" class="map-result"></div>
+                                        <!--<div id="result"></div>-->
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="endPlace" class="col-sm-2 control-label">到达地</label>
+                            <div class="col-sm-10">
+                                <div class="row">
+                                    <!-- <div class="col-xs-4"><input type="text" class="form-control" name="order_arr_city_name" value="${(order.arr_city_name)!''}" id="endPlace" placeholder="请选择"></div>
+                                    <div class="col-xs-8"><input type="text" class="form-control" name="order_arr_addr"  value="${(order.arr_addr)!''}" placeholder="请补充详细起始地址"></div> -->
+                                    
+                                    <div class="col-xs-4 addrselector">
+                                        <input data-val="true" data-val-number="字段 ToProvinceCode 必须是一个数字。" data-val-required="ToProvinceCode 字段是必需的。" id="ToProvinceCode" name="order_arr_province_code" value="${(order.arr_province_code)!''}" type="hidden">
+                                        <input id="ToProvinceName"  name="order_arr_province_name" value="${(order.arr_province_name)!''}"  type="hidden">
+                                        <input data-val="true" data-val-number="字段 ToCityCode 必须是一个数字。" data-val-required="ToCityCode 字段是必需的。" id="ToCityCode"  name="order_arr_city_code" value="${(order.arr_city_code)!''}"  type="hidden">
+                                        <input id="ToCityName"  name="order_arr_city_name" value="${(order.arr_city_name)!''}"   type="hidden">
+                                        <input data-val="true" data-val-number="字段 ToCountyCode 必须是一个数字。" id="depCountyCode"  name="order_arr_county_code" value="${(order.arr_county_code)!''}"   type="hidden">
+                                        <input id="ToCountyName"  name="order_arr_county_name" value="${(order.arr_county_name)!''}"  type="hidden" value="">
+                                    </div>
+                                    
+                                    <div class="col-xs-8 map-result-container">
+                                        <input type="text" class="form-control" id="endPlaceDetail" name="order_arr_addr"  value="${(order.arr_addr)!''}" placeholder="请补充详细起始地址">
+                                        <div id="result2" name="result2" class="map-result"></div>
+                                        <!--<div id="result"></div>-->
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="carLengthAdd" class="col-sm-2 control-label">车长</label>
+                            <div class="col-sm-10">
+                            	<#if (order.car_id ??)>
+                            		<input type="text" class="form-control" id="carLengthAdd" name="order_car_length" value="${(order.car_length)!''}" readonly="readonly">
+                            	<#else>
+                            		<select class="form-control" id="carLengthAdd" name="order_car_length" value="${(order.car_length)!''}">
+	                                    <option value="">请选择车长</option>
+	                                    <option value="1.8米" <#if strkit('1.8米',(order.car_length)!)>selected</#if> >1.8米</option>
+	                                    <option value="2.6米" <#if strkit('2.6米',(order.car_length)!)>selected</#if> >2.6米</option>
+	                                    <option value="3.2米" <#if strkit('3.2米',(order.car_length)!)>selected</#if> >3.2米</option>
+	                                    <option value="4.2米" <#if strkit('4.2米',(order.car_length)!)>selected</#if> >4.2米</option>
+	                                    <option value="5.2米" <#if strkit('5.2米',(order.car_length)!)>selected</#if> >5.2米</option>
+	                                    <option value="5.8米" <#if strkit('5.8米',(order.car_length)!)>selected</#if> >5.8米</option>
+	                                    <option value="6.2米" <#if strkit('6.2米',(order.car_length)!)>selected</#if> >6.2米</option>
+	                                    <option value="6.5米" <#if strkit('6.5米',(order.car_length)!)>selected</#if> >6.5米</option>
+	                                    <option value="6.8米" <#if strkit('6.8米',(order.car_length)!)>selected</#if> >6.8米</option>
+	                                    <option value="7.2米" <#if strkit('7.2米',(order.car_length)!)>selected</#if> >7.2米</option>
+	                                    <option value="8米" <#if strkit('8米',(order.car_length)!)>selected</#if> >8米</option>
+	                                    <option value="9.6米" <#if strkit('9.6米',(order.car_length)!)>selected</#if> >9.6米</option>
+	                                    <option value="13米" <#if strkit('13米',(order.car_length)!)>selected</#if> >13米</option>
+	                                    <option value="15米" <#if strkit('15米',(order.car_length)!)>selected</#if> >15米</option>
+	                                    <option value="16.5米" <#if strkit('16.5米',(order.car_length)!)>selected</#if> >16.5米</option>
+	                                    <option value="17.5米" <#if strkit('17.5米',(order.car_length)!)>selected</#if> >17.5米</option>
+	                                    <option value="18.5米" <#if strkit('18.5米',(order.car_length)!)>selected</#if> >18.5米</option>
+	                                    <option value="20米" <#if strkit('20米',(order.car_length)!)>selected</#if> >20米</option>
+	                                    <option value="22米" <#if strkit('22米',(order.car_length)!)>selected</#if> >22米</option>
+	                                    <option value="24米" <#if strkit('24米',(order.car_length)!)>selected</#if> >24米</option>
+	                                </select>
+                            	</#if>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="carClassAdd" class="col-sm-2 control-label">车型</label>
+                            <div class="col-sm-10">
+                            	<#if (order.car_id ??)>
+                            		<input type="text" class="form-control" id="carClassAdd" name="order_car_type" value="${(order.car_type)!''}" readonly="readonly">
+                            	<#else>
+                            		<select class="form-control" id="carClassAdd" name="order_car_type" value="${(order.car_type)!''}">
+	                                    <option value="">请选择车型</option>
+	                                    <option value="三轮车" <#if strkit('三轮车',(order.car_type)!)>selected</#if> >三轮车</option>
+	                                    <option value="面包车" <#if strkit('面包车',(order.car_type)!)>selected</#if> >面包车</option>
+	                                    <option value="厢车" <#if strkit('厢车',(order.car_type)!)>selected</#if> >厢车</option>
+	                                    <option value="平板车" <#if strkit('平板车',(order.car_type)!)>selected</#if> >平板车</option>
+	                                    <option value="高低板车" <#if strkit('高低板车',(order.car_type)!)>selected</#if> >高低板车</option>
+	                                    <option value="高栏车" <#if strkit('高栏车',(order.car_type)!)>selected</#if> >高栏车</option>
+	                                    <option value="冷藏车" <#if strkit('冷藏车',(order.car_type)!)>selected</#if> >冷藏车</option>
+	                                    <option value="危险品车" <#if strkit('危险品车',(order.car_type)!)>selected</#if> >危险品车</option>
+	                                    <option value="大件车" <#if strkit('大件车',(order.car_type)!)>selected</#if> >大件车</option>
+	                                </select>
+                            	</#if>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="arrivalTime" class="col-sm-2 control-label">装货时间</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="sizing-addon2">
+                                        <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                                    </span>
+                                    <input type="text" class="form-control"  name="order_load_time" value="${(order.load_time)!''}" id="arrivalTime"  placeholder="到达装货地点时间" aria-describedby="sizing-addon2"
+                                    onclick="WdatePicker({dateFmt:&#39;yyyy-MM-dd HH:mm:00&#39;,minDate:&#39;%y-%M-%d %H %m&#39;,maxDate:&#39;%y-%M-{%d+2} 23:55&#39;,isShowOK:false,isShowToday:false,isShowClear:false, errDealMode:1 });" readonly="readonly" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactPhone" class="col-sm-2 control-label">联系电话</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="sizing-addon1">
+                                        <span class="glyphicon glyphicon-phone" aria-hidden="true"></span>
+                                    </span>
+                                    <input type="text" class="form-control"  name="order_mobile" value="${(order.mobile)!''}" id="contactPhone"  placeholder="请输入联系电话" aria-describedby="sizing-addon1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="carChangpao" class="col-sm-2 control-label">捎句话</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="sizing-addon3">
+                                        <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                                    </span>
+                                    <input type="text" class="form-control"  name="order_remark" value="${(order.remark)!''}" id="carChangpao"  placeholder="捎句话（可选）" aria-describedby="sizing-addon3">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <#if (!order.id??)>
+                        	<div class="form-group">
+		                        <div class="col-sm-offset-2 col-sm-10">
+		                            <div class="checkbox">
+		                                <label>
+		                                    <input type="checkbox"  name="send_sms_flag" id="send_sms_flag" /> 短信通知我的车队司机(免费)
+		                                </label>
+		                            </div>
+		                        </div>
+		                    </div> 
+                        </#if>
+                       <div class="form-group">
+                            <label for="carZJE" class="col-sm-2 control-label">我要出价</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="sizing-addon3">
+                                        <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                                    </span>
+                                    <input type="text" class="form-control"  name="order_zje" value="${(order.zje)!''}" id="carZJE"  placeholder="愿付出的费用" aria-describedby="sizing-addon3">
+                                </div>
+                            </div>
+                        </div>
+	                        <div class="form-group">
+	                            <label for="carZFFS" class="col-sm-2 control-label">支付方式</label>
+	                            <div class="col-sm-10">
+	                                <div class="input-group">
+	                                    <input type="radio" name="order_zffs" id="order_zffs" value="1" <#if order.zffs?? && order.zffs=='1'> checked="checked" </#if>>在线支付
+	                                    <input type="radio" name="order_zffs" id="order_zffs" value="2"  <#if order.zffs?? &&  order.zffs=='2'> checked="checked" </#if>>现付
+	                                    <input type="radio" name="order_zffs" id="order_zffs" value="3"  <#if order.zffs?? &&  order.zffs=='3'> checked="checked" </#if>>到付
+	                                     <input type="radio" name="order_zffs" id="order_zffs" value="3"  <#if order.zffs?? &&  order.zffs=='4'> checked="checked" </#if>>回单付
+	                                </div>
+	                            </div>
+	                        </div>
+                        
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                            	<#if (!order.id??)>
+                            		<button type="submit" id="submit_btn" class="btn btn-primary" <#if ( !(!order.status?? || order.status == '待成交'))> disabled="disabled" </#if> > <#if ( order.id?? )>保存订单<#else>下单</#if></button>
+                            		<span style="color: red; display: none;" id="span_save_tip">正在保存...</span>
+                            	</#if>
+                            	<#if (order.id?? && order.zfzt !='1')>
+	                            	<button type="submit" id="submit_btn" class="btn btn-primary">保存并支付订单</button>
+                            	</#if>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="" style="display: none;">
+            <div class="panel panel-default">
+                <div class="panel-body mapContainer" id="mapContainer">
+                    	地图
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+<!-- 栏目页 -->
+<div class="blank10"></div>
+<#include '../inc/foot.html'>
+
+<script type="text/javascript" src="${CTX}/res/js/fmcar/plugins/require.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+    require(['./res/js/fmcar/boot'], function () {
+        require(['truck-orders-edit']);
+    });
+</script>
+</body>
+</html>

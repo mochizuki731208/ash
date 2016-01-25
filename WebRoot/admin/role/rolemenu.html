@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/otree/otree.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/otree/otree.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/otree/common.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+  <body>
+	  <form id="myform" name="myform" action="" method="post">
+		  	<input type="hidden" id="roleid" name="roleid" value="${(roleid)!}"/>
+		  	<input type="hidden" id="menuids" name="menuids" value=""/>
+			<input type="button" id="btn_add" class="button" value="授 权" onclick="uf_save();"/>
+			<input type="button" id="btn_query" class="button" value="刷 新" onclick="refresh();" />
+			<div id="tleft" class="tleft" style="overflow: auto;"/>
+			<script type="text/javascript">
+				var TreeData=${str_Script};
+				var otree = new OTree({
+					panel 	: document.getElementById("tleft"),
+					data	: TreeData,
+					isAutoCheckParent:false,
+					isAutoCheckSub:true
+				});
+				otree.paint();
+				otree.expandAll();
+				function ClickEvent(node){
+				       //document.all.p_id.value=node.attributes.id;
+				       //document.all.myform.target="dlist";
+				       //document.all.myform.action="${CTX}/admin/role/listrole";
+				       //document.all.myform.submit();
+					}
+				otree.addListener('click',ClickEvent);
+				
+				function uf_save(){
+					document.all.menuids.value = otree.getCheckeds('id');
+					$.post("${CTX}/admin/role/saverolemenu",$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("所选择的角色授权成功！",function () {
+								refresh();
+					        }).title('3秒后关闭本提示框').time(3);
+						}else{
+							$.dialog.alert("所选择的角色授权失败，请检查操作是否正确！");
+						}
+					});
+				}
+			</script>
+		</form>
+  </body>
+</html>

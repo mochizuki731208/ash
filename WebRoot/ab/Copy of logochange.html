@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			$("#myform").validate({
+				rules: {
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$.post("${CTX}/ab/savelogochange",$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("保存数据成功！",function () {
+								$("#btn_save").attr('value','修改');
+								window.location.href="${CTX}/ab/logochange";
+						    }).time(0.5);
+	                    }
+					});
+				}
+			});
+			
+			//首页图片
+			$('#titleimg').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择头像',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#tb_logo').attr('value',data);
+					$('#imga').html("<img src='${CTX}/upload/"+data+"' style='max-width: 130px;max-height: 100px;'/>");
+                 }
+			});
+		});
+	</script>
+ </head>
+  <body>
+  	<#include 'inc/top.html'>
+	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include 'inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">头像修改</h2>
+			<form id="myform" name="myform" action="" method="post">
+			<input type="hidden" class="text" name="tb_id" value="${(vo.id)!}">
+			<input type="hidden" class="text" id="tb_logo" name="tb_logo" value="${(vo.logo)!}">
+			<table class="input">
+				<tr>
+					<th align="right">名称：</th>
+					<td>${(vo.mc)!}</td>
+				</tr>
+				<tr>
+					<th align="right">头像：</th>
+					<td>
+						<div id="imga">
+							<#if vo.logo?exists>
+								<img src="${CTX}/upload/${(vo.logo)!''}" style="max-width: 50px;max-height:50px;">
+							<#else>
+								<img src="${CTX}/res/images/tx.jpg" style="max-width: 50px;max-height:50px;">
+							</#if>
+						</div>
+						<input type="file" name="titleimg" id="titleimg" multiple="false"/> 
+					</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td><input type="button" id="btn_save" name="btn_save" class="button" value="保存头像"/></td>
+				</tr>
+			</table>
+			</form>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</body>
+</html>

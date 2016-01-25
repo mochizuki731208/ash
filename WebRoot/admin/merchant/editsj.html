@@ -1,0 +1,142 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					tb_mc: {required:true,stringMaxLength:50},
+					tb_sub_id: {required:true},
+					tb_price: {required:true,number:true,decimal:true,min:0},
+					tb_mdprice: {required:true,stringMaxLength:50},
+					tb_jf: {required:true,number:true,decimal:true,min:0},
+					tb_seq_num: {required:true,integer:true,min:0},
+					tb_productinfo: {stringMaxLength:200}
+				}
+			});
+			$('#titleimg').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='img_url' value='"+data+"'/>");
+					$('#imga').append("<img src='${CTX}/upload/"+data+"' width=80px height=60px/>");
+                 }
+			});
+			
+			$('#file_upload').uploadify({
+				swf: '${CTX}/res/js/uploadify/uploadify.swf',
+				uploader: '${CTX}/common/upload',
+				debug:false,
+				multi: true,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+                onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='imgurl' value='"+data+"'/>");
+					$('#myform').append("<input type='hidden' name='imgsize' value='"+file.size+"'/>");
+					$('#myform').append("<input type='hidden' name='imgtype' value='"+file.type+"'/>");
+					$('#myform').append("<input type='hidden' name='imgname' value='"+file.name+"'/>");
+					$('#imgb').append("<img src='${CTX}/upload/"+data+"' width=80px height=60px/>");
+                 }
+			});
+			
+			$("#tb_city_id").change(function () {
+                //清除二级下拉列表
+                $("#tb_area_id").empty();
+                //$("#tb_area_id").append($("<option/>").text("--请选择--").attr("value","-1"));
+                //将选中的一级下拉列表项的id传过去
+                $.getJSON("${CTX}/common/subarea", {p_id:$("#tb_city_id").find("option:selected").val()},function (data) {
+                    //对请求返回的JSON格式进行分解加载
+                    $(data).each(function () {
+                        $("#tb_area_id").append($("<option/>").text(this.mc).attr("value",this.id));
+                    });
+                });
+            });
+		});
+	</script>
+</head>
+  <body>
+    <form id="myform" name="myform" method="post">
+	<input type="hidden" name="tb_id" id="tb_id" value="${(vo.id)!}"/>
+	<input type="hidden" id="tb_lng" name="tb_lng" value="${(vo.lng)!}"/>
+	<input type="hidden" id="tb_lat" name="tb_lat" value="${(vo.lat)!}"/>
+	<input type="hidden" id="tb_city_id" name="tb_city_id" value="${(vo.city_id)!}"/>
+	<input type="hidden" id="tb_city_name" name="tb_city_name" value="${(vo.city_name)!}"/>
+	<input type="hidden" id="tb_area_id" name="tb_area_id" value="${(vo.area_id)!}"/>
+	<input type="hidden" id="tb_area_name" name="tb_area_name" value="${(vo.area_name)!}"/>
+	<input type="hidden" id="tb_xxdz" name="tb_xxdz" value="${(vo.xxdz)!}">
+	
+	<input type="hidden" name="tbuser_id" id="tbuser_id" value="${(tbuser.id)!}"/>
+	<input type="hidden" id="tbuser_role_id" name="tbuser_role_id" value="105"/>
+	<input type="hidden" id="tbuser_role_name" name="tbuser_role_name" value="店铺商家"/>
+	<input type="hidden" id="tbuser_mapbusiness" name="tbuser_mapbusiness" value="${(tbuser.mapbusiness)!}"/>
+	<input type="hidden" id="tb_mapbusiness" name="tb_mapbusiness" value="${(tb.mapbusiness)!}"/>
+	<input type="hidden" id="tbuser_lng" name="tbuser_lng" value="${(tbuser.lng)!}"/>
+	<input type="hidden" id="tbuser_lat" name="tbuser_lat" value="${(tbuser.lat)!}"/>
+	<input type="hidden" id="tbuser_zhlx" name="tbuser_zhlx" value="0"/>
+	<table class="input">
+		<tr>
+			<th align="right">名称：</th>
+			<td colspan="3"><input type="text" name="tb_mc" id="tb_mc" class="text" value="${(vo.mc)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">登录号：</th>
+			<td><input type="text" name="tbuser_loginid" id="tbuser_loginid" class="text" value="${(tbuser.loginid)!}"></td>
+			<th align="right">密码：</th>
+			<td><input type="password" name="tbuser_loginpwd" id="tbuser_loginpwd" class="text" value="${(tbuser.loginpwd)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">邮政编码：</th>
+			<td><input type="text" name="tb_yzbm" id="tb_yzbm" class="text" value="${(vo.yzbm)!}" maxlength="6"></td>
+			<th align="right">详细地址：</th>
+			<td><input type="text" id="tb_xxdz" name="tb_xxdz" class="text" value="${(vo.xxdz)!}" disabled="disabled"></td>
+		</tr>
+		<tr>
+			<th align="right">QQ号码：</th>
+			<td><input type="text" id="tb_qq" name="tb_qq" class="text" value="${(vo.qq)!}"></td>
+			<th align="right">手机号：</th>
+			<td><input type="text" name="tb_mobile" id="tb_mobile" class="text" value="${(vo.mobile)!}" maxlength="11"></td>
+		</tr>
+		<tr>
+			<th align="right">微信号：</th>
+			<td><input type="text" name="tb_weixin" id="tb_weixin" class="text" value="${(vo.weixin)!}"></td>
+			<th align="right">微博号：</th>
+			<td><input type="text" id="tb_weibo" name="tb_weibo" class="text" value="${(vo.weibo)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">商家简介：</th>
+			<td colspan="3"><textarea id="tb_brief" name="tb_brief" class="text">${(vo.brief)!}</textarea></td>
+		</tr>
+		<tr>
+			<th align="right">首页展示图：</th>
+			<td colspan="3">
+				<div id="imga"><#if vo.img_url??><img src="${CTX}/upload/${(vo.img_url)!}" style="width: 80px;height: 60px;"></#if></div>
+			<input type="file" name="titleimg" id="titleimg" multiple="false"/> </td>
+		</tr>
+		<tr>
+			<th align="right">商家图片：</th>
+			<td colspan="3">
+				<div id="imgb">
+					<#list list_img as x>
+					    <img src="${CTX}/upload/${(x.lager)!''}" style="width: 80px;height: 60px;">
+					</#list>
+				</div>
+				<input id="file_upload" name="file_upload" type="file" multiple="true"></td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

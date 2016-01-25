@@ -1,0 +1,217 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+	
+	
+			var currcity = "${(mer.city_name)!}";
+			
+		$().ready(function() {
+			var $inputForm = $("#myform");
+			var wl = '${(wl)!''}';
+			// 表单验证
+			$inputForm.validate({
+				rules: {
+					us_mobile: {required:true,mobile:true,
+						remote:{
+							type:"POST",
+							url:"${CTX}/ab/reg/checkloginid",
+			               	dataType:"json",
+			                data: {
+			                    mobile: function() { return $("#user_mobile").val();}
+			                }
+						}
+					},
+					<#if (us.id)??><#else>
+					us_loginpwd: {required:true,stringCheck:true,rangelength:[6,20]},
+					rpassword: {required:true,equalTo:"#user_loginpwd"},
+					</#if>
+					userSubType: {required:true},
+					mer_mc: {required:true,stringMaxLength:50},
+					mer_city_id: {required:true},
+					mer_area_id: {required:true},
+					mer_xxdz:{required:true,stringMaxLength:100},
+				},
+				messages:{
+					userSubType: {required:"请选择类型！"},
+					us_mobile:{required:"手机号不能为空！",mobile:"请输入合法的手机号！",remote:"该手机号已经被注册，请重新选择！"},
+					<#if (us.id)??><#else>
+					us_loginpwd:{required:"登录密码不能为空！",stringCheck:"长度在6-20之间，只能包含字符、数字和下划线。",rangelength:"长度在6-20之间，只能包含字符、数字和下划线"},
+					rpassword:{required:"确认密码不能为空！",equalTo:"两次输入的密码不一致！"},
+					</#if>
+					mer_mc:{required:"商家名称不能为空！",stringMaxLength:"最长不超过50个字符！"},
+					mer_city_id:{required:"请选择城市！"},
+					mer_area_id:{required:"请选择商圈！"},
+					mer_xxdz:{required:"详细地址不能为空！",stringMaxLength:"长度不能超过100个字符"},
+				}
+			});
+			
+			$.post("${CTX}/ab/subject/getSubSubject",{userType: '1020'},function(data){
+				$.each(data,function(i,o){
+					$("#userSubType").append($("<option value='" + o.id + "'>" + o.mc + "</option>"))
+				});
+				<#if (mer.id)??>$("#userSubType option[value='${(mer.subject_id)}']").attr("selected", true);  </#if>
+			});
+			
+			$("#btn_save").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$("#mer_city_name").attr('value',$("#mer_city_id").find("option:selected").text());
+					$("#mer_area_name").attr('value',$("#mer_area_id").find("option:selected").text());
+					$.post("${CTX}/admin/logi/savemer",$("#myform").serializeArray(),function(data){
+	                    if(data){
+							alert("保存成功！");
+	                    	window.location.href="${CTX}/admin/logi/list";
+						}else {
+	                    	alert("保存失败！");
+	                    }
+					});
+				}
+			});
+				
+			$("#mer_city_id").change(function () {
+				currcity = $("#mer_city_id").find("option:selected").text();
+				initMap();
+                //清除二级下拉列表
+                $("#mer_area_id").empty();
+                //$("#mer_area_id").append($("<option/>").text("--请选择--").attr("value","-1"));
+                //将选中的一级下拉列表项的id传过去
+                $.getJSON("${CTX}/common/subarea", {p_id:$("#mer_city_id").find("option:selected").val()},function (data) {
+                    //对请求返回的JSON格式进行分解加载
+                    $(data).each(function () {
+                        $("#mer_area_id").append($("<option/>").text(this.mc).attr("value",this.id));
+                    });
+                });
+            });
+			
+			//首页图片
+			$('#titleimg').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#mer_img_url').val(data);
+					$('#imga').append("<img src='${CTX}/upload/"+data+"' width=130px height=100px/>");
+                 }
+			});
+			
+			<#if (mer.xxdz)??>
+			<#else>
+			initMap();
+			</#if>
+		});
+		
+		function initMap() {
+		var map = new BMap.Map("container");
+		map.centerAndZoom(currcity, 13);
+			var localSearch = new BMap.LocalSearch(map);
+			var ac = new BMap.Autocomplete(
+				//建立一个自动完成的对象
+		    	{"input" : "mer_xxdz","location" : map,location:currcity}
+		    );
+			ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+			    //计算距离
+			    var _value = e.item.value;
+				$("#user_mapbusiness").attr('value',_value.business);
+				$("#mer_xxdz").attr('value',_value.business);
+				localSearch.search(_value.business);
+			    localSearch.setSearchCompleteCallback(function (searchResult) {
+			　　　　var poi = searchResult.getPoi(0);
+				  $("#user_lng").attr('value', poi.point.lng);
+				  $("#user_lat").attr('value', poi.point.lat);
+				  $("#mer_lng").attr('value', poi.point.lng);
+				  $("#mer_lat").attr('value', poi.point.lat);
+			　　});
+			});
+			}
+	</script>	
+ </head>
+  <body>
+  <div id="container" style="display: none;"></div>
+	<!-- 用户注册 -->
+	<div class="registeruser">
+		<form id="myform" name="myform" action="${CTX}/admin/logi/savemer" method="post">
+		<input type="hidden" id="checkcode" name="checkcode" value=""/>
+		
+		<input type="hidden" id="user_id" name="us_id" value="${(us.id)!}"/>
+		<input type="hidden" id="user_role_id" name="us_role_id" value="105"/>
+		<input type="hidden" id="user_role_name" name="us_role_name" value="店铺商家"/>
+		<input type="hidden" id="user_mapbusiness" name="us_mapbusiness" value="${(us.mapbusiness)!}"/>
+		<input type="hidden" id="user_lng" name="us_lng" value="${(us.lng)!}"/>
+		<input type="hidden" id="user_lat" name="us_lat" value="${(us.lat)!}"/>
+		<input type="hidden" id="mer_lng" name="mer_lng" value="${(mer.lng)!}"/>
+		<input type="hidden" id="mer_lat" name="mer_lat" value="${(mer.lat)!}"/>
+		
+		<!--
+		<input type="hidden" id="user_zhlx" name="us_zhlx" value="1020"/>
+		<input type="hidden" id="mer_subject_id" name="mer_subject_id" value="1020"/>
+		<input type="hidden" id="mer_subject_name" name="mer_subject_name" value="${(subject.mc)!''}"/>
+		<input type="hidden" id="mer_is_type" name="mer_is_type" value="${(subject.is_type)!''}"/>
+		-->
+		
+		<input type="hidden" class="text" name="mer_id" value="${(mer.id)!}">
+		<input class="text" name="mer_sfzs" type="hidden" value="1" /> 
+				<input class="text" name="mer_business_status" type="hidden" value="1" /> 
+				<input class="text" name="mer_zdpsje" type="hidden" value="0" /> 
+				<input class="text" name="mer_chk_fgzrxd" type="hidden" value="1" />
+				<input type="hidden" id="mer_img_url" name='mer_img_url' value="${(mer.img_url)!}"/>
+				
+		<table width="800px;" style="margin-left: 100px;" align="center" class="input">
+			<tr>
+				<td colspan="4"><h1>供应商注册：<span style="line-height: 30px;color: black;font-size: 14px;">&nbsp;&nbsp;物流企业注册</span></h1></td>
+			</tr>
+			
+			
+			<tr>
+				<th>企业名称：<font color="red">*</font></th>
+				<td><input class="text" id="mer_mc" name="mer_mc" type="text" style="width: 400px;" value="${(mer.mc)!}"/></td>
+				<th>物流企业负责人：<font color="red">*</font></th>
+				<td><input class="text" id="logi_chief" name="logi_chief" type="text" value="${(logi.chief)!}"/></td>
+			</tr>
+			<tr>
+				<th>详细地址：<font color="red">*</font></th>
+				<td><input class="text" id="mer_xxdz" name="mer_xxdz"  value="${(mer.xxdz)!}" type="text" style="width: 400px;"/></td>
+				<th align="right">服务热线：<font color="red">*</font></th>
+					<td><input type="text" class="text"  name="logi_servhotline" value="${(logi.servhotline)!}"></td>
+			</tr>
+				<tr>
+				<th align="right">邮政编码：</th>
+					<td><input type="text" class="text" name="mer_yzbm" value="${(mer.yzbm)!}" maxlength="6"></td>
+				<th align="right">QQ号码：</th>
+					<td><input type="text" class="text"  name="mer_qq" value="${(mer.qq)!}"></td>
+				</tr>
+				<tr>
+					<th align="right">微博：</th>
+					<td><input type="text" class="text"  name="mer_weibo" value="${(mer.weibo)!}"></td>
+					<th align="right">微信：</th>
+					<td><input type="text" class="text"  name="mer_weixin" value="${(mer.weixin)!}"></td>
+				</tr>
+				<tr>
+					<th >商家介绍：<font color="red">*</font></th>
+					<td><textarea class="text" id="mer_brief" name="mer_brief" style="width: 550px;height: 100px;">${(mer.brief)!}</textarea></td>
+					<th align="right">LOGO展示图：</th>
+					<td>
+						<div id="imga"><#if (mer.img_url)??><img src="${CTX}/upload/${(mer.img_url)!''}" style="width: 130px;height: 100px;"></#if></div>
+						<input type="file" name="titleimg" id="titleimg" multiple="false"/> 
+					</td>
+				</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td colspan="3"><input type="button" id="btn_save" name="btn_save" class="button" value="保 存"/></td>
+			</tr>
+		</table>
+		</form>
+		
+	</div>
+	</body>
+</html>

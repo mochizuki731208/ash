@@ -1,0 +1,273 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			// 表单验证
+			$("#myform").validate({
+				rules: {
+					tb_mc: {required:true},
+					tb_zhlx:{required:true},
+					tb_mobile: {required:true,mobile:true},
+					tb_loginid: {required:true,mobile:true,
+						remote:{
+							type:"POST",
+							url:"${CTX}/common/checkloginid",
+			               	dataType:"json",
+			                data: {
+			                    id: function() { return $("#tb_id").val();},
+			                    loginid: function() { return $("#tb_loginid").val();}
+			                }
+						}
+					},
+					tb_loginpwd: {required:true,stringMinLength:6,rangelength:[6,32]},
+					tb_city_id: {required:true},
+					tb_area_id: {required:true}
+				},
+				messages:{
+					tb_mc:{required:"企业名称不能为空！"},
+					tb_loginid:{required:"登录号不能为空！",remote:"该手机号已经被注册，请重新选择！"},
+					tb_loginpwd:{required:"密码不能为空！"},
+					tb_city_id:{required:"请选择城市！"},
+					tb_area_id:{required:"请选择商圈！"}
+				}
+	        });
+	            
+			$('#yyzscsfzzp').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_yyzscsfzzp").attr('value',data);
+					$('#img_yyzscsfzzp').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+			
+			$('#yyzzsmj').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_yyzzsmj").attr('value',data);
+					$('#img_yyzzsmj').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+			
+			$("#tb_city_id").change(function () {
+                //清除二级下拉列表
+                $("#tb_area_id").empty();
+                //$("#mer_area_id").append($("<option/>").text("--请选择--").attr("value","-1"));
+                //将选中的一级下拉列表项的id传过去
+                $.getJSON("${CTX}/common/subarea", {p_id:$("#tb_city_id").find("option:selected").val()},function (data) {
+                    //对请求返回的JSON格式进行分解加载
+                    $(data).each(function () {
+                        $("#tb_area_id").append($("<option/>").text(this.mc).attr("value",this.id));
+                    });
+                });
+            });
+            //added by mochizuki 2015/9/29
+            
+			$("#tb_zhlx").change(function(){
+			    //这里视数据库具体数值修改
+				if($("#tb_zhlx").val()=="10181003"){
+					$("#tptxt1").html("身份证正面扫描件：");
+					$("#tptxt2").html("身份证背面扫描件：");
+					$("#zp_yyzz1").hide();
+					$("#zp_yyzz2").hide();
+					$("#zp_sfz1").show();
+					$("#zp_sfz2").show();
+					
+				}else{
+					$("#tptxt1").html("营业执照扫描件：");
+					$("#tptxt2").html("运营者手持身份证照片：");
+					$("#zp_yyzz1").show();
+					$("#zp_yyzz2").show();
+					$("#zp_sfz1").hide();
+					$("#zp_sfz2").hide();
+				
+				}
+				
+			});
+			var info = {};
+			var currcity = "${(currcity.mc)!}";
+			var map = new BMap.Map("container");
+			//map.centerAndZoom(currcity, 13);
+			var localSearch = new BMap.LocalSearch(map);
+			var ac = new BMap.Autocomplete(
+				//建立一个自动完成的对象
+		    	{"input" : "new_xxdz","location" : map}
+		    );
+			ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+			    //计算距离
+			    var _value = e.item.value;
+				$("#tb_mapbusiness").attr('value',_value.business);
+				$("#tb_xxdz").attr('value',$("#new_xxdz").val());
+				
+			    localSearch.search(_value.business);
+			    localSearch.setSearchCompleteCallback(function (searchResult) {
+			　　　　var poi = searchResult.getPoi(0);
+				  $("#tb_lng").attr('value', poi.point.lng);
+				  $("#tb_lat").attr('value', poi.point.lat);
+			　　});
+			});
+			$("#zp_yyzz1").show();
+			$("#zp_yyzz2").show();
+			$("#zp_sfz1").hide();
+			$("#zp_sfz2").hide();
+			
+		});
+	</script>
+</head>
+  <body>
+  	 <form id="myform" name="myform" action="${CTX}/ab/reg/saveywyrz" method="post">
+	  	 <input type="hidden" id="tb_id" name="tb_id" value="${(vo.id)!}">
+	  	 <input type="hidden" id="tb_role_id" name="tb_role_id" value="107">
+	  	 <input type="hidden" id="tb_role_name" name="tb_role_name" value="会员">
+		 <input type="hidden" id="tb_yyzscsfzzp" name="tb_yyzscsfzzp" value="${(vo.yyzscsfzzp)!}">
+		 <input type="hidden" id="tb_yyzzsmj" name="tb_yyzzsmj" value="${(vo.yyzzsmj)!}">
+		 <input type="hidden" id="tb_lng" name="tb_lng" value="${(vo.lng)!}">
+		 <input type="hidden" id="tb_lat" name="tb_lat" value="${(vo.lat)!}">
+		 <input type="hidden" id="oldpwd" name="oldpwd" value="${(vo.loginpwd)!}">
+		 <input type="hidden" id="tb_xxdz" name="tb_xxdz" value="${(vo.xxdz)!}">
+		 <input type="hidden" id="tb_mapbusiness" name="tb_mapbusiness" value="${(vo.mapbusiness)!}">
+		<table class="input">
+		<tr>
+			<th align="right">用户名(手机号)：</th>
+			<td><input type="text" name="tb_loginid" id="tb_loginid" class="text" value="${(vo.loginid)!}"></td>
+			<th align="right">密码：</th>
+			<td><input type="password" name="tb_loginpwd" id="tb_loginpwd" class="text" value="${(vo.loginpwd)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">企业名称：</th>
+			<td><input type="text" name="tb_mc" id="tb_mc" class="text" value="${(vo.mc)!}"></td>
+			<th align="right">账户余额：</th>
+			<td><input type="text" name="tb_zhye" id="tb_zhye" class="text" value="${(vo.zhye)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">所属城市：</th>
+			<td>
+				<input class="text" id="tb_city_name" name="tb_city_name" type="hidden" value="${(vo.city_name)!}"/>
+				<select name="tb_city_id" id="tb_city_id" style="width: 205px;" >
+					<option value="">请选择...</option>
+					<@_cityarea_list p_id='ROOT'>
+		      			<#list list as t>
+			      			<#if t.hassub==0>
+			      				<option value="${(t.id)!}" <#if strkit((vo.city_id)!,t.id)>selected</#if>>${(t.mc)!}</option>
+			      			<#else>
+				      			<optgroup label="${(t.mc)!}">
+				      				<@_cityarea_list p_id=t.id>
+						      			<#list list as sub>
+						      			<option value="${(sub.id)!}" <#if strkit((vo.city_id)!,sub.id)>selected</#if>>${(sub.mc)!}</option>
+						      			</#list>
+									</@_cityarea_list>
+				      			</optgroup>
+			      			</#if>
+		      			</#list>
+					</@_cityarea_list>
+				</select>
+			</td>
+			<th align="right">所属商圈：</th>
+			<td>
+				<input class="text" id="tb_area_name" name="tb_area_name" type="hidden" value="${(vo.area_name)!}"/>
+				<select name="tb_area_id" id="tb_area_id" style="width: 205px;" >
+					<#if (vo.area_id)??>
+					<option value="${(vo.area_id)!}">${(vo.area_name)!}</option>
+					<#else>
+					<option value="">请选择</option>
+					</#if>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">营业执照注册号：</th>
+			<td><input type="text" name="tb_yyzzzch" id="tb_yyzzzch" class="text" value="${(vo.yyzzzch)!}"></td>
+			<th align="right">组织机构代码证号：</th>
+			<td><input type="text" name="tb_zzjgdm" id="tb_zzjgdm" class="text" value="${(vo.zzjgdm)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">运营者身份证明：</th>
+			<td><input type="text" name="tb_yyzsfzm" id="tb_yyzsfzm" class="text" value="${(vo.yyzsfzm)!}"></td>
+			<th align="right">运营者身份证号码：</th>
+			<td><input type="text" name="tb_yyzsfzh" id="tb_yyzsfzh" class="text" value="${(vo.yyzsfzh)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">地址：</th>
+			<td colspan="3">
+			<#if (vo.xxdz)??>
+			已输入地址：${(vo.xxdz)!}<br/>
+			新地址：
+			</#if>
+			<input type="text" name="new_xxdz" id="new_xxdz" class="text" style="width: 400px;" value="${(vo.xxdz)!}"></td>
+		</tr>
+		<tr>
+			<!-- <th align="right">企业邮箱：</th>
+			<td><input type="text" name="tb_email" id="tb_email" class="text" value="${(vo.email)!}"></td> -->
+			<th align="right">货源类型</th>
+			<td>
+				<select name="tb_zhlx" id="tb_zhlx">
+				<option value="">请选择</option>
+				<optgroup label="货源会员">
+					<#list subject_list as x>
+				    	<option value="${(x.id)!''}" <#if strkit((x.id)!'',(vo.zhlx)!)>selected</#if>>${(x.mc)!''}</option>
+					</#list>
+				</optgroup>
+			</td>
+		</tr>
+		<tr>
+			<td align="right" id="tptxt1">营业执照扫描件：</td>
+			<td>
+            	<div id="zp_yyzz1">
+				<#if (vo.yyzzsmj)??>
+					<img src="${CTX}/upload/${(vo.yyzzsmj)!}"  width= "150px" height="150px"  id="img_yyzzsmj"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/yyzz.png" width= "150px" height="150px"  id="img_yyzzsmj"/>
+				</#if>
+				<input type="file" name="yyzzsmj" id="yyzzsmj" multiple="false"/> 
+                </div>
+                <div id="zp_sfz1">
+                <#if (vo.sfzzpzm)??>
+					<img src="${CTX}/upload/${(vo.sfzzpzm)!}"  width= "150px" height="150px"  id="img_sfzzpzm"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/sf.png" width= "150px" height="150px"  id="img_sfzzpzm"/>
+				</#if>
+				<input type="file" name="sfzzpzm" id="sfzzpzm" multiple="false"/> 
+
+                </div>
+			</td>
+			<td align="right" id="tptxt2">运营者手持身份证照片：</td>
+			<td>
+            	<div id="zp_yyzz2">
+				<#if (vo.yyzscsfzzp)??>
+					<img src="${CTX}/upload/${(vo.yyzscsfzzp)!}"  width= "150px" height="150px"  id="img_yyzscsfzzp"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/sf.png" width= "150px" height="150px"  id="img_yyzscsfzzp"/>
+				</#if>
+				<input type="file" name="yyzscsfzzp" id="yyzscsfzzp" multiple="false"/> 
+                </div>
+                <div id="zp_sfz2">
+                <#if (vo.sfzzpbm)??>
+					<img src="${CTX}/upload/${(vo.sfzzpbm)!}"  width= "150px" height="150px"  id="img_sfzzpbm"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/sf1.png" width= "150px" height="150px"  id="img_sfzzpbm"/>
+				</#if>
+				<input type="file" name="sfzzpbm" id="sfzzpbm" multiple="false"/> 
+
+                </div>
+			</td>
+		</tr>
+	</table>
+  </body>
+</html>
+

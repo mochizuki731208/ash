@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					tb_xq: {required:true},
+					tb_sbsj: {required:true},
+					tb_xbsj: {required:true}
+				}
+			});
+		});
+	</script>
+</head>
+  <body style="margin-top: 30px;">
+    <form id="myform" name="myform" method="post">
+	<input type="hidden" name="tb_id" id="tb_id" value="${(vo.id)!}"/>
+	<input type="hidden" name="tb_mid" id="tb_mid" value="${(vo.mid)!}"/>
+	<input type="hidden" name="tb_mname" id="tb_mname" value="${(vo.mname)!}"/>
+	<table class="input">
+		<tr>
+			<th align="right">星期选择：</th>
+			<td>
+				<select id="tb_xq" name="tb_xq" style="width:150px;" class="required">
+						<option value="">请选择</option>
+						<option value="1" <#if (((vo.xq)!) == 1)>selected="selected"</#if> >星期一</option>
+						<option value="2" <#if (((vo.xq)!) == 2)>selected="selected"</#if> >星期二</option>
+						<option value="3" <#if (((vo.xq)!) == 3)>selected="selected"</#if> >星期三</option>
+						<option value="4" <#if (((vo.xq)!) == 4)>selected="selected"</#if> >星期四</option>
+						<option value="5" <#if (((vo.xq)!) == 5)>selected="selected"</#if> >星期五</option>
+						<option value="6" <#if (((vo.xq)!) == 6)>selected="selected"</#if> >星期六</option>
+						<option value="7" <#if (((vo.xq)!) == 7)>selected="selected"</#if> >星期日</option>
+				</select>
+			<font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">营业时间从：</th>
+			<td><input class="Wdate" id="tb_sbsj" name="tb_sbsj" value="${(vo.sbsj)!}" onclick="WdatePicker({skin:'whyGreen',dateFmt:'HH:mm:ss'})" /><font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">至：</th>
+			<td><input class="Wdate" id="tb_xbsj" name="tb_xbsj" value="${(vo.xbsj)!}" onclick="WdatePicker({skin:'whyGreen',dateFmt:'HH:mm:ss'})" /><font color="red">*</font></td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			$("#btn_save").click(function(){
+				$.post("${CTX}/ab/mer/${save_action}",$("#myform").serializeArray(),function(data){
+                    if(data){
+                    	$.dialog.alert("保存数据成功！",function () {
+							$("#btn_save").attr('value','修改');
+							window.location.href="${CTX}/ab/mer/${edit_action}";
+					    }).time(0.5);
+                    } else {
+                    	alert("保存数据失败！");
+                    }
+				});
+			});
+			
+			<#list 1..8 as x>
+			$('#fileimg0${x!}').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#imgurl0${x!}').val(data);
+					$('#imgsize0${x!}').val(file.size);
+					$('#imgtype0${x!}').val(file.type);
+					$('#imgname0${x!}').val(file.name);
+					$('#imga0${x!}').append("<img src='${CTX}/upload/"+data+"' width=130px height=100px/>");
+                 }
+			});
+			</#list>
+		});
+	</script>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">${title!}</h2>
+			<form id="myform" name="myform" action="#" method="post">
+			<input type="hidden" class="text" name="mc_id" value="${(vo.id)!}">
+			<input type="hidden" class="text" name="lo_id" value="${(lo.id)!}">
+			<table class="input">
+				<#list 1..8 as x>
+					<@_mer_logimg lid=lo.id num=x desc=imgdesc>
+					<tr>
+						<th align="right">${subtitle!}${x!}：</th>
+						<td width="200px">
+							<input type="text" name="imgurl0${x!}" id="imgurl0${x!}" <#if img??>value="${(img.lager)!}"</#if>/>
+							<input type="hidden" name="imgsize0${x!}" id="imgsize0${x!}"/>
+							<input type="hidden" name="imgtype0${x!}" id="imgtype0${x!}" <#if img??>value="${(img.type_name)!}"</#if>/>
+							<input type="hidden" name="imgname0${x!}" id="imgname0${x!}"/>
+						</td>
+						<td width="100px"><input type="file" name="fileimg0${x!}" id="fileimg0${x!}" multiple="false"/> </td>
+						<td>
+							<div id="imga0${x!}">
+							<#if img??><img src="${CTX}/upload/${(img.lager)!''}" style="width: 130px;height: 100px;"></#if>
+							</div>
+						</td>
+					</tr>
+					</@_mer_logimg>
+					</#list>
+					<tr>
+						<td>&nbsp;</td>
+						<td><input type="button" id="btn_save" name="btn_save" class="button" value="保 存"/></td>
+					</tr>
+			</table>
+			</form>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

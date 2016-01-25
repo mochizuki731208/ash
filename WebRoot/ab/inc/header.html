@@ -1,0 +1,513 @@
+<link rel="stylesheet" type="text/css" href="${CTX}/res/js/comm/common.css" />
+
+<!-- 搜索栏 -->
+	
+<script type="text/javascript"
+	src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+<script type="text/javascript"
+	src="${CTX}/res/js/comm/common.js"></script>    
+<script type="text/javascript" src="${CTX}/res/js/comm/jquery.validate.min.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/comm/jquery.validate.custom.js"></script>
+<script type="text/javascript">
+	function querykeyword() {
+		$('#queryform').action = "${CTX}/ab/listitemquery";
+		$('#queryform').target = "_self";
+		$('#queryform').submit();
+	}
+	
+	function querykeyword(kw) {
+		$('#keyword').attr('value', kw);
+		$('#queryform').action = "${CTX}/ab/listitemquery";
+		$('#queryform').target = "_self";
+		$('#queryform').submit();
+	}
+	
+	function toubao() {
+		$('#queryform').attr("action","${CTX}/admin/dd/issued_policy").submit();
+	}
+	// 询价
+	function askprice() {
+		$('#queryform').attr("action","${CTX}/ab/logi/askPrice").submit();
+		/*
+		$.dialog({
+			width:"200px",
+			height:"100px", 
+		    id: 'ask_price',
+		    max: false,
+		    min: false,
+		    drag: false,
+		    resize: false,
+		    title: '询价',
+		    content: '请选择您的询价对象!',
+		    button: [
+		        {
+		            name: '物流公司',
+		            callback: function () {
+		            	$("<form>").attr("action","${CTX}/ab/logi/askPrice").submit();
+		            	return false;
+		            },
+		            focus: true
+		        },
+		        {
+		            name: '司机',
+		            callback: function () {
+		            	$("<form>").attr("action","${CTX}/ab/order/mapTrucks").submit();
+		            	return false;
+		            }
+		        }
+		    ]
+		});*/
+	}
+</script>
+
+<script type="text/javascript"
+	src="${CTX}/res/ss/jquery.SuperSlide.2.1.1.js"></script>
+<style>
+.slideTxtBox {
+	width: 650px;
+	text-align: left;
+}
+
+.slideTxtBox .hd {
+	height: 30px;
+	line-height: 30px;
+	padding: 0 20px;
+	position: relative;
+}
+
+.slideTxtBox .hd ul {
+	float: left;
+	position: absolute;
+	left: 20px;
+	top: -1px;
+	height: 32px;
+}
+
+.slideTxtBox .hd ul li {
+	float: left;
+	padding: 0 15px;
+	cursor: pointer;
+}
+
+.slideTxtBox .hd ul li.on {
+	height: 32px;
+    background: #FF7F24;
+    border-bottom: 2px solid #fff;
+}
+
+.slideTxtBox .bd ul {
+	zoom: 1;
+}
+
+.slideTxtBox .bd li {
+	height: 34px;
+	line-height: 34px;
+}
+
+.slideTxtBox .bd li .date {
+	float: right;
+	color: #999;
+}
+</style>
+<!--[if IE]>
+<style>
+
+.article { width:900px; display:table; margin:20px auto; padding:20px; border:#a2a2a2 1px solid; text-align:left; }
+
+.article img { max-width:865px; }
+.article .body {width:900px;margin: 0;}
+
+</style>
+<![endif]-->
+<div class="topPart">
+	<div class="pagecontainer">
+		<div class="logo">
+			<a href="${CTX}/">
+				<img src="${CTX}/res/css/ab/images/logo.png" width="210" height="80">
+			</a>
+		</div>
+		<div class="changecity">&nbsp;</div>
+		<div class='searchBar'>
+			<div class="header_search pr vm">
+
+				<div class="slideTxtBox">
+					<div id = "slideTxtBoxhd" class="hd">
+						<ul>
+							<li class="on">运单查询</li>
+							<li>路线</li>
+							<li>物流企业</li>
+							<li>店铺</li>
+						</ul>
+					</div>
+					<div id = "slideTxtBoxbd" class="bd">
+						<ul>
+							<li class="libd" >
+								<form class="pr f0" id="queryform" name="queryform" method="post" action="${CTX}/ab/order/ordermap">
+									<input id="keyword3" name="keyword3" type="text" class="keyword vm"  value="${(keyword3)!}" placeholder="请输入类似右侧的运单号，如：756824193" />
+									<span style="padding-left:15px;"><input type="submit" id="fsubmit" onclick="" value="搜索" class="fsubmit vm" />
+									<span style="padding-left:15px;"><input type="button" id="apubmit" onclick="toubao();" value="投保" class="fsubmit vm" />
+								</form>
+							</li>
+							<li class="libd" style="display:none;">
+							<form class="pr f0" id="queryform" name="queryform"
+									method="post" action="${CTX}/ab/logi/index1"">
+					            	<div class="area-tab" id="startArea" style="top: 45px; left: 470px; display: none;"></div>
+					            	<div class="area-tab" id="endArea" style="top: 45px; left: 470px; display: none;"></div>
+									<input type="hidden" id="findtype" name="findtype" value="${(findtype)!}" /> 
+						
+									<div class='keyword' style='float:left; display:inline;border:3px solid #ff7f24'>
+										<!-- 									
+										<input style='width:130px;font-size:12px;margin-top:5px' data-action="0" id="startAreaId" name="order_start_city_name" type="text" class="keyword2 vm" id="whatNew" value="${(from)!}"  placeholder="出发地" /> ——
+										 -->							
+		 
+									 	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/citys.css" />
+										<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/select-city.min.css" />
+										<script type="text/javascript" src="${CTX}/res/js/fmcar/plugins/require.js"></script>
+										<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>	
+		 
+									    <div style="padding-left:0px;float:left;width:140px;display:inline;margin-top:2px" class="col-xs-4 addrselector">
+											<input data-val="true" data-val-number="字段 ToProvinceCode 必须是一个数字。" data-val-required="ToProvinceCode 字段是必需的。" id="depProvinceCode" name="order_start_province_code" value="${(order.start_province_code)!''}" type="hidden">
+											<input id="depProvinceName"  name="order_start_province_name" value="${(start_province_name)!''}"  type="hidden">
+											<input data-val="true" data-val-number="字段 ToCityCode 必须是一个数字。" data-val-required="ToCityCode 字段是必需的。" id="depCityCode"  name="order_start_city_code" value="${(order.start_city_code)!''}"  type="hidden">
+											<input id="depCityName"  name="order_start_city_name" value="${(start_city_name)!''}"   type="hidden">
+											<input data-val="true" data-val-number="字段 ToCountyCode 必须是一个数字。" id="depCountyCode"  name="order_start_county_code" value="${(order.start_county_code)!''}"   type="hidden">
+											<input id="depCountyName"  name="order_start_county_name" value="${(start_county_name)!''}"  type="hidden" value="">
+									     </div>
+								 
+										<div style='display:inline;float: left;margin-top:5px;margin-right:1px;background-image:split.png'>
+										 	<img src="${CTX}/res/css/ab/images/split.png" style='margin-left:-15px'/>
+										</div>
+	 
+										<!--  
+										<input style='width:130px;font-size:12px;margin-top:5px' data-action="1" id="endAreaId" name="order_arr_city_name" type="text" class="keyword2 vm" id="whatNew" value="${(to)!}"  placeholder="目的地" /> 
+										 -->
+	
+										<div style="padding-left:0px;float:left;width:140px;display:inline;margin-top:2px" class="col-xs-4 addrselector">
+											<input data-val="true" data-val-number="字段 ToProvinceCode 必须是一个数字。" data-val-required="ToProvinceCode 字段是必需的。" id="ToProvinceCode" name="order_arr_province_code" value="${(order.arr_province_code)!''}" type="hidden">
+			                                <input id="ToProvinceName"  name="order_arr_province_name" value="${(arr_province_name)!''}"  type="hidden">
+			                                <input data-val="true" data-val-number="字段 ToCityCode 必须是一个数字。" data-val-required="ToCityCode 字段是必需的。" id="ToCityCode"  name="order_arr_city_code" value="${(order.arr_city_code)!''}"  type="hidden">
+			                                <input id="ToCityName"  name="order_arr_city_name" value="${(arr_city_name)!''}"   type="hidden">
+			                                <input data-val="true" data-val-number="字段 ToCountyCode 必须是一个数字。" id="depCountyCode"  name="order_arr_county_code" value="${(order.arr_county_code)!''}"   type="hidden">
+			                                <input id="ToCountyName"  name="order_arr_county_name" value="${(arr_county_name)!''}"  type="hidden" value="">
+			                            </div>									
+									</div>
+									<!--  
+									<input  data-action="0" id="startAreaId" name="from" type="text"  class="keyword2 vm" id="whatNew" value="${(from)!}"  placeholder="出发地" /> ——
+									<input data-action="1" id="endAreaId" name="to" type="text"  class="keyword2 vm" id="whatNew" value="${(to)!}"  placeholder="目的地" /> 
+									-->
+									<span style="padding-left:15px;"/>
+									<input type="submit" id="fsubmit" onclick="" value="搜索" class="fsubmit vm" />
+									<span style="padding-left:15px;"/>
+									<!-- <input type="button" id="apubmit" onclick="askprice();" value="询价" class="fsubmit vm" /> -->
+									<input type="button" id="apubmit" onclick="toubao();" value="投保" class="fsubmit vm" />
+								</form>
+							</li>
+							<li class="libd" style="display:none;"><form class="pr f0" id="queryform" name="queryform"
+									method="post" action="${CTX}/ab/logi">
+									<input type="hidden" id="findtype" name="findtype" value="${(findtype)!}" /> 
+									<input id="keyword" name="loginame" type="text" class="keyword vm" id="whatNew" value="${(loginame)!}" placeholder="搜索物流企业" /> 
+									<span style="padding-left:15px;"/>
+									<input type="submit" id="fsubmit" onclick="querykeyword();" value="搜索" class="fsubmit vm" />
+									<span style="padding-left:15px;"/>
+									<!-- <input type="button" id="apubmit" onclick="askprice();" value="询价" class="fsubmit vm" /> -->
+									<input type="button" id="apubmit" onclick="toubao();" value="投保" class="fsubmit vm" />
+									<span style="padding-left:15px;">
+								</form>
+							</li>
+							<li class="libd" style="display:none;"><form class="pr f0" id="queryform" name="queryform"
+									method="post" action="${CTX}/ab/listitemquery">
+									<input type="hidden" id="findtype" name="findtype" value="${(findtype)!}" /> 
+									<input id="keyword" name="keyword" type="text" class="keyword vm" id="whatNew" value="${(keyword)!}" placeholder="搜索商家、商品" /> 
+									<input type="submit" id="fsubmit" onclick="querykeyword();" value="搜 索" class="fsubmit vm" />
+									<span style="padding-left:15px;"/>
+									<!-- <input type="button" id="apubmit" onclick="askprice();" value="询价" class="fsubmit vm" /> -->
+									<input type="button" id="apubmit" onclick="toubao();" value="投保" class="fsubmit vm" />
+									<span style="padding-left:15px;"/>
+								</form>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+
+			</div>
+		</div>
+		<div class="clear"></div>
+	</div>
+<script type="text/javascript">
+	
+(function(){
+	//$("#slideTxtBoxbd ul li").eq(1).hide();
+	//$("#slideTxtBoxbd ul li").eq(2).hide();
+	//$("#slideTxtBoxbd ul li").eq(3).hide();
+	
+	$('#slideTxtBoxhd ul li').bind({
+    'mouseover' : function(){
+        //获取当前元素的索引值
+        index = $(this).index();
+        //执行函数,这里会显示右侧的第一个div元素
+        $("#slideTxtBoxbd ul li").each(function(i){
+        	if(i!=index){
+        	    $("#slideTxtBoxbd ul li.libd").eq(i).hide();
+        	    $("#slideTxtBoxhd ul li").eq(i).removeClass("on");	
+        	}else{
+        	    $("#slideTxtBoxhd ul li").eq(i).addClass("on");	
+        	    $("#slideTxtBoxbd ul li.libd").eq(i).show();
+        	}
+        });          
+    },
+    'mouseout' : function(){
+        //鼠标划开时的操作
+        //index = $(this).index();
+        //$("#slideTxtBoxbd ul li").eq(index).hide();
+    }
+    });
+    
+		
+}()); 
+
+
+</script>	
+
+<script type="text/javascript">
+	(function (n, $) {
+		ZXB.AreaQuery = {
+			areaSelects: {
+				selects: [],
+				init: function () {
+					var options = [],
+							$txtId = ["#startAreaId", "#endAreaId"],
+							areaID = ["#startArea", "#endArea"];
+					var selectNums = areaID.length;
+					function getArea()
+					{	
+						var da = ZXB.DATA.areaData;
+						return da;
+					}
+					for (var i = 0; i < selectNums; i++) {
+						var source =getArea();
+						if(i==1)
+						{
+							source = ZXB.DATA.areaData;
+						}
+						(function (idx) {
+							options[idx] = {
+								grade: 3,
+								gg:2,
+								cGrade: 1,
+								$txtId: $txtId[idx],
+								codes: [],
+								source: source,
+								onCodesChange: function (codes) {
+									var selector = ZXB.AreaQuery.areaSelects.selects[idx];
+									ZXB.AreaQuery.areaSelects._fillArea(idx, codes, selector.getAddressList());
+									if (selector.isTxtAvailable() && selector.isCodesComplete()) {
+										selector.clearTip();
+									}
+								   
+								},
+								afterClose: function (codes) {
+								   // var selector = ZXB.AreaQuery.areaSelects.selects[idx];
+								   // ZXB.AreaQuery.areaSelects._fillArea(idx, codes, selector.getAddressList());
+								},
+								onItemClick: function (txt) {
+									//txt.prev("label").text("");
+								}
+							};
+							ZXB.AreaQuery.areaSelects.selects[idx] = ZXB.Widget.getAreaSelect(areaID[idx], options[idx]);
+							ZXB.AreaQuery.areaSelects.selects[idx].init();
+							$($txtId[idx]).focus(function () {
+								var action = $(this).attr("data-action");
+								for (var j = 0; j < selectNums; j++) {
+									if (j != action) {
+										ZXB.AreaQuery.areaSelects.selects[j].close();
+									}
+								}
+							});
+						})(i);//调用时参数
+					}
+					
+					$("body").click(function (e) {
+						var $target = $(e.target);
+						if ($target.closest(".area-tab").length == 0 && !$target.hasClass("open") && (typeof($target.attr("data-action")) == "undefined")) {
+
+							for (var i = 0; i < selectNums; i++) {
+								ZXB.AreaQuery.areaSelects.selects[i].close();
+							}
+						}
+					});
+
+//					$("#topSearchAreaLine").click(function () {
+//						$("#topQueryAreaFrm").submit();
+//					});
+
+				},
+				_fillArea: function (who, codes, addresses) {
+					switch (who) {
+						case 0:
+							$("#queryStartProvinceId").val(codes[0] == -1 ? "" : codes[0]);
+							$("#queryStartCityId").val(codes[1] == -1 ? "" : codes[1]);
+							$("#queryStartCountyId").val(codes[2] == -1 ? "" : codes[2]);
+							break;
+						case 1:
+							$("#queryEndProvinceId").val(codes[0] == -1 ? "" : codes[0]);
+							$("#queryEndCityId").val(codes[1] == -1 ? "" : codes[1]);
+							$("#queryEndCountyId").val(codes[2] == -1 ? "" : codes[2]);
+							break;
+					}
+				}
+			}
+		};
+	})(ZXB, jQuery);
+
+
+	$(function () {
+//		$("#startAreaId").placeholder({labelStyle:{margin: "-3px 0 0 3px"}});
+//		$("#endAreaId").placeholder({labelStyle:{margin: "-3px 0 0 3px"}});
+		ZXB.AreaQuery.areaSelects.init();
+        $("#startAreaId").val("输入城市名(中文/拼音)");
+        $("#endAreaId").val("输入城市名(中文/拼音)");
+	});
+
+	$(function () {
+		var $topQueryAreaFrm = $("#topQueryAreaFrm");
+		$topQueryAreaFrm.validate({
+			rules: {
+				startAreaId: {
+						required: true,
+						checkArea: function () {
+							return [ ZXB.AreaQuery.areaSelects.selects[0] ];
+						}  
+					},
+			   endAreaId: {
+						required: true,
+						checkArea: function () {
+							return [ ZXB.AreaQuery.areaSelects.selects[1] ];
+						}  
+					}
+			},
+			messages: {
+				startAreaId: {required: "起始地不能为空!"},
+				endAreaId: {required: "目的地不能为空!"}
+			},
+			showErrors: function (errorMap, errorList) {
+				if (errorList && errorList.length > 0) {
+					var showID = $("#"+errorList[0].element.id);
+					layer.tips(errorList[0].message,showID , {
+						time: 3,
+						style: ['background-color:#FFFF99; color:#000000', '#FFFF99'],
+				 maxWidth:250
+					});
+				}
+			},
+			
+			onkeyup: false,
+			onclick: false,
+			onfocusout: false
+
+		});
+	})
+</script>
+<script type="text/javascript">
+        $(function () {
+
+            $("button.wfhbg").click(function(){
+                location.href = "/order/new"
+            });
+
+            var username = getCookie("username");
+            if (username != null) {
+                $("#routeCount").hide();
+                $("#myZxb").show();
+            } else {
+                $("#routeCount").show();
+                $("#myZxb").hide();
+            }
+        });
+
+        $(document).ready(function(){
+
+
+            /*change windowSize*/
+            var checkWindowSize = function(){
+                if($(document).width()<1263){
+                    $("#qq-t-2").css("right","6px");
+                    $("div.tool-bk-ctn").css("right","80px");
+                    $("#qq-zxkf-2").css("display","block");
+                }
+                else{
+                    var qqw = ($(document).width()-1423)/2+80;
+                    var bkw = ($(document).width()-1423)/2+150;
+                    $("#qq-t-2").css("right",qqw+"px");
+                    $("div.tool-bk-ctn").css("right",bkw+"px");
+                    $("#qq-zxkf-2").css("display","none");
+                }
+            }();
+            //qq
+            $("#qq-t-2>a").mouseover(function(){$("#qq-zxkf-2").css("display","block");})
+            $("#qq-t-2").hover(
+                    function () {},
+                    function () {($(document).width()>=1263)?$("#qq-zxkf-2").css("display","none"):"";
+                    });
+            //广告轮播
+            $("div.slideBox").slide({mainCell: ".bd ul", autoPlay: true, interTime: 3500, effect: "fold", delayTime: 0});
+            //列表鼠标效果
+            $("#yzxlUl li,#ssjyUl li,#dhxlUl li").bind("mouseover mouseout", function(){
+                $(this).toggleClass("li-hover");
+            });
+
+            //合作单位
+            /*                $("#pre,#next").bind('click',function(event){
+                                var $v_show = $(this).siblings(".lb-div").find("ul");
+                                var index_Left = $(this).attr("id") == "pre" ? "0": "-100px";
+                                !$v_show.is(":animated") ? $v_show.animate({ left : index_Left}, "slow"):"";
+                            });*/
+
+            $("div.hzkh").slide({ mainCell: "ul", vis: 8, prevCell: "#pre", nextCell: "#next", effect: "leftLoop", autoPlay: true, interTime: 4500});
+
+            //返回到top
+            $(window).scroll(function(){
+                if ($(window).scrollTop()>100){
+                    $("div.tool-bk-ctn").fadeIn(400);
+                }
+                else
+                {
+                    $("div.tool-bk-ctn").fadeOut(400);
+                }
+            });
+        });
+
+        //列表对齐效果
+        var setLiWFun = function(e){
+            var w_array = [];
+            var w = 0;
+            for(var i=0; i<e.length; i++){
+                w_array.push(e.eq(i).width());
+            }
+            for(var j=0; j<w_array.length; j++){
+                if(w_array[j] > w_array[j+1]){
+                    w = w_array[j];
+                    w_array[j] = w_array[j+1];
+                    w_array[j+1] = w;
+                }
+            }
+            return w_array[w_array.length-1] + 1;
+        }
+        var $ssjy_S_1= $("#ssjyUl li span.span-4");
+        var $ssjy_S_2= $("#ssjyUl li span.span-3");
+        var $ssjy_S_3= $("#ssjyUl li span.span-5");
+        var $yzxl_S_1 = $("#yzxlUl li span.span-6");
+        var $dhxl_S_1 = $("#dhxlUl li span.span-1").next("span");
+        var $yzxl_S_2 = $("#yzxlUl li span.span-1");
+        var $dhxl_S_2 = $("#dhxlUl li span.span-1");
+        $ssjy_S_1.width(setLiWFun($ssjy_S_1));
+        $ssjy_S_2.width(setLiWFun($ssjy_S_2));
+        $ssjy_S_3.width(setLiWFun($ssjy_S_3));
+        $yzxl_S_1.width(setLiWFun($yzxl_S_1));
+        $dhxl_S_1.width(setLiWFun($dhxl_S_1));
+        $yzxl_S_2.width(setLiWFun($yzxl_S_2));
+        $dhxl_S_2.width(setLiWFun($dhxl_S_2));
+    </script>
+    
+<script type="text/javascript"
+	src="${CTX}/res/js/comm/areaSelect.js"></script>    

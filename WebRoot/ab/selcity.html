@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+    <script type="text/javascript">
+    $().ready(function() {
+    	$("#mer_city_id").change(function () {
+              //清除二级下拉列表
+               $("#tb_area").empty();
+               var vhtml='';
+               $.ajaxSettings.async = false; 
+               $.getJSON("${CTX}/common/subarea", {p_id:$("#mer_city_id").find("option:selected").val()},function (data) {
+                  $(data).each(function () {
+		                  vhtml += "<tr>";
+		                  vhtml +="<td class=\"city\" style=\"text-align: center\">&nbsp;&nbsp;</td>";
+		                  vhtml +="<td>";
+                  		  vhtml +="<a href=\"javascript(0)\" onclick=\"uf_selarea('"+this.id+"')\">"+this.mc+"</a>&nbsp;";
+			              vhtml +="</td>";
+                  		  vhtml +="</tr>";
+                  });
+               });
+              
+               $("#tb_area").append(vhtml);
+          });
+          
+    });
+    </script>
+ </head>
+  <body style="margin-top: 5px;">
+  	&nbsp;请选择
+  	<select name="mer_city_id" id="mer_city_id">
+		<option value="">请选择省市...</option>
+		<#if list_city??>
+			<#list list_city as t>
+			<option value="${(t.id)!}">${(t.mc)!}</option>
+			</#list>
+		</#if>
+	</select>
+	<table style="width: 100%;" class="selcity" id="tb_area">
+		
+	</table>
+	<script type="text/javascript">
+		function uf_selarea(id){
+			$.post("${CTX}/ab/setcurrcity",{areaid: id},function(data){
+                if(data){
+					window.parent.location.reload();
+				}else{
+					$.dialog.alert("城市商圈切换失败！");
+				}
+			});
+		}
+	</script>	
+	</body>
+</html>

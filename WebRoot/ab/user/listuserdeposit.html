@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>	
+ </head>
+  <body>
+  	<form id="myform" name="myform">
+  	<#include '../inc/top.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">充值记录</h2>
+			<div class="bold" style="padding-left: 5px;height: 30px;line-height: 30px;">
+				账户余额：<span class="red">${(u.zhye)?string("currency")}</span>
+				<a href="${CTX}/ab/user/yhcz">立即充值</a>
+			</div>
+			<table class="list">
+            <tr>
+	            <th width="30px;">序号</th>
+	            <th width="120px;">登录号</th>
+	            <th width="120px;">姓名</th>
+	            <th width="140px;">充值金额</th>
+	            <th width="100px;">充值状态</th>
+	            <th width="130px;">充值时间</th>
+	            <th width="*">备注</th>
+	        </tr>
+	        <#if listpage ??>
+      				<#list listpage.list as lst>
+	                  <tr>
+	                  	<td>${(lst_index+1)!''}</td>
+	                    <td>${(lst.loginid)!''}</td>
+	                    <td>${(lst.mc)!''}</td>
+	                    <td class="red bold">${(lst.czje)?string("currency")}</td>
+	                    <td><#if strkit('0',(lst.status)!)>失败</#if><#if strkit('1',(lst.status)!)>成功</#if></td>
+	                    <td>${(lst.createtime)!}</td>
+	                    <td>${(lst.remark)!}</td>
+	                  </tr>
+					</#list>
+					<tr>
+						<th colspan="7">
+						<#include '../../common/_paginate.html'>
+						</th>
+					</tr>
+			</#if>
+            </table>
+		</div>
+	</div>
+	</form>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

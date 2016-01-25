@@ -1,0 +1,60 @@
+/* CSS Document */
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,p,blockquote,th,td{margin:0;padding:0;}
+h1,h2,h3,h4,h5,h6{font-size:100%;}
+img{border:0; font-size:0;}
+button,input,select,textarea{font-size:100%; font-family:inherit}
+ul,ol{list-style:none;}
+html,body{ font-size: 13px; font-family: "Microsoft YaHei" !important; background:#fff; color: #000; -webkit-text-size-adjust:none;}
+a{color:#333;  text-decoration:none;}
+/*全局样式*/
+.clear{ clear:both; height:0; margin:0; padding:0; font-size:0; overflow:hidden;}
+.clearfix:after{ content:".";display:block;height:0;clear:both;visibility:hidden;}
+.clearfix{*zoom:1;}
+.float_left { float: left;}
+.float_right { float: right;}
+.block { display: block;}
+
+.header { z-index: 999;  position: relative;  background: #FFF; }
+.front-topbar { border-bottom: 1px solid #F5F5F5;  margin-top: 5px; height: 60px;}
+.pull-right { text-align:right; color: #999; padding-right:15px; }
+.loginSta{width:74px; height:40px; color:#FFFFFF; font-size:16px; border:none; margin-top:8px; background:url(../images/login.jpg) no-repeat;}
+.loginChange{width:74px; height:40px; color:#FFFFFF; font-size:16px; border:none; margin-top:8px; background:url(../images/login_over.jpg) no-repeat;}
+.registerSta{width:74px; height:40px; color:#EF9433; font-size:16px; border:none; margin-top:8px; background:url(../images/register.jpg) no-repeat;}
+.registerChange{width:74px; height:40px; color:#F99526; font-size:16px; border:none; margin-top:8px; background:url(../images/register.jpg) no-repeat;}
+.front-topbar a { color: #999;  font-size: 12px; display:inline-block; padding:0 6px;}
+.front-topbar span{ padding:0 6px;}
+.front-topbar .icon-user{ padding-left:18px; background:url(../images/icon-user01.jpg) no-repeat;}
+.container { overflow: hidden; width:1002px; margin:0 auto; position:relative;}
+.navbar-header{ height:77px;}
+.navbar-header .logo{ padding:15px;}
+.nav{ height:77px;}
+.nav li{ float:left;}
+.nav a{ display:block; position:relative; height:75px;line-height:75px; padding:0 15px; border-top:2px solid #fff; font-size: 16px;font-weight: 600;}
+.nav a i{ width:6px; height:3px; background:url(../images/nav_cur.png); left:50%; margin-left:-3px; display:none; position:absolute; top:0;}
+.nav .active a,.nav a:hover{ border-top:2px solid #0da3e2; color:#0da3e2;background:#fcfcfc;}
+.bottom_bar{ position:absolute; top:108px; left:0; right:0;height:5px; }
+.bottom_bar .left{ width:34%; height:5px; position:absolute; left:0; background:#83c2e3;}
+.bottom_bar .right{ width:34%;height:5px; position:absolute; right:0; background:#1d6194;}
+.bottom_bar .center{ width:33%;height:5px; position:absolute; left:34%; background:#0084c9;}
+.banner{ background:#c5c4c0 url(../images/banner-home.jpg) no-repeat center center; height:598px; }
+.banner .container{ height:598px;} 
+.banner .home_banner_inner{ width:550px; height:200px; position:absolute; top:170px; right:70px; background: url(../images/home_banner_inner.png);}
+.home_banner_inner h1 { margin:15px 0; font-size:36px; font-weight:300; text-align:center; color:#fff;}
+.home_banner_inner .look{ font-size: 27px; display: block; text-align:center; color:#fff;}
+.home_banner_inner .look:hover span{display:inline-block; background:#ffb848;}
+.home_banner_inner .place{ position:absolute; bottom:10px; right:20px;  background: #f47c00;font-size: 22px;float: right; border:none; color:#fff; padding: 12px 55px 12px 30px;font-weight: bold; transition:background 0.5s;}
+.home_banner_inner .place:hover{ background:#ffb848}
+.home_banner_inner .place i{ position:absolute; width:16px; height:16px; background:url(../images/jiantouo.png); top:18px; right:32px;}
+.col-md-4{ float:left; width:300px; margin:30px 17px 50px;}
+.service-box-heading { padding: 12px 0px;  color: #444;  font-size: 21px; line-height: 25px;font-weight: 400; margin-bottom: 10px; text-indent:50px;}
+.contTop1{ background:url(../images/contTop1.jpg) no-repeat 3px 10px;}
+.contTop2{ background:url(../images/contTop2.jpg) no-repeat 3px 10px;}
+.contTop3{ background:url(../images/contTop3.jpg) no-repeat 3px 10px;}
+.col-md-4 p {  color: #656565; font-size: 13px;padding-bottom: 10px;}
+.copyright{ background:#4A5866; padding:8px 0; color:#bbb; line-height:20px; text-indent:20px;}
+.copyright a{ position:absolute; left:70%; }
+.foot {width: 100%;border-top: 2px solid #eee;color: #A2A2A2;}
+.foot .flink {margin: 0 auto;width:1002px;height: 32px;line-height: 32px;text-align: center;}
+.foot .flink a{color: #A2A2A2;}
+.foot .flink a:hover{color:#808080;}
+#goTopBtn{ position:fixed; bottom:10px; right:10px; cursor:pointer;}

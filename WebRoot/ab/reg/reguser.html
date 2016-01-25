@@ -1,0 +1,255 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>易生活网</title>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/login.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			$("#myform").validate({
+				rules: {
+					user_mobile: {required:true,mobile:true,
+						remote:{
+							type:"POST",
+							url:"${CTX}/ab/reg/checkloginid",
+			               	dataType:"json",
+			                data: {
+			                    mobile: function() { return $("#user_mobile").val();}
+			                }
+						}
+					},
+					user_loginpwd: {required:true,stringCheck:true,rangelength:[6,20]},
+					rpassword: {required:true,equalTo:"#user_loginpwd"},
+					user_city_id: {required:true},
+					user_area_id: {required:true},
+					smsCodeRand: {required:true,stringMinLength:6,equalTo:"#checkcode"}
+				},
+				messages:{
+					user_mobile:{required:"手机号不能为空！",mobile:"请输入合法的手机号！",remote:"该手机号已经被注册，请重新选择！"},
+					user_loginpwd:{required:"登录密码不能为空！",stringCheck:"长度在6-20之间，只能包含字符、数字和下划线。",rangelength:"长度在6-20之间，只能包含字符、数字和下划线"},
+					rpassword:{required:"确认密码不能为空！",equalTo:"两次输入的密码不一致！"},
+					user_city_id:{required:"请选择城市！"},
+					user_area_id:{required:"请选择商圈！"},
+					smsCodeRand:{required:"手机验证码不能为空！",stringMinLength:"验证码长度不正确，为6位数字",equalTo:"验证码输入不正确！"}
+				},
+				errorPlacement:function(error, element){
+	                error.appendTo($("#spantip").html(error));
+	            }
+			});
+			
+			$("#user_city_id").change(function () {
+                //清除二级下拉列表
+                $("#user_area_id").empty();
+                //$("#mer_area_id").append($("<option/>").text("--请选择--").attr("value","-1"));
+                //将选中的一级下拉列表项的id传过去
+                $.getJSON("${CTX}/common/subarea", {p_id:$("#user_city_id").find("option:selected").val()},function (data) {
+                    //对请求返回的JSON格式进行分解加载
+                    $(data).each(function () {
+                        $("#user_area_id").append($("<option/>").text(this.mc).attr("value",this.id));
+                    });
+                });
+            });
+            
+			$("#btn_save").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$("#user_city_name").attr('value',$("#user_city_id").find("option:selected").text());
+					$("#user_area_name").attr('value',$("#user_area_id").find("option:selected").text());
+					$.post("${CTX}/ab/reg/savereguser",$("#myform").serializeArray(),function(data){
+	                    if(data){window.location.href="${CTX}/ab/mainuser";}
+					});
+				}
+			});
+		});
+	</script>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+  	<!-- 搜索栏 -->
+	<#include '../inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+	<#include '../inc/nav.html'>
+	<div class="blank10"></div>
+	<!-- 用户注册 -->
+	
+	
+	<div class="d_registerBox">
+		<input type="hidden" value="dianwobacom" id="keyword">
+	      <h2 class="tit" style="line-height: 36px;font-size: 14px;"><a href="###" title="" class="on">下单用户注册</a>个人、工厂、批发市场、第三方物流等有下单和发货需求的</h2>
+	      <div class="registerBox clearfix">
+	           <div class="registerBoxL">
+	                <div class="registerCon">
+	                  <form id="myform" name="myform" action="${CTX}/ab/reg/savereguser" method="post">
+	                  	<input type="hidden" id="checkcode" name="checkcode" value=""/>
+	                  	<input type="hidden" id="invitecode" name="invitecode" value="${(invitecode)!}"/>
+	                    <input type="hidden" id="user_role_id" name="user_role_id" value="107"/>
+						<input type="hidden" id="user_role_name" name="user_role_name" value="会员"/>
+						<input type="hidden" id="user_zhlx" name="user_zhlx" value="${(subject.id)!'1'}"/>
+	                          <span id="spantip"></span>
+	                          <ul class="registerList formList">
+	                              <li class="clearfix">
+	                                  <label for="phoneNum">手机号</label>
+	                                  <div class="con clearfix">
+	                                      <div class="conBox clearfix">
+	                                         <input type="text" name=user_mobile placeholder="请输入11位手机号码" id="user_mobile" class="input40" maxlength="11">
+	                                      </div>
+	                                      <p class="voiceText" style="display: none;">该手机号码已被注册，请直接<a href="/ab/login">登录</a></p>
+	                                  </div>
+	                              </li>
+	                              <li class="clearfix">
+	                                  <label for="password">密码</label>
+	                                  <div class="con clearfix">
+	                                      <div class="conBox clearfix">
+	                                          <input type="password" name="user_loginpwd" placeholder="请输入6-20位字母，数字组合" id=user_loginpwd class="input40" maxlength="20">
+	                                      </div>    
+	                                  </div>
+	                              </li>
+	                              <li class="clearfix">
+	                                  <label for="password2">确认密码</label>
+	                                  <div class="con clearfix">
+	                                      <div class="conBox clearfix">
+	                                          <input type="password" placeholder="请输入6-20位字母，数字组合" id="rpassword" name="rpassword" class="input40"  maxlength="20">
+	                                      </div>    
+	                                  </div>
+	                              </li>
+	                              <li class="clearfix">
+	                                  <label for="password2">所属城市</label>
+	                                  <div class="con clearfix">
+	                                      <div class="conBox clearfix">
+	                                          <input class="text" id="user_city_name" name="user_city_name" type="hidden" value=""/>
+												<select name="user_city_id" id="user_city_id" style="width: 205px;" >
+													<option value="">请选择...</option>
+													<@_cityarea_list p_id='ROOT'>
+										      			<#list list as t>
+											      			<#if t.hassub==0>
+											      				<option value="${(t.id)!}" <#if strkit(currcity.id,t.id)>selected</#if>>${(t.mc)!}</option>
+											      			<#else>
+												      			<optgroup label="${(t.mc)!}">
+												      				<@_cityarea_list p_id=t.id>
+														      			<#list list as sub>
+														      			<option value="${(sub.id)!}" <#if strkit(currcity.id,sub.id)>selected</#if>>${(sub.mc)!}</option>
+														      			</#list>
+																	</@_cityarea_list>
+												      			</optgroup>
+											      			</#if>
+										      			</#list>
+													</@_cityarea_list>
+												</select>
+	                                      </div>    
+	                                  </div>
+	                              </li>
+	                              <li class="clearfix">
+	                                  <label for="password2">所属商圈</label>
+	                                  <div class="con clearfix">
+	                                      <div class="conBox clearfix">
+	                                          	<select name="user_area_id" id="user_area_id" style="width: 205px;" >
+													<option value="">请选择</option>
+													<#if currcity?? && currcity.id??>
+														<@_cityarea_list p_id=currcity.id>
+											      			<#list list as lst>
+											      			<option value="${(lst.id)!}">${(lst.mc)!}</option>
+											      			</#list>
+														</@_cityarea_list>
+													</#if>
+												</select>
+												<input class="text" id="user_area_name" name="user_area_name" type="hidden" value=""/>
+	                                      </div>    
+	                                  </div>
+	                              </li>
+	                              <li class="clearfix">
+	                                  <label for="checkcode">验证码</label>
+	                                  <div class="con clearfix">
+	                                      <div class="conBox clearfix">
+		                                      <input type="text" name="smsCodeRand" placeholder="请输入6位数字" id="smsCodeRand" class="input40 w88"  maxlength="6">
+		                                      <a href="###" id="btn_send" title="获取验证码" class="codeBtn" style="width: auto;padding: 0 5px;">获取验证码</a>
+		                                  </div>    
+	                                      <p class="voiceText voiceText_" style="display: none">未收到验证码，<a href="javascript:void(0)" class="voiceBtn">点此收听语音验证码</a></p>
+	                                  </div>
+	                              </li>
+	                          </ul>
+	                          
+	                          <div class="btnBox">
+	                              <input type="button" id="btn_save" name="btn_save" value="同意以下协议并注册" class="btnOrg40 phone_sub_">
+	                          </div>
+	                  </form>
+	                </div>
+	                <div class="protocol">
+	                    <a href="${CTX}/ab/news/zcxy-9" title="" id="protocolBtn"><span class="xy_icon"></span>网站服务协议</a></div>
+	          		 </div>	
+	           <div class="registerBoxR">
+	               <dl class="d_otherLogin clearfix">
+	                   
+	               </dl>
+	           </div>
+	
+	      </div><!--registerBox end-->
+	</div>
+	
+	
+	<!-- 栏目页 -->
+	<div class="blank10"></div>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	<script type="text/javascript">
+		var wait=60;
+		
+		//获取6位随机验证码
+		function random() {
+		    var num = "";
+		    for (i = 0; i < 6; i++) {
+		        num = num + Math.floor(Math.random() * 10);
+		    }
+		    return num;
+		}
+		
+		function time(o) {
+	        if (wait == 0) {
+	        	$("#checkcode").attr("value",'');
+	            o.removeAttribute("disabled");       
+	            $("#btn_send").text("获取验证码");
+	            wait = 60;
+	        } else {
+	        	if(wait==60){
+	        		$("#checkcode").attr("value",random());//填充内容
+	        		$.ajax({
+					      type: "POST",
+					      url: "${CTX}/ab/reg/sendSmsMsg?phone=" + $("#user_mobile").val() + "&smsCodeRand=" + $("#checkcode").val(),
+					      dataType:"json",
+					      success: function(data) {
+					          if (data) {
+					             	o.setAttribute("disabled", true);
+	            					$("#btn_send").text("重新发送(" + wait + ")");
+						            wait--;
+						            setTimeout(function() {
+						                time(o)
+						            },
+						            1000);
+					          }
+					          else {
+					              alert("验证码获取失败！请重新获取");
+					          }
+					       },
+					       error: function() { alert("error"); }
+					  });
+	        	}else{
+	        		o.setAttribute("disabled", true);
+		           $("#btn_send").text("重新发送(" + wait + ")");
+		            wait--;
+		            setTimeout(function() {
+		                time(o)
+		            },
+		            1000);
+	        	}
+	        }
+	    }
+		document.getElementById("btn_send").onclick=function(){time(document.getElementById("btn_send"));}
+	</script>	
+	</body>
+</html>

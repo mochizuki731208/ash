@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta name="description" content="易生活网是一个具有国内商户特色，提供各类商户活动，集商户开店，商户搜索，支付预订为一体的综合性门户网站。" />
+	<meta name="keywords" content="商户，服务，开店" />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width = device-width, user-scalable=yes minimum-scale=1.0" />
+	<meta name="apple-touch-fullscreen" content="YES" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="white" />
+	<meta name="MobileOptimized" content="width" />
+	<meta name="HandheldFriendly" content="true" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/main_city.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/style_city.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+</head>
+<body class="city_bg">
+	<input type="hidden" id="selectcityid" value="<#if currcity?? >${(currcity.id)!}</#if>"/>
+	<input type="hidden" id="selectcityareaid" value="<#if currarea?? >${(currarea.id)!}</#if>"/>
+		<div id="city_top">
+			<div class="title">本地生活服务—随叫随到，服务到家</div>
+            <div class="city"><a href="javascript:;" id="cityid"><#if currcity?? >${(currcity.mc)!}</#if><x></x></a></div>
+            <form>
+                <input type="text" name="city_qu_seach" class="qu_seach" placeholder="请选择地区" />
+            </form>
+        </div>
+		<div id="city">
+			<t></t>
+        	<div class="top">
+        		<p class="title">选择您所在的城市:</p>
+            	<form class="search">
+            		<span>猜你在：</span>
+            		<span class="now"><a href="javascript:;"><#if currcity?? >${(currcity.mc)!}</#if></a></span>
+                	<input type="text" id="city_search" name="city_search" class="search_city" value="" placeholder="城市名称拼音" />
+                	<input type="button" id="btn_search" value="搜索"/>
+            	</form>
+        	</div>
+        	<div class="main" id="maindiv">
+        		<span class="ping">按省份进行选择<x></x></span>
+            	<div class="clear"></div>
+            	
+            	<#if list_city ??>
+            		<#list list_city as lst>
+            			<div class="lei">
+		            		<span class="en">${(lst.mc)!}</span>
+		            		<div class="citylist">
+		            		<#if lst.listsub ??>
+            					<#list lst.listsub as sub>
+            						<a href="javascript:;" data='${(sub.id)!}'>${(sub.mc)!}</a>
+					            </#list>
+			            	</#if>
+		                	</div>
+		            	</div>
+            		</#list>
+            	</#if>
+        	</div>
+    	</div>
+    	<div id="city_qu">
+    		<t></t>
+            <div class="qu" id="quid">
+            	<#if listcurrent ??>
+         			<#list listcurrent as lst>
+         				<a href="javascript:void(0)" onclick="uf_selarea('${(lst.id)!}')">${(lst.mc)!}</a>
+		            </#list>
+            	</#if>
+            </div>	
+        </div>
+    
+    <script type="text/javascript">
+    	$(document).ready(function(){
+			$('#city_top .city').click(function(){
+				$('#city').show();
+				$('#city_qu').hide();
+				$('#t_bg').show();
+			});
+			$('#city_top .qu_seach').click(function(){
+				$('#city_qu').show();
+				$('#city').hide();
+				$('#t_bg').show();
+			});
+			
+			$('#btn_search').click(function(){
+				$('.lei').remove();
+                $.ajaxSettings.async = false; 
+                $.post("${CTX}/common/getcity",{cityname:$("#city_search").val()},function(data){
+                    $('#maindiv').append(data);
+				});
+			});
+			
+			$('#city .citylist a').click(function(){
+				$('#city').hide();
+				$('#cityid').html($(this).html()+'<x></x>');
+				$('#selectcityid').attr('value',$(this).attr("data"));
+				
+				//清除二级下拉列表
+               $("#lei").empty();
+               var vhtml='';
+               $.ajaxSettings.async = false; 
+               $.getJSON("${CTX}/common/subarea", {p_id:$("#selectcityid").val()},function (data) {
+                  $(data).each(function () {
+		                  vhtml += "<a href=\"javascript(0)\" onclick=\"uf_selarea('"+this.id+"')\">"+this.mc+"</a>";
+                  });
+               });
+              
+               $("#quid").html(vhtml);
+				//alert($("#quid").html());
+				//alert($(this).attr("data"));
+				//alert($('#city .citylist a').attr("data"));
+			});
+			$('#city_qu .qu a').click(function(){
+				$('#city_qu').hide();
+			});
+			$('#city .now').click(function(){
+				$('#city').hide();
+			});
+			$('#t_bg').click(function(){
+				$(this).hide();
+				$('#city').hide();
+				$('#city_qu').hide();
+			});
+		});
+		
+		function uf_selectcity(id,mc){
+			$('#city').hide();
+			$('#cityid').html(mc+'<x></x>');
+			$('#selectcityid').attr('value',id);
+			
+			//清除二级下拉列表
+              $("#lei").empty();
+              var vhtml='';
+              $.ajaxSettings.async = false; 
+              $.getJSON("${CTX}/common/subarea", {p_id:$("#selectcityid").val()},function (data) {
+                 $(data).each(function () {
+	                  vhtml += "<a href=\"javascript:void(0)\" onclick=\"uf_selarea('"+this.id+"')\">"+this.mc+"</a>";
+                 });
+              });
+             
+              $("#quid").html(vhtml);
+		}
+		
+		function uf_selarea(id){
+			$.post("${CTX}/ab/setcurrcity",{areaid: id},function(data){
+                if(data){
+					window.location.href="${CTX}/";
+				}else{
+					$.dialog.alert("城市商圈切换失败！");
+				}
+			});
+		}
+    </script>
+    <div id="t_bg"></div>
+	</body>
+</html>

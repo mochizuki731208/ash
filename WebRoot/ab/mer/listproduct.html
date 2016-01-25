@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+    <script type="text/javascript">
+    	function uf_del(id){
+			$.dialog.confirm('是否要删除所选数据？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/mer/delproduct",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除数据成功！",function () {
+								window.location.href="${CTX}/ab/mer/listproduct";
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("删除数据失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_sj(id){
+			$.dialog.confirm('确定要上架此商品吗？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/mer/updatemerprosj",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("所选商品上架成功！",function () {
+								window.location.href="${CTX}/ab/mer/listproduct";
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("所选商品上架失败！");
+						}
+					}
+				});
+			});
+		}
+		function uf_xj(id){
+			$.dialog.confirm('确定要下架此商品吗？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/mer/updatemerproxj",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("所选商品下架成功！",function () {
+								window.location.href="${CTX}/ab/mer/listproduct";
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("所选商品下架失败！");
+						}
+					}
+				});
+			});
+		}
+		function yu_Lan(id){
+			$.dialog({
+				title:'预览商品',
+				content: 'url:${CTX}/ab/mer/yuLan?id=' + id,
+			    lock:true,
+			    resize: true,
+			    width : 400,
+				height : 300,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭'
+			});//
+		}
+    </script>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">商品信息</h2>
+			<div class="bold red" style="height: 30px;height: 30px;font-size:14px;">
+			&nbsp;系统提示：如果商家自送，每个订单的送餐费为订单所选商品所设置的最大送餐费！
+			<a href="${CTX}/ab/mer/addproduct?mid=${(mid)!}">新增商品</a>
+			</div>
+			<table class="list">
+            <tr>
+	            <th width="4%">序号</th>
+	            <th width="10%">图片</th>
+	            <th width="*%">名称</th>
+	            <th width="8%">类别</th>
+	            <th width="8%">价格(元)</th>
+	            <th width="8%">门店价(元)</th>
+	            <th width="8%">送餐费(元)</th>
+				<th width="8%">审核状态</th>
+				<th width="6%">状态</th>
+				<th width="6%">顺序号</th>
+				<th width="12%">操作</th>
+	        </tr>
+      			<#list listproduct as s>
+                  <tr>
+                  	<td>${(s_index+1)!}</td>
+                    <td><#if s.img_url?exists><img src="${CTX}/upload/${(s.img_url)!''}" class="vm" style="max-width: 100px;max-height: 70px;margin: 2px;"></#if></td>
+                  	<td>${(s.mc)!}</td>
+                  	<td>${(s.thr_name)!}</td>
+                    <td class="red">${(s.price)?string("currency")}</td>
+                    <td>${(s.mdprice)?string("currency")}</td>
+                    <td>${(s.ptf)?string("currency")}</td>
+                    <td><#if strkit('0',(s.zt)!)>待审</#if><#if strkit('1',(s.zt)!)>通过</#if><#if strkit('2',(s.zt)!)>不通过</#if></td>
+                     <td>
+                    	<#if strkit('1',(s.sfsj)!)>上架</#if>
+                    	<#if strkit('0',(s.sfsj)!)>下架</#if>
+                    </td>
+                    <td>${(s.seq_num)!''}</td>
+                    <td>
+     	               <a href="javascript:void(0)" onclick="yu_Lan('${(s.id)!}')">预览</a>
+                    	<#if strkit('0',(s.sfsj)!)><a href="javascript:void(0)" onclick="uf_sj('${(s.id)!}')">上架</a></#if>
+                    	<#if strkit('1',(s.sfsj)!)><a href="javascript:void(0)" onclick="uf_xj('${(s.id)!}')">下架</a></#if>
+                    	<#if strkit('0',(s.zt)!)><a href="${CTX}/ab/mer/editproduct?id=${(s.id)!}">修改</a></#if>
+                    	<#if strkit('2',(s.zt)!)><a href="${CTX}/ab/mer/editproduct?id=${(s.id)!}">修改</a></#if>
+                    	<#if strkit('0',(s.zt)!)><a href="javascript:void(0)" onclick="uf_del('${(s.id)!}')">删除</a></#if>
+                    </td>
+                  </tr>
+				</#list>
+            </table>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

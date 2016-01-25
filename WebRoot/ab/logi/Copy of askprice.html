@@ -1,0 +1,266 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/logi/css/style.css" />
+    <style type="text/css">
+    	ul{margin:10px;}
+    </style>
+	<script type="text/javascript">
+		function load_province() {
+			$("#source_province").empty();
+			$("#target_province").empty();
+			$("#source_province").append("<option value=''>-省份-</option>");
+            $("#target_province").append("<option value=''>-省份-</option>");
+			$.post("${CTX}/ab/logi/queryLowerLevelCity",function(data){
+                $.each(data,function(index,obj) {
+                	$("#source_province").append("<option value='" + obj["id"] + "'>" + obj["mc"] + "</option>");
+                	$("#target_province").append("<option value='" + obj["id"] + "'>" + obj["mc"] + "</option>");
+                });
+			});
+		}
+		function load_city() {
+			$.each($("#source_province,#target_province"),function(index,obj) {
+				$(obj).change(function() {
+					var city,area;
+					if($(this).attr("id") == "source_province") {
+						city = $("#source_city");
+						area = $("#source_area");
+					} else {
+						city = $("#target_city");
+						area = $("#target_area");
+					}
+					if($(this).val() == "") {
+						city.empty();
+						city.append("<option value=''>-城市-</option>");
+						area.empty();
+						area.append("<option value=''>-地区-</option>");
+						return;
+					}
+					// 清空
+					city.empty();
+					// 添加元素
+					city.append("<option value=''>-城市-</option>");
+					$.post("${CTX}/ab/logi/queryLowerLevelCity",{"p_id":$(this).val()},function(data1){
+		                $.each(data1,function(index1,obj1) {
+		                	city.append("<option value='" + obj1["id"] + "'>" + obj1["mc"] + "</option>");
+		                });
+					});
+				});
+			});
+		}
+		function load_area() {
+			$.each($("#source_city,#target_city"),function(index,obj) {
+				$(obj).change(function() {
+					var area;
+					if($(this).attr("id") == "source_city") {
+						area = $("#source_area");
+					} else {
+						area = $("#target_area");
+					}
+					if($(this).val() == "") {
+						area.empty();
+						area.append("<option value=''>-地区-</option>");
+						return;
+					}
+					// 清空
+					area.empty();
+					// 添加元素
+					area.append("<option value=''>-地区-</option>");
+					$.post("${CTX}/ab/logi/queryLowerLevelCity",{"p_id":$(this).val()},function(data1){
+		                $.each(data1,function(index1,obj1) {
+		                	area.append("<option value='" + obj1["id"] + "'>" + obj1["mc"] + "</option>");
+		                });
+					});
+				});
+			});
+		}
+		$().ready(function() {
+			// 初始化省份
+			load_province();
+			// 根据省份动态加载城市
+			load_city();
+			// 根据城市加载地区
+			load_area();
+			$("#submit_btn").click(function() {
+				var user_id = $("#user_id").val();
+				if(user_id == "") {
+					alert("请选登陆!");
+					return false;
+				}
+				var goods_name = $("#goods_name").val();
+				if(goods_name == "") {
+					alert("货物名称不能为空!");
+					return false;
+				}
+				var goods_size = $("#goods_size").val();
+				if(goods_size == "" || ($.isNumeric(goods_size) && parseFloat(goods_size) <= 0)) {
+					alert("重量(吨)/体积(m³)不能为空并且大于0!");
+					return false;
+				}
+				var usecar_date = $("#usecar_date").val();
+				if(usecar_date == "") {
+					alert("用车时间不能为空!");
+					return false;
+				}
+				var linkman = $("#linkman").val();
+				if(linkman == "") {
+					alert("联系人不能为空!");
+					return false;
+				}
+				var mobile = $("#mobile").val();
+				if(mobile == "") {
+					alert("联系电话不能为空!");
+					return false;
+				}
+				// 验证是否存在物流公司或者熟车
+				$.post("${CTX}/ab/logi/validate",$("form").serialize(),function(data1){
+					if(parseInt(data1) > 0) {
+						$("#myform")[0].submit();
+						return true;
+					} else {
+						alert("没有查询到符合要求的熟车或者物流公司，暂时不能下查询单!");
+						return false;
+					}
+				});
+			});
+			$("input[name='ask_price_type']").click(function() {
+				$("#source_province").empty();
+				$("#source_city").empty();
+				$("#source_area").empty();
+				if($(this).val() == 1) {
+					$("#target_province").empty();
+					$("#target_city").empty();
+					$("#target_area").empty();
+					// 物流公司
+					// 初始化省份
+					load_province();
+					$("#source_province").change();
+					$("#target_province").change();
+				} else if($(this).val() == 2) {
+					if($("#user_source_province_id").val() == "") {
+						$("#target_province").empty();
+						$("#target_city").empty();
+						$("#target_area").empty();
+						// 物流公司
+						// 初始化省份
+						load_province();
+						$("#source_province").change();
+						$("#target_province").change();
+					}
+					// 熟车,使用用户注册地址
+					$("#source_province").append("<option value='" + $("#user_source_province_id").val() + "'>" + $("#user_source_province_mc").val() + "</option>");
+					$("#source_city").append("<option value='" + $("#user_source_city_id").val() + "'>" + $("#user_source_city_mc").val() + "</option>");
+					$("#source_area").append("<option value='" + $("#user_source_area_id").val() + "'>" + $("#user_source_area_mc").val() + "</option>");
+				}
+			});
+			$("#goods_type_desc").html("重量(吨)");
+			$("input[name='goods_type']").click(function() {
+				if($(this).val() == 1) {
+					// 重货
+					$("#goods_type_desc").html("重量(吨)");
+				} else if($(this).val() == 2) {
+					// 轻货
+					$("#goods_type_desc").html("体积(m³)");
+				}
+			});
+		});
+    </script>
+    <script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+</head>
+<body>    
+    <#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+          <article>
+          	<form id="myform" name="myform" action="${CTX}/ab/logi/saveAskPrice">
+          		<input type="hidden" id="user_id" name="user_id" value="${c_user_id!}">
+				<input type="hidden" id="user_source_city_id" name="user_source_city_id" value="${user_source_city_id!}">
+				<input type="hidden" id="user_source_city_mc" name="user_source_city_mc" value="${user_source_city_mc!}">
+				<input type="hidden" id="user_source_area_id" name="user_source_area_id" value="${user_source_area_id!}">
+				<input type="hidden" id="user_source_area_mc" name="user_source_area_mc" value="${user_source_area_mc!}">
+				<input type="hidden" id="user_source_province_id" name="user_source_province_id" value="${user_source_province_id!}">
+				<input type="hidden" id="user_source_province_mc" name="user_source_province_mc" value="${user_source_province_mc!}">
+          		<div class="selecter">
+          		<ul style="width:900px;">
+          			<li class="fl" style="width:900px;">
+          				<label style="width:150px;"><font color="red">*</font>选择询价对象:</label>&nbsp;&nbsp;&nbsp;&nbsp;
+      					<input type="radio" value="1" name="ask_price_type" id="ask_price_type" checked="checked">物流公司&nbsp;&nbsp;&nbsp;&nbsp;
+      			  	    <input type="radio" value="2" name="ask_price_type" id="ask_price_type">熟车
+          			</li>
+          		</ul>
+               	<ul style="width:900px;">
+                	<li class="fl" style="width:450px;">
+                		<label style="width:150px;"><font color="red">*</font>起始地：</label>
+                		<select id="source_province" class="selectbox" name="source_province" style="width:86px;">
+				             <option value="">-省份-</option>
+				        </select>
+				        <select id="source_city" class="selectbox" name="source_city" style="width:86px;">
+				             <option value="">-城市-</option>
+				        </select>
+				        <select id="source_area" class="selectbox" name="source_area" style="width:86px;">
+				             <option value="">-地区-</option>
+				        </select>
+                	</li>
+                	<li class="fl" style="width:450px;">
+                		<label style="width:150px;"><font color="red">*</font>目的地：</label>
+                		<select id="target_province" class="selectbox" name="target_province" style="width:86px;">
+				             <option value="">-省份-</option>
+				        </select>
+				        <select id="target_city" class="selectbox" name="target_city" style="width:86px;">
+				             <option value="">-城市-</option>
+				        </select>
+				        <select id="target_area" class="selectbox" name="target_area" style="width:86px;">
+				             <option value="">-地区-</option>
+				        </select>
+                	</li>
+                </ul>
+                <ul style="width:900px;">
+                	<li class="fl" style="width:450px;">
+                		<label style="width:150px;"><font color="red">*</font>货物名称：</label>
+                		<input class="txt" type="text" id="goods_name" name="goods_name" value="" style="width:250px;"/>
+                	</li>
+                	<li class="fl" style="width:450px;">
+                		<label style="width:150px;"><font color="red">*</font>货物类型：</label>
+                		<input class="tsel" type="radio" id="goods_type" name="goods_type" value="1" checked/>重货&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                		<input class="tsel" type="radio" id="goods_type" name="goods_type" value="2" />轻货&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                	</li>
+                </ul>
+                <ul style="width:900px;">
+                	<li class="fl" style="width:450px;">
+                		<label style="width:150px;"><font color="red">*</font><span id="goods_type_desc">重量(吨)/体积(m³)：</span></label>
+                		<input class="txt" type="text" id="goods_size" name="goods_size" value="" style="width:250px;"/>
+                	</li>
+                	<li class="fl" style="width:450px;">
+                		<label style="width:150px;"><font color="red">*</font>用车时间：</label>
+                		<input class="txt" type="text" id="usecar_date" name="usecar_date" value="" style="width:250px;" onFocus="WdatePicker({})"/>
+                	</li>
+                </ul>
+                <ul style="width:900px;">
+                	<li class="fl" style="width:900px;">
+                		<label style="width:150px;">备注：</label>
+                		<input class="txt" type="text" id="remark" name="remark" value="" style="width:700px;"/>
+                	</li>
+                </ul>
+                <ul style="width:900px;">
+                	<li class="fl" style="width:450px;">
+                		<label style="width:150px;"><font color="red">*</font>联系人：</label>
+                		<input class="txt" type="text" id="linkman" name="linkman" value="" style="width:250px;"/>
+                	</li>
+                	<li class="fl" style="width:450px;">
+                		<label style="width:150px;"><font color="red">*</font>手机：</label>
+                		<input class="txt" type="text" id="mobile" name="mobile" value="" style="width:250px;"/>
+                	</li>
+                </ul>
+                <ul style="width:900px;">
+                	<li class="fl" style="width:900px;text-align:center;">
+                		<input class="btn cp" type="button" id="submit_btn" value="提交" />
+                	</li>
+                </ul>
+               </div>
+			</form>
+          </article>
+           <!-- foot页 -->
+	<#include '../inc/foot.html'>
+     </body>
+</html>

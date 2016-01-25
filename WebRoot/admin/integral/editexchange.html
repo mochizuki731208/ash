@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					exc_rect:{required:true,stringMaxLength:50},
+					exc_rect_mobile:{required:true,stringMaxLength:50},
+					exc_rect_adrs:{required:true,stringMaxLength:120}
+				}
+			});
+			
+			$("#exc_rect").focus();
+			
+			$("#btn_save").click(function(){
+				if($("#myform").valid()){
+				    $("#myform").submit();
+				}
+			});
+		});
+		
+	
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" method="post" >
+	<input type="hidden" name="exc_id" id="exc_id" value="${(vo.id)!}"/>
+	<table class="input">
+		<tr>
+			<th align="right" width="20%;">收件人：</th>
+			<td><input type="text" name="exc_rect" id="exc_rect" class="text" value="${(vo.rect)!}"> <font color="red">*</font> </td>
+		</tr>
+		<tr>
+			<th align="right">收件人电话：</th>
+			<td><input type="text" name="exc_rect_mobile" id="exc_rect_mobile" class="text" value="${(vo.rect_mobile)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">详细地址：</th>
+			<td><input type="text" name="exc_rect_adrs" id="exc_rect_adrs" class="text" value="${(vo.rect_adrs)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">发货状态：</th>
+			<td>
+			<select id="exc_send_status" name="exc_send_status" style="width:150px;" class="required">
+					<option value="">请选择</option>
+					<option value="1" <#if (((vo.send_status)!) == "1")>selected="selected"</#if> >已发货</option>
+					<option value="0" <#if (((vo.send_status)!) == "0")>selected="selected"</#if> >未发货</option>
+			</select>
+			<font color="red">*</font>
+		</td>
+		<tr>
+			<th align="right">发货时间：</th>
+			<td><input class="Wdate" id="exc_send_time" name="exc_send_time" value="${(vo.send_time)!}" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss'})"/></td>
+		</tr>
+		<tr>
+			<th align="right">快递名称：</th>
+			<td><input type="text" name="exc_send_type" id="exc_send_type" class="text" value="${(vo.send_type)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">快递单号：</th>
+			<td>
+				<input type="text" name="exc_send_number" id="exc_send_number" class="text" value="${(vo.send_number)!}">
+			</td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

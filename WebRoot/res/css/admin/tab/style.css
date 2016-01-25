@@ -1,0 +1,60 @@
+#NavTagContainer {
+	z-index: 99999999;
+	position: relative;
+	top: 0px;
+	margin: 5px 0px 0px 0px;
+}
+
+#tablist {
+	z-index: 99999999;
+	position: relative;
+	margin: 5px 0px 0px 0px;
+	vertical-align: top;
+}
+
+div#NavTagContent {
+	border-width: 1px 0px 0px 0px;
+	border-style: solid;
+	border-color: #96CAE7;
+}
+
+#NavTagContent {
+	z-index: 999998;
+}
+
+#NavTagContainer .normalLabel,#NavTagContainer .currentLabel {
+	font-size: 12px;
+	padding: 4px 8px 4px 8px;
+	margin-bottom: 3px;
+	border-width: 1px 1px 0px 1px;
+	border-style: solid;
+	cursor: pointer;
+}
+
+#NavTagContainer .normalLabel {
+	color: black;
+	font-weight: normal;
+	border-color: gray;
+}
+
+#NavTagContainer .currentLabel {
+	color: black;
+	font-weight: bold;
+	border-color: #96CAE7;
+	background-color: white;
+}
+
+label#NavTag0,label#NavTag1 {
+	margin-left: 5px;
+}
+
+#MemberCustomerList table {
+	border-collapse: collapse;
+}
+
+#MemberCustomerList td {
+	border: 1px #96B8D9 solid;
+	line-height: 22px;
+	padding: 3px 8px 3px 8px;
+	font-size: 13px;
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+  	<title>快速下单 - 确认订单</title>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" href="${CTX}/res/css/ab/reset.css" />
+	<link rel="stylesheet" href="${CTX}/res/css/ab/order.css">
+	<script type="text/javascript">
+	
+	</script>	
+ </head>
+  <body>
+	<div class="blank10"></div>
+	
+
+<div class="container clearfix">
+    <div class="suc-yy">
+        <h2>您已预约成功
+        <span id="tips">
+        	<#if tc_order.style == '2'>
+           		我们会尽快处理，你可以在订单中心选择中标司机，然后进行支付！感谢您选择易生活！
+           	<#elseif tc_order.pay_type == '1'>
+           		您选择的在线支付支付，请尽快登录并在订单中心进行支付！感谢您选择易生活！
+           	<#else>
+           		我们会尽快处理，请你在货物送到之后付款！感谢您选择易生活！
+            </#if>
+        </span><i class="ico"></i></h2>
+        <div class="ministep"></div>
+        <dl class="promise ">
+            <dt><span class="i1"></span></dt>
+            <dd><h3>快速响应</h3>数千名服务人员，全城覆盖<br>
+预约到上门最快只需30分钟</dd>
+            <dt><span class="i2"></span></dt>
+            <dd><h3>经济实惠</h3>低于业内价15%<br>
+明码标价，不胡乱收费</dd>
+            <dt><span class="i3"></span></dt>
+            <dd><h3>服务专业</h3>所有师傅阿姨实名身份认证<br>
+100%培训，标准服务流程</dd>
+            <dt><span class="i4"></span></dt>
+            <dd><h3>100%保障</h3>每笔订单有专属客服跟进<br>
+100%赔付保障包你满意</dd>
+        </dl>
+    </div>
+</div>
+	</body>
+</html>

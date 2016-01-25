@@ -1,0 +1,300 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript">
+    	function uf_showdd(id){
+			$.dialog({
+				title:'订单明细',
+				content: 'url:${CTX}/admin/dd/showdd?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 900,
+				height : 480,
+				cover:true,
+				max:true,
+				min:true,
+				cancel:true,
+				fixed:true,
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+    	function goToChongZhi(){
+			window.location.href="${CTX}/ab/user/yhcz";
+		}
+    	$(function(){
+    		
+    	})
+    </script>
+    <style type="text/css">
+		.content-inner{}
+		.account-status{ width:920px; height:138px; border:solid 1px #BDBDBD; background-color:#F2F2F2; padding:15px 20px; margin-left:auto; margin-right:auto}
+		.col-left{ width:284px; height:50px}
+		.col-left .avatar{position: relative;float: left;margin-right: 15px;width: 48px;height: 48px;border: 1px solid #ccc;background: url(${CTX}/res/images/sprites.png) no-repeat 0 -230px;}
+		.account-status .avatar a {display: none;position: absolute;top: 0;left: 0;width: 48px;height: 42px;padding-top: 6px;background-color: rgba(0,0,0,0.3);color: white;text-align: center;}
+		.user-safety-level.low {background-position: 0 -90px;color: #f00;}
+		.user-safety-level.center {background-position: 0 -100px;color: #f00;}
+		.user-safety-level.high {background-position: 0 -120px;color: #f00;}
+		.account-status .safety-level-wrapper {margin-left: 65px;width: 235px;}
+		.account-status .money-level-wrapper {margin-left: 300px;width: 235px;}
+		.account-status .safety-level-wrapper h5 {font-size: 18px;line-height: 1.5;margin-bottom: 5px; color:#555}
+		.account-status .money-level-wrapper h5 {font-size: 18px;line-height: 1.5;margin-bottom: 5px; color:#555}
+		.user-safety-level {display: inline-block;padding-left: 82px;height: 10px;line-height: 10px;background: url(${CTX}/res/images/sprites.png) no-repeat 0 0;}
+		.account-status .related-info {margin: 30px 0 0 0;}
+		.account-status .related-info li {float: left;width: 280px;margin: 0 20px 10px 0; line-height:18px;display: list-item;}
+		.account-status .related-info li i.icon-point {background-position: 0 -170px;vertical-align: text-top;}
+		.account-status .related-info li i.icon-order {background-position: 0 -190px;vertical-align: text-top;}
+		.account-status .related-info li i.icon-star {background-position: 0 -210px;vertical-align: text-top;}
+		.account-status .related-info li i {margin-right: 5px;width: 14px;height: 14px;background: url(${CTX}/res/images/sprites.png) no-repeat 0 0;display: inline-block;}
+		.account-status .related-info li a{color:#08c;display: inline; line-height:18px}
+		
+		.latest-orders { width:960px; margin-left:auto; margin-right:auto; margin-top:20px}
+		.tab_wrapper .tab_header {margin: 0;display:block; color:#555; height:30px; line-height:30px;}
+		.tab_wrapper .tab_header li {position: relative;float: left;display: block;margin-right: 5px;padding: 5px 15px;background: #fff;border:1px solid #bdbdbd;font-weight: bold;cursor: pointer;border-radius: 3px 3px 0 0; height:18px; line-height:18px}
+		.tab_wrapper .tab_header .active{background-color: #eee;border-bottom-color: #eee;}
+		.tab_wrapper .tab_body {background-color: #fff;border: 1px solid #BDBDBD;margin-top: -1px;}
+		.tab_body .food-orders{color: rgb(85, 85, 85);display: block;font-size: 13px;height: 58px;line-height: 18px;position: relative;word-break: break-all;}
+		.tab_body .deal-orders{color: rgb(85, 85, 85);display: block;font-size: 13px;height: 58px;line-height: 18px;position: relative;word-break: break-all;}
+		.latest-orders .empty {background-color: #eee;margin: 0;padding: 20px 0;text-align: center;}
+		.hide{display: none !important;}
+	</style>	
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">管理首页&nbsp;&nbsp;[${(abuser.loginid)!}]您好！欢迎登录本系统！</h2>
+			<table class="input">
+				<tr>
+					<td align="right">
+							<#if abuser.logo?exists>
+								<img src="${CTX}/upload/${(abuser.logo)!''}" style="max-width: 50px;max-height:50px;">
+							<#else>
+								<img src="${CTX}/res/images/tx.jpg" style="max-width: 50px;max-height:50px;">
+							</#if>
+					</td>
+					<td colspan="2">
+						<h5><#if abuser??>${(abuser.loginid)!}</#if></h5>
+                         <span class="text-gray">安全等级：</span> 
+                         <#if strkit('0',(securtynum)!)>
+                              <a class="user-safety-level low" href="javascript:void(0)" 
+                                       title="绑定邮箱和手机后可以进行在线支付">低 </a>
+                          </#if>
+                          <#if strkit('1',(securtynum)!)>
+                              <a class="user-safety-level center" href="javascript:void(0)"
+                                        title="绑定邮箱和手机后可以进行在线支付">中</a>
+                           </#if>
+                           <#if strkit('2',(securtynum)!)>
+                               <a class="user-safety-level center" href="javascript:void(0)"
+                                       	title="绑定邮箱和手机后可以进行在线支付">中 </a>
+                            </#if>
+                            <#if strkit('3',(securtynum)!)>
+                               <a class="user-safety-level high" href="javascript:void(0)"
+                                       	title="绑定邮箱和手机后可以进行在线支付">高</a>
+                           </#if>
+					</td>
+					<td>
+						 <div class="money-level-wrapper">
+                            <h5><#if abuser??>账户余额：<br></#if></h5>
+                             <#if abuser??>
+                             	 <font style="font-size: 25px">${(abuser.zhye)!'--'}</font>元&nbsp;&nbsp;&nbsp;&nbsp;
+                             	 <input type="button" onclick="goToChongZhi();" value="立刻充值" style="width: 129px;color:white;font-size: 18pt;cursor: pointer;vertical-align: middle;background-color: #FF7F24;margin-top: -20px;border: solid 1px #ff9c00"></input>
+                             </#if>
+                          </div>
+					</td>
+				</tr>
+				<tr>
+					<th align="right">商家名称：</th>
+					<td>${(vo.mc)!''}</td>
+					<th align="right">加盟时间：</th>
+					<td>${(vo.create_time)!}</td>
+				</tr>
+				<tr>
+					<th align="right">总订单数：</th>
+					<td class="red bold"><a href="${CTX}/ab/order/listmerorder">(${(cnt_dd)!})</a></td>
+					<th align="right">今日订单数：</th>
+					<td class="red bold"><a href="${CTX}/ab/order/listordershsh">(${(cnt_jrdd)!})</a></td>
+				</tr>
+				<tr>
+					<th align="right">评论数：</th>
+					<td class="red bold"><a href="void(0);">(${(cnt_comment)!})</a></td>
+					<th align="right">信用等级：</th>
+					<td class="red bold">
+							<#if strkit('1',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('2',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('3',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('4',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('5',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> <img
+						src="${CTX}/res/css/ab/images/credit1.gif"> </#if> <#if
+						strkit('6',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('7',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('8',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('9',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('10',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> <img
+						src="${CTX}/res/css/ab/images/credit2.gif"> </#if> <#if
+						strkit('11',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if> <#if
+						strkit('12',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if> <#if
+						strkit('13',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if> <#if
+						strkit('14',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if> <#if
+						strkit('15',(vo.credittype)!)> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> <img
+						src="${CTX}/res/css/ab/images/credit4.gif"> </#if>
+					</td>
+				</tr>
+				<tr>
+					<th align="right">评价分数：</th>
+					<td class="red bold">${(vo.rate)!}</td>
+					<th align="right">客户评级：</th>
+					<td class="red bold">
+							<#if (vo.rate?number>=0 && vo.rate?number<1)> ☆☆☆☆☆ </#if> 
+							<#if (vo.rate?number>=1 && vo.rate?number<2)> ★☆☆☆☆ </#if> 
+					        <#if (vo.rate?number>=2 && vo.rate?number<3)> ★★☆☆☆ </#if>
+					        <#if (vo.rate?number>=3 && vo.rate?number<4)> ★★★☆☆ </#if> 
+					        <#if (vo.rate?number>=4 && vo.rate?number<5)> ★★★★☆ </#if> 
+					        <#if (vo.rate?number>=5 && vo.rate?number<6)> ★★★★★ </#if>
+					</td>
+				</tr>
+			</table>
+			<table class="list">
+			<h4 class="box_title">店铺今日订单</h4>
+            <tr>
+	            <th width="40px;">序号</th>
+	            <th width="15%;">订单号</th>
+	            <th width="10%;">总金额</th>
+	            <th width="10%;">联系人</th>
+	            <th width="10%;">联系电话</th>
+	            <th width="*;">收货地址</th>
+	            <th width="8%;">支付方式</th>
+	            <th width="8%;">支付状态</th>
+	            <th width="8%;">订单状态</th>
+	        </tr>
+	        <#if list_wcl_order ??>
+	        	<#if (list_wcl_order?size gt 0)>
+      			  <#list list_wcl_order as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!}</td>
+                    <td><a href="JavaScript:void(0);" onclick="uf_showdd('${(lst.id)!}')">${(lst.sn)!}</a></td>
+                    <td class="red">${(lst.ddzje)?string("currency")}</td>
+                    <td><#if strkit('1',(lst.ddzt)!)>***<#else>${(lst.lxr)!}</#if></td>
+                    <td><#if strkit('1',(lst.ddzt)!)>***<#else>${(lst.lxrdh)!}</#if></td>
+                    <td><#if strkit('1',(lst.ddzt)!)>***<#else>${(lst.shdz)!}</#if></td>
+                    <td>
+                    	<#if strkit('1',(lst.zffs)!)><span class="red">充值直扣</span></#if>
+                    	<#if strkit('2',(lst.zffs)!)><span class="red">支付宝</span></#if>
+                    	<#if strkit('3',(lst.zffs)!)><span class="red">货到付款</span></#if>
+                    	<#if strkit('4',(lst.zffs)!)><span class="red">无支付</span></#if>
+                    </td>
+                    <td><#if strkit('0',(lst.zfzt)!)>未支付</#if><#if strkit('1',(lst.zfzt)!)>已支付</#if></td>
+                    <td>
+                    	<#if strkit('0',(lst.ddzt)!)><span class="red">未提交</span></#if>
+                    	<#if strkit('1',(lst.ddzt)!)>已提交</#if>
+                    	<#if strkit('2',(lst.ddzt)!)>取货中</#if>
+                    	<#if strkit('3',(lst.ddzt)!)>送货中</#if>
+                    	<#if strkit('4',(lst.ddzt)!)>已送达</#if>
+                    	<#if strkit('5',(lst.ddzt)!)>已签收</#if>
+                    	<#if strkit('6',(lst.ddzt)!)><span class="red">拒单</span></#if>
+                    	<#if strkit('7',(lst.ddzt)!)><span class="red">已退单</span></#if>
+                    	<#if strkit('8',(lst.ddzt)!)><span class="red">已撤单</span></#if>
+                    </td>
+                  </tr>
+				</#list>
+				<#else>
+				<tr>
+					<td colspan="9" class="red blod">店铺今日暂无订单!</td>
+				</tr>
+				</#if>
+			</#if>
+            </table>
+            <h4 class="box_title">您的功能应用</h4>
+            <table class="list">
+            <tr>
+	            <th width="200px;">
+	            	<a href="${CTX}/ab/order/listmerorder">订单管理</a>
+	            </th>
+	            <th width="200px;">
+	            	<a href="${CTX}/ab/mer/listproduct">商品管理</a>
+	            </th>
+	        </tr>
+	        </table>
+		</div>
+	</div>
+	<!-- 提示信息 -->
+	
+	<div id="myordercart" style="width:250px;height:160px;border: 1px solid #EE7621;background-color: #F4F4F4;z-index: 10;">
+		<div style="height: 28px;background-color: #EE7621;width: 250px;line-height: 28px;color: white;font-weight: bold;"><img src="${CTX}/res/images/laba.gif"/>系统提醒</div>
+		<div style="height: 150px;width: 250px;">
+			<span style="line-height: 50px;font-size: 13px;font-weight: bold;padding-left: 10px;">您尚有<span style="color: blue;"><a href="${CTX}/ab/order/listordershsh">(${(cnt_wcldd)!})</a></span>个订单未处理，请处理！</span>
+		</div>
+	</div>
+<script type="text/javascript">
+ function scroll(p){
+     var d = document,w = window,o = d.getElementById(p.id),ie6 = /msie 6/i.test(navigator.userAgent);
+     if(o){
+	      o.style.cssText +=";position:"+(p.f&&!ie6?'fixed':'absolute')+";"+(p.r?'left':"right")+":0;"+(p.t!=undefined?'top:'+p.t+'px':'bottom:20;right: 10px;');
+	      if(!p.f||ie6){
+	       -function(){
+	           var t = 500,st = d.documentElement.scrollTop||d.body.scrollTop,c;
+	                 c = st  - o.offsetTop + (p.t!=undefined?p.t:(w.innerHeight||d.documentElement.clientHeight)-o.offsetHeight);//如果你是html 4.01请改成d.body,这里不处理以减少代码
+	              c!=0&&(o.style.top = o.offsetTop + Math.ceil(Math.abs(c)/10)*(c<0?-1:1) + 'px',t=10);
+	              setTimeout(arguments.callee,t)
+	          }() 
+	      }
+	     }  
+ }
+ 
+ $().ready(function(){
+	scroll({id:'myordercart'});
+ });
+</script>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+    <script type="text/javascript">
+    	function uf_del(id){
+			$.dialog.confirm('是否要删除所选打印机？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/mer/doDeletePrint",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除打印机成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("删除打印机失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_sj(id){
+			$.dialog.confirm('确定要启用该打印机吗？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/mer/changeWorkSatus",
+					type: "POST",
+					data: {id:id,isWork:1},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("所选打印机启用成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("所选打印机启用失败！");
+						}
+					}
+				});
+			});
+		}
+		function uf_xj(id){
+			$.dialog.confirm('确定要关闭该打印机吗？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/mer/changeWorkSatus",
+					type: "POST",
+					data: {id: id, isWork: 0},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("所选打印机关闭成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("所选打印机关闭失败！");
+						}
+					}
+				});
+			});
+		}
+		
+		$().ready(function(){
+			//打印机页面
+			$("#addprint").bind("click",function(){
+				$.dialog({
+					title:'添加打印机',
+					content: "url:${CTX}/ab/mer/initSaveUpdatePrint",
+				    lock:true,
+				    resize: false,
+				    width : 440,
+					height : 300,
+					cover:true,
+					max:false,
+					min:false,
+					cancel:true,
+					button: [{
+		            	name: '确定',
+			            callback: function(){
+							if(!this.content.$("#myform").valid()) {
+								return false;
+							}else{
+								$.post("${CTX}/ab/mer/doSaveUpdatePrint",this.content.$("#myform").serializeArray(),function(data){
+				                    if(data){
+										$.dialog.alert("保存数据成功！",function () {
+											refresh();
+								        }).time(0.5);
+									}else{
+										$.dialog.alert("保存数据失败！");
+									}
+								});
+							}
+							return false;
+			            },
+	           			focus: true
+			        }],
+			        cancelVal:'关 闭'
+				});//弹出框
+			});
+		})
+		function edit_pt(id){
+			$.dialog({
+				title:'修改打印机',
+				content: "url:${CTX}/ab/mer/initSaveUpdatePrint?id=" + id, 
+			    lock:true,
+			    resize: false,
+			    width : 440,
+				height : 300,
+				cover:true,
+				max:false,
+				min:false,
+				cancel:true,
+				button: [{
+	            	name: '确定',
+		            callback: function(){
+						if(!this.content.$("#myform").valid()) {
+							return false;
+						}else{
+							$.post("${CTX}/ab/mer/doSaveUpdatePrint",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+									$.dialog.alert("修改数据成功！",function () {
+										refresh();
+							        }).time(0.5);
+								}else{
+									$.dialog.alert("修改数据失败！");
+								}
+							});
+						}
+						return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		function pre_pt(id){
+			$.dialog({
+				title:'打印测试',
+				content: "url:${CTX}/ab/mer/initPrintMsg?id=" + id, 
+			    lock:true,
+			    resize: false,
+			    width : 440,
+				height : 300,
+				cover:true,
+				max:false,
+				min:false,
+				cancel:true,
+				button: [{
+	            	name: '确定',
+		            callback: function(){
+						if(!this.content.$("#myform").valid()) {
+							return false;
+						}else{
+							$.post("${CTX}/ab/mer/doPrintMsg",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+									$.dialog.alert("发送打印数据成功！",function () {
+										refresh();
+							        }).time(0.5);
+								}else{
+									$.dialog.alert("发送打印数据失败！");
+								}
+							});
+						}
+						return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+    </script>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">打印机信息</h2>
+			<form id="myform" name="myform" action="" method="post">
+			<div class="bold red" style="height: 30px;height: 30px;font-size:14px;margin-left: 20px">
+				<input type="button" id="addprint" value="新增打印机" class="button">
+			</div>
+			<table class="list">
+            <tr>
+	            <th width="4%">序号</th>
+	            <th width="10%">用户id</th>
+	            <th width="*%">打印机终端号</th>
+	            <th width="15%">API密钥</th>
+	            <th width="15%">打印机密钥</th>
+	            <th width="15%">手机号</th>
+				<th width="6%">状态</th>
+				<th width="20%">操作</th>
+	        </tr>
+      			<#list listprint as s>
+                  <tr>
+                  	<td>${(s_index+1)!}</td>
+                  	<td>${(s.partner)!}</td>
+                  	<td>${(s.machinecode)!}</td>
+                    <td>${(s.apikey)!}</td>
+                    <td>${(s.mkey)!}</td>
+                    <td>${(s.mobile)!''}</td>
+                    <td>
+                    	<#if strkit('0',(s.iswork)!)>未启用</#if>
+                    	<#if strkit('1',(s.iswork)!)>已启用</#if>
+                    </td>
+                    <td>
+                   		<#if strkit('1',(s.iswork)!)><a href="javascript:void(0)" onclick="uf_xj('${(s.id)!}')">停用</a></#if>
+                    	<#if strkit('0',(s.iswork)!)><a href="javascript:void(0)" onclick="uf_sj('${(s.id)!}')">启用</a></#if>
+                    	<a href="javascript:void(0)" onclick="edit_pt('${(s.id)!}')">修改</a>
+                    	<#if strkit('0',(s.iswork)!)><a href="javascript:void(0)" onclick="uf_del('${(s.id)!}')">删除</a></#if>
+                    	<#if strkit('1',(s.iswork)!)><a href="javascript:void(0)" onclick="pre_pt('${(s.id)!}')">打印测试</a></#if>
+                    </td>
+                  </tr>
+				</#list>
+            </table>
+            </form>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

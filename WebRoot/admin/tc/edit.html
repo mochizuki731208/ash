@@ -1,0 +1,171 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+		var rooturl = "${CTX}/";
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					c_type:{required:true,stringMaxLength:50},
+					c_name:{required:true,stringMaxLength:50},
+					
+					c_value:{required:true,stringMaxLength:500},
+					c_listorder:{required:true}
+				}
+			});
+			
+			$("#user_mc").focus();
+			var city_id = '${(c.city_id)!}';
+			$.get("${CTX}/admin/tc/cities",{},function(data){
+				if(data && data.length > 0){
+					var str = '';
+					for(var i=0;i<data.length;i++){
+						var d = data[i];
+						str += "<option value=\""+d["id"]+"\">"+d["mc"]+"</option>";
+					}
+					$("#c_city_id").append(str);
+					if(city_id != ''){
+						$("#c_city_id").val(city_id);
+					}
+				}
+			});
+			
+// 			$('#file_upload').uploadFile({},function(data){
+// 	            alert(data);
+// 	            $("#c_value").val(data);
+// 	            $("#imgb").prepend('<img src="${CTX}/upload/'+data+'"/>');
+// 	        },"file_upload");
+			
+			
+			$('#file_upload').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+// 					$('#myform').append("<input type='hidden' id='img_url' name='img_url' value='"+data+"'/>");
+// 					$('#imga').append("<img src='${CTX}/upload/"+data+"' width=80px height=60px/>");
+					 $("#c_value").val(data);
+			         $("#imgb").prepend("<img src='${CTX}/upload/"+data+"' width=80px height=60px/>");
+                 }
+			});
+		});
+		function changerKey(v){
+			if(v=="封面"){
+				$("#c_valueDiv").hide();
+			}
+			else{
+				$("#c_valueDiv").show();
+			}
+
+			 if(v=="自定义"){
+				$("#key1").show();
+			}	else{
+				$("#key1").hide();
+			}
+		}
+		
+		function changerKey1(v){
+			 if(v=="自定义"){
+				$("#c_name1").show();
+			}	else{
+				$("#c_name1").hide();
+			}
+		}
+	</script>
+	<style>
+	.upload_btn_over { position: relative;  cursor: pointer; text-decoration: none;  background: url('${CTX}/res/images/sel_file.gif') no-repeat scroll 0px 0px transparent;   display: block; height:35px;}
+    .upload_btn {position:absolute; left: 0px; width: 117px;  height: 36px; background-color: #00F;opacity: 0;cursor: pointer;}
+	</style>
+</head>
+
+  <body>
+    <form id="myform" name="myform" action="${CTX}${NAME_SPACE}/save" method="post" >
+	<input type="hidden" name="c_id" id="c_id" value="${(c.id)!}"/>
+	<table class="input">
+		<tr style="display: none;">
+			<th align="right" width="20%;">类型：</th>
+			<td><input type="hidden" name="c_type" id="c_type" class="text" value="01"></td>
+		</tr>
+		<tr>
+			<th align="right">名称：</th>
+			<td>
+				<select name="c_name" id="c_name"  value="${(c.name)!}" onchange="changerKey1(this.value)">				
+					<option value="人工直达">人工直达</option>
+					<option value="三轮车">三轮车</option>
+					<option value="面包车">面包车</option>
+					<option value="金杯车">金杯车</option>
+					<option value="厢式货车">厢式货车</option>
+					<option value="自定义">自定义</option>
+				</select>
+				<input name="c_name1" id="c_name1" style="display: none;"/>
+			</td>
+		</tr>
+		 <tr>
+			<th align="right">关键词：</th>
+			<td>
+				<select name="c_key" id="c_key"  value="${(c.key)!}" onchange="changerKey(this.value)">				
+					<option value="起步价">起步价</option>
+					<option value="运输体积">运输体积</option>
+					<option value="重量限制">重量限制</option>
+					<option value="超公里费">超公里费</option>
+					<option value="夜间服务 ">夜间服务 </option>
+					<option value="封面">封面</option>
+					<!-- <option value="自定义">自定义</option> -->
+				</select>
+				<input name="c_key1" id="key1" style="display: none;"/>
+			</td>
+		</tr> 
+		
+		<!-- <tr>
+			<th align="right">自定义：</th>
+			<td>
+				<input type="hidden" name="c_key" id="c_key" value="自定义">
+				<input name="c_key1" id="key1"/>
+			</td>
+		</tr> -->
+		
+		<tr>
+			<th align="right">值：</th>
+			<td>
+				<span id="c_valueDiv"><input type="text" name="c_value" id="c_value" class="text" value="${(c.value)!}">
+				<br></span>
+				<a href="javascript:;" onclick="$('#uploadDiv').show()">(如若上传图片，点这里)</a>
+				<div id="uploadDiv" style="display: none;">
+                    <a href="javascript:void(0)" class="upload_btn_over" style="top:0px ;left:0;width:112px; float:left">
+                        <input name="file_upload" id="file_upload"  type="file">
+                    </a>
+				</div>
+				<div id="imgb"></div>
+			</td>
+		</tr>		
+		<tr>
+			<th align="right">排序值：</th>
+			<td><input type="text" name="c_listorder" id="c_listorder" class="text" value="${(c.listorder)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">城市：</th>
+			<td>
+				<select name="c_city_id" id="c_city_id">
+					<option value="">==请选择==</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">备注：</th>
+			<td><textarea id="c_desc" name="c_desc" class="text">${(c.desc)!}</textarea></td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

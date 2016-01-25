@@ -1,0 +1,239 @@
+.more_rcv {
+	display: none;
+}
+
+  #address-common {
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px #cac9c9;
+    position: absolute;
+    /*top: 76px;  left: 135;*/
+    width: 500px;
+    z-index: 2;
+}
+#address-common .address-common-list-wrap {
+    border-bottom: 1px solid #e5e5e5;
+}
+#address-common .address-common-list-wrap .address-common-list {
+    cursor: pointer;
+    font-size: 12px;
+    min-height: 50px;
+    position: relative;
+}
+#address-common .address-common-list-wrap .address-common-list-selected {
+    background-color: #f3f3f3;
+}
+#address-common .address-common-list-wrap .address-common-list .address-common-icon {
+    background: url("../../images/tc_icon.png") no-repeat scroll -320px 0 rgba(0, 0, 0, 0);
+    display: block;
+    height: 28px;
+    left: 20px;
+    position: absolute;
+    top: 12px;
+    width: 28px;
+}
+#address-common .address-common-list-wrap .address-common-list .address-common-address {
+    line-height: 20px;
+    padding-left: 62px;
+    padding-top: 5px;
+    width: 380px;
+}
+#address-common .address-common-list-wrap .address-common-list .address-common-address span {
+    display: block;
+    word-break: normal;
+    word-wrap: break-word;
+}
+#address-common .address-common-list-wrap .address-common-list .address-common-address span.address-common-detail-address {
+    color: #a3a6ab;
+}
+#address-common .address-common-list-wrap .address-common-list .address-common-name, .address-common .address-common-list-wrap .address-common-list .address-common-phone {
+    line-height: 50px;
+    position: absolute;
+    text-align: center;
+    top: 0;
+}
+#address-common .address-common-list-wrap .address-common-list .address-common-name {
+    left: 450px;
+    width: 150px;
+}
+#address-common .address-common-list-wrap .address-common-list .address-common-phone {
+    left: 600px;
+    width: 150px;
+}
+#address-common .address-common-type {
+    background-color: #f3f3f3;
+    height: 40px;
+    line-height: 40px;
+    overflow: hidden;
+    text-align: center;
+}
+#address-common .address-common-type .address-common-type-list {
+    cursor: pointer;
+    position: relative;
+    width: 50%;
+}
+#address-common .address-common-type .address-common-type-list-left {
+    float: left;
+}
+#address-common .address-common-type .address-common-type-list-right {
+    float: right;
+}
+#address-common .address-common-type .address-common-type-list-left p {
+    border-right: 1px solid #e5e5e5;
+}
+#address-common .address-common-type .address-common-type-list a {
+    display: none;
+}
+#address-common .address-common-type .address-common-type-list-selected {
+    background-color: #fff;
+}
+#address-common .address-common-type .address-common-type-list-selected .left, .address-common .address-common-type .address-common-type-list-selected .right {
+    cursor: pointer;
+    display: block;
+    height: 17px;
+    position: absolute;
+    top: 10px;
+    width: 10px;
+}
+
+/*
+#address-common {
+	background-color: #fff;
+	border: 1px solid #e5e5e5;
+	border-radius: 5px;
+	box-shadow: 0 4px 10px #cac9c9;
+	left: 135;
+	position: absolute;
+	top: 76px;
+	width: 500px;
+	z-index: 2;
+}
+
+#address-common .address-common-list-wrap {
+	border-bottom: 1px solid #e5e5e5;
+}
+
+#address-common .address-common-list-wrap .address-common-list {
+	cursor: pointer;
+	font-size: 12px;
+	min-height: 50px;
+	position: relative;
+}
+
+#address-common .address-common-list-wrap .address-common-list-selected
+	{
+	background-color: #f3f3f3;
+}
+
+#address-common .address-common-list-wrap .address-common-list .address-common-icon
+	{
+	background: url("../../images/tc_icon.png") no-repeat scroll -320px
+		0 rgba(0, 0, 0, 0);
+	display: block;
+	height: 28px;
+	left: 20px !important;
+	position: absolute !important;
+	top: 12px;
+	width: 28px;
+}
+
+#address-common .address-common-list-wrap .address-common-list .address-common-address
+	{
+	line-height: 20px;
+	padding-left: 62px;
+	padding-top: 5px;
+	width: 380px !important;
+}
+
+#address-common .address-common-list-wrap .address-common-list .address-common-address span
+	{
+	display: block;
+	word-break: normal;
+	word-wrap: break-word;
+}
+
+#address-common .address-common-list-wrap .address-common-list .address-common-address span.address-common-detail-address
+	{
+	color: #a3a6ab;
+}
+
+#address-common .address-common-list-wrap .address-common-list .address-common-name,.address-common .address-common-list-wrap .address-common-list .address-common-phone
+	{
+	line-height: 50px;
+	position: absolute;
+	text-align: center;
+	top: 0;
+}
+
+#address-common .address-common-list-wrap .address-common-list .address-common-name
+	{
+	left: 450px;
+	width: 150px;
+}
+
+#address-common .address-common-list-wrap .address-common-list .address-common-phone
+	{
+	left: 600px;
+	width: 150px;
+}
+
+#address-common .address-common-type {
+	background-color: #f3f3f3;
+	height: 40px;
+	line-height: 40px;
+	overflow: hidden;
+	text-align: center;
+}
+
+#address-common .address-common-type .address-common-type-list {
+	cursor: pointer;
+	position: relative;
+	width: 50%;
+}
+
+#address-common .address-common-type .address-common-type-list-left {
+	float: left;
+}
+
+#address-common .address-common-type .address-common-type-list-right {
+	float: right;
+}
+
+#address-common .address-common-type .address-common-type-list-left p {
+	border-right: 1px solid #e5e5e5;
+}
+
+#address-common .address-common-type .address-common-type-list a {
+	display: none;
+}
+
+#address-common .address-common-type .address-common-type-list-selected
+	{
+	background-color: #fff;
+}
+
+#address-common .address-common-type .address-common-type-list-selected .left,.address-common .address-common-type .address-common-type-list-selected .right
+	{
+	cursor: pointer;
+	display: block;
+	height: 17px;
+	position: absolute !important;
+	top: 10px;
+	width: 10px;
+}
+
+#address-common p{  
+	margin-right: 0;
+  position: static;
+  margin-top: 0;
+  text-align: left;
+  font-size: 12px;
+  float: none;
+  }
+
+#address-common span {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  }*/

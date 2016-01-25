@@ -1,0 +1,179 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<link rel="stylesheet" type="text/css"
+	href="${CTX}/res/js/uploadify/uploadify.css" />
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<script type="text/javascript"
+	src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript"
+	src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+<script type="text/javascript">
+		$().ready(function() {
+			var max = $('#ddzje').val();
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					content:{required:true,stringMaxLength:100},
+					agree:{required:true},
+					money:{required:true,  max: max, min: 0}
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				if($("#myform").valid()){
+				    $("#myform").submit();
+				}
+			});
+		});
+		
+		function changeagree(obj){
+			var ags = $("input[name='agree']");
+			for(var i = 0;i<ags.length;i++){
+				if($(ags[i]).attr('id') == $(obj).attr('id')){
+					$(ags[i]).attr('checked', 'checked');
+				}else{
+					$(ags[i]).removeAttr('checked');
+				}
+			}
+			if($(obj).attr('id') == 'agree2'){
+				$('#money').val('0');
+				$('#money').attr('disabled', 'disabled');
+			}else{
+				$('#money').removeAttr('disabled');
+			}
+		}
+	
+	</script>
+</head>
+
+<body>
+	<form id="myform" name="myform" method="post">
+		<input type="hidden" name="cbid" id="cbid" value="${(cb.id)!}" />
+		<input type="hidden" name="ddzje" id="ddzje" value="${(cb.ddzje)!}" />
+		<table class="input">
+			<tr>
+				<th align="right">订单编号：</th>
+				<td>${(cb.sn)!}</td>
+				<th align="right">订单金额：</th>
+				<td style="color: red">${(cb.ddzje)?string("currency")}</td>
+			</tr>
+			<tr>
+				<th align="right">用户名称：</th>
+				<td>${(cb.xdrmc)!}</td>
+				<th align="right">商家名称：</th>
+				<td>${(cb.mname)!}</td>
+			</tr>
+			<tr>
+				<th align="right">接单人名称：</th>
+				<td>${(cb.qdrname)!}</td>
+				<th align="right">状态：</th>
+				<td>
+						<#if strkit('01',(cb.cb_status)!)>用户申请</#if>
+                    	<#if strkit('02',(cb.cb_status)!)>商户申请</#if>
+                    	<#if strkit('03',(cb.cb_status)!)>商户申诉</#if>
+                    	<#if strkit('04',(cb.cb_status)!)>取消退单</#if>
+                    	<#if strkit('05',(cb.cb_status)!)>客服介入</#if>
+                    	<#if strkit('06',(cb.cb_status)!)>退单成功</#if>
+                    	<#if strkit('07',(cb.cb_status)!)>退单失败</#if>
+                    	<#if strkit('08',(cb.cb_status)!)>业务员申请</#if>
+                    	<#if strkit('09',(cb.cb_status)!)>客服申请</#if>						
+				</td>
+			</tr>
+				<tr>
+				<th align="right">申请人名称：</th>
+				<td>${(cb.mc)!}
+				</td>
+				<th align="right">申请时间：</th>
+				<td>${(cb.apply_time)!}</td>
+			</tr>
+			<tr>
+				<th align="right">申请描述：</th>
+				<td colspan="3">${(cb.apply_desc)!} <#if cb.apply_img_url?? && cb.apply_img_url != ''> <img
+					src="${CTX}/upload/${(cb.apply_img_url)!''}"
+					style="width: 80px; height: 60px; padding-top: 5px;"> </#if>
+				</td>
+			</tr>
+			<tr>
+				<th align="right">商户回复：</th>
+				<td>${(cb.rep_desc)!}</td>
+				<th align="right">商户回复时间：</th>
+				<td>${(cb.rep_time)!}</td>
+			</tr>
+			<tr>
+				<th align="right">仲裁申请人：</th>
+				<td>${(cb.symc)!}</td>
+				<th align="right">申请仲裁时间：</th>
+				<td>${(cb.judge_time)!}</td>
+			</tr>
+			<tr>
+				<th align="right">申请仲裁描述：</th>
+				<td colspan="3">${(cb.judge_desc)!}</td>
+			</tr>
+		</table>
+
+
+		<#if items?exists && (items?size>0) >
+			<table class="list" style="border: 0px;">
+				<tr>
+					<th width="4%;">序号</th>
+					<th width="14%;">补充人名称</th>
+					<th width="15%;">图片</th>
+					<th width="15%;">内容</th>
+					<th width="10%;">补充时间</th>
+				</tr>
+				<#list items as item>
+					<tr>
+						<td>${item_index+1}</td>
+						<td>
+							<#if item.type == '1'>
+								${(cb.xdrmc)!} 
+							</#if>
+							<#if item.type == '2'>
+								${(cb.mname)!}
+							</#if>
+							<#if item.type == '3'>
+								${(cb.qdrname)!}
+							</#if>
+						</td>
+						<td><#if item.img_url?? && item.img_url !=''> <img
+							src="${CTX}/upload/${(item.img_url)!''}"
+							style="width: 80px; height: 60px; padding-top: 5px;"> </#if>
+						</td>
+						<td>${(item.content)!}</td>
+						<td>${(item.datetime)!}</td>
+					</tr>
+				</#list>
+			</table>
+		</#if>
+		
+		<table class="input">
+			<tr>
+				<th align="right">选择维权状态：</th>
+				<td>
+					<input type="radio" id="agree1" name="agree" onclick="changeagree(this)"
+						checked="checked" value="1" /> <span class="c494947">成功</span> 
+					<input type="radio" id="agree2" name="agree" value="2" onclick="changeagree(this)"/> <span
+						class="c494947">失败</span>
+				</td>
+			<tr>
+			<tr>
+				<th align="right">退款金额：</th>
+				<td>
+					<input type="number" id="money" name="money" value="0"/><font id="mr" color="red">*</font>
+				</td>
+			</tr>
+			<tr>
+				<th align="right">维权总结：</th>
+				<td colspan="3"><textarea name="content" id="content"
+						required="required" style="width: 500px;"></textarea> <font color="red">*</font></td>
+			<tr>
+		</table>
+
+	</form>
+
+</body>
+</html>
+

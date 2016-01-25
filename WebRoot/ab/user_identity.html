@@ -1,0 +1,236 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/style.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/user.css"/>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$('#sfzzpzm').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_sfzzpzm").attr('value',data);
+					$('#img_sfzzpzm').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+			
+			$('#sfzzpbm').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$("#tb_sfzzpbm").attr('value',data);
+					$('#img_sfzzpbm').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+			
+			$('#btn_gs').click(function(){
+				if($('#tb_sfzzpzm').val()=='') {$.dialog.alert("请上传身份证正面扫描件！"); return false;}
+				if($('#tb_sfzzpbm').val()=='') {$.dialog.alert("请上传身份证背面扫描件！"); return false;}
+				$.post("${CTX}/ab/user/saverz",$("#myform").serializeArray(),function(data){
+		            if(data){
+						$.dialog.alert("认证已提交！");
+						window.location.href="${CTX}/ab/certiUserIdentity";
+					}else{
+						$.dialog.alert("认证失败！");
+					}
+				});
+			});
+			//首页图片
+			$('#titleimg').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择头像',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#tb_logo').attr('value',data);
+					$('#imga').html("<img src='${CTX}/upload/"+data+"' style='max-width: 130px;max-height: 100px;'/>");
+                 }
+			});
+		});
+	</script>
+</head>
+  <body>
+  <form id="myform" name="myform" action="${CTX}/ab/reg/saveywyrz" method="post">
+  	<input type="hidden" id="tb_id" name="tb_id" value="${(vo.id)!}">
+	<input type="hidden" id="tb_sfzzpzm" name="tb_sfzzpzm" value="${(vo.sfzzpzm)!}">
+	<input type="hidden" id="tb_sfzzpbm" name="tb_sfzzpbm" value="${(vo.sfzzpbm)!}">
+	<input type="hidden" class="text" id="tb_logo" name="tb_logo" value="${(vo.logo)!}">
+  	<#include 'inc/top.html'>
+	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+<div class="blank10"></div>
+<div class="rz_main">
+	<div class="rz_title">身份认证</div>
+	<div class="rz_describe">
+		<p>用户信息登记审核通过后您可以：</p>
+		<p>1. 使用个人认证的所有功能；</p>
+    	<p>2. 提高帐号可信任度；</p>
+	</div>
+	<div id="carpt">
+	<div class="rz_title">&nbsp;</div>
+	<table class="rz_table">
+	
+		<tr>
+			<td  class="td1">头像：</td>
+			<td>
+				<div id="imga">
+					<#if vo.logo?exists>
+						<img src="${CTX}/upload/${(vo.logo)!''}" style="max-width: 50px;max-height:50px;">
+					<#else>
+						<img src="${CTX}/res/images/tx.jpg" style="max-width: 50px;max-height:50px;">
+					</#if>
+				</div>
+				<input type="file" name="titleimg" id="titleimg" multiple="false"/> 
+			</td>
+		</tr>
+	
+		<tr>
+			<td class="td1">真实姓名：</td>
+			<td>
+				<input type="text" class="rz_from" name="tb_mc" id="tb_mc" value="${(vo.mc)!}" />
+				<p class="ms">请填写该个人名称</p>
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">身份证号：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_idcard" name="tb_idcard"  value="${(vo.idcard)!}" />
+				<p class="ms">请输入身份证号</p>
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">身份证号正面扫描件：</td>
+			<td>
+				
+				<p class="ms">请上传身份证正面照片，支持.jpg .jpeg .bmp .gif格式照片，大小不超过2M。 </p>
+				<#if (vo.sfzzpzm)??>
+					<img src="${CTX}/upload/${(vo.sfzzpzm)!}"  width= "150px" height="150px"  id="img_sfzzpzm"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/sf.png" width= "150px" height="150px"  id="img_sfzzpzm"/>
+				</#if>
+				<input type="file" name="sfzzpzm" id="sfzzpzm" multiple="false"/> 
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">身份证号背面扫描件：</td>
+			<td>
+				
+				<p class="ms">请上传身份证背面照片，支持.jpg .jpeg .bmp .gif格式照片，大小不超过2M。 </p>
+				<#if (vo.sfzzpbm)??>
+					<img src="${CTX}/upload/${(vo.sfzzpbm)!}"  width= "150px" height="150px"  id="img_sfzzpbm"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/sf1.png" width= "150px" height="150px"  id="img_sfzzpbm"/>
+				</#if>
+				<input type="file" name="sfzzpbm" id="sfzzpbm" multiple="false"/> 
+			</td>
+		</tr>
+		<!-- <#if strkit('1',vo.zhlx)>
+<!--		<tr>
+			<td class="td1">年龄：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_nl" name="tb_nl" value="${(vo.nl)!}" style="width: 120px;"/>
+				星座：
+				<select id="tb_xz" name="tb_xz">
+					<option value="">请选择</option>
+					<option value="水瓶座" <#if strkit('水瓶座',(vo.xz)!)>selected</#if>>水瓶座</option>
+					<option value="双鱼座" <#if strkit('双鱼座',(vo.xz)!)>selected</#if>>双鱼座</option>
+					<option value="白羊座" <#if strkit('白羊座',(vo.xz)!)>selected</#if>>白羊座</option>
+					<option value="金牛座" <#if strkit('金牛座',(vo.xz)!)>selected</#if>>金牛座</option>
+					<option value="双子座" <#if strkit('双子座',(vo.xz)!)>selected</#if>>双子座</option>
+					<option value="巨蟹座" <#if strkit('巨蟹座',(vo.xz)!)>selected</#if>>巨蟹座</option>
+					<option value="狮子座" <#if strkit('狮子座',(vo.xz)!)>selected</#if>>狮子座</option>
+					<option value="处女座" <#if strkit('处女座',(vo.xz)!)>selected</#if>>处女座</option>
+					<option value="天秤座" <#if strkit('天秤座',(vo.xz)!)>selected</#if>>天秤座</option>
+					<option value="天蝎座" <#if strkit('天蝎座',(vo.xz)!)>selected</#if>>天蝎座</option>
+					<option value="射手座" <#if strkit('射手座',(vo.xz)!)>selected</#if>>射手座</option>
+					<option value="摩羯座" <#if strkit('摩羯座',(vo.xz)!)>selected</#if>>摩羯座</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">身高：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_sg" name="tb_sg" value="${(vo.sg)!}" />
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">签名：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_qm" name="tb_qm" value="${(vo.qm)!}" />
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">月薪：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_yx" name="tb_yx" value="${(vo.yx)!}" />
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">地区：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_dq" name="tb_dq" value="${(vo.dq)!}" />
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">职业：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_zhiye" name="tb_zhiye" value="${(vo.zhiye)!}" />
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">情感：</td>
+			<td>
+				<input type="text" class="rz_from" id="tb_qg" name="tb_qg" value="${(vo.qg)!}" />
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">其他：</td>
+			<td>
+				<input type="checkbox" id="tb_cy" name="tb_cy" value="1" <#if strkit('1',(vo.cy)!)>checked</#if>/>是否抽烟
+				&nbsp;&nbsp;
+				<input type="checkbox" id="tb_hj" name="tb_hj" value="1" <#if strkit('1',(vo.hj)!)>checked</#if>/>是否喝酒
+			</td>
+		</tr>
+<<<<<<< .mine
+		</#if> -->
+		<tr>
+			<td class="td1"></td>
+			<td>
+				<#if strkit('',(vo.sfrzzt)!)><a href="javascript:;" id="btn_gs" class="rz_submit">立即提交</a></#if>
+				<#if strkit('0',(vo.sfrzzt)!)><a href="javascript:;" id="btn_gs" class="rz_submit">立即提交</a></#if>
+				<#if strkit('1',(vo.sfrzzt)!)>认证中...</#if>
+				<#if strkit('2',(vo.sfrzzt)!)>认证通过</#if>
+				<#if strkit('3',(vo.sfrzzt)!)>
+					认证失败<br/>
+					<a href="javascript:;" id="btn_gs" class="rz_submit">立即提交</a>
+				</#if>
+				<a href="${CTX}/ab/mainuser">返回个人中心</a>
+			</td>
+		</tr>
+		</table>
+	</div>
+	
+	
+	</div>
+	
+	<!-- 栏目页 -->
+	<div class="blank10"></div>
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</form>
+	</body>
+</html>

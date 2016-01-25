@@ -1,0 +1,228 @@
+	<!-- 在线下单，同城快递，基础信息 -->
+<!--============================================= content begin =========================================-->
+<div class="con-wrap order1">
+  <div class="order-t" data-unuse="1"></div>
+  	<div id="container"><div id="content"><div id="slider">
+  	<ul class="sul">
+  		<#list carsLoop as l>
+	  	<li class="sli">
+	  	<div id="carImgBj" class="order-info" car_type="" data-unuse="1">
+		  	<#list l as c>
+		    <div class="carImg img2" style="display:block;" car_type="3" data-unuse="1">
+		      <div class="car_wrap" data-unuse="1">
+		        <div class="t" data-unuse="1">
+		          <h2>${c.name}</h2>
+		          <p class="tip">本次服务：</p>
+		          <p class="price"><span>￥<em>${(c['起步价'])!}</em><b>起</b></span></p>
+		        </div>
+		        <div class="icon" data-unuse="1"></div>
+		        <div class="img" data-unuse="1">
+		        	<img src="${CTX}/upload/${(c['封面'])!}" height="224" width="230"/>
+		        </div>
+		        <div class="c" data-unuse="1">
+		          <ul>
+		            <h3>&nbsp;</h3>
+		            <li>起步价格：${(c['起步价'])!}元（含${(c['起步公里'])!}公里）</li>
+		            <li>运输体积：${(c['运输体积'])!}</li>
+		            <li>长*宽*高：${(c['长宽高'])!}</li>
+		            <li>重量限制：${(c['重量限制'])!}</li>
+		            <li>超公里费：${(c['超公里费'])!}元/公里</li>
+		            <#if (c['车长'])?exists><li>车长：可选（${(c['车长'])!}）米</li></#if>
+		          </ul>
+		        </div>
+		      </div>
+		    </div>
+			</#list>
+	  	</div>
+	  	</li>
+	  	</#list>	  	
+  	</ul></div></div></div>
+  <!--  成都 begin --> 
+</div>
+
+
+
+<div class="info-order-wrap">
+  <div class="info-order" data-unuse="1">
+    <div class="info" data-unuse="1"> 
+      <!--====发货信息 begin ======-->
+      <div class="info-list" data-unuse="1">
+        <div class="info-t" data-unuse="1">发货信息:</div>
+        <div class="tab2 takeGoods-js pickup" address-info-x="" address-info-y="" address-info-province="" address-info-city="" address-info-id="" data-unuse="1">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tbody>
+              <tr>
+               <tr>
+              	<th>下单人电话：</th>
+	              	<td>
+	              		<input autocomplete="off" type="text" placeholder="请输入下单人电话" class="address-info-phone vphone" value="${(tel)!''}" id="tel" name="tel">
+	              	</td>
+                </tr>
+                <th>发货地址：</th>
+                <td><div class="address-wrap" data-unuse="1">
+                    <div class="address" data-unuse="1">
+                      <input type="text" placeholder="请输入发货地址" class="l address-info-address vaddr" value="" id="sendAddr" name="sendAddr">
+                    </div>
+                    <div id="sendAddr_panel"></div>
+                  </div></td>
+              </tr>
+              <tr>
+                <th>联系人姓名：</th>
+                <td><p>
+                    <input autocomplete="off" type="text" placeholder="请输入姓名" class="address-info-name vname" id="sendName" name="sendName" value="${(userNew.mc)!}">
+                  </p></td>
+              </tr>
+              <tr>
+                <th>联系电话：</th>
+                <td><p>
+                    <input autocomplete="off" type="text" placeholder="请输入联系电话" class="address-info-phone vphone" value="" id="sendPhone" name="sendPhone">
+                  </p></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!--====发货信息 over ======--> 
+      <!--====收货信息 begin ======-->
+      <div class="info-list" data-unuse="1">
+        <div class="info-t" data-unuse="1">收货信息:</div>
+        <!--====tab2 begin ======-->
+        <div class="tab2 tab-js takeGoods-js" address-info-x="" address-info-y="" address-info-province="" address-info-city="" address-info-id="" data-unuse="1">
+          <div class="receipt-address-num num1" data-unuse="1" style="display: none;"></div>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tbody>
+              <tr>
+                <th>收货地址：</th>
+                <td><div class="address-wrap" data-unuse="1">
+                    <div class="address" data-unuse="1">
+                      <input autocomplete="off" type="text" placeholder="请输入收货地址" class="l address-info-address vaddr" value="" id="rcvAddr" name="rcvAddr">
+                    </div>
+                    <div id="rcvAddr_panel"></div>
+                  </div></td>
+                <td rowspan="3" width="47" class="sed-operation"><a href="javascript:void(0);" class="plus" onclick="addRcv();"></a></td>
+              </tr>
+              <tr>
+                <th>联系人姓名：</th>
+                <td><p>
+                    <input autocomplete="off" type="text" placeholder="请输入姓名" class="address-info-name vname" value="" id="rcvName" name="rcvName">
+                  </p></td>
+              </tr>
+              <tr>
+                <th>联系电话：</th>
+                <td><p>
+                    <input autocomplete="off" type="text" placeholder="请输入联系电话" class="address-info-phone vphone" value="" id="rcvPhone" name="rcvPhone">
+                  </p></td>
+              </tr>
+            </tbody>
+          </table>
+          	<#list 2..5 as a>
+			<table width="100%" cellpadding="0" cellspacing="0" class="more_rcv">
+            <tbody>
+              <tr>
+                <th>收货地址${a}：</th>
+                <td><div class="address-wrap" data-unuse="1">
+                    <div class="address" data-unuse="1">
+                      <input autocomplete="off" type="text" placeholder="请输入收货地址" class="l address-info-address vaddr" value="" id="rcvAddr${a}" name="rcvAddr${a}">
+                    </div>
+                    <div id="rcvAddr${a}_panel"></div>
+                  </div></td>
+                <td rowspan="3" width="47" class="sed-operation"><a href="javascript:void(0);" class="reduction" onclick="removeRcv(${a});"></a></td>
+              </tr>
+              <tr>
+                <th>联系人姓名${a}：</th>
+                <td><p>
+                    <input autocomplete="off" type="text" placeholder="请输入姓名" class="address-info-name vname" value="" id="rcvName${a}" name="rcvName${a}">
+                  </p></td>
+              </tr>
+              <tr>
+                <th>联系电话${a}：</th>
+                <td><p>
+                    <input autocomplete="off" type="text" placeholder="请输入联系电话" class="address-info-phone vphone" value="" id="rcvPhone${a}" name="rcvPhone${a}">
+                  </p></td>
+              </tr>
+            </tbody>
+          </table>			
+			</#list>
+        </div>
+        <!--====tab2 over ======-->
+        <div class="info-tip">最多可添加五个收货人，请按照卸货顺序填写，以遍准确估算价格</div>
+      </div>
+      <!--====收货信息 over ======--> 
+      <div class="info-list" data-unuse="1">
+        <div class="info-t" data-unuse="1">订单模式:</div>
+        <div class="tab2 takeGoods-js pickup" address-info-x="" address-info-y="" address-info-province="" address-info-city="" address-info-id="" data-unuse="1">
+          <table width="100%" cellpadding="0" cellspacing="0" class="">
+				<tr>
+                  <td align="left" colspan="2">
+                  	&nbsp;&nbsp;
+					<label><input type="radio" name="orderStyle" value="1" id="isXS" style="width:20px"/>我要悬赏</label>
+					<label><input type="radio" name="orderStyle" value="2" style="width:20px"/>司机竞标报价</label>&nbsp;&nbsp;
+					<br>
+					<span class=cff5801>&nbsp;&nbsp;
+						<img src=${CTX}/res/css/ab/images/img11.png />&nbsp;
+						招标模式：跑腿人员（司机）竞标，您选择其中一位为您服务； 悬赏模式：一口价，可以额外加悬赏金额哟！
+					</span>
+              	  </td>
+              	</tr>
+              	<tr id="zb_div1" style="display: none;">
+                    <td align="left" height="50">
+                        <span class="fb f12 c646464">&nbsp;&nbsp;&nbsp;&nbsp;悬赏价格：</span>
+                    </td>
+                    <td align="left">
+                    <input autocomplete="off" type="text" placeholder="悬赏金额" class="address-info-name vmoney" value="" id="xsMoney" name="xsMoney" onblur="calcTotal();">
+                    <br>
+                    <p class="pmt"></p>
+                    </td>
+                </tr>
+              	<tr id="xs_div" style="display: ;">
+                    <td align="left" height="50">
+                        <span class="fb f12 c646464">&nbsp;&nbsp;&nbsp;&nbsp;额外悬赏金额：</span>
+                    </td>
+                    <td align="left">
+                    <label><input type=radio name="moreMoney" onchange="calcTotal()" value="10" style="width:20px"/>&nbsp;10元</label>&nbsp;&nbsp;
+                    <label><input type=radio name="moreMoney" onchange="calcTotal()" value="20" style="width:20px"/>&nbsp;20元</label>&nbsp;&nbsp;
+                    <label><input type=radio name="moreMoney" onchange="calcTotal()" value="30" style="width:20px"/>&nbsp;30元</label>&nbsp;&nbsp;
+                    <label><input type=radio name="moreMoney" onchange="calcTotal()" value="50" style="width:20px"/>&nbsp;50元</label>&nbsp;&nbsp;
+                    <label><input type=radio name="moreMoney" onchange="calcTotal()" value="100" style="width:20px"/>&nbsp;100元</label>
+                    </td>
+                </tr>
+                <tr id="zb_div2" style="display: none;">
+                    <td align="left" height="50">
+                        <span class="fb f12 c646464">&nbsp;&nbsp;&nbsp;&nbsp;价格区间：</span>
+                    </td>
+                    <td align="left">
+                    <input autocomplete="off" type="text" placeholder="最低价格" class="address-info-name vmoney" value="" id="minPrice" name="minPrice">
+                    -
+                    <input autocomplete="off" type="text" placeholder="最高价格" class="address-info-name vmoney" value="" id="maxPrice" name="maxPrice">
+                    <br>
+                    <p class="pmt"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left" colspan="2">
+                   		<span class=cff5801>&nbsp;&nbsp;
+							特别提醒：如果您的物流距离超过100公里，您可以选择直接录入一个悬赏价格或招标一个价格区间！
+						</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+      </div>
+      <!--====信息统计 下一步 begin ======-->
+      <div class="info-last-wrap">
+        <div class="info-last" id="someInfo">
+          <p> <span class="t">预计行驶里程：</span><span class="range c"><em class="order_distance" id="kiloRst">0</em>公里</span></p>
+          <p><span class="t">车型：</span><span class="c"><em class="order_car_type" id="carRst">...</em></span></p>
+          <p><span class="t">订单基本费用：</span><span><strong class="order_fare" id="total">0</strong>元</span></p>
+        </div>
+        <div class="info-last">
+          <p>
+            <button type="button" id="saveInfo" class="next-btn tc_button_next" onclick="next();">下一步</button>
+          </p>
+        </div>
+      </div>
+      <!--====信息统计 下一步  over ======--> 
+    </div>
+  </div>
+</div>
+<div id="allmap" style="display: none;"></div>

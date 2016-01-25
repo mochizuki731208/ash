@@ -1,0 +1,409 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+  	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/dd.css"/>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_reset.css">
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/main.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/liuyan.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/page.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+    <link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/common.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-1.8.17.custom.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-zh-CN.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>	<script type="text/javascript">
+ //用于接受上传的条数
+	 var length;
+	 //用于接受整车价格数据
+	 var total;
+	 //用于接受整车价格
+	 var total_price;
+    //百度地图API功能
+	function valDintance(sendAddr,addr,i,transferType,volumn,total){
+		// 添加一个隐藏的div百度地图
+      var map = new BMap.Map("allmap");
+        //获得自驾的导航地址
+	  var driving = new BMap.DrivingRoute(map);
+        //定义自驾的回调函数
+        driving.setSearchCompleteCallback(function (results) {
+            if (driving.getStatus() != BMAP_STATUS_SUCCESS) {
+                return;
+            }
+            var plan = results.getPlan(0);
+		  //自驾距离  
+           var km= parseInt(plan.getDistance(false))/ 1000;  // 驾车距离就是他了
+		    //将计算好的距离和价格添加到表格中
+			$("#distance"+i+"").html(km);
+			if(transferType=='零担'){
+			  if(volumn<=0.5){
+			  	  $("#money"+i+"").html(parseInt(km*2*0.5+28).toFixed(2));
+			  }else if(0.6<volumn<1){
+				 $("#money"+i+"").html(parseInt(km*3.5*volumn+28).toFixed(2));
+			 }
+			 if(volumn>=1){
+			var less=volumn-1;
+			 $("#money"+i+"").html(parseInt(km*2*less+km*3.5*1+28).toFixed(2));
+			}
+			}else{
+			    //划分获得的计算公式
+			   var arr=total.split("-");
+   				if(km<100){
+   					total_price =arr[0]+arr[4]*km; 
+					 $("#money"+i+"").html(total_price);   
+  				 }else{
+					   //计算100公里的价格用于和输入的比较
+					    total_price =arr[0]+arr[4]*100; 
+					    $("#money"+i+"").html("<span style='color:red'>行驶路程已过100公里,需手动输!</span>");
+						$("#operate"+i+"").html("<input type='button' value='修改费用'   onclick='sureMoney("+i+")' id='sureMoney"+i+"'  class='uploadify-button '/>");
+  				 }
+			}
+        })
+       	//搜寻自驾路线
+		  driving.search(sendAddr, addr); 
+	}
+	//用于检测修改费的确定
+	function sureMoney(i){
+		$("#money"+i+"").html("<input type='input' id='moneyInput"+i+"'/>");
+		$("#operate"+i+"").html("<input type='button' value='确定'  onclick='checkMoney("+i+")'   class='uploadify-button '/>");
+	}
+	
+	//用于检测修改费是否正确
+	function checkMoney(i){
+		if(isNaN(total_price)){
+			$("#money"+i+"").html("<span style='color:red'>费用计算失败，请重新上传/span>");
+			return ;
+		}
+// 		alert($("#moneyInput"+i).val() + ";" + total_price);
+		 if(eval($("#moneyInput"+i).val()-total_price)<0){
+		      $("#money"+i+"").html("<span style='color:red'>费用低于最低100公里行驶费用</span>"+total_price+"<span style='color:red'>(元)</span>");
+			  $("#operate"+i+"").html("<input type='button' value='修改费用'   onclick='sureMoney("+i+")'   class='uploadify-button '/>");
+	     }else{
+			 $("#money"+i+"").html($("#moneyInput"+i).val());
+			 //清除修改内容
+			 $("#operate"+i+"").html("");
+		  }
+	}
+	//检测距离是否成功
+	function checkOut(length){
+		for(var i=0;i<length;i++){
+			if(isNaN($("#distance"+i+"").html())){
+				$("#distance"+i+"").html("<span style='color:red'>请确定地址是否正确!!</span>");
+				 $("#money"+i+"").html("<span style='color:red'>距离不正确，费用无法计算!!</span>");
+				//显示修改按钮
+				 $("#operate"+i+"").html("<input type='button' value='修改距离' id='modify"+i+"' onclick='modify("+i+")' class='uploadify-button '  />");
+			}
+		}
+	}
+	
+	//页面修改后单击点击查询事件
+	function checkOutAgain(i){
+		if(isNaN($("#distance"+i+"").html())){
+			$("#distance"+i+"").html("<span style='color:red'>请确定地址是否正确!!</span>");
+		    $("#money"+i+"").html("<span style='color:red'>距离不正确，费用无法计算!!</span>");
+			//显示修改按钮
+			$("#operate"+i+"").html("<input type='button' value='修改距离' id='modify"+i+"' onclick='modify("+i+")' class='uploadify-button '  />");
+		}else{
+			//清除修改内容
+			//判断是否是修改费用按钮，如果是不清除
+			if(!$("#sureMoney"+i+"").val()){
+			  $("#operate"+i+"").html("");
+			}
+		}
+	}
+	//修改距离内容
+	function modify(i){
+		if($("#errorMsg").html()){
+		//清除错误信息
+		  $("#errorMsg").html("");
+		}
+		 $("#sendAddr"+i+"").html("<input type='input' value='"+$("#sendAddr"+i+"").html()+"' id='clearSednAddr"+i+"' onfocus='clearSednAddr("+i+")' />");
+		  $("#addr"+i+"").html("<input type='input' value='"+$("#addr"+i+"").html()+"'  id='clearAddr"+i+"' onfocus='clearAddr("+i+")' />");
+		
+		  if($("#transferType"+i+"").html()=='零担'){
+		   $("#transferType"+i+"").html("<select id='clearTransferType"+i+"'><option selected>零担</option><option >整车</option></select>");
+		  }else{
+		   $("#transferType"+i+"").html("<select id='clearTransferType"+i+"'><option >零担</option><option selected>整车</option></select>");
+		  }
+		 $("#car"+i+"").html("<input type='input' value='"+$("#car"+i+"").html()+"'  id='clearCar"+i+"'  onfocus='clearCar("+i+")' />");
+		$("#operate"+i+"").html("<input type='button' value='确定' id='modify"+i+"'   onclick='sure("+i+")'   class='uploadify-button '/>");
+	}
+	//确定距离内容
+	function sure(i){
+		if($("#errorMsg").html()){
+		//清除错误信息
+		  $("#errorMsg").html("");
+		}
+		//再次查询距离
+		var sendAddr= $("#clearSednAddr"+i+"").val();
+		var addr=   $("#clearAddr"+i+"").val();
+		var transferType= $("#clearTransferType"+i+"").val();
+		var volumn= $("#volumn"+i+"").val();
+		//更改页面属性
+		 $("#sendAddr"+i+"").html(sendAddr);
+		 $("#addr"+i+"").html(addr);
+		 $("#transferType"+i+"").html( $("#clearTransferType"+i+"").val());
+		 $("#car"+i+"").html( $("#clearCar"+i+"").val());
+		 $("#distance"+i+"").html('计算中...');
+		  $("#money"+i+"").html('计算中...');
+		valDintance(sendAddr,addr,i,transferType,volumn,total);
+		setTimeout('checkOutAgain('+i+')',2000);
+	}
+	//清除内容
+	function clearSednAddr(i){
+	 $("#clearSednAddr"+i+"").val("");
+	}
+	function clearAddr(i){
+	   $("#clearAddr"+i+"").val("");
+	}
+//function clearTransferType(i){
+	//  $("#clearTransferType"+i+"").val("");
+//}
+	function clearCar(i){
+	  $("#clearCar"+i+"").val("");
+	}
+	
+	$(function(){
+			var uploadExcel = $("#uploadExcel");
+			$("#uploadExcel").uploadify({
+				'swf':'${CTX}/res/js/uploadify/uploadify.swf',
+				'uploader':'${CTX}/ab/user/actionUploadExcel?userid=${(abuser.id)!}',
+				'auto': true, //是否自动上传 
+				'multi': false,
+				'buttonText' :'选择文件',
+				'width': '75', //按钮宽度  
+				'height': '24', //按钮高度
+				'fileExt':'*.xls;*.xlsx;',
+				'queueID': 'fileQueue',//队列id,用来展示上传进度的
+				'fileObjName': 'uploadExcel', //<input type="file"/>的name  
+				'method': 'post',
+				'removeCompleted': true,//上传完成后自动删除队列  
+				onUploadSuccess:function(file,data,response){
+					var result = eval("(" + data + ")");
+					if(result.successNum && result.successNum > 0){
+						alert("操作成功，共"+result.successNum+"条记录.");
+						//alert(result["data"]);
+						fillData(result["data"]);
+					}else{
+						alert(data);
+					}
+		         }
+			});
+			//刷新页面，如果已经缓存了excel信息。则直接显示出来
+			loadTcOrder();		
+		});
+		
+		function loadTcOrder(){
+			$.get("${CTX}/ab/user/uploadTcOrder",{flag: 1},function(data){
+				fillData(data["data"]);
+			});
+		}
+		function fillData(data){
+			$("#rst tbody tr").has("td").remove();
+			$("#rst").show();
+			for(var i=0;i<data.length;i++){
+			console.info(data[i]);
+			//百度地图搜索地址
+			var sendAddr=data[i]["sendAddr"];
+			var addr=data[i]["addr"];
+			var transferType=data[i]["transferType"];
+			var volumn=data[i]["volumn"];
+			 total=data[i]["total"];
+			//查询距离和价格
+			valDintance(sendAddr,addr,i,transferType,volumn,total);				
+				var str = '<tr>';
+				str += '<td id=sendAddr'+i+'>'+sendAddr+'</td>';
+				str += '<td>'+data[i]["sender"]+'</td>';
+				str += '<td>'+data[i]["sendPhone"]+'</td>';
+				str += '<td id=addr'+i+'>'+addr+'</td>';
+				str += '<td>'+data[i]["receiver"]+'</td>';
+				str += '<td>'+data[i]["rcvPhone"]+'</td>';
+				str += '<td id=transferType'+i+'>'+transferType+'</td>';
+				str += '<td id=car'+i+'>'+data[i]["cheliang"]+'</td>';
+				str += '<td>'+data[i]["productName"]+'</td>';
+				str += '<td>'+data[i]["productSn"]+'</td>';
+				str += '<td>'+data[i]["producer"]+'</td>';
+				str += '<td>'+data[i]["cangku"]+'</td>';
+				str += '<td>'+data[i]["operator"]+'</td>';
+				str += '<td id=volumn'+i+'>'+volumn+'</td>';
+				str += '<td>'+data[i]["weight"]+'</td>';
+				str += '<td>'+data[i]["money"]+'</td>';
+				//添加距离计算和总价
+				str+= '<td id=distance'+i+'>'+'计算中...'+'</td>';
+				str+= '<td id=money'+i+'>'+'计算中...'+'</td>';
+				//添加修改
+				str+= '<td id=operate'+i+'><input type="checkbox" name="selected" value="' + data[i]["sn"] + ',' + i +'"></td>';
+			    str += '</tr>';
+				$("#rst tbody").append(str);
+			}
+			length=data.length;
+			setTimeout('checkOut('+length+')',2000);		}
+		function save(){
+ 			//判断是否有出错的上传信息
+			 for(var i=0;i<length;i++){
+			  if(isNaN($("#distance"+i+"").html())){
+			 
+			  $("#errorMsg").html("您导入的出发地:"+"<span style='color:red;font-size:12px' >"+$("#sendAddr"+i+"").html()+"</span>"+"  到目的地:"+"<span style='color:red;font-size:12px' >"+$("#addr"+i+"").html()+"</span>"+" 距离计算有误，请重新填写");
+			    return;
+			  }
+			  if(isNaN($("#money"+i+"").html())){
+			 
+			  $("#errorMsg").html("您导入的出发地:"+"<span style='color:red;font-size:12px' >"+$("#sendAddr"+i+"").html()+"</span>"+"  到目的地:"+"<span style='color:red;font-size:12px' >"+$("#addr"+i+"").html()+"</span>"+" 费用计算有误，请重新填写");
+			    return;
+			  }
+		}
+		 
+		 //获得表中计算的
+		 var kilo="";
+		 var total_price="";
+		 for(var i=0;i<length;i++){
+			 kilo+=""+$("#distance"+i+"").html()+"-";
+			 total_price+=""+$("#money"+i+"").html()+"-";
+		 }
+			$.get("${CTX}/ab/user/saveUploadExcel",{},function(data){
+				if(data == false){
+					alert("保存失败，请联系管理员");
+				}else if(data == true){
+					alert("保存成功");
+					window.location.reload();
+				}
+			});
+		}
+			function bachpay(){
+				var selected = $("input[name='selected']:checked");
+				var sns = "";
+				kilo = "";
+				total_price = "";
+				for(var i = 0;i < selected.length;i++){
+					 var temp = $(selected[i]).val();
+					 var sn = temp.split(",")[0];//订单编号
+					 var index = temp.split(",")[1];//序号
+					 sns += "" + sn + "-";
+					 kilo+=""+$("#distance"+index+"").html()+"-";
+					 total_price+=""+$("#money"+index+"").html()+"-";
+				}
+				$.get("${CTX}/ab/user/bachpay?kilo="+kilo+"&total_price="+total_price+ "&sns=" + sns,{},function(data){
+						if(data.msg == "success"){
+							alert("支付成功！");
+							window.location.reload();
+						}else if(data.msg == "error"){
+							alert("操作失败");
+						}else if(data.msg=="failed"){
+							alert("账户余额不足，请充值！");
+							window.location.href="${CTX}/ab/card/zhyefail";
+						}
+					});
+			}
+	</script>	
+	<style>
+		.swfupload{
+			left:0;
+		}
+		.bath-bottom{border-top:1px solid #e5e5e5;padding:30px;font-size:12px;margin-top:20px}
+		.bath-bottom p{line-height:20px;color:#999}
+	</style>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<form id="myform" name="myform" method="post" action="">
+	<input type="hidden" name="mid" id="mid"/>
+	<input type="hidden" name="qdrid" id="qdrid"/>
+	<input type="hidden" name="orderid" id="orderid"/>
+	<input type="hidden" name="backorderid" id="backorderid"/>
+	<input type="hidden" name="apyimg" id="apyimg"/>
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">批量上传物流订单</h2>
+			<div style="margin: 20px auto;">
+				<div class="form-group">
+						<table style="border: 0; width: 400px; margin: 10px auto;">
+							<tr>
+								<td>导入Excel：</td>
+								<td><input type="file" name="uploadExcel" id="uploadExcel" multiple="false"/></td>
+								<td><a href="${CTX}/ab/excel_sample.xlsx" class="button" >模板下载</td>
+							</tr>
+						</table>
+                       <div id="fileQueue" style="margin: 10px auto;"></div>
+                </div>
+                <div class="bath-bottom">
+					<p><span class="orange">温馨提示：</span>批量发布前请先下载并按照excel模板编辑文档后导入：
+		            <a href="${CTX}/ab/excel_sample.xlsx">批量发布模板.xls</a></p>
+					<p>一次最多可导入100条货单，点击上面的“导入”按钮导入快货运后完成发单</p>
+				</div>
+			</div>
+			<div id="rst" style="width: 98%; border-top: 1px solid black;display: none; margin: 0 auto;">
+				<input type="button" value="批量在线付款" onclick="bachpay()">				
+				<table class="list" style="">
+					<tr>
+						<th colspan="3">发货方</th>
+						<th colspan="3">收货方</th>
+						<th rowspan="2">运输类型</th>
+						<th rowspan="2">车型</th>
+						<th colspan="5">货品名称</th>
+						<th rowspan="2">总体积<br>(方)</th>
+						<th rowspan="2">重量<br>(吨)</th>
+						<th rowspan="2">代收货款<br>(元)</th>
+<th rowspan="2">总里程<br>(公里)</th>
+						<th rowspan="2">预计费用<br>(元)</th>
+						<th rowspan="2">操作</th>					</tr>
+					<tr>
+						<th colspan="1">起运地</th>
+						<th colspan="1">发货人</th>
+						<th colspan="1">电话</th>
+						<th colspan="1">目的地</th>
+						<th colspan="1">收货人</th>
+						<th colspan="1">电话</th>
+<th colspan="1">产品名字</th>
+						<th colspan="1">产品货号</th>
+						<th colspan="1">生产厂家</th>
+						<th colspan="1">仓库</th>
+						<th colspan="1">操作人</th>					</tr>
+				</table>
+<div>	
+				<span  id='errorMsg'  style='font-size:12px'></span>
+				</div>				<div>
+					<br><br>
+					<input type="button" id="btn_return" class="button" value="保 存" onclick="save();"/>
+				</div>
+			</div>
+		</div>
+	</div>
+	</form>
+<!--添加百度地图-->
+	<div id="allmap" style="display: none;"></div>	
+	
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	
+	
+	
+	<div class="blank10"></div>
+	<div id="lean_overlay" style="display: none; opacity: 0.45;"></div>
+	
+	<!-- 退单弹出框 -->
+	
+	<div class="blank10"></div>
+	
+	
+	</body>
+</html>

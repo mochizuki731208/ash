@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+</head>
+  <body>
+	<table class="input">
+		<tr>
+			<th align="right">头像：</th>
+			<td colspan="3">
+				<#if strkit('',(vo.logo)!)>
+					<img src="${CTX}/upload/${(vo.logo)!}" style="max-width: 60px;max-height: 60px;">
+				<#else>无
+				</#if>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">司机名称：</th>
+			<td colspan="3">${(vo.mc)!}</td>
+		</tr>
+		<tr>
+			<th align="right">所属城市：</th>
+			<td>${(vo.city_name)!}</td>
+			<th align="right">所属商圈：</th>
+			<td>${(vo.area_name)!}</td>
+		</tr>
+		<tr>
+			<th align="right">所属城市：</th>
+			<td>${(vo.loginid)!}</td>
+			<th align="right">详细地址：</th>
+			<td>${(vo.xxdz)!}</td>
+		</tr>
+		<tr>
+			<th align="right">驾照：</th>
+			<td>
+				<#if vo.jz??>
+				<a href="${CTX}/upload/${(vo.jz)!}" target="_blank"><img src="${CTX}/upload/${(vo.jz)!}" style="width: 160px;height:120px;"></a>
+				<#else>
+				无
+				</#if>
+			</td>
+			<!-- -- -->
+			<th align="right">行驶证：</th>
+			<td>
+				<#if vo.xsz??>
+				<a href="${CTX}/upload/${(vo.xsz)!}" target="_blank"><img src="${CTX}/upload/${(vo.xsz)!}" style="width: 160px;height:120px;"></a>
+				<#else>
+				无
+				</#if>
+			</td>
+		</tr>
+<!-- 		<tr>
+			<th align="right">车身：</th>
+			<td>
+				<#if vo.cs??>
+				<a href="${CTX}/upload/${(vo.cs)!}" target="_blank"><img src="${CTX}/upload/${(vo.cs)!}" style="width: 160px;height:120px;"></a>
+				<#else>
+				无
+				</#if>
+			</td>
+			<th align="right">车头和车牌号码：</th>
+			<td>
+				<#if vo.ct??>
+				<a href="${CTX}/upload/${(vo.ct)!}" target="_blank"><img src="${CTX}/upload/${(vo.ct)!}" style="width: 160px;height:120px;"></a>
+				<#else>
+				无
+				</#if>
+			</td>
+		</tr>
+ -->		<tr>
+			<th align="right">身份证：</th>
+			<td>
+				<#if vo.sfz??>
+				<a href="${CTX}/upload/${(vo.sfz)!}" target="_blank"><img src="${CTX}/upload/${(vo.sfz)!}" style="width: 160px;height:120px;"></a>
+				<#else>
+				无
+				</#if>
+			</td>
+			<th align="right">大头照：</th>
+			<td>
+				<#if vo.dtz??>
+				<a href="${CTX}/upload/${(vo.dtz)!}" target="_blank"><img src="${CTX}/upload/${(vo.dtz)!}" style="width: 160px;height:120px;"></a>
+				<#else>
+				无
+				</#if>
+			</td>
+		</tr>
+	</table>
+  </body>
+</html>
+

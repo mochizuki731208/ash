@@ -1,0 +1,142 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+	<#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function doSure(id){
+			if(window.confirm("确认打款成功？")){
+				$.ajax({
+					url: "${CTX}/admin/user/doSure",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("确认成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("确认失败！");
+						}
+					}
+				});
+			}
+		}
+		function doFailure(id){
+			if(window.confirm("确认打款失败吗？")){
+				$.ajax({
+					url: "${CTX}/admin/user/doFailure",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("确认成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("确认失败！");
+						}
+					}
+				});
+			}
+		}
+		function batchFK(){
+			if(window.confirm("确定为支付宝提现的用户打款吗？")){
+				$.ajax({
+					url: "${CTX}/admin/user/batchfukuan",
+					type: "POST",
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if("error" != data.result){
+							window.location.href=data.result;
+						}else{
+							$.dialog.alert("没有需要支付宝提现的申请！");
+						}
+					},
+					error:function(){
+						alert("系统错误");
+					}
+				});
+			}
+		}
+	</script>	
+</head>
+  <body>
+	<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+		提现状态：
+		<select name="result" id="result">
+			<option value="">全部</option>
+			<option value="1">成功</option>
+			<option value="2">失败</option>
+			<option value="0">等待</option>
+		</select>
+		提现方式：
+		<select name="txtype" id="txtype">
+			<option value="">全部</option>
+			<option value="0">支付宝</option>
+			<option value="1">银行卡</option>
+		</select>
+		<input type="button" id="btn_query" class="button" value="查 询" onclick="refresh();"/>
+		<input type="button" id="btn_FK" class="button" style="width: 100px" value="支付宝批量打款" onclick="batchFK();"/>
+	    <table class="list">
+            <tr>
+	            <th width="30px;">序号</th>
+	            <th width="100px;">姓名</th>
+	            <th width="80px;">提现金额</th>
+	            <th width="70px;">提现状态</th>
+	            <th width="120px;">提现时间</th>
+	            <th width="120px;">到账时间</th>
+	            <th width="80px;">提现方式</th>
+	            <th>收款账号信息</th>
+	            <th width="130px">操作</th>
+	        </tr>
+	        <#if listpage ??>
+      				<#list listpage.list as lst>
+	                  <tr>
+	                  	<td>${(lst_index+1)!''}</td>
+	                    <td>${(lst.mc)!''}</td>
+	                    <td style="color: red;font-weight: bold">￥${(lst.totalfee)!}</td>
+	                    <td><#if strkit('0',(lst.result)!)>等待</#if><#if strkit('1',(lst.result)!)>成功</#if><#if strkit('2',(lst.result)!)>失败</#if></td>
+	                    <td>${(lst.time)!}</td>
+	                    <td>${(lst.totime)!'---'}</td>
+	                    <td><#if strkit('0',(lst.txtype)!)>支付宝</#if><#if strkit('1',(lst.txtype)!)>银行卡</#if></td>
+	                    <td>
+	                    	<#if strkit('0',(lst.txtype)!)>${(lst.zfbaddress)!}</#if>
+	                    	<#if strkit('1',(lst.txtype)!)>
+	                    		${(lst.txyhknum)!}
+	                    		<#if strkit('1',(lst.txyhkid)!)>中国工商银行</#if>
+	                    		<#if strkit('2',(lst.txyhkid)!)>中国农业银行</#if>
+	                    		<#if strkit('3',(lst.txyhkid)!)>中国建设银行</#if>
+	                    		<#if strkit('4',(lst.txyhkid)!)>招商银行</#if>
+	                    	</#if>
+	                    </td>
+	                    <td>
+	                    	<#if strkit('0',(lst.result)!)>
+	                    		<a href="javascript:void(0)" onclick="doSure('${(lst.id)!''}')">确认打款</a>
+	                    		<a href="javascript:void(0)" onclick="doFailure('${(lst.id)!''}')">确认打款失败</a>
+	                    	</#if>
+	                    	<#if strkit('1',(lst.result)!)>已打款</#if>
+	                    	<#if strkit('2',(lst.result)!)>打款失败，信息有误，已退款</#if>
+	                    </td>
+	                  </tr>
+					</#list>
+					<tr>
+						<th colspan="9">
+							<#include '../../common/_paginate.html'>
+						</th>
+					</tr>
+			</#if>
+         </table>
+	</form>
+  </body>
+</html>

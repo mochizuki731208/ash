@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<base href="${CTX}/">
+	<#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/bootstrapValidator.min.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/common.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/my-trucks.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+<link rel="stylesheet" type="text/css"	href="${CTX}/res/css/ab/style.css" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/user.css" />
+	
+	<style type="text/css">
+		.container_ywy {
+		    font-family: 'Microsoft YaHei',Tahoma,"\5b8b\4f53",Arial,Helvetica,Arial,sans-serif;
+		    font-size: 14px;
+		    line-height: 20px;
+		    color: #333;
+		}
+	</style>
+	
+</head>
+<body>
+	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+   			<div class="rz_describe">
+				<p>用户信息登记审核通过后您可以：</p>
+				<p>1. 使用认证的所有功能；</p>
+				<p>2. 提高帐号可信任度；</p>
+				<p>3. 点击查看认证信息登记指引。</p>
+			</div>
+
+<!-- 			<iframe src="${CTX}/ab/logochange" scrolling="no" height="280px" width="100%" frameborder="0"></iframe> -->
+			<input type="hidden" value="${(abuser.loginid)!''}" id="carMobilePhone"/>
+			<h2 class="box_title">有车司机人员信息登记</h2>
+            <div class="container_ywy">
+            
+                <form class="form-horizontal" id="formImportCarS2" method="post">
+                	<input type="hidden" value="${(car.id)!''}"  name="abFmcar_id"/>
+                    <div class="form-group">
+                        <label for="driver" class="col-sm-2 control-label">姓名</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="abFmcar_driver" placeholder="司机姓名" name="abFmcar_driver" value="${(car.driver)!''}"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="driver" class="col-sm-2 control-label">身份证号</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="tb_idcard" placeholder="身份证号" name="tb_idcard" value="<#if (vo.idcard)??>${vo.idcard}</#if>"/>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="carNo" class="col-sm-2 control-label">车牌号</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="carNo" placeholder="车牌号" name="abFmcar_car_no" maxlength="7" value="${(car.car_no)!''}"/>
+                        </div>
+                    </div>
+                    <div class="form-group">  
+                        <label for="carPhone" class="col-sm-2 control-label">电话号码</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="abFmcar_mobile" placeholder="电话号码" readonly="readonly" name="abFmcar_mobile" value="${(car.mobile)!''}"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="carLengthAdd" class="col-sm-2 control-label">车长</label>
+                        <div class="col-sm-10">
+                            <select name="abFmcar_length" class="form-control" id="carLengthAdd">
+                                <option value="">请选择车长</option>
+                            	<option value="1.8米" <#if strkit('1.8米',(car.length)!)>selected</#if> >1.8米</option>
+	                        	<option value="2.6米" <#if strkit('2.6米',(car.length)!)>selected</#if> >2.6米</option>
+	                           	<option value="3.2米" <#if strkit('3.2米',(car.length)!)>selected</#if> >3.2米</option>
+	                        	<option value="4.2米" <#if strkit('4.2米',(car.length)!)>selected</#if> >4.2米</option>
+	                       		<option value="5.2米" <#if strkit('5.2米',(car.length)!)>selected</#if> >5.2米</option>
+	                            <option value="5.8米" <#if strkit('5.8米',(car.length)!)>selected</#if> >5.8米</option>
+	                            <option value="6.2米" <#if strkit('6.2米',(car.length)!)>selected</#if> >6.2米</option>
+	                       		<option value="6.5米" <#if strkit('6.5米',(car.length)!)>selected</#if> >6.5米</option>
+	                      		<option value="6.8米" <#if strkit('6.8米',(car.length)!)>selected</#if> >6.8米</option>
+	                        	<option value="7.2米" <#if strkit('7.2米',(car.length)!)>selected</#if> >7.2米</option>
+	                          	<option value="8米" <#if strkit('8米',(car.length)!)>selected</#if> >8米</option>
+	                         	<option value="9.6米" <#if strkit('9.6米',(car.length)!)>selected</#if> >9.6米</option>
+	                        	<option value="13米" <#if strkit('13米',(car.length)!)>selected</#if> >13米</option>
+	                    		<option value="15米" <#if strkit('15米',(car.length)!)>selected</#if> >15米</option>
+	                         	<option value="16.5米" <#if strkit('16.5米',(car.length)!)>selected</#if> >16.5米</option>
+	                          	<option value="17.5米" <#if strkit('17.5米',(car.length)!)>selected</#if> >17.5米</option>
+	                          	<option value="18.5米" <#if strkit('18.5米',(car.length)!)>selected</#if> >18.5米</option>
+	                        	<option value="20米" <#if strkit('20米',(car.length)!)>selected</#if> >20米</option>
+	                     		<option value="22米" <#if strkit('22米',(car.length)!)>selected</#if> >22米</option>
+	                         	<option value="24米" <#if strkit('24米',(car.length)!)>selected</#if> >24米</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="carClassAdd" class="col-sm-2 control-label">车型</label>
+                        <div class="col-sm-10">
+                            <select name="abFmcar_type" class="form-control" id="carClassAdd">
+                                <option value="">请选择车型</option>
+                                 <option value="三轮车" <#if strkit('三轮车',(car.type)!)>selected</#if> >三轮车</option>
+	                             <option value="面包车" <#if strkit('面包车',(car.type)!)>selected</#if> >面包车</option>
+	                             <option value="厢车" <#if strkit('厢车',(car.type)!)>selected</#if> >厢车</option>
+	                             <option value="平板车" <#if strkit('平板车',(car.type)!)>selected</#if> >平板车</option>
+	                             <option value="高低板车" <#if strkit('高低板车',(car.type)!)>selected</#if> >高低板车</option>
+	                             <option value="高栏车" <#if strkit('高栏车',(car.type)!)>selected</#if> >高栏车</option>
+	                             <option value="冷藏车" <#if strkit('冷藏车',(car.type)!)>selected</#if> >冷藏车</option>
+	                             <option value="危险品车" <#if strkit('危险品车',(car.type)!)>selected</#if> >危险品车</option>
+	                             <option value="大件车" <#if strkit('大件车',(car.type)!)>selected</#if> >大件车</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                    	<label for="carVV" class="col-sm-2 control-label">体积(立方米)</label>
+                    	<div class="col-sm-10">
+                    		<input type="text" class="form-control" id="carVV" placeholder="请输入车的体积，方便给您推荐订单" name="abFmcar_vv" value="${(car.vv)!''}">
+                    	</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="carChangpao" class="col-sm-2 control-label">常跑城市</label>
+                        <div class="col-sm-10">
+                            <input type="hidden" id="s2id_FromName" class="form-control select2-offscreen" tabindex="-1" name="runcity" value="${(carcity)!''}">
+                        </div>
+                    </div>
+                    <h5>司机证件只做内部存档，不会公开使用。</h3>
+                    <input type="hidden" id="tb_jz" name="tb_jz" value="${(vo.jz)!}">
+					<input type="hidden" id="tb_xsz" name="tb_xsz" value="${(vo.xsz)!}">
+					<input type="hidden" id="tb_sfz" name="tb_sfz" value="${(vo.sfz)!}">
+
+                    <table "rz_table" >
+					<tr>
+						<td class="td1">1、驾照
+							<p class="carms">请清楚摄到数字</p>
+						</td>
+						<td><#if (vo.jz)?? && vo.jz != ''> <img
+							src="${CTX}/upload/${(vo.jz)!}" id="img_jz" /> <#else> <img
+							src="${CTX}/res/css/ab/images/car1.png" id="img_jz" /> </#if> <input
+							type="file" name="jz" id="jz" multiple="false" />
+						</td>
+					</tr>
+
+					<tr>
+						<td class="td1">2、行驶证
+							<p class="carms">请清楚拍摄到数字</p>
+						</td>
+						<td><#if (vo.xsz)?? && vo.xsz != ''> <img
+							src="${CTX}/upload/${(vo.xsz)!}" id="img_xsz" /> <#else> <img
+							src="${CTX}/res/css/ab/images/car4.png" id="img_xsz" /> </#if> <input
+							type="file" name="xsz" id="xsz" multiple="false" />
+						</td>
+					</tr>
+					<tr>
+						<td class="td1">3、身份证</td>
+						<td><#if (vo.sfz)?? && vo.sfz != ''> <img
+							src="${CTX}/upload/${(vo.sfz)!}" id="img_sfz" /> <#else> <img
+							src="${CTX}/res/css/ab/images/car5.png" id="img_sfz" /> </#if> <input
+							type="file" name="sfz" id="sfz" multiple="false" />
+						</td>
+					</tr>
+					<tr>
+						<td class="td1"></td>
+						<td><#if strkit('',(vo.sfrzzt)!)><a href="javascript:;"
+							id="btn_sj" class="rz_submit">立即提交</a></#if> 
+                            <#if strkit('0',(vo.sfrzzt)!)><a href="javascript:;" id="btn_sj"
+							class="rz_submit">立即提交</a></#if> 
+                            <#if strkit('1',(vo.sfrzzt)!)>认证中...</#if>
+                            <#if strkit('2',(vo.sfrzzt)!)>认证通过</#if> 
+                            <#if strkit('3',(vo.sfrzzt)!)>认证失败<br /> <a href="javascript:;"
+							id="btn_sj" class="rz_submit">立即提交</a> </#if> 
+                            <a	href="${CTX}/ab/mainywy">返回司机后台</a>
+						</td>
+					</tr>
+                    </table>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                        </div>
+                    </div>
+                </form>
+            </div>
+<!--            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="addKnowYes">保存</button>
+            </div>
+-->		
+	</div>
+	<!-- 栏目页 -->
+	
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	<script type="text/javascript" src="${CTX}/res/js/fmcar/plugins/require.js"></script>
+	<script>
+	    require(['./res/js/fmcar/boot'], function () {
+	        require(['my-trucks-ywy']);
+	    });
+		$(function(){
+			$("#myform").submit(function() {
+				return false;
+			});	
+		});
+		
+		/* 驾照 */
+		$('#jz').uploadify(
+			{
+				swf : '${CTX}/res/js/uploadify/uploadify.swf',
+				uploader : '${CTX}/common/upload',
+				multi : false,
+				sizeLimit : '1024*1024',
+				buttonText : '选择图片',
+				fileExt : '*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess : function(file,
+						data, response) {
+					$("#tb_jz").attr('value', data);
+					$('#img_jz')
+							.attr(
+									"src",
+									"${CTX}/upload/"
+											+ data);
+			}
+		});
+
+		/* 行驶证 */
+		$('#xsz').uploadify(
+						{
+							swf : '${CTX}/res/js/uploadify/uploadify.swf',
+							uploader : '${CTX}/common/upload',
+							multi : false,
+							sizeLimit : '1024*1024',
+							buttonText : '选择图片',
+							fileExt : '*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+							onUploadSuccess : function(file,
+									data, response) {
+								$("#tb_xsz")
+										.attr('value', data);
+								$('#img_xsz')
+										.attr(
+												"src",
+												"${CTX}/upload/"
+														+ data);
+							}
+		});
+
+		//身份证
+		$('#sfz').uploadify(
+						{
+							swf : '${CTX}/res/js/uploadify/uploadify.swf',
+							uploader : '${CTX}/common/upload',
+							multi : false,
+							sizeLimit : '1024*1024',
+							buttonText : '选择图片',
+							fileExt : '*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+							onUploadSuccess : function(file,
+									data, response) {
+								$("#tb_sfz")
+										.attr('value', data);
+								$('#img_sfz')
+										.attr(
+												"src",
+												"${CTX}/upload/"
+														+ data);
+							}
+		});
+
+		$('#btn_sj').click(function() {
+			  if($('#tb_jz').val()=='') {alert("请上传驾照图片！"); return false;}
+			  if($('#tb_xsz').val()=='') {alert("请上传行驶证图片！"); return false;}
+			  if($('#tb_sfz').val()=='') {alert("请上传身份证图片！"); return false;}
+
+			  if($('#driver').val()=='') {alert("请填写名称！"); return false;}
+			  if($('#tb_idcard').val()=='') {alert("请填写身份证号！"); return false;}
+			  if($('#abFmcar_car_no').val()=='') {alert("请填写车牌号！"); return false;}
+
+			  if(!isCardNo($('#tb_idcard').val())) {alert("请填写正确身份证号！"); return false;}
+			  //if(!isLicenseNo($('#abFmcar_car_no').val())) {$.dialog.alert("请填写正确车牌号号！"); return false;}
+			  
+			  $.post("${CTX}/ab/ywy/saverz",$("#formImportCarS2").serializeArray(),function(data) {
+					  if (data) {
+						  alert("认证已提交！");
+						  window.location.href = "${CTX}/ab/mainywy";
+					  } else {
+						  alert("认证失败！");
+					  }
+			  });
+		  });
+					
+	function isCardNo(card)  
+	{  
+	   // 身份证号码为15位或者18位，15位时全为数字，18位前17位为数字，最后一位是校验位，可能为数字或字符X  
+	   var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;  
+	   if(reg.test(card) === false)  
+	   {  
+	       return  false;  
+	   }  
+	   return true
+	} 
+	
+	function isLicenseNo(str) {
+	      return /(^[\u4E00-\u9FA5]{1}[A-Z0-9]{6}$)|(^[A-Z]{2}[A-Z0-9]{2}[A-Z0-9\u4E00-\u9FA5]{1}[A-Z0-9]{4}$)|(^[\u4E00-\u9FA5]{1}[A-Z0-9]{5}[挂学警军港澳]{1}$)|(^[A-Z]{2}[0-9]{5}$)|(^(08|38){1}[A-Z0-9]{4}[A-Z0-9挂学警军港澳]{1}$)/.test(str);
+	  }
+		
+	</script>
+</body>
+</html>

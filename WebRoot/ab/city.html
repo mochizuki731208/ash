@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta name="description" content="易生活网是一个具有国内商户特色，提供各类商户活动，集商户开店，商户搜索，支付预订为一体的综合性门户网站。" />
+	<meta name="keywords" content="商户，服务，开店" />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width = device-width, user-scalable=yes minimum-scale=1.0" />
+	<meta name="apple-touch-fullscreen" content="YES" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="white" />
+	<meta name="MobileOptimized" content="width" />
+	<meta name="HandheldFriendly" content="true" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/main_city.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/style_city.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+</head>
+<body class="city_bg">
+	<input type="hidden" id="selectcityid" value="<#if currcity?? >${(currcity.id)!}</#if>"/>
+	<input type="hidden" id="selectcityareaid" value="<#if currarea?? >${(currarea.id)!}</#if>"/>
+		<div id="city">
+        	<div class="main" id="maindiv">
+        		<span class="ping">按省份进行选择<x></x></span>
+            	<div class="clear"></div>
+            	<#if list_city ??>
+            		<#list list_city as lst>
+            			<div class="lei">
+		            		<span class="en"><a href="javascript:;" onclick="uf_selarea('${(lst.id)!}')" data='${(lst.id)!}' style="color: white;">${(lst.mc)!}</a></span>
+		            		<div class="citylist">
+		            		<#if lst.listsub ??>
+            					<#list lst.listsub as sub>
+            						<a href="javascript:;" onclick="uf_selarea('${(sub.id)!}')" data='${(sub.id)!}'>${(sub.mc)!}</a>
+					            </#list>
+			            	</#if>
+		                	</div>
+		            	</div>
+            		</#list>
+            	</#if>
+        	</div>
+    	</div>
+    
+    <script type="text/javascript">
+    	$(document).ready(function(){
+			
+		});
+		
+		function uf_selectcity(id,mc){
+			$('#city').hide();
+			$('#cityid').html(mc+'<x></x>');
+			$('#selectcityid').attr('value',id);
+			
+			//清除二级下拉列表
+              $("#lei").empty();
+              var vhtml='';
+              $.ajaxSettings.async = false; 
+              $.getJSON("${CTX}/common/subarea", {p_id:$("#selectcityid").val()},function (data) {
+                 $(data).each(function () {
+	                  vhtml += "<a href=\"javascript:void(0)\" onclick=\"uf_selarea('"+this.id+"')\">"+this.mc+"</a>";
+                 });
+              });
+             
+              $("#quid").html(vhtml);
+		}
+		
+		function uf_selarea(id){
+			$.post("${CTX}/ab/setcurrcity",{cityid: id},function(data){
+                if(data){
+					window.location.href="${CTX}/";
+				}else{
+					$.dialog.alert("城市切换失败！");
+				}
+			});
+		}
+    </script>
+    <div id="t_bg"></div>
+	</body>
+</html>

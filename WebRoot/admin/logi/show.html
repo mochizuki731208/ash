@@ -1,0 +1,83 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+</head>
+  <body>
+	<table class="input">
+		<tr>
+			<th align="right">企业名称：</th>
+			<td>${(logi.mc)!}</td>
+			<th align="right">手机：</th>
+			<td>${(logi.mobile)!}</td>
+		</tr>
+		<tr>
+			<th align="right">总部地址：</th>
+			<td colspan="3">${(logi.xxdz)!}</td>
+		</tr>
+		<tr>
+			<th align="right">直达城市：</th>
+			<td>${(logi.city_name)!} - ${(logi.maincity)!}</td>
+			<th align="right">主营路线：</th>
+			<td>${(logi.mainline)!}</td>
+		</tr>
+		<tr>
+			<th align="right">营运模式：</th>
+			<td>${(logi.smode)!}</td>
+			<th align="right">运输方式：</th>
+			<td>${(logi.transtype)!}</td>
+		</tr>
+		<tr>
+			<th align="right">运输承保公司：</th>
+			<td>${(logi.ticc)!}</td>
+			<th align="right">放款周期：</th>
+			<td>${(logi.loan_period)!}</td>
+		</tr>
+		<tr>
+			<th align="right">放款时间：</th>
+			<td>${(logi.loan_time)!}</td>
+			<th align="right">放款方式：</th>
+			<td>${(logi.loan_type)!}</td>
+		</tr>
+		<tr>
+			<th align="right">查询电话：</th>
+			<td>${(logi.checkphone)!}</td>
+			<th align="right">QQ：</th>
+			<td>${(logi.qq)!}</td>
+		</tr>
+		<tr>
+			<th align="right">负责人：</th>
+			<td>${(logi.chief)!}</td>
+			<th align="right">服务监督电话：</th>
+			<td>${(logi.servhotline)!}</td>
+		</tr>
+		<tr>
+			<th align="right">创建时间：</th>
+			<td>${(logi.createtime)!}</td>
+			<th align="right">审核状态：</th>
+			<td>
+				<#if (((logi.check_status)!) == '0')>待审核</#if>
+				<#if (((logi.check_status)!) == '1')>通过</#if>
+				<#if (((logi.check_status)!) == '2')>不通过</#if>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">收货地址：</th>
+			<td colspan="3">${(logi.recaddress)!}</td>
+		</tr>
+		<tr>
+			<th align="right">卸货地址：</th>
+			<td colspan="3">${(logi.disaddress)!}</td>
+		</tr>
+		<tr>
+			<th align="right">公司简介：</th>
+			<td colspan="3">${(logi.profile)!}</td>
+		</tr>
+		<tr>
+			<th align="right">服务承诺：</th>
+			<td colspan="3">${(logi.servpromise)!}</td>
+		</tr>
+	</table>
+  </body>
+</html>
+

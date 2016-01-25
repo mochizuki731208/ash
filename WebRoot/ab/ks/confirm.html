@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+  	<title>快速下单 - 确认订单</title>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" href="${CTX}/res/css/ab/reset.css" />
+	<link rel="stylesheet" href="${CTX}/res/css/ab/order.css">
+	<script type="text/javascript">
+	function editsubmit(){
+		document.getElementById("editsubmit").submit();
+	}
+	</script>	
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+  	<!-- 搜索栏 -->
+	<#include '../inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+	<#include '../inc/nav.html'>
+	<div class="blank10"></div>
+	
+
+<div class="container clearfix">
+    <div class="mainyy">
+        <div class="step s2"></div>
+        <div class="firm-order">
+            <ul>
+                               <li>服务类型：${data.type1[0]} &nbsp; ${data.type2[0]}</li>
+                 <li>服务地点：${data.addressarea[0]} &nbsp; ${data.addressdoor[0]}</li>
+                <li>服务时间：${data.date1[0]} &nbsp; ${data.time1[0]}</li>
+                <li>特殊备注：${data.mark[0]}</li>
+                <li>联系电话：${data.phone[0]}</li>
+                          </ul>
+        </div>
+       <form action="${CTX}/ab/ks/complete" id="editsubmit" class="form" method="post">
+        <input type="hidden" id="type1" name="type1" value="${data.type1[0]}">
+        <input type="hidden" id="type2" name="type2" value="${data.type2[0]}">
+        <input type="hidden" id="time" name="time" value="${data.date1[0]} ${data.time1[0]}">
+        <input type="hidden" id="address" name="address" value="${data.addressarea[0]} ${data.addressdoor[0]}">
+        <input type="hidden" id="phone" name="phone" value="${data.phone[0]}">
+        <input type="hidden" id="mark" name="mark" value="${data.mark[0]}">
+        <input type="hidden" id="pros" name="pros" value="${data.pros[0]}">
+              </form>
+        <div class="btnlayer">
+		<input type="button" value="提交订单" class="btn-enter" onclick="editsubmit()">
+		<a class="toedit" onclick="history.go(-1)">返回修改</a>
+        </div>
+    </div>
+    <!--58到家服务承诺-->
+	<div class="jzt-promise">
+        <h2>易生活服务承诺</h2>   
+        <dl class="promise ">
+            <dt><span class="i1"></span></dt>
+            <dd><h3>快速响应</h3>数千名服务人员，全城覆盖<br>
+预约到上门最快只需30分钟</dd>
+            <dt><span class="i2"></span></dt>
+            <dd><h3>经济实惠</h3>低于业内价15%<br>
+明码标价，不胡乱收费</dd>
+            <dt><span class="i3"></span></dt>
+            <dd><h3>服务专业</h3>所有师傅阿姨实名身份认证<br>
+100%培训，标准服务流程</dd>
+            <dt><span class="i4"></span></dt>
+            <dd><h3>100%保障</h3>每笔订单有专属客服跟进<br>
+100%赔付保障包你满意</dd>
+        </dl>
+    </div>
+</div>
+	
+
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

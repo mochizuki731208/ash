@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript">
+		$(function(){
+			
+		})
+	</script>
+</head>
+<body>
+	<form id="myform" name="myform" method="post" >
+		<input type="hidden" name="id" id="id" value="${(sug.id)!''}">
+		<input class="text" id="tb_city_name" name="tb_city_name" type="hidden" value="${(vo.city_name)!}"/>
+		<div style="text-align: center;">
+			<#if user.id == 'admin'>
+				城市：<select name="tb_city_id" id="tb_city_id" style="width: 190px;">
+				<option value="">请选择...</option>
+				<@_cityarea_list p_id='ROOT'>
+			      	<#list list as t>
+				      	<#if t.hassub==0>
+				      		<option value="${(t.id)!}" <#if strkit((sug.cityid)!,t.id)>selected</#if>>${(t.mc)!}</option>
+				      	<#else>
+					      	<optgroup label="${(t.mc)!}">
+					      		<@_cityarea_list p_id=t.id>
+							      	<#list list as sub>
+							      	<option value="${(sub.id)!}" <#if strkit((sug.cityid)!,sub.id)>selected</#if>>${(sub.mc)!}</option>
+							      	</#list>
+								</@_cityarea_list>
+					      	</optgroup>
+				      	</#if>
+			      	</#list>
+				</@_cityarea_list>
+			</select><br><br>
+			</#if>
+			<#if user.id != 'admin'>
+				<input type="hidden" name="tb_city_id" id="tb_city_id" value="${(sug.cityid)!''}">
+			</#if>
+			
+			组名：<input type="text" name="groupname" id="groupname" value="${(sug.groupname)!''}" class="text" required="required">
+		</div>
+		
+	</form>
+</body>
+</html>
+

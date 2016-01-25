@@ -1,0 +1,41 @@
+<div class="body_left">
+	<div class="body_left1">
+     <ul><li>基本信息</li>
+     </ul>
+     <h1>${(vo.mc)!}
+     <#if strkit('1',(vo.is_recommend)!)>
+     						<span class="tooltip" title="推荐开始时间：${(vo.tjkssj)!}-截止时间：${(vo.tjjzsj)!}" style="padding:4px 4px 4px 4px;background-color:#EE2C2C;color: white;">荐</span>
+     					</#if>
+     </h1>
+     <img src="<#if (vo.img_url)??>${CTX}/upload/${(vo.img_url)!}<#else>${CTX}/res/trans/img/jbxx.jpg</#if>" height="140px"/>
+     <p>
+       负责人：${(lo.chief)!} <br />
+       服务监督:${(lo.servhotline)!} <br />
+       -----------------------------------------------
+     </p>
+     </div>
+   
+    <div class="body_left2">
+     <ul><li>服务信息</li>
+     </ul>
+         <br/>
+         <p>运输方式：${(lo.transtype)!}<br/>
+         经营模式：${(lo.smode)!}<br/>
+         运输保险：${(lo.ticc)!}<br/><br/>
+         -----------------------------------------------
+         <br/><br/>
+         放款周期：${(lo.loan_period)!}<br/>
+         放款时间：${(lo.loan_time)!}<br/>
+         放款方式：${(lo.loan_type)!}<br/>
+         查款电话：${(lo.checkphone)!}<br/>
+         </p>
+     
+    </div>
+    
+    <div class="body_left3">
+     <ul><li>服务承诺</li>
+     </ul>
+     <br/>
+     <p>${(lo.servpromise)!}</p>
+    </div>
+</div>

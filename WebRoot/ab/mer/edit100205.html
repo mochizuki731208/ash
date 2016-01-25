@@ -1,0 +1,173 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	
+	<base href="${CTX}/">
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/bootstrapValidator.min.css">
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/common.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/lrtk.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/select-city.min.css" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/my-trucks.css" />
+	
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			$("#myform").validate({
+				rules: {
+					mer_mc: {required:true,stringMaxLength:50},
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				if(!$("input[name='line_weight_price']").val()||!$("input[name='line_volumn_price']").val()
+						||!$("input[name='line_to_time']").val()||!$("input[name='line_from_time']").val()){
+					alert("请填写完整!");
+					return ;
+				}
+				var submit = true;
+				var depProvinceCode = $("#depProvinceCode").val();
+		        var ToProvinceCode = $("#ToProvinceCode").val();
+				
+		        if (!depProvinceCode && !$("#line_from").val()) {
+					alert("请先选择出发城市");
+					submit = false;
+				}else if (!ToProvinceCode && !$("#line_to").val()) {
+					alert("请先选择到达城市");
+					submit = false;
+				}
+				
+				if(depProvinceCode || !$("#line_from").val()) {
+				if($("#depCountyName").val()) $("#line_from").val($("#depCountyName").val());
+		        else if($("#depCityName").val()) $("#line_from").val($("#depCityName").val());
+				else $("#line_from").val(depProvinceCode);
+				}
+				
+				if(ToProvinceCode || !$("#line_to").val()) {
+				if($("#ToCountyName").val()) $("#line_to").val($("#ToCountyName").val());
+		        else if($("#ToCityName").val()) $("#line_to").val($("#ToCityName").val());
+				else $("#line_to").val(ToProvinceCode);
+				}
+				
+				 if (submit) {
+					$.post("${CTX}/ab/mer/linesave",$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	alert("保存数据成功！");
+								window.location.href="${CTX}/ab/mer/edit1002line";
+	                    } else {
+	                    	alert("保存数据失败！");
+	                    }
+					});
+				}
+			});
+		});
+	</script>
+	<style type="text/css">
+	#mainline {
+		width: 120px;
+	}
+	</style>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">物流线路登记</h2>
+			<form id="myform" name="myform" action="" method="post">
+			<input type="hidden" class="text" name="line_id" value="${(line.id)!}">
+			<table class="input">
+				<tr>
+					<th align="right">出发地：</th>
+					<td>
+					<input type="hidden" class="text" name="line_from" id="line_from" value="${(line.from)!}">
+					<div style="padding-left:0px;width:215px;" class="col-xs-4 addrselector">
+                        <input data-val="true" data-val-number="字段 ToProvinceCode 必须是一个数字。" 
+                        data-val-required="ToProvinceCode 字段是必需的。" id="depProvinceCode" 
+                        name="order_start_province_code" value="${(order.start_province_code)!''}" 
+                        type="hidden">
+                        
+                        <input id="depProvinceName"  name="order_start_province_name" 
+                        value="${(order.start_province_name)!''}"  type="hidden">
+                        
+                        <input data-val="true" data-val-number="字段 ToCityCode 必须是一个数字。" 
+                        data-val-required="ToCityCode 字段是必需的。" id="depCityCode"  name="order_start_city_code" 
+                        value="${(order.start_city_code)!''}"  type="hidden">
+                        
+                        <input id="depCityName"  name="order_start_city_name" 
+                        value="${(order.start_city_name)!''}"   type="hidden">
+                        
+                        <input data-val="true" data-val-number="字段 ToCountyCode 必须是一个数字。" 
+                        id="depCountyCode"  name="order_start_county_code" 
+                        value="${(order.start_county_code)!''}"   
+                        type="hidden">
+                        
+                        <input id="depCountyName"  name="order_start_county_name" 
+                        value="${(order.start_county_name)!''}"  
+                        type="hidden" value="">
+                    </div>
+					</td>
+				</tr>
+				<tr>
+					<th align="right">目的地：</th>
+					<td><input type="hidden" class="text" name="line_to" id="line_to" value="${(line.to)!}">
+					<div style="padding-left:0px;width:215px;" class="col-xs-4 addrselector">
+                        <input data-val="true" data-val-number="字段 ToProvinceCode 必须是一个数字。" data-val-required="ToProvinceCode 字段是必需的。" id="ToProvinceCode" name="order_arr_province_code" value="${(order.arr_province_code)!''}" type="hidden">
+                        <input id="ToProvinceName"  name="order_arr_province_name" value="${(order.arr_province_name)!''}"  type="hidden">
+                        <input data-val="true" data-val-number="字段 ToCityCode 必须是一个数字。" data-val-required="ToCityCode 字段是必需的。" id="ToCityCode"  name="order_arr_city_code" value="${(order.arr_city_code)!''}"  type="hidden">
+                        <input id="ToCityName"  name="order_arr_city_name" value="${(order.arr_city_name)!''}"   type="hidden">
+                        <input data-val="true" data-val-number="字段 ToCountyCode 必须是一个数字。" id="depCountyCode"  name="order_arr_county_code" value="${(order.arr_county_code)!''}"   type="hidden">
+                        <input id="ToCountyName"  name="order_arr_county_name" value="${(order.arr_county_name)!''}"  type="hidden" value="">
+                    </div>
+				</td>
+				</tr>
+				<tr>
+					<th align="right">出发时间：</th>
+					<td><input type="text" class="Wdate text required" placeholder="" name="line_from_time" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" value="${(line.from_time)!}"></td>
+				</tr>
+				<tr>
+					<th align="right">到达时间：</th>
+					<td><input type="text" class="Wdate text required" placeholder="" name="line_to_time" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" value="${(line.to_time)!}"></td>
+				</tr>
+				<tr>
+					<th align="right">按重量计价：</th>
+					<td><input type="text" class="text required" name="line_weight_price" value="${(line.weight_price)!}">公斤</td>
+				</tr>
+				<tr>
+					<th align="right">按体积计价：</th>
+					<td><input type="text" class="text required"  name="line_volumn_price" value="${(line.volumn_price)!}">立方米</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td><input type="button" id="btn_save" name="btn_save" class="button" value="保 存"/></td>
+				</tr>
+			</table>
+			</form>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	
+	<script type="text/javascript" src="${CTX}/res/js/fmcar/plugins/require.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/comm/WdatePicker.js"></script>
+	
+<script>
+    require(['./res/js/fmcar/boot'], function () {
+        require(['truck-line']);
+    });
+</script>
+	</body>
+</html>

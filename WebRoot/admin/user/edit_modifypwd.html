@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					user_mc:{required:true,stringMaxLength:50},
+					user_loginid:{required:true,stringMaxLength:20},
+					user_loginpwd:{required:true,stringMaxLength:32},
+					cfpwd:{required:true,equalTo:"#user_loginpwd"}
+				}
+			});
+			
+			$("#user_loginpwd").focus();
+		});
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" action="${CTX}${NAME_SPACE}/save_modifypwd" method="post" >
+	<input type="hidden" name="user_id" id="user_id" value="${(vo.id)!}"/>
+	<input type="hidden" name="oldpwd" id="oldpwd" value="${(vo.loginpwd)!}"/>
+	<table class="input">
+		<tr>
+			<th align="right" width="20%;">姓名：</th>
+			<td><input type="text" name="user_mc" id="user_mc" class="text" value="${(vo.mc)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">用户名：</th>
+			<td><input type="text" name="user_loginid" id="user_loginid" class="text" value="${(vo.loginid)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">新密码：</th>
+			<td><input type="password" name="user_loginpwd" id="user_loginpwd" class="text" value="${(vo.loginpwd)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">重复输入新密码：</th>
+			<td><input type="password" name="cfpwd" id="cfpwd" class="text" value="${(vo.loginpwd)!}"></td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

@@ -1,0 +1,76 @@
+﻿
+body ,div,p,ul,li,span{margin:0; padding:0; word-spacing:normal; white-space:normal;font-size:12px;font-family: "宋体", "Arial Narrow", HELVETICA;}
+img{ border:0 none; vertical-align:middle}
+a{ text-decoration:none}
+.cl{ height:0px; line-height:0px; font-size:0px; clear:both}
+.line{ height:1px; border-bottom: solid 1px #eee; line-height:1px}
+.mt24{ margin-top:20px}.mt18{ margin-top:2px}.mt12{ margin-top:12px}
+.cd48543{ color:#d48543}
+.l24{ line-height:24px}
+.h200{ height:200px}
+.h230{ height:230px}
+
+.f18{ font-size:18px;}.f12{ font-size:12px !important}
+.fb{ font-weight:bold}
+
+.wrap{width:100%; text-align:center; background-color:rgb(243,243,243); height:100%}
+.header{ height:80px; border-bottom:solid 2px rgb(235,215,192);
+         background-color:rgb(249,249,249);}
+.header .box{width:1000px; margin-left:auto; margin-right:auto; line-height:80px;position:relative;  }
+.header .logo{ width:250px; height:69px; float:left}
+.header .slogan{ width:200px; float:left; text-align:left; margin-left:20px;}
+.header .slogan span{ font-size:18px; font-weight:bold}
+.header .monitoring{ width:350px; height:22px; position:absolute; right:0px; top:0px}
+.header .monitoring a{ line-height:22px; margin-left:5px; text-decoration:none;}
+.header .monitoring a span{font-size:14px; color:rgb(213,136,69); font-weight:bold; }
+.header .monitoring .username{ font-size:14px; font-weight:bold; color:#aaa; margin-left:20px}
+
+.body{ margin-top:24px; margin-left:auto; margin-right:auto; height:600px; width:1000px; position:relative }
+                      
+.body .right_bg{ position:absolute; right:0px; top:0px;background:url(../images/dd/img4.png); background-repeat:repeat-y;
+                      background-position:5px top; width:20px; height:390px; }
+
+.body .conent{ width:665px; height:350px; float:left; }
+.body .conent .order{background:#fff; padding-top:5px;}
+.body .conent .order .item{ height:40px; line-height:40px; text-align:left;}
+.body .conent .order .item span{ color:rgb(95,96,100); font-size:14px; font-weight:bold; width:60px; display:inline-block; text-align:left; margin-left:30px}
+.body .conent .order .item .text{ height:28px; border:solid 1px rgb(222,222,222); line-height:28px; width:150px}
+.body .conent .order .address { height:40px}
+.body .conent .order .address .map{ height:24px; line-height:24px; width:100px;color:rgb(110,122,174); margin-left:5px}
+.body .conent .order .address .text{ height:28px; border:solid 1px rgb(222,222,222); line-height:28px; width:435px}
+.body .conent .order .remark .text{height:28px; border:solid 1px rgb(222,222,222); line-height:28px; width:555px}
+.body .conent .order .pay .a{ height:30px; border:solid 1px rgb(219,219,219); line-height:30px; width:85px; display:inline-block; text-align:center;
+                       background-color:rgb(248,248,248); margin-right:20px; border-width:1px; text-align:center; font-size:14px; font-weight:bold; color:#ccc
+                       ; text-decoration:none}
+.body .conent .action{ text-align:left}
+.body .conent .action .button{ background-color:rgb(236,123,1); border:none; color:#fff; height:30px; line-height:30px; width:100px; font-size:14px; margin-left:50px}
+
+.body .shoppingcart{ width:290px; height:390px; float:left; background:url(../images/dd/img1.png); background-repeat:no-repeat;
+                      background-position:top left; margin-left:20px; padding-left:12px}
+.body .shoppingcart .box{ width:300px; height:327px; background-color:#fff; border-bottom:solid 1px #ccc}
+.body .shoppingcart .title{ height:32px; line-height:32px; text-align:left; padding-left:20px; position:relative}
+.body .shoppingcart .title .span1{ color:rgb(39,44,48); font-size:16px; font-weight:bold; margin-left:10px; line-height:30px; margin-top:3px}
+.body .shoppingcart .title .clearcart{ position:absolute; right:12px; top:0px; color:red}
+
+.body .shoppingcart .sum{ background-color:#fff; margin-left:12px; width:250px; min-height:50px; margin-top:0px}
+
+.body .shoppingcart .box .orderitem{ color:rgb(53,55,54); line-height:40px}
+.body .shoppingcart .box .orderitem .subtract{ width:30px; }
+.body .shoppingcart .box .orderitem .plus{width:30px; }
+.body .shoppingcart .box .orderitem{ width:280px}
+
+.body .shoppingcart .sumbox{ width:290px; background-color:#fff; height:60px}
+
+
+.foot{ margin-top:24px; margin-left:auto; margin-right:auto; height:70px}
+input.error { border: 1px solid red;}
+label.error {
+  background:url("./demo/images/unchecked.gif") no-repeat 0px 0px;
+  padding-left: 16px;
+  padding-bottom: 2px;
+  font-weight: bold;
+  color: #EA5200;
+}
+label.checked {
+  background:url("./demo/images/checked.gif") no-repeat 0px 0px;
+}

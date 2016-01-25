@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>订单调度-司机抢单</title>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+    
+    
+    <script type="text/javascript">
+    function uf_showdd(id){
+		$.dialog({
+			title:'订单明细',
+			content: 'url:${CTX}/admin/dd/showdd?id='+id,
+		    lock:true,
+		    resize: false,
+		    width : 900,
+			height : 480,
+			cover:true,
+			max:true,
+			min:true,
+			cancel:true,
+			fixed:true,
+	        cancelVal:'关 闭'
+		});//弹出框
+	}
+    function uf_accept(id){
+    	$.dialog.confirm('是否抢单？', function(){
+			   $.ajax({
+					url: "${CTX}/diaodu/acceptOrder",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("抢单成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("抢单失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+    }
+	function uf_reject(id){
+		$.dialog.confirm('确定拒绝该订单吗？', function(){
+			   $.ajax({
+					url: "${CTX}/diaodu/rejectOrder",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("操作成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("操作失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+    }
+	function uf_addprice(id){
+	$.dialog({
+		title:'输入报价金额',
+		content: 'url:${CTX}/diaodu/initBaoJia?id=' + id,
+	    lock:true,
+	    resize: true,
+	    width : 300,
+		height : 80,
+		cover:true,
+		max:true,
+		min:true,
+		button:[{
+			name: '保 存',
+			callback:function(){
+					$.post("${CTX}/diaodu/addPriceForOder",this.content.$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("报价成功，请等待下单人选择是否中标！");
+	                    	refresh();
+						}
+					});
+				return false;
+			},
+			focus: true
+		}],
+        cancelVal:'关 闭'
+		});//
+    }
+	function refresh(){
+		$('#myform').submit();
+		$('#myform').action = "";
+		$('#myform').target = "_self";
+	}
+
+    </script>
+  </head>
+  
+  <body>
+    <#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">我要抢单</h2>
+			<table class="list">
+            <tr>
+	            <th width="20px;">序号</th>
+	            <th width="50px;">订单号</th>
+	            <th width="50px;">总金额</th>
+	            <th width="50px;">联系人</th>
+	            <th width="70px;">联系电话</th>
+	            <th width="160px;">收货地址</th>
+	            <th width="80px;">支付状态</th>
+	            <th width="50px;">订单状态</th>
+	            <th width="50px;">订单类型</th>
+				<th width="120px;">操作</th>
+	        </tr>
+	         <#if listpage ??>
+      			<#list listpage.list as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!} </td>
+                  	<td>
+                    	<#if strkit('0',(lst.ddzt)!)>
+                    		<a href="${CTX}/ab/order/ddjs">${(lst.sn)!''}</a>
+                    	<#else>
+                    	<a href="javaScript:void(0);" onclick="uf_showdd('${(lst.id)!}')">${(lst.sn)!}</a>
+                    	</#if>
+                    </td>
+                     <td class="red">
+                          		<#if lst.style?exists && lst.style==2 && lst.min_price?exists && lst.max_price?exists>
+                    			￥${(lst.min_price)!}元 - ￥${(lst.max_price)!}元 
+                    		<#else>
+                    			${(lst.ddzje)?string("currency")}
+                    		</#if>
+                    </td>
+                     <td> ${(lst.lxr)!}</td>
+                    <td>${(lst.lxrdh)!}</td>
+                    <td>${(lst.shdz)!}</td>
+                    <td>
+                    <#if lst.sn.substring(0,2)=='TC' && lst.pay_type?exists >
+                    <#if lst.pay_type==1>在线支付</#if>
+                    <#if lst.pay_type==2>现付</#if>
+                    <#if lst.pay_type==3>到付</#if>
+                    -
+                    </#if>
+                    <#if strkit('0',(lst.zfzt)!)><span class="red">未支付</span></#if><#if strkit('1',(lst.zfzt)!)>已支付</#if>
+                    </td>
+                    <td>
+                    	<#if strkit('0',(lst.ddzt)!)><span class="red">未提交</span></#if>
+						<#if strkit('1',(lst.ddzt)!)>已提交</#if>
+						<#if strkit('2',(lst.ddzt)!)>取货中</#if>
+						<#if strkit('3',(lst.ddzt)!)>送货中</#if>
+						<#if strkit('4',(lst.ddzt)!)>已送达</#if>
+						<#if strkit('5',(lst.ddzt)!)>已签收</#if>
+						<#if strkit('6',(lst.ddzt)!)>拒单</#if>
+						<#if strkit('7',(lst.ddzt)!)>已退单</#if>
+                    	<#if strkit('8',(lst.ddzt)!)><span class="red">已撤单</span></#if>
+                    </td>
+                    <td>
+						<#if strkit('1',(lst.way)!)>同城订单</#if>
+						<#if strkit('5',(lst.way)!)>物流公司下单</#if>
+						<#if strkit('3',(lst.way)!)>熟车下单</#if>
+						<#if strkit('4',(lst.way)!)>同城找车</#if>
+                    </td>
+                    <td>
+                    	<#if lst.qdrid?? && lst.qdrid==lst.driverid>
+	                    	订单已经确认
+                        <#else>                        
+                    	<a href="javascript:void(0);" onclick="uf_accept('${(lst.id)}')">抢单</a>
+                    	<a href="javascript:void(0);" onclick="uf_addprice('${(lst.id)}')">报价</a>
+                    	<a href="javascript:void(0);" onclick="uf_reject('${(lst.id)}')">拒单</a>
+                        </#if>
+                    </td>
+                  </tr>
+                 </#list>
+                 <tr>
+					<td colspan="10">
+						<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+              </#if>
+	     </table>
+	</div>
+</div>
+	
+	
+	
+	
+	<#include '../inc/foot.html'>
+  </body>
+</html>

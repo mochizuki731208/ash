@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>后台管理系统</title>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/admin.css"/>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			 $("#inputForm").validate({
+				rules: {
+					config.name: "required",
+					config.type_id: "required",
+					config.is_display: "required",
+					config.seqNum: {
+						required:true,
+						integer:true,
+						min:1
+					},
+					config.remark: "stringMaxLength:500"
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				  //$("#config.name").val($("select[@config.name] option[@selected]").text());
+				  
+				  if($("#inputForm").valid()){
+				    	//$("#inputForm").submit();
+				  }
+			});
+		});
+	</script>
+</head>
+
+  <body>
+    <form id="inputForm" name="inputForm" action="${CTX}/admin/sms/save" method="post">
+	<input type="hidden" name="config.id" id="config.id" value="${(vo.id)!}"/>
+	<div class="path">
+		<a href="javascript:void(0);">首页</a> &raquo; 短信服务配置
+	</div>
+	<table class="input">
+		<tr>
+			<th align="right">名称：</th>
+			<td><input type="text" name="config.yt" id="config.yt" class="text" value="${(vo.yt)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">服务器地址：</th>
+			<td><input type="text" name="config.c1" id="config.c1" class="text" value="${(vo.c1)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">用户名：</th>
+			<td><input type="text" id="config.c2" name="config.c2" class="text" value="${(vo.c2)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">密码：</th>
+			<td><input type="text" id="config.c3" name="config.c3" class="text" value="${(vo.c3)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">备注：</th>
+			<td><textarea id="config.c4" name="config.c4" class="text" style="width: 400px;">${(vo.c4)!}</textarea></td>
+		</tr>
+		<tr>
+		<td>&nbsp;</td>
+		<td>
+			<input type="submit" id="btn_save" class="button" value="保 存" />
+			<input type="button" id="btn_return" class="button" value="刷 新" onclick="javascript:window.location.href='${CTX}/admin/sms/edit'"/>
+		</td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

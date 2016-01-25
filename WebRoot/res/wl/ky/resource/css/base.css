@@ -1,0 +1,51 @@
+.cb{
+	clear: both;
+}
+.h2{
+	height: 2px;
+	_font-size:0;
+}
+.h6{
+	height: 6px;
+	_font-size: 0;
+}
+.h8{
+	height: 8px;
+	_font-size: 0;
+}
+
+.h11{
+	height: 11px;
+	_font-size: 0;
+}
+.h17{
+	height: 17px;
+	_font-size: 0;
+}
+.h19{
+	height: 19px;
+	_font-size: 0;
+}
+.h20{
+	height: 20px;
+	_font-size: 0;
+}
+.h23{
+	height: 23px;
+	_font-size:0;
+}
+.h150{
+	height: 150px;
+}
+.h65{
+	height: 65px;
+}
+.fl{
+	float: left;
+}
+.fr{
+	float: right;
+}
+.nomargin{
+	margin:0 !important;
+}

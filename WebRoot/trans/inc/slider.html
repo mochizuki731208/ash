@@ -1,0 +1,64 @@
+<!-- 幻灯片开始-->
+<div class="hdp">  
+   <div id="banner_tabs" class="flexslider">
+	<ul class="slides">
+		<#if img ??>
+		<#list img as lst>
+		<li>
+			<a title="" href="#">
+				<img width="980" height="482"  alt="" style="height:100%;background: url(${CTX}/upload/${lst.lager}) no-repeat center;" src="${CTX}/upload/${lst.lager}">
+			</a>
+		</li>
+		</#list>
+		<#else>
+		<li>
+			<a title="" href="#">
+				<img width="1920" height="482" alt="" style="background: url(${CTX}/res/trans/img/banner1.jpg) no-repeat center;" src="${CTX}/res/trans/img/alpha.png">
+			</a>
+		</li>
+		<li>
+			<a title="" href="#">
+				<img width="1920" height="482" alt="" style="background: url(${CTX}/res/trans/img/banner2.jpg) no-repeat center;" src="${CTX}/res/trans/img/alpha.png">
+			</a>
+		</li>
+		<li>
+			<a title="" href="#">
+				<img width="1920" height="482" alt="" style="background: url(${CTX}/res/trans/img/banner3.jpg) no-repeat center;" src="${CTX}/res/trans/img/alpha.png">
+			</a>
+		</li>
+		</#if>
+		
+	</ul>
+	<ul class="flex-direction-nav">
+		<li><a class="flex-prev" href="javascript:;">Previous</a></li>
+		<li><a class="flex-next" href="javascript:;">Next</a></li>
+	</ul>
+	<ol id="bannerCtrl" class="flex-control-nav flex-control-paging">
+		<li><a>1</a></li>
+		<li><a>2</a></li>
+		<li><a>2</a></li>
+	</ol>
+</div>
+<!-- <script type="text/javascript" src="${CTX}/res/trans/js/jquery-1.10.2.min.js"></script> -->
+<script type="text/javascript" src="${CTX}/res/trans/js/slider.js"></script>
+<script type="text/javascript">
+$(function() {
+	var bannerSlider = new Slider($('#banner_tabs'), {
+		time: 5000,
+		delay: 400,
+		event: 'hover',
+		auto: true,
+		mode: 'fade',
+		controller: $('#bannerCtrl'),
+		activeControllerCls: 'active'
+	});
+	$('#banner_tabs .flex-prev').click(function() {
+		bannerSlider.prev()
+	});
+	$('#banner_tabs .flex-next').click(function() {
+		bannerSlider.next()
+	});
+})
+</script>
+</div>
+<!--幻灯片结束-->

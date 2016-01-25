@@ -1,0 +1,101 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/score.css" />
+<script type="text/javascript">
+	$(function () {
+	    $('#J_ui-tab').find('dd').each(function () {
+	        var $self = $(this);
+	        $self.bind('click', function () {
+	            $(this).siblings().removeClass();
+	            $(this).addClass('activity');
+	            var data = $(this).attr("data");
+	            $.ajax({
+	        		url : '${CTX}/ab/exc/listpartscore',
+	        		type : "post",
+	        		async : true,
+	        		data : {
+	        			'data' : data,
+	        		},
+	        		dataType : "html",
+	        		error : function(data) {
+	        		},
+	        		success : function(data) {
+	        			$("#J_pointDetail").html(data);
+	        		}
+	        	});
+	        });
+	    });
+	});
+</script>
+</head>
+<body>
+	<#include '../inc/top.html'> 
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="pagemain">
+        <dl class="ui-tab clearfix" id="J_ui-tab">
+            <dt>我的积分</dt><dd class="activity" data="1">积分明细</dd><dd data="2">积分收入</dd><dd data="3">积分支出</dd></dl>
+        <div class="connent">
+            <div id="J_pointSummary">
+                <div class="summary clearfix">
+                    <div class="summary-item valid">
+                        <span class="desc">可用的积分</span><span class="point">${score}</span></div>
+                    <div class="summary-item expired-soon">
+                        <span class="desc">消耗的积分</span><span class="point">${usedscore}</span><span class="date">2015年12月31日</span></div>
+                    <div class="summary-item exchange">
+                        <a href="${CTX}/ab/exc/listgoodsexchange" target="_top">兑换超值商品与优惠劵</a></div>
+                </div>
+            </div>
+            <div class="detail">
+                <div class="masthead clearfix">
+                    <span class="why">来源/用途</span><span class="what">积分变化</span><span class="when">日期</span><span
+                        class="notes right">备注</span></div>
+                <div id="J_pointDetail">
+                    <ul class="item-list" id="J_item-list">
+                    	<#if listscore ??> <#list listscore as lst>
+	                        <li class="item clearfix">
+	                            <div class="why">
+	                                <a class="img" href="#" target="_blank">
+		                                <#if strkit('07',(lst.type)!)>
+		                                    <img src="${CTX}/upload/${(lst.img_url)!''}"
+		                                        width="60" height="60">
+		                                <#else>
+		                                    <img src="${CTX}/res/css/ab/images/caomei.gif"
+		                                        width="60" height="60">
+		                                </#if>
+	                                </a>
+	                                <a class="title" target="_blank" href="#">
+	                                           ${(lst.title)!''}</a>
+	                                            <span class="order-number">
+	                                            	<#if strkit('',(lst.sn)!)>编号：${(lst.sn)!''}</#if>
+	                                            </span>
+	                                            </div>
+	                            <div class="what">
+	                                <span class="1  plus "><#if (lst.value>0)>+</#if>${(lst.value)!''}</span></div>
+	                            <div class="when">
+	                                ${(lst.datetime)!''}</div>
+	                            <div class="notes">
+	                            	<#if strkit('01',(lst.type)!)>注册</#if>
+	                            	<#if strkit('02',(lst.type)!)>每日登录</#if>
+	                            	<#if strkit('03',(lst.type)!)>下载App</#if>
+	                            	<#if strkit('04',(lst.type)!)>购买商品15天内评价</#if>
+	                            	<#if strkit('05',(lst.type)!)>推荐好友注册</#if>
+	                            	<#if strkit('06',(lst.type)!)>交易获得</#if>
+	                            	<#if strkit('07',(lst.type)!)>积分兑换</#if>
+	                            </div>
+	                        </li>
+                      	</#list> </#if>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+</body>
+</html>

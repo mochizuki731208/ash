@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<script type="text/javascript"
+	src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+<script type="text/javascript">
+		function uf_delete(id){
+			$.dialog.confirm('确认要删除当前选择的数据吗？', function(){
+			   $.ajax({
+					url: "${CTX}/admin/integral/deleteexchange",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("保存数据成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("删除数据失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_edit(id){
+			$.dialog({
+				title:'积分兑换记录编辑',
+				content: 'url:${CTX}/admin/integral/editexchange?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 400,
+				height : 320,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							$.post("${CTX}/admin/integral/saveexchange",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+			                    	$.dialog.alert("保存数据成功！",function () {
+										refresh();
+							        }).title('3秒后关闭').time(3);
+								}else{
+									$.dialog.alert("保存数据失败！");
+								}
+							});
+						}
+			            return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+<body>
+	<form id="myform" name="myform" method="post" action="">
+		商品标题信息：<input type="text" name="title" id="title" class="text" value="${(title)!}" style="width: 100px;" /> 
+		收件人电话：<input type="text" name="rect_mobile" id="rect_mobile" class="text" value="${(rect_mobile)!}" style="width: 100px;" /> 
+		收件人姓名：<input type="text" name="rect" id="rect" class="text" value="${(rect)!}" style="width: 100px;" /> 
+		<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();" />
+		<table class="list">
+			<tr>
+				<th width="3%">序号</th>
+				<th width="10%">商品标题信息</th>
+				<th width="8%">商品图片</th>
+				<th width="4%">积分</th>
+				<th width="5%">收件人姓名</th>
+				<th width="5%">收件人电话</th>
+				<th width="10%">详细地址</th>
+				<th width="4%">支付方式</th>
+				<th width="8%">备注</th>
+				<th width="10%">兑换时间</th>
+				<th width="4%">发货状态</th>
+				<th width="10%">发货时间</th>
+				<th width="6%">快递名称</th>
+				<th width="6%">快递单号</th>
+				<th width="*%">操作</th>
+			</tr>
+			<#if listpage ??> <#list listpage.list as lst>
+			<tr ondblclick="uf_edit('${(lst.id)!}')">
+				<td>${(lst_index+1)!''}</td>
+				<td>${(lst.title)!''}</td>
+				<td><img src="${CTX}/upload/${(lst.img_url)!''}"
+					style="width: 80px; height: 60px;"></td>
+				<td>${(lst.score)!''}</td>
+				<td>${(lst.rect)!''}</td>
+				<td>${(lst.rect_mobile)!''}</td>
+				<td>${(lst.rect_adrs)!''}</td>
+				<td>
+					<#if strkit('1',(lst.pay_type)!)>充值直扣</#if>
+					<#if strkit('2',(lst.pay_type)!)>支付宝</#if>
+					<#if strkit('3',(lst.pay_type)!)>货到付款</#if>
+					<#if strkit('4',(lst.pay_type)!)>无需支付</#if>
+				</td>
+				<td>${(lst.remark)!''}</td>
+				<td>${(lst.datetime)!''}</td>
+				<td><#if strkit('0',(lst.send_status)!)>未发货</#if><#if strkit('1',(lst.lst.send_status)!)>发货</#if></td>
+				<td>${(lst.send_time)!''}</td>
+				<td>${(lst.send_type)!''}</td>
+				<td>${(lst.send_number)!''}</td>
+				<td><a href="javascript:void(0);"
+					onclick="uf_edit('${(lst.id)!}')">修改</a> <a
+					href="javascript:void(0);" onclick="uf_delete('${(lst.id)!}')">删除</a>
+				</td>
+			</tr>
+			</#list> </#if>
+			<tr>
+				<td colspan="15"><#include '../../common/_paginate.html'></td>
+			</tr>
+		</table>
+
+	</form>
+</body>
+</html>

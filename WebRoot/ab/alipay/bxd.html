@@ -1,0 +1,453 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<link rel="stylesheet" type="text/css"	href="${CTX}/res/css/admin/admin.css" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/tab/style.css"/>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/bootstrap.min.css" />
+<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+
+<script type="text/javascript">
+	var index1 = "${(index)!}";
+	$().ready(function() {
+		var tmp = (index1 == "" ? 0 : parseInt(index1));
+		shiftNavTag(tmp);
+	});
+	function uf_showdd(id){
+		$.dialog({
+			title:'订单明细',
+			content: 'url:${CTX}/admin/dd/showdd?id='+id,
+		    lock:true,
+		    resize: false,
+		    width : 900,
+			height : 480,
+			cover:true,
+			max:true,
+			min:true,
+			cancel:true,
+			fixed:true,
+	        cancelVal:'关 闭'
+		});//弹出框
+	}
+	function shiftNavTag(which) 
+	{
+		index1 = which + "";
+		for(var index = 0;index<4;index++) {
+			if(index == which) {
+				$("#Container" + index)[0].style.display="";
+				$("#NavTag" + index)[0].className="currentLabel";
+			} else {
+				$("#Container" + index)[0].style.display="none";
+				$("#NavTag" + index)[0].className="normalLabel";
+			}
+		}
+	}
+	function refresh() {
+		$("form").attr("action","${CTX}/ab/tc/bxd/" + index1).submit();
+	}
+	function pay(_id,_cost) {
+		$.ajax({
+			url: "${CTX}/ab/order/initalipayapi",
+			type: "POST",
+			data:{
+				WIDout_trade_no:_id,// 保费单号
+				WIDsubject:"充值",
+				WIDbody:"充值",
+				zzfs:"0",// 在线充值
+				WIDtotal_fee:_cost,
+				yhkid:$("input:radio[name='yhkid']:checked").val(),
+				type:"0" // 充值
+			},
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				if(!data.result){
+					alert("信息有误，请重新提交！");
+				}else{
+					$.ajax({
+					   type: "POST",
+					   url: "${CTX}/admin/dd/update_policy",
+					   data: {"policy_id" : _id},
+					   dataType: "text",
+					   success: function(_data){
+					   		if(_data == "2") {
+			        			alert("保费已支付但是保单状态修改失败，请联系客服人员!");
+			        		}else {
+			        			// alert("保单已保存成功并且保费已支付成功!");
+			        			window.location.href = data.url;
+			        		}
+					   },
+					   error:function(XMLHttpRequest, textStatus, errorThrown) {
+					   		alert("执行错误!" + textStatus + "  " + errorThrown);
+					   }
+					});
+				}
+			},
+			error:function(){
+				alert("系统错误，请稍后重试！");
+			}
+		});
+	}
+	function detail(_id) {
+		/*
+		$.dialog({
+			title:'保险单明细',
+			content: 'url:${CTX}/admin/dd/policyDetail/'+_id,
+		    lock:true,
+		    resize: false,
+		    width : 900,
+			height : 480,
+			cover:true,
+			max:true,
+			min:true,
+			cancel:true,
+			fixed:true,
+	        cancelVal:'关 闭'
+		});//弹出框
+		*/
+		$("form").attr("action",'${CTX}/admin/dd/policyDetail/'+_id).attr("method","post").submit();
+	}
+</script>
+</head>
+<body>
+		<#include '../inc/top.html'>
+		<#include '../inc/header.html'>
+		<#include '../inc/nav.html'>
+		<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<form name="alipayment" class="form-inline" id="alipayment">
+				<div id="tablist_tx">
+					 <div id="NavTagContainer" style="z-index: 1;">
+						<input type="button" onClick="shiftNavTag(0)" id="NavTag0" name="NavTag" class="currentLabel" value="所有保单"></input>
+						<input type="button" onClick="shiftNavTag(1)" id="NavTag1" name="NavTag" class="normalLabel" value="未支付保单"></input>
+						<input type="button" onClick="shiftNavTag(2)" id="NavTag2" name="NavTag" class="normalLabel" value="已支付保单"></input>
+						<input type="button" onClick="shiftNavTag(3)" id="NavTag3" name="NavTag" class="normalLabel" value="已完成保单"></input>
+					</div>
+					<div id="NavTagContent" style="width: 100%;">
+						<div id="Container0" style="margin: 3px 0px 3px 0px; display: block;">
+							<table class="list">
+					            <tr>
+						            <th width="20px;">序号</th>
+						            <th width="50px;">被保险人</th>
+						            <th width="50px;">货物名称</th>
+						            <th width="50px;">起始地</th>
+						            <th width="50px;">目的地</th>
+						            <th width="50px;">起运时间</th>
+						            <th width="50px;">保单金额</th>
+						            <th width="50px;">保费</th>
+						            <th width="50px;">状态</th>
+						            <th width="50px;">订单号</th>
+						            <th width="70px;">操作</th>
+						        </tr>
+						        <#if all_listpage ??>
+					      				<#list all_listpage.list as lst>
+					                  <tr>
+					                  	<td>${(lst_index+1)!}</td>
+					                  	<td>${(lst.insurant)!}</td>
+					                  	<td>${(lst.goods_name)!}</td>
+					                  	<td>${(lst.start_site_province)!}-${(lst.start_site_city)!}-${(lst.start_site_country)!}</td>
+					                  	<td>${(lst.end_site_province)!}-${(lst.end_site_city)!}-${(lst.end_site_country)!}</td>
+					                  	<td>${(lst.start_time)!}</td>
+					                  	<td>¥&nbsp;${(lst.policy_quota)!}</td>
+					                  	<td>¥&nbsp;${(lst.policy_cost)!}</td>
+					                  	<td>
+					                  		<#if strkit('01',(lst.policy_status)!)>未支付</#if>
+					                    	<#if strkit('02',(lst.policy_status)!)>已支付</#if>
+					                    	<#if strkit('03',(lst.policy_status)!)>已完成</#if>
+					                  	</td>
+					                  	<td>${(lst.order_sn)!}</td>
+					                    <td>
+					                    	<#if strkit('01',(lst.policy_status)!)><a onclick="pay('${(lst.id)!}','${(lst.policy_cost)!}')">支付保费</a></#if>
+					                    	<a onclick="detail('${(lst.id)!}')">详情</a>
+										</td>
+					                  </tr>
+									</#list>
+									<tr>
+										<td colspan="11">
+											<div class="page">
+												<input type="hidden" id="all_curPage" name="all_curPage" value="${all_listpage.curPage}"/>
+										     	 共${all_listpage.totalRow}条记录 ${all_listpage.curPage}/${all_listpage.totalPage}页
+											      <a href="javascript:void(0);" onclick="all_uf_page_setcurpage('1');">首页</a>
+											      <#if all_listpage.curPage==1>
+											      <a href="javascript:void(0);" onclick="all_uf_page_setcurpage('1');">上一页</a>
+											      <#else>
+											       <a href="javascript:void(0);" onclick="all_uf_page_setcurpage('${all_listpage.curPage-1}');">上一页</a>
+											      </#if>
+											      <#if all_listpage.curPage lt all_listpage.totalPage>
+											      <a href="javascript:void(0);" onclick="all_uf_page_setcurpage('${all_listpage.curPage+1}');">下一页</a>
+											      <#else>
+											      <a href="javascript:void(0);" onclick="all_uf_page_setcurpage('${all_listpage.totalPage}');">下一页</a>
+											      </#if>
+											      <a href="javascript:void(0);" onclick="all_uf_page_setcurpage('${all_listpage.totalPage}');">尾页</a>
+											      跳转到
+											      <select onchange="all_uf_goto(this.value)">
+											      	<#list 1..all_listpage.totalPage as i>
+											      	<option <#if i==all_listpage.curPage>selected</#if>>${i}</option>
+											      	</#list> 
+											      </select>
+											      页
+											      <script type="text/javascript">
+											      		function all_uf_page_setcurpage(page){
+											      			document.all.all_curPage.value = page;
+											      			refresh();
+											      		}
+											      		function all_uf_goto(page){
+											      			document.all.all_curPage.value = page;
+											      			refresh();
+											      		}
+											      </script>
+											</div>
+										</td>
+									</tr>
+								</#if>
+					    	</table>
+						</div>
+						<div id="Container1" style="margin: 3px 0px 3px 0px; display: block;">
+							<table class="list">
+					            <tr>
+						            <th width="20px;">序号</th>
+						            <th width="50px;">被保险人</th>
+						            <th width="50px;">货物名称</th>
+						            <th width="50px;">起始地</th>
+						            <th width="50px;">目的地</th>
+						            <th width="50px;">起运时间</th>
+						            <th width="50px;">保单金额</th>
+						            <th width="50px;">保费</th>
+						            <th width="50px;">状态</th>
+						            <th width="50px;">订单号</th>
+						            <th width="70px;">操作</th>
+						        </tr>
+						        <#if wzf_listpage ??>
+					      				<#list wzf_listpage.list as lst>
+					                  <tr>
+					                  	<td>${(lst_index+1)!}</td>
+					                  	<td>${(lst.insurant)!}</td>
+					                  	<td>${(lst.goods_name)!}</td>
+					                  	<td>${(lst.start_site_province)!}-${(lst.start_site_city)!}-${(lst.start_site_country)!}</td>
+					                  	<td>${(lst.end_site_province)!}-${(lst.end_site_city)!}-${(lst.end_site_country)!}</td>
+					                  	<td>${(lst.start_time)!}</td>
+					                  	<td>¥&nbsp;${(lst.policy_quota)!}</td>
+					                  	<td>¥&nbsp;${(lst.policy_cost)!}</td>
+					                  	<td>
+					                  		<#if strkit('01',(lst.policy_status)!)>未支付</#if>
+					                    	<#if strkit('02',(lst.policy_status)!)>已支付</#if>
+					                    	<#if strkit('03',(lst.policy_status)!)>已完成</#if>
+					                  	</td>
+					                  	<td>${(lst.order_sn)!}</td>
+					                    <td>
+					                    	<#if strkit('01',(lst.policy_status)!)><a onclick="pay('${(lst.id)!}','${(lst.policy_cost)!}')">支付保费</a></#if>
+					                    	<a onclick="detail('${(lst.id)!}')">详情</a>
+										</td>
+					                  </tr>
+									</#list>
+									<tr>
+										<td colspan="11">
+											<div class="page">
+												<input type="hidden" id="wzf_curPage" name="wzf_curPage" value="${wzf_listpage.curPage}"/>
+										     	 共${wzf_listpage.totalRow}条记录 ${wzf_listpage.curPage}/${wzf_listpage.totalPage}页
+											      <a href="javascript:void(0);" onclick="wzf_uf_page_setcurpage('1');">首页</a>
+											      <#if wzf_listpage.curPage==1>
+											      <a href="javascript:void(0);" onclick="wzf_uf_page_setcurpage('1');">上一页</a>
+											      <#else>
+											       <a href="javascript:void(0);" onclick="wzf_uf_page_setcurpage('${wzf_listpage.curPage-1}');">上一页</a>
+											      </#if>
+											      <#if wzf_listpage.curPage lt wzf_listpage.totalPage>
+											      <a href="javascript:void(0);" onclick="wzf_uf_page_setcurpage('${wzf_listpage.curPage+1}');">下一页</a>
+											      <#else>
+											      <a href="javascript:void(0);" onclick="wzf_uf_page_setcurpage('${wzf_listpage.totalPage}');">下一页</a>
+											      </#if>
+											      <a href="javascript:void(0);" onclick="wzf_uf_page_setcurpage('${wzf_listpage.totalPage}');">尾页</a>
+											      跳转到
+											      <select onchange="wzf_uf_goto(this.value)">
+											      	<#list 1..wzf_listpage.totalPage as i>
+											      	<option <#if i==wzf_listpage.curPage>selected</#if>>${i}</option>
+											      	</#list> 
+											      </select>
+											      页
+											      <script type="text/javascript">
+											      		function wzf_uf_page_setcurpage(page){
+											      			document.all.wzf_curPage.value = page;
+											      			refresh();
+											      		}
+											      		function wzf_uf_goto(page){
+											      			document.all.wzf_curPage.value = page;
+											      			refresh();
+											      		}
+											      </script>
+											</div>
+										</td>
+									</tr>
+								</#if>
+					    	</table>
+						</div>
+						<div id="Container2" style="margin: 3px 0px 3px 0px; display: block;">
+							<table class="list">
+					            <tr>
+						            <th width="20px;">序号</th>
+						            <th width="50px;">被保险人</th>
+						            <th width="50px;">货物名称</th>
+						            <th width="50px;">起始地</th>
+						            <th width="50px;">目的地</th>
+						            <th width="50px;">起运时间</th>
+						            <th width="50px;">保单金额</th>
+						            <th width="50px;">保费</th>
+						            <th width="50px;">状态</th>
+						            <th width="50px;">订单号</th>
+						            <th width="70px;">操作</th>
+						        </tr>
+						        <#if yzf_listpage ??>
+					      				<#list yzf_listpage.list as lst>
+					                  <tr>
+					                  	<td>${(lst_index+1)!}</td>
+					                  	<td>${(lst.insurant)!}</td>
+					                  	<td>${(lst.goods_name)!}</td>
+					                  	<td>${(lst.start_site_province)!}-${(lst.start_site_city)!}-${(lst.start_site_country)!}</td>
+					                  	<td>${(lst.end_site_province)!}-${(lst.end_site_city)!}-${(lst.end_site_country)!}</td>
+					                  	<td>${(lst.start_time)!}</td>
+					                  	<td>¥&nbsp;${(lst.policy_quota)!}</td>
+					                  	<td>¥&nbsp;${(lst.policy_cost)!}</td>
+					                  	<td>
+					                  		<#if strkit('01',(lst.policy_status)!)>未支付</#if>
+					                    	<#if strkit('02',(lst.policy_status)!)>已支付</#if>
+					                    	<#if strkit('03',(lst.policy_status)!)>已完成</#if>
+					                  	</td>
+					                  	<td>${(lst.order_sn)!}</td>
+					                    <td>
+					                    	<#if strkit('01',(lst.policy_status)!)><a onclick="pay('${(lst.id)!}','${(lst.policy_cost)!}')">支付保费</a></#if>
+					                    	<a onclick="detail('${(lst.id)!}')">详情</a>
+										</td>
+					                  </tr>
+									</#list>
+									<tr>
+										<td colspan="11">
+											<div class="page">
+												<input type="hidden" id="yzf_curPage" name="yzf_curPage" value="${yzf_listpage.curPage}"/>
+										     	 共${yzf_listpage.totalRow}条记录 ${yzf_listpage.curPage}/${yzf_listpage.totalPage}页
+											      <a href="javascript:void(0);" onclick="yzf_uf_page_setcurpage('1');">首页</a>
+											      <#if yzf_listpage.curPage==1>
+											      <a href="javascript:void(0);" onclick="yzf_uf_page_setcurpage('1');">上一页</a>
+											      <#else>
+											       <a href="javascript:void(0);" onclick="yzf_uf_page_setcurpage('${yzf_listpage.curPage-1}');">上一页</a>
+											      </#if>
+											      <#if yzf_listpage.curPage lt yzf_listpage.totalPage>
+											      <a href="javascript:void(0);" onclick="yzf_uf_page_setcurpage('${yzf_listpage.curPage+1}');">下一页</a>
+											      <#else>
+											      <a href="javascript:void(0);" onclick="yzf_uf_page_setcurpage('${yzf_listpage.totalPage}');">下一页</a>
+											      </#if>
+											      <a href="javascript:void(0);" onclick="yzf_uf_page_setcurpage('${yzf_listpage.totalPage}');">尾页</a>
+											      跳转到
+											      <select onchange="yzf_uf_goto(this.value)">
+											      	<#list 1..yzf_listpage.totalPage as i>
+											      	<option <#if i==yzf_listpage.curPage>selected</#if>>${i}</option>
+											      	</#list> 
+											      </select>
+											      页
+											      <script type="text/javascript">
+											      		function yzf_uf_page_setcurpage(page){
+											      			document.all.yzf_curPage.value = page;
+											      			refresh();
+											      		}
+											      		function yzf_uf_goto(page){
+											      			document.all.yzf_curPage.value = page;
+											      			refresh();
+											      		}
+											      </script>
+											</div>
+										</td>
+									</tr>
+								</#if>
+					    	</table>
+						</div>
+						<div id="Container3" style="margin: 3px 0px 3px 0px; display: block;">
+							<table class="list">
+					            <tr>
+						            <th width="20px;">序号</th>
+						            <th width="50px;">被保险人</th>
+						            <th width="50px;">货物名称</th>
+						            <th width="50px;">起始地</th>
+						            <th width="50px;">目的地</th>
+						            <th width="50px;">起运时间</th>
+						            <th width="50px;">保单金额</th>
+						            <th width="50px;">保费</th>
+						            <th width="50px;">状态</th>
+						            <th width="50px;">订单号</th>
+						            <th width="70px;">操作</th>
+						        </tr>
+						        <#if ywc_listpage ??>
+					      				<#list ywc_listpage.list as lst>
+					                  <tr>
+					                  	<td>${(lst_index+1)!}</td>
+					                  	<td>${(lst.insurant)!}</td>
+					                  	<td>${(lst.goods_name)!}</td>
+					                  	<td>${(lst.start_site_province)!}-${(lst.start_site_city)!}-${(lst.start_site_country)!}</td>
+					                  	<td>${(lst.end_site_province)!}-${(lst.end_site_city)!}-${(lst.end_site_country)!}</td>
+					                  	<td>${(lst.start_time)!}</td>
+					                  	<td>¥&nbsp;${(lst.policy_quota)!}</td>
+					                  	<td>¥&nbsp;${(lst.policy_cost)!}</td>
+					                  	<td>
+					                  		<#if strkit('01',(lst.policy_status)!)>未支付</#if>
+					                    	<#if strkit('02',(lst.policy_status)!)>已支付</#if>
+					                    	<#if strkit('03',(lst.policy_status)!)>已完成</#if>
+					                  	</td>
+					                  	<td>${(lst.order_sn)!}</td>
+					                    <td>
+					                    	<#if strkit('01',(lst.policy_status)!)><a onclick="pay('${(lst.id)!}','${(lst.policy_cost)!}')">支付保费</a></#if>
+					                    	<a onclick="detail('${(lst.id)!}')">详情</a>
+										</td>
+					                  </tr>
+									</#list>
+									<tr>
+										<td colspan="5">
+											<div class="page">
+												<input type="hidden" id="ywc_curPage" name="ywc_curPage" value="${ywc_listpage.curPage}"/>
+										     	 共${ywc_listpage.totalRow}条记录 ${ywc_listpage.curPage}/${ywc_listpage.totalPage}页
+											      <a href="javascript:void(0);" onclick="ywc_uf_page_setcurpage('1');">首页</a>
+											      <#if ywc_listpage.curPage==1>
+											      <a href="javascript:void(0);" onclick="ywc_uf_page_setcurpage('1');">上一页</a>
+											      <#else>
+											       <a href="javascript:void(0);" onclick="ywc_uf_page_setcurpage('${ywc_listpage.curPage-1}');">上一页</a>
+											      </#if>
+											      <#if ywc_listpage.curPage lt ywc_listpage.totalPage>
+											      <a href="javascript:void(0);" onclick="ywc_uf_page_setcurpage('${ywc_listpage.curPage+1}');">下一页</a>
+											      <#else>
+											      <a href="javascript:void(0);" onclick="ywc_uf_page_setcurpage('${ywc_listpage.totalPage}');">下一页</a>
+											      </#if>
+											      <a href="javascript:void(0);" onclick="ywc_uf_page_setcurpage('${ywc_listpage.totalPage}');">尾页</a>
+											      跳转到
+											      <select onchange="ywc_uf_goto(this.value)">
+											      	<#list 1..ywc_listpage.totalPage as i>
+											      	<option <#if i==ywc_listpage.curPage>selected</#if>>${i}</option>
+											      	</#list> 
+											      </select>
+											      页
+											      <script type="text/javascript">
+											      		function ywc_uf_page_setcurpage(page){
+											      			document.all.ywc_curPage.value = page;
+											      			refresh();
+											      		}
+											      		function ywc_uf_goto(page){
+											      			document.all.ywc_curPage.value = page;
+											      			refresh();
+											      		}
+											      </script>
+											</div>
+										</td>
+									</tr>
+								</#if>
+					    	</table>
+						</div>
+					</div>
+				</div>
+			</form>
+			</div>
+			</div>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+</body>
+</html>
+

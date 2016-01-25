@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+	<#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_save(){
+			if($('#area_id').val()==''){
+				$.dialog.alert("城市或者商圈未选择！");
+				return false;
+			}
+			
+			if($('#subject_id').val()==''){
+				$.dialog.alert("分类未选择！");
+				return false;
+			}
+			
+			if($('#srvmoney').val()==''){
+				$.dialog.alert("请输入服务费，必须是数值！");
+				return false;
+			}
+			
+			$.post("${CTX}/admin/subject/save_ptf",$("#myform").serializeArray(),function(data){
+                   if(data){
+                   	$.dialog.alert("保存数据成功！",function () {
+						refresh();
+			        }).time(0.8);
+				}else{
+					$.dialog.alert("保存数据失败！");
+				}
+			});
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>	
+</head>
+  <body>
+	<form id="myform" name="myform" method="post" action="" style="margin: 5px;">
+	<input type="hidden" name="id" id="id" class="text" value="${(r.id)!}"/>
+	<input type="hidden" name="area_id" id="area_id" class="text" value="${(area_id)!}"/>
+	<input type="hidden" name="subject_id" id="subject_id" class="text" value="${(subject_id)!}"/>
+	服务费：<input type="text" name="srvmoney" id="srvmoney" value="${(r.srvmoney)!}" class="text"/>
+	<input type="button" id="btn_save" class="button" value="设 置" onclick="uf_save();"/>
+	</form>
+  </body>
+</html>

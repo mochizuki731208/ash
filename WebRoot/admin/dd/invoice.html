@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+</head>
+  <body>
+  <form id="myform" name="myform" action="${CTX}/ab/checklogin" method="post">
+	<table border="0" cellpadding="0" cellspacing="0" width="100%;" class="input">
+        		<tbody><tr>
+                    <td align="right" width="15%;">姓名</td>
+                    <td align="left" width="85%;"><input type="text" class="text valid" id="lxr" name="lxr" value="系统管理员"> <font color="red">*</font></td>
+                </tr>
+                <tr>
+                    <td align="right">电话</td>
+                    <td align="left"><input type="text" class="text" id="lxrdh" name="lxrdh" value=""> <font color="red">*</font></td>
+                </tr>
+                <tr>
+                    <td align="right">地址</td>
+                    <td align="left"><input type="text" class="text" placeholder="请输入发货地址" id="shdz" name="shdz" size="30" value="" style="width:300px;" autocomplete="off"> <font color="red">*</font></td>
+                </tr>
+                <tr>
+                    <td align="right">备注</td>
+                    <td align="left"><textarea id="memo" name="memo" style="width: 600px;height: 100px;"></textarea></td>
+                </tr>
+                <tr>
+                    <td align="right">支付方式</td>
+                    <td align="left">
+                  		<input type="checkbox" value="1" name="zffs" class="zffs" onclick="check(this);">充值直扣
+                        <input type="checkbox" value="2" name="zffs" class="zffs" onclick="check(this);">支付宝
+                        <input type="checkbox" value="3" name="zffs" class="zffs" onclick="check(this);">货到付款 <font color="red">*</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">送达</td>
+                    <td align="left"><input class="Wdate text" id="yqsdsj" name="yqsdsj" value="" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss'})"></td>
+                </tr>
+                <tr>
+                <td align="right"><input type="submit" id="btn_submit" name="btn_submit" class="button" onclick="uf_submit();" value="确认"></td>
+                </tr>
+        	</tbody></table>
+  </body>
+</html>
+

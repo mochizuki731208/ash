@@ -1,0 +1,135 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+		function uf_del(id){
+			$.dialog.confirm('是否要删除所选营业时间数据吗？', function(){
+			   $.ajax({
+					url: "${CTX}/ab/mer/del_yysj",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除数据成功！",function () {
+								refresh();
+					        }).time(0.3);
+						}else{
+							$.dialog.alert("删除数据失败！");
+						}
+					}
+				});
+			}, function(){
+			    //$.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_edit(id){
+			$.dialog({
+				title:'营业时间编辑',
+				content: 'url:${CTX}/ab/mer/edit_yysj?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 500,
+				height : 180,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							$.post("${CTX}/ab/mer/save_yysj",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+									$.dialog.alert("保存数据成功！",function () {
+										refresh();
+							        }).time(0.5);
+								}else{
+									$.dialog.alert("保存数据失败！");
+								}
+							});
+						}
+			            return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">营业时间管理</h2>
+			<form id="myform" name="myform" action="" method="post">
+			<input type="button" id="btn_add" name="btn_add" class="button" value="添 加" onclick="uf_edit('');"/>
+			<table class="list">
+	            <tr>
+		            <th width="40px;">序号</th>
+		            <th width="30%">星期</th>
+		            <th width="20%">营业时间从</th>
+		            <th width="20%">至</th>
+					<th width="*%">操作</th>
+		        </tr>
+	      		<#if listpage ??>
+	      			  <#list listpage.list as lst>
+	                  <tr ondblclick="uf_edit('${(lst.id)!}')">
+	                  	<td>${(lst_index+1)!''}</td>
+	                  	<td>
+	                  		<#if (((lst.xq)!) == 1)>星期一</#if>
+	                  		<#if (((lst.xq)!) == 2)>星期二</#if>
+	                  		<#if (((lst.xq)!) == 3)>星期三</#if>
+	                  		<#if (((lst.xq)!) == 4)>星期四</#if>
+	                  		<#if (((lst.xq)!) == 5)>星期五</#if>
+	                  		<#if (((lst.xq)!) == 6)>星期六</#if>
+	                  		<#if (((lst.xq)!) == 7)>星期日</#if>
+	                  	</td>
+	                  	<td>${(lst.sbsj)!}</td>
+	                    <td>${(lst.xbsj)!}</td>
+	                    <td>
+	                    	<a href="javascript:void(0)" onclick="uf_edit('${(lst.id)!}')">修 改</a>
+	                    	<a href="javascript:void(0)" onclick="uf_del('${(lst.id)!}')">删 除</a>
+	                    </td>
+	                  </tr>
+					</#list>
+					</#if>
+					<tr>
+						<td colspan="5">
+						<#include '../../common/_paginate.html'>
+						</td>
+					</tr>
+	            </table>
+			</form>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_sjtjyes(id){
+			if(confirm("确定要推荐此企业吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/merchant/savesjtjyes",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("推荐设置成功！");
+							refresh();
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		
+		function uf_sjtjno(id){
+			if(confirm("确定要取消推荐此企业吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/merchant/savesjtjno",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("取消企业推荐成功！");
+							refresh();
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		function uf_show(id){
+	    	$.dialog({
+				title:'企业信息',
+				content: 'url:${CTX}/admin/merchant/showmerchant/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 500,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});
+	    }
+	    
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+</head>
+  <body>
+  	  <form id="myform" name="myform" method="post" action="">
+			企业名称：<input type="text" name="mname" id="mname" class="text" value="${(mname)!}" style="width: 120px;"/>
+			分类
+			<select name="subjectid" id="subjectid">
+					<option value="">全部...</option>
+				<#list list_subject as x>
+				    <option value="${(x.id)!''}" <#if strkit((x.id)!'',(subjectid)!)>selected</#if>>${(x.mc)!''}</option>
+				</#list>
+			</select>
+			<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+	  		<table class="list">
+	            <tr>
+		            <th width="4%">序号</th>
+		            <th width="15%">名称</th>
+		            <th width="10%">分类</th>
+		            <th width="6%">类型</th>
+		            <th width="6%">城市</th>
+		            <th width="8%">商圈</th>
+					<th width="10%">地址</th>
+					<th width="8%">手机号</th>
+					<th width="8%">电话</th>
+					<th width="8%">QQ</th>
+					<th width="8%">审核状态</th>
+					<th width="*%">操作</th>
+		        </tr>
+	      		<#if listpage ??>
+      				<#list listpage.list as lst>
+	                  <tr>
+	                  	<td>${(lst_index+1)!''}</td>
+	                    <td><a href="javascript:void(0);" onclick="uf_show('${(lst.id)!''}')">${(lst.mc)!''}</a></td>
+	                    <td>${(lst.subject_name)!''}</td>
+	                    <td><#if strkit('0',(lst.is_type)!)>货物</#if><#if strkit('1',(lst.is_type)!)>服务</#if></td>
+	                    <td>${(lst.city_name)!''}</td>
+	                    <td>${(lst.area_name)!''}</td>
+	                    <td>${(lst.xxdz)!''}</td>
+	                    <td>${(lst.mobile)!''}</td>
+	                    <td>${(lst.tel)!''}</td>
+	                    <td>${(lst.qq)!''}</td>
+	                    <td>
+	                    	<#if strkit('0',(lst.check_status)!)>待审</#if>
+	                    	<#if strkit('1',(lst.check_status)!)>审核通过</#if>
+	                    	<#if strkit('2',(lst.check_status)!)>
+	                    	<font color="red">审核不通过</font>
+	                    	</#if>
+	                    </td>
+	                    <td>
+	                    	<#if strkit('0',(lst.is_recommend)!)>
+	                    	<a href="javascript:void(0)" onclick="uf_sjtjyes('${(lst.id)!}')">推荐企业</a>
+	                    	</#if>
+	                    	<#if strkit('1',(lst.is_recommend)!)>
+	                    	<a href="javascript:void(0);" onclick="uf_sjtjno('${(lst.id)!''}')">取消推荐</a>
+	                    	</#if>
+	                    </td>
+	                  </tr>
+					</#list>
+				</#if>
+				<tr>
+					<td colspan="12">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+            </table>
+   
+			</form>
+  </body>
+</html>

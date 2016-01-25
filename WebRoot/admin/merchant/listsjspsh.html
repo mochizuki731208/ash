@@ -1,0 +1,397 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_sptg(id){
+			$.dialog.confirm('是否将此商品审核通过吗？', function(){
+			    $.ajax({
+					url: "${CTX}/admin/merchant/spsptg",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("所选商品信息审核通过！");
+							refresh();
+						}
+					}
+				});
+			}, function(){
+			    $.dialog.tips('执行取消操作');
+			});
+			
+		}
+		
+		
+		function uf_spbtg(id){
+			$.dialog.confirm('是否将此商品审核不通过？', function(){
+			    $.ajax({
+					url: "${CTX}/admin/merchant/spspbtg",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							alert("所选商品信息审核不通过！");
+							refresh();
+						}
+					}
+				});
+			}, function(){
+			    $.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_tj(id){
+			$.dialog.confirm('是否推荐此商品？', function(){
+			    $.ajax({
+					url: "${CTX}/admin/merchant/sptj",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							$.dialog.alert("推荐成功！",function () {
+								refresh();
+					        }).time(0.3);
+						}
+					}
+				});
+			}, function(){
+			    $.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_qxtj(id){
+			$.dialog.confirm('是否取消推荐此商品？', function(){
+			    $.ajax({
+					url: "${CTX}/admin/merchant/spqxtj",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(msg) {
+						if(msg){
+							$.dialog.alert("取消推荐成功！",function () {
+								refresh();
+					        }).time(0.3);
+						}
+					}
+				});
+			}, function(){
+			    $.dialog.tips('执行取消操作');
+			});
+		}
+		
+		function uf_show(id){
+	    	$.dialog({
+				title:'企业信息',
+				content: 'url:${CTX}/admin/merchant/showmerchant/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 500,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});
+	    }
+	    
+	    function uf_showsp(id){
+	    	$.dialog({
+				title:'商品信息',
+				content: 'url:${CTX}/admin/merchant/showsp/'+id,
+			    lock:true,
+			    resize: false,
+			    width : 1000,
+				height : 500,
+				max:true,
+				min:true,
+				cancel:true,
+		        cancelVal:'关 闭'
+			});
+	    }
+	    
+	    function uf_yjsz(id,yj){
+			$.dialog.prompt('请填写此商品的佣金比例（1-100直接的整数）',
+			    function(val){
+			        $.post("${CTX}/admin/merchant/saveproductyj",{id:id,yj:val},function(data){
+	                    if(data){
+							$.dialog.alert("佣金比例设置成功！",function () {
+								refresh();
+					        }).time(0.8);
+						}else{
+							$.dialog.alert("佣金比例设置失败！");
+						}
+					});
+					return false;
+			    },
+			    yj
+			);
+		}
+		
+		function uf_edit(id){
+				$.dialog({
+					title:'信息编辑',
+					content: 'url:${CTX}/admin/merchant/editproduct?id='+id,
+				    lock:true,
+				    resize: false,
+				    width : 900,
+					height : 480,
+					cover:true,
+					max:false,
+					min:true,
+					cancel:true,
+					button: [{
+		            	name: '保 存',
+			            callback: function(){
+					        var r = this.content.$("#myform").valid();
+							if(!r) {
+								return false;
+							}else{
+								this.content.$("#product_sub_name").attr('value',this.content.$("#product_sub_id").find("option:selected").text());
+								$.post("${CTX}/admin/merchant/saveproduct",this.content.$("#myform").serializeArray(),function(data){
+				                    if(data){
+										$.dialog.alert("保存数据成功！",function () {
+											refresh();
+								        }).time(0.3);
+									}else{
+										$.dialog.alert("删除数据失败！");
+									}
+								});
+							}
+				            return false;
+			            },
+	           			focus: true
+			        }],
+			        cancelVal:'关 闭'
+				});//弹出框
+			}
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		$().ready(function() {
+			$("#btn_all").click(function (){
+				$("#zt").attr("value","");
+				refresh();
+			});
+			
+			$("#btn_ytg").click(function (){
+				$("#zt").attr("value","1");
+				refresh();
+			});
+			
+			$("#btn_wtg").click(function (){
+				$("#zt").attr("value","2");
+				refresh();
+			});
+			
+			$("#btn_dsh").click(function (){
+				$("#zt").attr("value","0");
+				refresh();
+			});
+			
+			$("#btn_qx").click(function(){
+				if($("#btn_qx").prop("checked")==true){
+					$("[name='ids']").prop("checked",true);//全选
+				}else{
+					$("[name='ids']").prop("checked",false);//全否 
+				}
+			});
+			
+			
+			$("#btn_pl_shtg").click(function (){
+				
+				var obj=document.getElementsByName('ids');  //选择所有name="'test'"的对象，返回数组    
+			    var s='';    
+				for(var i=0; i<obj.length; i++){    
+				    if(obj[i].checked) s+=obj[i].value+',';  //如果选中，将value添加到变量s中    
+				}
+				
+				if(s==''){
+					return false;
+					alert("你还没有选择任何内容！");
+				}
+				
+				if(confirm("是否将所选商品审核通过吗?")){
+				 	$.ajax({
+						url: "${CTX}/admin/merchant/spsptg_pl",
+						type: "POST",
+						data: {ids:s},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("所选商品信息审核通过！",function(){
+									refresh();
+								});
+							}
+						}
+					});
+				}else{
+					return false;
+				} 
+				refresh();
+			});
+			
+			$("#btn_pl_shbtg").click(function (){
+				
+				var obj=document.getElementsByName('ids');  //选择所有name="'test'"的对象，返回数组    
+			    var s='';    
+				for(var i=0; i<obj.length; i++){    
+				    if(obj[i].checked) s+=obj[i].value+',';  //如果选中，将value添加到变量s中    
+				}
+				
+				if(s==''){
+					return false;
+					alert("你还没有选择任何内容！");
+				}
+				
+				if(confirm("是否将所选商品审核不通过吗?")){
+				 	$.ajax({
+						url: "${CTX}/admin/merchant/spspbtg_pl",
+						type: "POST",
+						data: {ids:s},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("所选商品信息审核不通过！",function(){
+									refresh();
+								});
+							}
+						}
+					});
+				}else{
+					return false;
+				} 
+				refresh();
+			});
+			
+			$("#btn_pl_delete").click(function (){
+				
+				var obj=document.getElementsByName('ids');  //选择所有name="'test'"的对象，返回数组    
+			    var s='';    
+				for(var i=0; i<obj.length; i++){    
+				    if(obj[i].checked) s+=obj[i].value+',';  //如果选中，将value添加到变量s中    
+				}
+				
+				if(s==''){
+					return false;
+					alert("你还没有选择任何内容！");
+				}
+				
+				if(confirm("是否将所选商品信息删除?")){
+				 	$.ajax({
+						url: "${CTX}/admin/merchant/delproduct_pl",
+						type: "POST",
+						data: {ids:s},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("所选商品信息删除成功！",function(){
+									refresh();
+								});
+							}
+						}
+					});
+				}else{
+					return false;
+				} 
+				refresh();
+			});
+		});
+	</script>
+</head>
+  <body>
+  	  <form id="myform" name="myform" method="post" action="">
+  	  		<input type="hidden" id="zt" name="zt" value=""/>
+			企业名称：<input type="text" name="mname" id="mname" class="text" value="${(mname)!}" style="width: 120px;"/>
+			产品名称：<input type="text" name="mc" id="mc" class="text" value="${(mc)!}" style="width: 120px;"/>
+			分类
+			<select name="subjectid" id="subjectid">
+				<option value="">全部...</option>
+				<optgroup label="联盟商家">
+					<#list list_subject as x>
+						<#if x.p_id.substring(0,4)=='1019'>
+				    		<option value="${(x.id)!''}" <#if strkit((x.id)!'',(subjectid)!)>selected</#if>>${(x.mc)!''}</option>
+				    	</#if>
+					</#list>
+				</optgroup>
+			</select>
+			<input type="button" id="btn_all" class="button" value="全部" onclick="refresh();"/>
+			<input type="button" id="btn_ytg" class="button" value="已通过" onclick="refresh();"/>
+			<input type="button" id="btn_wtg" class="button" value="未通过" onclick="refresh();"/>
+			<input type="button" id="btn_dsh" class="button" value="待审核" onclick="refresh();"/>
+			<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+	  		<table class="list">
+            <tr>
+	            <th width="42px;">序号</th>
+	            <th width="14%">企业</th>
+	            <th width="*%">名称</th>
+	            <th width="6%">分类</th>
+	            <th width="6%">价格</th>
+	            <th width="6%">门店价</th>
+				<th width="6%">积分</th>
+				<th width="6%">佣金比例</th>
+				<th width="7%">状态</th>
+				<th width="28%">操作</th>
+	        </tr>
+      		<#if listpage ??>
+      			  <#list listpage.list as lst>
+                  <tr>
+                  	<td><input type="checkbox" id="ids" name="ids" value="${(lst.id)!}"/></td>
+                  	<td><a href="javascript:void(0);" onclick="uf_show('${(lst.mid)!''}')">${(lst.mname)!''}</a></td>
+                  	<td>${(lst.mc)!''}</td>
+                    <td>${(lst.subject_name)!''}-${(lst.sub_name)!''}-${(lst.thr_name)!''}</td>
+                    <td><font color="red">${(lst.price)?string("currency")}</font></td>
+                    <td><font color="red">${(lst.mdprice)?string("currency")}</font></td>
+                    <td>${(lst.jf)!''}</td>
+                    <td>${(lst.yj)!}%</td>
+                    <td>
+                    	<#if strkit('0',(lst.zt)!)>待审</#if>
+                    	<#if strkit('1',(lst.zt)!)>通过</#if>
+                    	<#if strkit('2',(lst.zt)!)>不通过</#if>
+                    </td>
+                    <td>
+                    	<#if strkit('0',(lst.sysfxs)!)>
+                    	<a href="javascript:void(0)" onclick="uf_tj('${(lst.id)!}')"><img src="${CTX}/res/images/btn/tick.png"/>推荐</a>
+                    	<#else>
+                    	<a href="javascript:void(0)" onclick="uf_qxtj('${(lst.id)!}')"><img src="${CTX}/res/images/btn/del.png"/>取消推荐</a>
+                    	</#if>
+                    	<a href="javascript:void(0)" onclick="uf_yjsz('${(lst.id)!}','${(lst.yj)!}')"><img src="${CTX}/res/images/btn/config.png"/>佣金</a>
+                    	<a href="javascript:void(0)" onclick="uf_sptg('${(lst.id)!}')"><img src="${CTX}/res/images/btn/tick.png"/>通过</a>
+                    	<a href="javascript:void(0)" onclick="uf_spbtg('${(lst.id)!}')"><img src="${CTX}/res/images/btn/del.png"/>不通过</a>
+                    	<a href="javascript:void(0)" onclick="uf_edit('${(lst.id)!}')"><img src="${CTX}/res/images/btn/config.png"/>修改</a>
+                    	<a href="javascript:void(0);" onclick="uf_showsp('${(lst.id)!''}')"><img src="${CTX}/res/images/btn/zoom.png"/>查看</a>
+                    </td>
+                  </tr>
+				</#list>
+				</#if>
+				<tr>
+					<td colspan="10" style="text-align: left">&nbsp;
+					<input type="checkbox" id="btn_qx">全选
+					<input type="button" id="btn_pl_shtg" class="button" value="批量通过" />
+					<input type="button" id="btn_pl_shbtg" class="button" value="批量不通过"/>
+					<input type="button" id="btn_pl_delete" class="button" value="批量删除"/>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="10">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+            </table>
+   
+			</form>
+  </body>
+</html>

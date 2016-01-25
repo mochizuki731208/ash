@@ -1,0 +1,152 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/umeditor/themes/default/css/umeditor.min.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/umeditor/umeditor.config.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/umeditor/umeditor.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/umeditor/lang/zh-cn/zh-cn.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			var um = UM.getEditor('tb_txt');
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					tb_title:{required:true,stringMaxLength:100},
+					tb_short_title:{required:true,stringMaxLength:100},
+					tb_seo_keyword:{required:true,stringMaxLength:100},
+					tb_seo_desc:{required:true,stringMaxLength:200},
+					tb_author:{required:true,stringMaxLength:50},
+					tb_origin:{required:true,stringMaxLength:100},
+					tb_origin_url:{stringMaxLength:100},
+					tb_summary:{required:true,stringMaxLength:200},
+					tb_txt:{required:true},
+					tb_is_publication:{required:true,stringMaxLength:20},
+					tb_is_recommend:{required:true,stringMaxLength:20}
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				if($("#myform").valid()){
+				    $("#myform").submit();
+				}
+			});
+			$("#btn_exit").click(function(){
+				window.location.href="${CTX}${NAME_SPACE}/listcontent";
+			});
+			
+			$('#titleimg').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='tb_title_img' value='"+data+"'/>");
+					$('#imga').attr("src","${CTX}/upload/"+data);
+                 }
+			});
+    		
+			$("#tb_title").focus();
+		});
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" action="${CTX}${NAME_SPACE}/save" method="post" >
+	<input type="hidden" name="tb_id" id="tb_id" value="${(vo.id)!}"/>
+	<table class="input">
+		<tr>
+			<th align="right" width="20%;">标题：</th>
+			<td><input type="text" name="tb_title" id="tb_title" class="text" value="${(vo.title)!}"> <font color="red">*</font> </td>
+		</tr>
+		<tr>
+			<th align="right">副标题：</th>
+			<td><input type="text" name="tb_short_title" id="tb_short_title" class="text" maxlength="18" value="${(vo.short_title)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">内容分类：</th>
+			<td>
+				<select id="tb_lbid" name="tb_lbid" style="width:150px;" class="required">
+					<#list listnrlb as lst>
+				  	  <option value="${(lst.id)!}" <#if strkit((lst.id)!'',(vo.lbid)!)>selected</#if>>${(lst.lbmc)!''}</option>
+					</#list>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">SEO 关键字：</th>
+			<td><input type="text" name="tb_seo_keyword" id="tb_seo_keyword" class="text" value="${(vo.seo_keyword)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">SEO描述：</th>
+			<td><textarea id="tb_seo_desc" name="tb_seo_desc" class="text">${(vo.seo_desc)!}</textarea></td>
+		</tr>
+		<tr>
+			<th align="right">作者：</th>
+			<td><input type="text" name="tb_author" id="tb_author" class="text" value="${(vo.author)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">来源：</th>
+			<td><input type="text" name="tb_origin" id="tb_origin" class="text" maxlength="11" value="${(vo.origin)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">来源连接：</th>
+			<td><input type="text" name="tb_origin_url" id="tb_origin_url" class="text" value="${(vo.origin_url)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">摘要：</th>
+			<td><textarea id="tb_summary" name="tb_summary" class="text">${(vo.summary)!}</textarea></td>
+		</tr>
+		<tr>
+			<th align="right">是否发布：</th>
+			<td>
+				<select id="tb_is_publication" name="tb_is_publication" style="width:150px;" class="required">
+						<option value="1" <#if (((vo.is_publication)!'') == '1')>selected="selected"</#if> >是</option>
+						<option value="0" <#if (((vo.is_publication)!'') == '0')>selected="selected"</#if> >否</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">是否推荐：</th>
+			<td>
+				<select id="tb_is_recommend" name="tb_is_recommend" style="width:150px;" class="required">
+						<option value="1" <#if (((vo.is_recommend)!'') == '1')>selected="selected"</#if> >是</option>
+						<option value="0" <#if (((vo.is_recommend)!'') == '0')>selected="selected"</#if> >否</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">首页图片：</th>
+			<td>
+				<#if (vo.title_img)??>
+					<img src="${CTX}/upload/${(vo.title_img)!}"  width= "150px" height="150px"  id="imga"/>
+				<#else>
+					<img src="${CTX}/res/css/ab/images/sf1.png" width= "150px" height="150px"  id="imga"/>
+				</#if>
+				<input type="file" name="titleimg" id="titleimg" multiple="false"/> 
+			</td>
+		</tr>
+		
+		<tr>
+			<th align="right">内容：</th>
+			<td><textarea id="tb_txt" name="tb_txt" class="text">${(vo.txt)!}</textarea></td>
+		</tr>
+		<tr>
+			<th></th>
+			<td>
+				<input type="button" id="btn_save" value="保 存"/>
+				<input type="button" id="btn_exit" value="取 消"/>
+			</td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

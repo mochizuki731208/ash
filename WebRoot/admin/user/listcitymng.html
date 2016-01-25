@@ -1,0 +1,121 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+	<#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_delete(id){
+			if(confirm("确认要删除当前选择的数据吗?")){
+			 	$.ajax({
+					url: "${CTX}/admin/user/delete",
+					type: "POST",
+					data: {id:id},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						if(data){
+							$.dialog.alert("删除用户数据成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("删除用户数据失败！");
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+		
+		function uf_edit(id){
+			$.dialog({
+				title:'员工信息编辑',
+				content: 'url:${CTX}/admin/user/editcitymng?id='+id,
+			    lock:true,
+			    resize: false,
+			    width : 600,
+				height : 400,
+				cover:true,
+				max:false,
+				min:true,
+				cancel:true,
+				button: [{
+	            	name: '保 存',
+		            callback: function(){
+				        var r = this.content.$("#myform").valid();
+						if(!r) {
+							return false;
+						}else{
+							$.post("${CTX}/admin/user/save",this.content.$("#myform").serializeArray(),function(data){
+			                    if(data){
+			                    	$.dialog.alert("保存用户数据成功！",function () {
+										refresh();
+							        }).title('3秒后关闭').time(3);
+								}else{
+									$.dialog.alert("保存用户数据失败！");
+								}
+							});
+						}
+			            return false;
+		            },
+           			focus: true
+		        }],
+		        cancelVal:'关 闭'
+			});//弹出框
+		}
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>	
+</head>
+  <body>
+	<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+		用户名：<input type="text" name="loginid" id="loginid" class="text" value="${(loginid)!}" style="width: 80px;"/>
+		<input type="button" id="btn_add" class="button" value="新 增" onclick="uf_edit('');"/>
+		<input type="button" id="btn_query" class="button" value="查 询" onclick="refresh();"/>
+	    <table class="list">
+                  <tr>
+                    <th width="4%">序号</th>
+                    <th width="10%">用户名</th>
+					<th width="*%">姓名</th>
+					<th width="12%">身份证号</th>
+					<th width="8%">手机号</th>
+					<th width="10%">角色</th>
+					<th width="10%">佣金比例</th>
+					<th width="12%">创建时间</th>
+					<th width="12%">最后登录时间</th>
+					<th width="8%">最后登录IP</th>
+					<th width="10%">操作</th>
+                  </tr>
+      		<#if listpage ??>
+      			<#list listpage.list as lst>
+                  <tr ondblclick="uf_edit('${(lst.id)!}')">
+                  	<td>${(lst_index+1)!''}</td>
+                  	<td>${(lst.loginid)!}</td>
+                    <td>${(lst.mc)!}</td>
+					<td>${(lst.idcard)!}</td>
+                    <td>${(lst.mobile)!}</td>
+					<td>${(lst.role_name)!}</td>
+                    <td>${(lst.per)!}％</td>
+                    <td>${(lst.create_date)!}</td>
+                    <td>${(lst.login_date)!}</td>
+                    <td>${(lst.login_ip)!}</td>
+                    <td>
+	                    <a href="javascript:void(0);" onclick="uf_edit('${(lst.id)!}')">修改</a>
+	                    <a href="javascript:void(0);" onclick="uf_delete('${(lst.id)!}')">删除</a>
+	                </td>
+                  </tr>
+				</#list>
+				<tr>
+					<td colspan="11">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+			</#if>
+            </table>
+	</form>
+  </body>
+</html>

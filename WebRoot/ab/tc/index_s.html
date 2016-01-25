@@ -1,0 +1,500 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    
+    
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/lrtk1.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/main.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/index.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/ps/css/reset.css"/>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_reset.css">
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_style.css">
+
+	<link rel="stylesheet" href="${CTX}/res/tc/css/common.css" />
+	<link rel="stylesheet" href="${CTX}/res/tc/css/style.css" />
+	<link rel="stylesheet" href="${CTX}/res/tc/css/state.css" />
+	
+	<link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+    <link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+    
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-1.8.17.custom.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-zh-CN.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/tc_order.js"></script>
+	
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/tc/js/param.js"></script>	
+	 
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ShISlKhdEZ4PSVpAaScOIAdt"></script>
+	
+	<script type="text/javascript">
+		var zb = '${(zb)!}';
+		var carsLen = ${cars.size()};
+		var currLoc = "${(currcity.mc)!}";
+		//var typeSelIndex = -1;
+		var typeSelIndex = 0;
+		//var selIndex = -1;
+		var selIndex = 0;
+		var carNames = [<#list cars as c>"${(c['name'])!}",</#list>""];
+		var basePrice = [<#list cars as c>"${(c['起步价'])!}",</#list>""];
+		var overPrice = [<#list cars as c>"${(c['超公里费'])!}",</#list>""];
+		var baseKilo = [<#list cars as c>"${(c['起步公里'])!}",</#list>""];
+		var nightPrice = [<#list cars as c>"${(c['夜间服务'])!}",</#list>""];
+		var carLong = [<#list cars as c>"${(c['车长'])!}",</#list>""];
+		var currKilo = -1;	//当前正在计算的路段, 0:from-to, 1:to-to2, 2:to2-to3...
+		var maxKilo = 100; //当大于100公里，则另外输入一个悬赏金额
+		var webctx = '${CTX}';
+		var info = {};		
+		
+		
+		//保存、提交订单
+		function saveOrderForm(action) {
+			var param1 = new Date();
+			var param2 = param1.getFullYear() + '-' + (param1.getMonth()+1) + '-' + param1.getDate() + ' ' + param1.getHours() + ':' + param1.getMinutes() + ':' + param1.getSeconds();
+			$('#sendTime').attr('value',param2);
+			if(resetSInfo() == false)return;
+			info['action'] = action;
+			info['sum'] = o.calcPrice();
+			$.post('${CTX}/ab/tc/isUser', info, function(data) {
+
+				if (data == '0') {
+					
+					$.post('${CTX}/ab/tc/saveOrderForm', info, function(data) {
+						if (data == '1') {
+							alert('物流快递订单，提交成功！');
+							if (action == "save") {
+								self.location.href = '${CTX}';
+							} else {
+								self.location.href = '${CTX}/ab/tc/pay?isok=1';
+							}
+						} else if (data == '0') {//余额不足以支付
+							if (action == "save") {
+								self.location.href = '${CTX}';
+							} else {
+								alert('物流快递订单，提交成功！但是您的账户余额不足，请使用支付宝在线支付！');
+								self.location.href = '${CTX}/ab/tc/pay';
+								//self.location.href = '${CTX}/ab/card/zhyefail';
+							}
+						}else if (data == '3') {
+							alert('尚未登录，请先登录');
+						} else {
+							alert('订单保存失败，请稍候再试！');
+						}
+					});
+				}else if (data == '3') {
+					alert('尚未登录，请先登录');
+				} 
+			});
+			
+		}
+
+	//预览
+	function preview() {
+		resetInfo();
+		$.dialog({
+			title : '订单明细',
+			content : 'url:${CTX}/ab/tc/previewOrder?' + parseParam(info),
+			lock : true,
+			resize : false,
+			width : 900,
+			height : 480,
+			cover : true,
+			max : true,
+			min : true,
+			cancel : true,
+			fixed : true,
+			cancelVal : '关 闭'
+		});//弹出框
+	}
+
+	</script>	
+	<script type="text/javascript" src="${CTX}/res/js/tc_address.js"></script>
+	<script type="text/javascript" src="${CTX}/res/tc/js/tc.js"></script>
+	<script type="text/javascript" src="${CTX}/res/tc/js/order.js"></script>
+	<!--<script type="text/javascript" src="${CTX}/res/tc/js/inputSuggest_0.1.js"></script>-->
+    <script>
+   
+    
+    $(function(){
+    	
+		    <#list 2..5 as a>
+			/*
+		    var recSuggest${a} = new InputSuggest({
+					input: document.getElementById('rcvAddr${a}'),
+					aid: ${a}
+				});
+				*/
+		    addressSearch${a} = new AddressSearch(currLoc,5, function(search_data){
+			        if (!search_data) {
+			            // 查询结果为空
+			            return;
+			        }
+			        if (search_keyword != search_data.keyword) {
+			            // 查询关键词与当前查询不匹配
+			            return;
+			        }
+			        //select_data${a} = search_data['data'];
+					//recSuggest${a}.refresh(select_data${a});
+			        var html =  '<div id="address-common">'+
+			                    '   <div class="address-common-list-wrap">';
+			        for (var i = 0; i < search_data['data'].length; i++) {
+			            var item = search_data['data'][i];
+			            html += '       <div class="address-common-list" index="'+i+'">' +
+			                    '           <span class="address-common-icon"></span>' +
+			                    '           <p class="address-common-address">' +
+			                    '               <span class="address-common-title">'+item['title']+'</span>' +
+			                    '               <span class="address-common-detail-address"> 详细地址：<em>'+item['address']+'</em></span>' +
+			                    '               <span style="display:none;" class="lng">'+item['lng']+'</span>' +
+			                    '               <span style="display:none;" class="lat">'+item['lat']+'</span>' +
+			                    '           </p>' +
+			                    '       </div>';
+			        }
+			        html +=     '   </div>' +
+			                    '</div>';
+			        $("#rcvAddr${a}_panel").html(html);
+					setPos("#rcvAddr${a}_panel #address-common", "#rcvAddr${a}");
+			        $("#rcvAddr${a}_panel .address-common-list").click(function(){
+			        	$("#rcvAddr${a}").val($(this).find("em").html());
+			        	$("#rcvAddr${a}_panel").html('');
+			        	info['rcvAddr${a}'] = $(this).find("em").html();
+			        	info['rcvAddr${a}_lng'] = $(this).find(".lng").html();
+			        	info['rcvAddr${a}_lat'] = $(this).find(".lat").html();
+			        	tryDrive();
+			        });
+			    });    	
+    		 $("#rcvAddr${a}").on('focus', function(){
+		        var that = $(this);
+		        var last_val = that.val();
+		        clear_interval();
+		        address_interval = window.setInterval(function(){
+		            search_keyword = that.val();
+		            if (search_keyword && (search_keyword != last_val)) {
+		                addressSearch${a}.search(search_keyword);
+		                last_val = search_keyword;
+		            }
+		        }, 100);		        
+		    }).on('blur', function(){
+		        clear_interval();
+		    });
+			
+			$("input[name!='rcvAddr${a}']").on('focus', function() {
+				$("#rcvAddr${a}_panel").html("");
+			});
+		    </#list>
+		    
+		   
+    	});		
+    </script>
+	<style type="text/css">
+		.suggest-container{border:1px solid #C1C1C1;visibility:hidden;background-color:#fff;}
+		.suggest-item{padding:3px 2px;}
+		.suggest-active {background:#33CCFF;color:white;padding:3px 2px;}			
+	</style>
+	<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	
+	
+</head>
+<body>
+
+    <#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<!-- 在线下单，同城快递，基础信息 -->
+<!--============================================= content begin =========================================-->
+
+<div class="contain">
+  
+  <div class="mid-main">
+	<div class="wrap">
+		<div class="bz-box step-1">
+			<div class="line-gray"></div>
+			<div class="line-orage"></div>
+			<span class="icons-f0 icons-s1"></span>
+			<span class="icons-f0 icons-s2"></span>
+			<span class="icons-f0 icons-s3"></span>
+			<span class="icons-f0 icons-s4"></span>
+			<span class="icons-f1 icons-f-1 icons-s1"></span>
+			<span class="icons-f1 icons-f-2 icons-s2"></span>
+			<span class="icons-f1 icons-f-3 icons-s3"></span>
+			<span class="icons-f1 icons-f-4 icons-s4"></span>
+			<div class="text-1">填写订单</div>
+			<div class="text-2">提交订单,等待处理</div>
+			<div class="text-3">物流公司处理</div>
+			<div class="text-4">发货完成</div>
+		</div>
+	</div>
+	<div class="wrap">
+		<div class="clearfix mt20">
+			<div class="main-1 fl">
+				<form method="post" id="addOrderForm" action="">
+					<div class=" ">
+						<div class="title-2">
+							<strong>发货方</strong>
+							<span>填写完整、准确的信息，物流跟进更及时</span>
+						</div>
+						<div class="sec-1">
+							<div class="table-box">
+								<table class="table-1">
+									<tbody>
+									<!--<tr>
+										<td class="tab-name">用车时间: </td>
+										<td class="tab-con">
+											<input type="text" id="sendTime" class="input input-1 time_input" autocomplete="off" placeholder="点击选择用车时间！" onblur="calcTotal()"/>
+											&nbsp;&nbsp;<span class="color-1">必填</span>
+										</td>
+									</tr>-->
+									<input type="hidden" id="sendTime" value="">
+									<tr>
+										<td class="tab-name">联系人：</td>
+										<td class="tab-con">
+											<input type="text" placeholder="请输入联系人" class="input input-1 address-info-name vname" id="sendName" name="sendName" value="${(abuser.mc)!}"/>
+											&nbsp;&nbsp;<span class="color-1">必填</span><span id="tip_send_userName" style="color:red;margin-left:7px"></span>
+										</td>
+									</tr>
+									<tr>
+										<td class="tab-name">手机：</td>
+										<td class="tab-con">
+											<input type="text" maxlength="11" placeholder="请输入手机号码" class="input input-1 address-info-phone vphone" id="sendPhone" name="sendPhone" value="${(abuser.mobile)!}"/>
+											&nbsp;&nbsp;<span class="color-1">必填</span> <span id="tip_send_senderMobilePhone" style="color:red;margin-left:7px"></span>
+										</td>
+									</tr>
+									<tr>
+										<td class="tab-name">货物类型：</td>
+										<td class="tab-con">
+											<select id="goodsType" class="selectbox input-1">
+												<option value="">请选择...</option>
+												<#list goodsList as g>
+												<option value="${g.value}">${g.value}</option>
+												</#list>
+											</select>											
+											&nbsp;&nbsp;<span class="color-1">必填</span>&nbsp;&nbsp;&nbsp;&nbsp;
+											<!--<a href="http://ask.lvmae.com/q-161.html" target="_blank" class="blue mgl20">禁用品说明</a>-->
+											<span id="tip_goodsName" style="color:red;margin-left:7px"></span>
+										</td>
+									</tr>
+									<tr>
+										<td class="tab-name">货物信息：</td>
+										<td class="tab-con td-1">
+											<input type="text" placeholder="请输入重量" id="weight" style="width: 92px;" class="fl input input-2 text_input"/>
+											<span class="fl">公斤</span>
+											<input type="text" placeholder="选填" id="goods_volumn" style="width: 92px;" class="fl input input-2 text_input"/>
+											<span class="fl">立方米</span>
+											<span class="gray fl">&nbsp;&nbsp;&nbsp;&nbsp;注：用于估算运费&nbsp;&nbsp;&nbsp;&nbsp;</span>
+											<!--<a class="fl" href="http://ask.lvmae.com/q-151.html" target="_blank">什么是重货轻货？</a>-->
+											<span class="fl" style="color:red;" id="tip_WV"></span>
+											<input type="hidden" id="goods_mount" value="1"/>
+											<input type="hidden" id="mId" value="${(mId.mid)!}"/>
+											<input type="hidden" id="vp" value="${(vp)!}"/>
+											<input type="hidden" id="wp" value="${(wp)!}"/>
+											<input type="hidden" value="${(mc)!}" id="mc" name="mc"/>
+											<input type="hidden" value="${(from)!}" id="from" name="from"/>
+											<input type="hidden" value="${(to)!}" id="to" name="to"/>
+											
+											<input type="hidden" value="${(mobile)!}" id="mobile" name="mobile"/>
+										</td>
+									</tr>
+									<tr><td colspan="2"><h1 style="border-bottom: 1px dotted #666;"></h1></td></tr>
+									<tr>
+										<td class="tab-name">上门提货：</td>
+										<td class="tab-con">
+											<!--<input type="text" placeholder="自动获取地址信息" class="input input-1" value="" id="sendAddr" name="sendAddr"/>
+											<a href="javascript:selOldAddr();"><span>常用地址</span></a>
+											<div id="sendAddr_panel"></div>-->
+											<input class="radio" name="smth" id="smth_no" value="0" checked="checked" type="radio"><label for="smth_no">否</label>
+											<input class="radio" name="smth" id="smth_yes" value="1" type="radio"><label for="smth_yes">是(可能产生额外费用)</label>
+										</td>
+									</tr>									
+									<tr id="area1" style="display:none">
+										<td class="tab-name">所在地区：</td>
+										<td class="tab-con">
+											
+											<input type="text" placeholder="自动获取地址信息" class="input input-1" value="" id="sendAddr" name="sendAddr"/>
+											<div id="sendAddr_panel"></div>
+											<input type="hidden" id="sp" value="${(line.from)!}"/>
+										</td>
+									</tr>
+									<tr>
+										<td class="tab-name">到达地：</td>
+										<td class="tab-con">
+											
+											<input class="radio" name="shsm" id="shsm_no" value="0" checked="checked" type="radio"><label for="shsm_no">否</label>
+											<input class="radio" name="shsm" id="shsm_yes" value="1" type="radio"><label for="shsm_yes">是(可能产生额外费用)</label>
+										</td>
+									</tr>										
+									<tr id="area2" style="display:none">
+										<td class="tab-name">所在地区：</td>
+										<td class="tab-con">
+											<input type="text" placeholder="自动获取地址信息" class="input input-1" value="" id="rcvAddr" name="rcvAddr"/>
+											<div id="rcvAddr_panel"></div>
+											<input type="hidden" id="ep" value="${(line.to)!}"/>
+										</td>
+									</tr>
+									<tr><td colspan="2"><h1 style="border-bottom: 1px dotted #666;"></h1></td></tr>
+									<tr>
+										<td class="tab-name">支付方式：</td>
+										<td class="tab-con">
+											<input class="radio" type="radio" name="payType" value="1" checked="checked" id="RadioGroup2_0" /><label for="RadioGroup2_0">在线支付</label>
+											<input class="radio" type="radio" name="payType" value="2" id="RadioGroup2_1" /><label for="RadioGroup2_1">现付</label>
+											<input class="radio" type="radio" name="payType" value="3" id="RadioGroup2_2" /><label for="RadioGroup2_2">到付</label>
+											<input class="radio" type="radio" name="payType" value="4" id="RadioGroup2_3" /><label for="RadioGroup2_3">回单付</label>
+											<!--<input class="radio" id="zffs_no" name="paymentType" value="1" checked="checked" type="radio"><label for="zffs_no">发货人支付（现付）</label>
+											<input class="radio" id="zffs_yes" name="paymentType" value="2" type="radio"><label for="zffs_yes">收货人支付（到付）</label>-->
+										</td>
+									</tr>
+									<tr class="last-item">
+										<td class="tab-name  vt">其他说明：</td>
+										<td class="tab-con">											
+											<textarea name="remark" id="remark" placeholder="请输入其他说明" cols="30" rows="10" maxlength="250"></textarea>
+										</td>
+									</tr>
+									</tbody>
+								</table>
+								<div class="mt20">总里程约: <span class="order_distance" id="kiloRst">&nbsp;&nbsp;&nbsp;&nbsp;</span> 预估总额：<span class="bold color-1" id="spanPriceId" style="font-size:20px;margin-right:10px">20.00元</span>(未包括提货和送货价格)</div>
+								<div class="gray">注：此价格与时效仅供参考，准确报价以物流承运商实际费用为准</div>&nbsp;
+							</div>
+						</div>
+						<div style="display: none;" class="title-2 feibixu">
+							<strong>收货方</strong>
+							<span>为了您货物安全，填写完整、准确的信息</span>
+						</div>
+						<div style="display: none;" class="sec-1 feibixu">
+							<div class="table-box">
+								<table class="table-1">
+									<tbody>
+									<tr>
+										<td class="tab-name">联系人：</td>
+										<td class="tab-con">
+											<input type="text" placeholder="请输入联系人" class="input input-1 address-info-name vname" value="" id="rcvName" name="rcvName" />
+											<span id="tip_receiptName" style="color:red;margin-left:7px"></span>
+										</td>
+									</tr>
+									<tr>
+										<td class="tab-name">手机：</td>
+										<td class="tab-con">
+											<input type="text" placeholder="请输入手机号码" class="input input-1 address-info-phone vphone" value="" id="rcvPhone" name="rcvPhone"/>
+											<span id="tip_arrive_mobile" style="color:red;margin-left:7px"></span>
+										</td>
+									</tr>
+									</tbody>
+								</table>
+							</div>	
+						</div>
+						<div class="states-box clearfix">
+							<div class="states fr moreinfo">
+								<em id="tiptext">填写更多信息</em>
+								<em class="icons-arrow-top moreinfo"></em>
+								<em class="icons-arrow-bottom moreinfo"></em>
+							</div>
+						</div>
+						<div class="btn-box submit-box" style="width: 100px">
+							<button class="btn b-6" id="submitform">提交订单</button>
+						</div>
+					</div>
+					<!-- 隐藏域 -->
+					<input name="carrierId" value="13538" type="hidden">
+					<input name="itemid" id="itemid" value="3317708" type="hidden">
+					<input name="carrierName" value="四海通达货运代理有限公司" type="hidden">
+					<input name="carrierMobile" value="18566162828" type="hidden">
+					<input name="lineName" value="珠海专线" type="hidden">
+					<input name="businessPhone" value="18566162828" type="hidden">
+					<!-- 发订单后，给承运商发短信的电话号码 -->					
+					<input name="amount" value="60" type="hidden">
+					<input id="company" value="1" type="hidden">
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div id="allmap" style="display: none;"></div>
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>
+<script type="text/javascript">
+//百度地图API功能
+var map = new BMap.Map("allmap");
+o.wPrice = $("#wp").val();
+o.vPrice = $("#vp").val();
+o.price = "20.00";
+map.centerAndZoom(currLoc, 11);
+var options = {
+	onSearchComplete: function(results){
+		if (driving.getStatus() == BMAP_STATUS_SUCCESS){
+			// 获取第一条方案
+			var plan = results.getPlan(0);
+			// 获取方案的驾车线路
+			var route = plan.getRoute(0);
+			//var meter = route.vf;
+			var meter = route.getDistance(false);
+			var k = 	(Math.floor(meter/1000) + 1);
+			info['kilo'] += k;
+			
+			currKilo++;
+			if(currKilo == 1 && info['rcvAddr2'] && info['rcvAddr2']!=''){
+				driving.search(new BMap.Point(info['to_lng'], info['to_lat']), new BMap.Point(info['rcvAddr2_lng'], info['rcvAddr2_lat']));
+				return;
+			}else if(currKilo >= 2 && info['rcvAddr'+(currKilo+1)] && info['rcvAddr'+(currKilo+1)]!=''){
+				driving.search(new BMap.Point(info['rcvAddr'+currKilo+'_lng'], info['rcvAddr'+currKilo+'_lat']), 
+					new BMap.Point(info['rcvAddr'+(currKilo+1)+'_lng'], info['rcvAddr'+(currKilo+1)+'_lat']));
+				return;
+			}
+			currKilo = -1;
+			set100Kilo();		
+		}else{
+			manKilo();
+		}
+	}
+};
+var driving = new BMap.DrivingRoute(map, options);
+$(document).ready(function(){
+
+	$(".moreinfo").click(function(){
+		if( $("#tiptext").html()== '填写更多信息' ){
+			$('.feibixu').show();
+			$('html, body, .content').animate({scrollTop: $(document).height()-300}, 1000);
+			$("#tiptext").html('隐藏更多信息');
+			$(this).addClass('show');
+		}else{
+			$('.feibixu').hide();
+			$('html, body').animate({scrollTop:250}, 500);
+			$("#tiptext").html('填写更多信息');
+			$(this).removeClass('show');
+		}
+	});
+	
+	$('input[name="smth"]').click(function(){
+		if( $(this).val() == '1' ){
+			$('#area1').show();
+			info['kilo'] = 0;
+			$('#kiloRst').html('');
+		}else{
+			$('#area1').hide();
+			info['from'] = $('#sp').val();
+			info['kilo'] = 0;
+			$('#kiloRst').html('');			
+		}
+	});
+
+	$('input[name="shsm"]').click(function(){
+		if( $(this).val() == '1' ){
+			$('#area2').show();
+			info['kilo'] = 0;
+			$('#kiloRst').html('');
+		}else{
+			$('#area2').hide();
+			info['to'] = $('#ep').val();			
+			info['kilo'] = 0;
+			$('#kiloRst').html('');
+		}
+	});
+	
+	$('#submitform').on('click',function(event){
+		event.preventDefault();
+		saveOrderForm('submit');
+	})
+});
+</script>

@@ -1,0 +1,231 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<#include '../ab/inc/meta.html'>
+<title>主页-${(vo.mc)!'物流企业'}</title>
+<link href="${CTX}/res/trans/css/mystyle.css" type="text/css" rel="stylesheet" />
+<link href="${CTX}/res/trans/css/jqhdp.css" type="text/css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/main.css"/>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css"/>
+<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script> 
+<script type="text/javascript" src="${CTX}/res/js/common.js"></script>
+</head>
+
+<body>
+<#include '../ab/inc/top.html'>
+<!-- 
+<div class="top">
+  <ul>
+    <li><a href="#">[切换城市]&nbsp;</a></li>
+    <li><a href="#">下单用户注册&nbsp;</a></li>
+    <li><a href="#">下单用户登录&nbsp;</a></li>
+    <li><a href="#">手机版&nbsp;</a></li>
+  </ul>
+  <ul>
+    <li class="fright"><a href="#">司机登录&nbsp;</a></li>
+    <li class="fright"><a href="#">司机注册&nbsp;</a></li>
+    <li class="fright"><a href="#">供应商登录&nbsp;</a></li>
+    <li class="fright"><a href="#">供应商注册&nbsp;</a></li>
+    <li class="fright"><a href="#">我的购物车(0)&nbsp;</a></li>
+  </ul>
+</div>
+ -->
+<div class="top_2">
+	<div class="title"><span>${(vo.mc)!}</span></div>
+</div>
+<#include 'inc/nav.html'>
+<!-- 幻灯片开始--> 
+<!--幻灯片结束-->
+<div class="container">
+<style>
+.comment-cont {
+    float: right;
+    width: 760px;
+}
+.clearfix {
+	width: 840px;
+}
+.body_center .time {
+	font-size: 12px;
+}
+.body_center .font_color {
+	margin-left: 10px;
+}
+.cen_canping { 
+    width: 860px;
+}
+</style>
+   <#include 'inc/left.html'>
+   <script> 
+			function fliterappraisetype(obj, mid){
+				var currentclass = $(obj).attr("class");
+				var currentname = $(obj).attr("id");
+				if("typeall" == currentname){
+					$(obj).attr("class", "radio_w radio_sel");
+					$('#typeone').attr("class", "radio_w");
+					$('#typetwo').attr("class", "radio_w");
+					$('#typethree').attr("class", "radio_w");
+				}
+				if("typeone" == currentname){
+					$(obj).attr("class", "radio_w radio_sel");
+					$('#typeall').attr("class", "radio_w");
+					$('#typetwo').attr("class", "radio_w");
+					$('#typethree').attr("class", "radio_w");
+				}
+				if("typetwo" == currentname){
+					$(obj).attr("class", "radio_w radio_sel");
+					$('#typeone').attr("class", "radio_w");
+					$('#typeall').attr("class", "radio_w");
+					$('#typethree').attr("class", "radio_w");
+				}
+				if("typethree" == currentname){
+					$(obj).attr("class", "radio_w radio_sel");
+					$('#typeone').attr("class", "radio_w");
+					$('#typetwo').attr("class", "radio_w");
+					$('#typeall').attr("class", "radio_w");
+				}
+				refreshappraise(mid);
+			}
+			
+			function fliterimagetype(obj, mid){
+				var currentclass = $(obj).attr("class");
+				if(currentclass.indexOf("checkbox_sel")>0){
+					$(obj).attr("class", "checkbox_w");
+				}else{
+					$(obj).attr("class", "checkbox_w checkbox_sel");
+				}
+				refreshappraise(mid);
+			}
+			
+			function refreshappraise(mid){
+				var $appraisemsglist = $("#appraisemsglist");
+				var imgchecked = "1";
+				if($('#imgtype').attr("class").indexOf("checkbox_sel")<0){
+					imgchecked = "0";
+				}
+				var type = "0";
+				if($('#typeone').attr("class").indexOf("radio_sel")>=0){
+					type="1";
+				}else if($('#typetwo').attr("class").indexOf("radio_sel")>=0){
+					type="2";
+				}else if($('#typethree').attr("class").indexOf("radio_sel")>=0){
+					type="3";
+				}
+				$.ajax(  
+	            	{  
+	               		url:'${CTX}/ab/appraise/findappraise',  
+	                    type:"post",  
+	                    async:true,  
+	                    data:{'mid':mid, 'type':type, 'imgchecked': imgchecked},  
+	                    dataType:"html",  
+	                    timeout:"3000",  
+	                    error:function(data)
+	                    {
+	                    	alert("error-"+data);
+	                    },  
+	                    success:function(data)  
+	                    {  
+	                    	$appraisemsglist.html(data);
+	                    }  
+	                }  
+	            ); 
+			}
+			
+			function refreshSafecode(){
+				var d = new Date();
+				document.getElementById("safecode").src="${CTX}/25console/imgcode?t="+d.toString(40);
+			}
+			
+			function refresh(){
+				$('#myform').submit();
+				$('#myform').action = "";
+				$('#myform').target = "_self";
+			}
+   </script>
+   
+   <div class="body_center" style="width:80%;"> 
+   <@_mer_logline_list lid=lo.id  id=vo.id list_comm=vo.id> 
+    
+   </@_mer_logline_list>
+			<div class="cen_canping">
+				<div class="canping_title">
+					<ul>
+						<li class="canping_radio">
+							<div id="typeall" class="radio_w radio_sel"
+								onclick="fliterappraisetype(this, '${(vo.id)!}')"></div> <input type="radio"
+							name="appraisetype" value="0" /><span class="sel_canping">全部评价<b>(${(merchantMap.count_appall)!})</b></span>
+						</li>
+						<li class="canping_radio">
+							<div id="typeone" class="radio_w"
+								onclick="fliterappraisetype(this, '${(vo.id)!}')"></div> <input type="radio"
+							name="appraisetype" value="1" /><span>好评<b>(${(merchantMap.count_app1)!})</b></span>
+						</li>
+						<li class="canping_radio">
+							<div id="typetwo" class="radio_w"
+								onclick="fliterappraisetype(this, '${(vo.id)!}')"></div> <input type="radio"
+							name="appraisetype" value="2" /><span>中评<b>(${(merchantMap.count_app2)!})</b></span>
+						</li>
+						<li class="canping_radio" style="border: none;">
+							<div id="typethree" class="radio_w"
+								onclick="fliterappraisetype(this, '${(vo.id)!}')"></div> <input type="radio"
+							name="appraisetype" value="3" /><span>差评<b>(${(merchantMap.count_app3)!})</b></span>
+						</li>
+					</ul>
+					<div class="canping_img">
+						<div id="imgtype" class="checkbox_w checkbox_sel"
+							onclick="fliterimagetype(this, '${(vo.id)!}')"></div>
+						<input type="checkbox" checked="checked" /><span>有图片的评价</span>
+					</div>
+				</div>
+			</div>
+			<div id="appraisemsglist" class="cen_pj">
+				<ul>
+					<#if list_comm ??> <#list list_comm as lst>
+					<li class="clearfix">
+						<div class="img cmtimg">
+							<img src="${CTX}/res/css/ab/images/user_superman.png" width="60"
+								height="60">
+						</div>
+						<div class="comment-cont">
+							<div class="comment-Title">
+								<div class="comment-TitleC">
+									<span><#if strkit('1',(lst.private)!)>${(lst.mc)!}</#if><#if strkit('2',(lst.private)!)>匿名</#if></span> <i>点评了 </i> <span><a href="#">${(lst.mmc)!}</a></span>
+								</div>
+								<!--点评时间-->
+								<p class="time">
+									${(lst.datetime)!} <span class="font_color"> <#if
+										strkit('1',(lst.type)!)><img
+										src="${CTX}/res/css/ab/images/img2.png" />好评</#if> <#if
+										strkit('2',(lst.type)!)><img
+										src="${CTX}/res/css/ab/images/img3.png" />中评</#if> <#if
+										strkit('3',(lst.type)!)><img
+										src="${CTX}/res/css/ab/images/img4.png" />差评</#if> 
+										<#if (lst.dync_val>=0 && lst.dync_val<1)> ☆☆☆☆☆ </#if> 
+										<#if (lst.dync_val>=1 && lst.dync_val<2)> ★☆☆☆☆ </#if> 
+							            <#if (lst.dync_val>=2 && lst.dync_val<3)> ★★☆☆☆ </#if>
+							            <#if (lst.dync_val>=3 && lst.dync_val<4)> ★★★☆☆ </#if> 
+							            <#if (lst.dync_val>=4 && lst.dync_val<5)> ★★★★☆ </#if> 
+							            <#if (lst.dync_val>=5 && lst.dync_val<6)> ★★★★★ </#if> 
+									</span>
+								</p>
+							</div>
+							<div class="comment-contents">
+								<p>${(lst.content)!}</p>
+							</div>
+							<div>
+								<#if lst.appsImgs ??> <#list lst.appsImgs as imgs> <img
+									src="${CTX}/upload/${(imgs.img_url)!}" width=80px height=60px />
+								</#list> </#if>
+							</div>
+						</div>
+					</li> </#list> </#if>
+				</ul>
+			</div> 
+     
+   </div>
+    
+     
+</div>
+<#include 'inc/footer.html'>
+</body>
+</html>

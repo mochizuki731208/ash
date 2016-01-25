@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/otree/otree.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/otree/otree.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/otree/common.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		function uf_submit(subid){
+			$('#subid').attr("value",subid);
+	        document.all.myform.action="${CTX}/admin/subject/subjectarea";
+			$('#myform').submit();
+		}
+	</script>	
+</head>
+  <body>
+  	<form id="myform" name="myform" action="" target="dlist" method="post">
+  	<input type="hidden" id="cityid" name="cityid"/>
+  	<input type="hidden" id="cityName" name="cityName"/>
+	<table id="frametable" cellpadding="0" cellspacing="0" width="100%" height="100%" style="width: 100%;">
+	    <tr>
+	        <td valign="top" width="600" height="100%">
+	            <div id="tleft" class="tleft" style="width:200px;border-right:1px solid #70cbea;overflow: auto;"></div>
+	        </td>
+	        <td valign="top" width="100%" height="100%">
+	            <iframe id="dlist" name="dlist" src="" width="100%" allowtransparency="true" width="100%" height="100%" frameborder="0" scrolling="yes" style="overflow:none;"></iframe>
+	        </td>
+	    </tr>
+	</table>
+	</form>
+	<script type="text/javascript">
+		$('#frametable').width($(window).width());
+		$('#frametable').height($(window).height());
+		$('#tleft').height($(window).height());
+		$('#dlist').width($(window).width()-201);
+		$('#dlist').height($(window).height());
+		var TreeData=${str_Script};
+		var otree = new OTree({
+			panel 	: document.getElementById("tleft"),
+			data	: TreeData,
+			isAutoCheckParent:false,
+			isAutoCheckSub:true
+		});
+		otree.paint();
+		//otree.expandAll();
+		function ClickEvent(node){
+			document.all.cityid.value=node.attributes.id;
+			document.all.cityName.value=node.attributes.text;
+			document.all.myform.action="${CTX}/admin/subject/subjectarea";
+			document.all.myform.target="dlist";
+			$('#myform').submit();
+		}
+		otree.addListener('click',ClickEvent);
+	</script>
+  </body>
+</html>

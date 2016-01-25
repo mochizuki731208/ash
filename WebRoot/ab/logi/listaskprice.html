@@ -1,0 +1,145 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+  	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/dd.css"/>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/tc_reset.css">
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/main.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/styles.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/liuyan.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/page.css"/>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+    <link type="text/css" href="${CTX}/res/css/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/common.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-1.8.17.custom.min.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/timepicker/jquery-ui-timepicker-zh-CN.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript">
+		function refresh(){
+			$('#queryType').val("");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function refresh_day(){
+			$('#queryType').val("day");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function refresh_week(){
+			$('#queryType').val("week");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		function refresh_month(){
+			$('#queryType').val("month");
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+		
+		$().ready(function() {
+			$(".time_input").datetimepicker({
+	            showSecond: false,
+	            timeFormat: 'hh:mm:ss',
+	            stepHour: 1,
+	            stepMinute: 1,
+	            stepSecond: 1
+	        });
+        });
+	</script>	
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<form id="myform" name="myform" method="post" action="">
+	<input type="hidden" name="queryType" id="queryType"/>
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">我的询价单</h2>
+			<div style="line-height: 40px;margin: 10px auto 20px;">
+				<table class="list" style="width: 90%; margin: 0 auto;">
+					<tr>
+						<td>下单时间</td>
+						<td colspan="3">
+							<input name="p_start_date" id="p_start_date" value="${(p_start_date)!}" class="time_input"/>
+							-
+							<input name="p_end_date" id="p_end_date" value="${(p_end_date)!}" class="time_input"/>
+						</td>
+						<td colspan="2">
+							<input type="button" id="btn_return" class="button" value="查 询" onclick="refresh();"/>
+							<input type="button" id="btn_return" class="button" value="当 日" onclick="refresh_day();"/>
+							<input type="button" id="btn_return" class="button" value="本 周" onclick="refresh_week();"/>
+							<input type="button" id="btn_return" class="button" value="本 月" onclick="refresh_month();"/>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<table class="list">
+            <tr>
+	            <th width="20px;">序号</th>
+	            <th width="100px;">起始地</th>
+	            <th width="100px;">目的地</th>
+	            <th width="90px;">货物名称</th>
+	            <th width="50px;">货物类型</th>
+	            <th width="60px;">用车时间</th>
+	            <th width="80px;">联系人</th>
+	            <th width="50px;">联系方式</th>
+	        </tr>
+	        <#if listpage ??>
+      				<#list listpage.list as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!}</td>
+                    <td>
+                    	${cities.get(lst.source_province!'-1')!}-${cities.get(lst.source_city!'-1')!}-${cities.get(lst.source_area!'-1')!}
+                    </td>
+                    <td>
+                    	${cities.get(lst.target_province!'-1')!}-${cities.get(lst.target_city!'-1')!}-${cities.get(lst.target_area!'-1')!}
+                    </td>
+                    <td>${(lst.goods_name)!}</td>
+                    <td>
+                    	<#if strkit('1',(lst.goods_type)!)>重货</#if>
+						<#if strkit('2',(lst.goods_type)!)>轻货</#if>
+                    </td>
+                    <td>${(lst.usecar_date)!}</td>
+                    <td>
+                    	${(lst.linkman)!}
+                    </td>
+                    <td>
+                    	${(lst.mobile)!}
+                    </td>
+                  </tr>
+				</#list>
+				<tr>
+					<td colspan="9">
+					<#include '../../common/_paginate.html'>
+					</td>
+				</tr>
+			</#if>
+            </table>
+		</div>
+	</div>
+	</form>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>易生活网</title>
+    <#include '../inc/meta.html'>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+  	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">商家充值记录</h2>
+			<div class="infotext lh30">
+				账户余额：<font color="red" style="font-size: 16px;"> ${(zhye)?string(",##0.00#")} </font>元
+				<a href="${CTX}/ab/user/yhcz">立即充值</a>
+			</div>
+			<table class="list">
+            <tr>
+	            <th width="6%">序号</th>
+	            <th width="20%">充值金额</th>
+	            <th width="20%">充值时间</th>
+	            <th width="10%">充值结果</th>
+	            <th width="*%">备注</th>
+	        </tr>
+	        <#if listpage ??>
+      				<#list listpage.list as lst>
+                  <tr>
+                  	<td>${(lst_index+1)!}</td>
+                    <td class="red">${(lst.czje)?string("currency")}</td>
+                    <td>${(lst.createtime)!}</td>
+                  	<td><#if strkit('1',(lst.status)!)>成功</#if><#if strkit('0',(lst.status)!)><font color="red">失败</font></#if></td>
+                  	<td>${(lst.remark)!}</td>
+                  </tr>
+				</#list>
+			</#if>
+			<tr>
+				<td colspan="5">
+				<#include '../../common/_paginate.html'>
+				</td>
+			</tr>
+            </table>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<#include '../inc/meta.html'>
+<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<link rel="stylesheet" type="text/css"	href="${CTX}/res/css/admin/admin.css" />
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/admin/tab/style.css"/>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/fmcar/bootstrap.min.css" />
+<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+
+<script type="text/javascript">
+	$().ready(function() {
+		shiftNavTag(0);
+	});
+	function checkValues(){
+		var WIDtotal_fee = $("#WIDtotal_fee").val();
+		if(!WIDtotal_fee){
+			alert("请输入金额");
+			$("#WIDtotal_fee").focus();
+			return false;
+		}
+		var exp = /^([1-9][\d]{0,7}|0)(\.[\d]{1,2})?$/;    
+		if(!exp.test(WIDtotal_fee)){    
+			alert("您输入的金额不正确！"); 
+			$("#WIDtotal_fee").val('');
+			$("#WIDtotal_fee").focus();
+			return false;
+		}
+		var zzfs = $("#zzfs").val();
+		var yhkid = $("input:radio[name='yhkid']:checked").val();
+		if(zzfs==0){
+			TableSumit();
+		}else{
+			if(yhkid==null || yhkid==''){
+				alert("请选择线下支付银行");
+			}else{
+				TableSumit();
+			}
+		}
+	}
+	
+	function shiftNavTag(which) 
+	{
+		var t0 = document.getElementById("MapContainer");
+		var t1 = document.getElementById("MemberCustomerListContainer");
+		var NavTag0 = document.getElementById("NavTag0"); // Map
+		var NavTag1 = document.getElementById("NavTag1");
+
+		if (which==0)
+		{ // Map
+			t0.style.display="";
+			t1.style.display="none";
+			NavTag0.className="currentLabel";
+			NavTag1.className="normalLabel";
+		} 
+
+		if (which==1) // 货物
+		{
+			t0.style.display="none";
+			t1.style.display="";
+			NavTag0.className="normalLabel";
+			NavTag1.className="currentLabel";
+		}
+		$("#zzfs").val(which);
+	}
+	
+	function TableSumit(){
+		$.ajax({
+			url: "${CTX}/ab/order/initalipayapi",
+			type: "POST",
+			data:{
+				WIDout_trade_no:$("#WIDout_trade_no").val(),
+				WIDsubject:$("#WIDsubject").val(),
+				WIDbody:$("#WIDbody").val(),
+				zzfs:$("#zzfs").val(),
+				WIDtotal_fee:$("#WIDtotal_fee").val(),
+				yhkid:$("input:radio[name='yhkid']:checked").val(),
+				type:$("#type").val()
+			},
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				if(0 == $("#zzfs").val()){//线上支付
+					if(!data.result){
+						alert("信息有误，请重新提交！");
+					}else{
+						window.location.href = data.url;
+					}
+				}else{//线下支付
+					if(!data.result){
+						alert("信息有误，请重新提交！");
+					}else{
+						$.dialog.tips("<h2>电汇订单已成功提交！</h2>充值金额：" + $("#WIDtotal_fee").val() 
+							+ "元<br>为了不影响您办理其他业务，如果您已汇款，请及时联络网站管理员，<br>管理员在确认相关银行账户收到以上金额后，会立即给您的账户冲入相应金额",
+							3,
+							'success.gif',
+							function () {
+							window.location.href="${CTX}/";
+					    }).title("充值提示：");
+					}
+				}
+			},
+			error:function(){
+				alert("系统错误，请稍后重试！");
+			}
+		});
+	}
+</script>
+</head>
+<body>
+		<#include '../inc/top.html'>
+		<#include '../inc/header.html'>
+		<#include '../inc/nav.html'>
+		<div class="blank5"></div>
+		<div class="cm">
+			<div class="leftmenu fl">
+				<#include '../inc/leftmenu.html'>
+			</div>
+			<div class="rightcon fr">
+			<h2 class="box_title">我要充值</h2>
+			<div class="modal-body"  style="margin-left: 100px">
+				<form name="alipayment" class="form-inline" id="alipayment" action="" method='post'>
+					<input name="WIDout_trade_no" id="WIDout_trade_no" type="hidden" value="${(WIDout_trade_no)!''}"/> 
+					<input name="WIDsubject" id="WIDsubject" value="${(WIDsubject)!''}" type="hidden"/> 
+					<input name="WIDbody" id="WIDbody" type="hidden" value="${(WIDbody)!''}"/>
+					<input name="zzfs" type="hidden" id="zzfs"/>
+					<input name="type" type="hidden" id="type" value="${(type)!''}"/>
+					<div class="form-group">
+						<label for="WIDtotal_fee">1.请输入${(type_name)}金额：</label>
+						<input name="WIDtotal_fee" id="WIDtotal_fee"  type="text" class="form-control"/>元
+					</div>
+					<br><br>
+					<div class="form-group">
+						<label for="zzfs">2.请选择${(type_name)}入口：</label>
+					</div>
+					<br><br>
+					<div id="tablist_cz">
+						 <div id="NavTagContainer">
+							<label onClick="shiftNavTag(0)" id="NavTag0" class="currentLabel">&nbsp;&nbsp;在线充值&nbsp;&nbsp;</label>
+							<label onClick="shiftNavTag(1)" id="NavTag1" class="normalLabel">&nbsp;&nbsp;线下支付&nbsp;&nbsp;</label>
+						</div>
+						<div id="NavTagContent" style="width: 100%;">
+							<div id="MapContainer" style="margin: 3px 0px 3px 0px; display: block;">
+								<br>
+								<label><input type="radio" checked="checked"><img alt="" src="${CTX}/ab/alipay/images/alipay.png"></label>
+								<br><br>
+								<button type="button" class="btn btn-primary" onclick="checkValues()" id="carSearchYes">
+									&nbsp;&nbsp;确&nbsp;&nbsp;定&nbsp;&nbsp;
+								</button>
+							</div>
+							<div id="MemberCustomerListContainer" style="display: none;"><br>
+								*请汇非整数金额（如200.08）以节省核对时间，更有利于我们快速为您充值<br><br>
+								<#list yhk_list as x>
+									<label>
+										<input name="yhkid"  type="radio" id="yhkid" value="${(x.id)}"/>
+											开户行：${(x.yhkname)}<br>
+											账号：${(x.yhkcode)}<br>
+											开户人：${(x.yhkuser)}
+									</label>&nbsp;&nbsp;
+								</#list>
+								<br>
+								<button type="button" class="btn btn-primary" onclick="checkValues()" id="carSearchYes">
+									&nbsp;&nbsp;提&nbsp;&nbsp;交&nbsp;&nbsp;
+								</button>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			</div>
+		</div>
+	</div>
+<div>
+</div>
+<!-- foot页 -->
+<#include '../inc/foot.html'>
+</body>
+</html>
+

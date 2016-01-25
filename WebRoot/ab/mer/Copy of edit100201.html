@@ -1,0 +1,220 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+    <script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			$("#myform").validate({
+				rules: {
+					mer_mc: {required:true,stringMaxLength:50},
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$.post("${CTX}/ab/mer/save1002company",$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("保存数据成功！",function () {
+								$("#btn_save").attr('value','修改');
+								window.location.href="${CTX}/ab/mer/edit1002company";
+						    }).time(0.5);
+	                    } else {
+	                    	alert("保存数据失败！");
+	                    }
+					});
+				}
+			});
+			//首页图片
+			$('#titleimg').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='tb_img_url' value='"+data+"'/>");
+					$('#imga').append("<img src='${CTX}/upload/"+data+"' width=130px height=100px/>");
+                 }
+			});
+			
+			$('#file_upload').uploadify({
+				swf: '${CTX}/res/js/uploadify/uploadify.swf',
+				uploader: '${CTX}/common/upload',
+				debug:false,
+				multi: true,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+                onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='imgurl' value='"+data+"'/>");
+					$('#myform').append("<input type='hidden' name='imgsize' value='"+file.size+"'/>");
+					$('#myform').append("<input type='hidden' name='imgtype' value='"+file.type+"'/>");
+					$('#myform').append("<input type='hidden' name='imgname' value='"+file.name+"'/>");
+					$('#imgb').append("<img src='${CTX}/upload/"+data+"' width=130px height=100px/>");
+                 }
+			});
+		});
+	</script>
+	<style type="text/css">
+	#mainline {
+		width: 120px;
+	}
+	</style>
+ </head>
+  <body>
+  	<#include '../inc/top.html'>
+	<#include '../inc/header.html'>
+	<#include '../inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include '../inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">物流企业信息登记</h2>
+			<form id="myform" name="myform" action="" method="post">
+			<input type="hidden" class="text" name="lo_mid" value="${(vo.id)!}">
+			<input type="hidden" class="text" name="lo_id" value="${(lo.id)!}">
+			<input type="hidden" class="text" name="tb_id" value="${(vo.id)!}">
+			
+			<table class="input">
+				<tr>
+					<th align="right">企业名称：<font color="red">*</font></th>
+					<td><input type="text" id="tb_mc"  name="tb_mc" class="text required" value="${(vo.mc)!''}"></td>
+				</tr>
+				<tr>
+					<th>详细地址：<font color="red">*</font></th>
+					<td><input class="text required" id="tb_xxdz" name="tb_xxdz" type="text" value="${(vo.xxdz)!''}" style="width: 400px;" /></td>
+				</tr> 
+				<tr>
+					<th align="right">店铺LOGO展示图：</th>
+					<td>
+						<div id="imga"><#if vo.img_url?exists><img src="${CTX}/upload/${(vo.img_url)!''}" style="width: 130px;height: 100px;"></#if></div>
+						<input type="file" name="titleimg" id="titleimg" multiple="false"/> 
+					</td>
+				</tr>
+				<tr>
+					<th align="right">店铺图片(1280x300)：</th>
+					<td>
+						<div id="imgb">
+							<#list list_img as x>
+							    <img src="${CTX}/upload/${(x.lager)!''}" style="width: 130px;height: 100px;">
+							</#list>
+						</div>
+						<input id="file_upload" name="file_upload" type="file" multiple="true"></td>
+				</tr>
+				<!-- <tr>
+					<th align="right">总部地址：</th>
+					<td>${(vo.xxdz)!''}</td>
+				</tr>
+				<tr>
+					<th align="right">直达城市：</th>
+					<td><input type="text" class="text" name="lo_maincity" value="${(lo.maincity)!}"></td>
+				</tr>
+				<tr>
+					<th align="right">主营路线：</th>
+					<td><#if (lo.mainline)??>
+					<#list (lo.mainline)?split(";") as m>
+						<input type="text" class="text" id="mainline"  name="mainline" value="${m!}">
+					</#list>
+					<#else>
+						<input type="text" class="text" id="mainline" name="mainline" >
+						<input type="text" class="text" id="mainline" name="mainline" >
+						<input type="text" class="text" id="mainline" name="mainline" >
+					</#if></td>
+				</tr>
+				<tr>
+					<th align="right">营运模式：</th>
+					<td><select id="smode" name="lo_smode">
+								<option value="0" <#if (((lo.smode)!) == '0')>selected="selected"</#if> >往返</option>
+								<option value="1" <#if (((vo.smode)!) == '1')>selected="selected"</#if> >单向</option>
+						</select> </td>
+				</tr> -->
+				<tr>
+					<th align="right">运输方式：</th>
+					<td><input type="checkbox" class="transtype" name="transtype" <#if (lo.transtype)?? && lo.transtype?contains("汽运")>checked="checked"</#if> value="汽运">汽运
+					<input type="checkbox" class="transtype"  name="transtype" <#if (lo.transtype)?? && lo.transtype?contains("铁路")>checked="checked"</#if> value="铁路">铁路
+					<input type="checkbox" class="transtype"  name="transtype" <#if (lo.transtype)?? && lo.transtype?contains("海运")>checked="checked"</#if> value="海运">海运
+					<input type="checkbox" class="transtype"  name="transtype" <#if (lo.transtype)?? && lo.transtype?contains("空运")>checked="checked"</#if> value="空运">空运</td>
+				</tr>
+				<tr>
+					<th align="right">运输承保公司：</th>
+					<td><input type="text" class="text" name="lo_ticc" value="${(lo.ticc)!}"></td>
+				</tr>
+				<tr>
+					<th align="right">放款周期：</th>
+					<td><input type="text" class="text" name="lo_loan_period" value="${(lo.loan_period)!}"></td>
+				</tr>
+				<tr>
+					<th align="right">放款时间：</th>
+					<td><input type="text" class="text" name="lo_loan_time" value="${(lo.loan_time)!}"></td>
+				</tr>
+				<tr>
+					<th align="right">放款方式：</th>
+					<td>
+						<input type="checkbox" class="loan_type"  name="loan_type" <#if (lo.loan_type)?? && lo.loan_type?contains("人工")>checked="checked"</#if> value="人工">人工
+						<input type="checkbox" class="loan_type"  name="loan_type" <#if (lo.loan_type)?? && lo.loan_type?contains("银行")>checked="checked"</#if> value="银行">银行
+					</td>
+				</tr>
+				<tr>
+					<th align="right">查款电话：</th>
+					<td><input type="text" class="text" name="lo_checkphone" value="${(lo.checkphone)!}"></td>
+				</tr>
+				<tr>
+					<th align="right">QQ：</th>
+					<td><input type="text" class="text" name="lo_qq" value="${(lo.qq)!}"></td>
+				</tr>
+				<tr>
+					<th align="right">收货地址：</th>
+					<td><textarea rows="5" cols="80" name="lo_recaddress">${(lo.recaddress)!}</textarea>
+					</td>
+				</tr>
+				<tr>
+					<th align="right">卸货地址：</th>
+					<td><textarea rows="5" cols="80" name="lo_disaddress">${(lo.disaddress)!}</textarea>
+					</td>
+				</tr>
+				<tr>
+					<th align="right">公司简介：</th>
+					<td><textarea rows="5" cols="80" name="lo_profile">${(lo.profile)!}</textarea>
+					</td>
+				</tr>
+				<tr>
+					<th align="right">服务承诺：</th>
+					<td><textarea rows="5" cols="80" name="lo_servpromise">${(lo.servpromise)!}</textarea>
+					</td>
+				</tr>
+				<tr>
+					<th align="right">负责人：<font color="red">*</font></th>
+					<td><input type="text" class="text required" name="lo_chief" value="${(lo.chief)!}" ></td>
+				</tr>
+				<tr>
+					<th align="right">服务监督电话：<font color="red">*</font></th>
+					<td><input type="text" class="text required" name="lo_servhotline" value="${(lo.servhotline)!}"></td>
+				</tr>
+
+				
+				<tr>
+					<td>&nbsp;</td>
+					<td><input type="button" id="btn_save" name="btn_save" class="button" value="保 存"/></td>
+				</tr>
+			</table>
+			</form>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include '../inc/foot.html'>
+	</body>
+</html>

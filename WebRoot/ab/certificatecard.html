@@ -1,0 +1,152 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					mc: {required:true,stringMaxLength:20},
+					idcard: {required:true,stringMaxLength:50},
+					khh: {required:true,stringMaxLength:50},
+					khhkh: {required:true,integer:true,min:1}
+				}
+			});
+			
+			/* 表单验证*/
+			$("#myformmoney").validate({
+				rules:{
+					certificatemoney: {required:true,number:true,min:0}
+				}
+			});
+			
+			$("#btn_send").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$("#btn_send").attr('disabled',true);
+					$("#btn_send").val("开始提交...")
+					$.post("${CTX}/ab/certiCardSend",$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("银行帐号认证信息提交成功！",function () {
+								refresh();
+					        }).title('1秒后关闭').time(1);
+						}else{
+							$.dialog.alert("银行帐号认证信息提交失败！");
+						}
+					});
+				}
+			});
+			
+			
+			$("#btn_sendmoney").click(function(){
+				var r = $("#myformmoney").valid();
+				if(!r) {
+					return false;
+				}else{
+					$("#btn_send").attr('disabled',true);
+					$("#btn_send").val("开始认证...")
+					$.post("${CTX}/ab/certiCardMoney",$("#myformmoney").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("银行帐号认证成功！",function () {
+								refresh();
+					        }).title('1秒后关闭').time(1);
+						}else{
+							$.dialog.alert("银行帐号认证失败！");
+						}
+					});
+				}
+			});
+			
+		});
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>
+ </head>
+  <body>
+  	<#include 'inc/top.html'>
+	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include 'inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">银行卡认证</h2>
+			<div class="editinfo">
+			<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+				<input type="hidden" id="id" name="id" class="text" value="${(abuser.id)!''}">
+				<table class="input">
+						<tr>
+							<th align="right">真实姓名：</th>
+							<td><input type="text" class="text" name="mc" <#if strkit('1',(abuser.certificatecard)!)>readonly</#if> value="${(abuser.mc)!}">&nbsp;与身份证一致</td>
+						</tr>
+						<tr>
+							<th align="right">身份证号：</th>
+							<td><input type="text" class="text" name="idcard" <#if strkit('1',(abuser.certificatecard)!)>readonly</#if> value="${(abuser.idcard)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">银行卡开户行：</th>
+							<td><input type="text" class="text" name="khh" <#if strkit('1',(abuser.certificatecard)!)>readonly</#if> value="${(abuser.khh)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">银行卡账号：</th>
+							<td><input type="text" class="text" name="khhkh" <#if strkit('1',(abuser.certificatecard)!)>readonly</#if> value="${(abuser.khhkh)!}"></td>
+						</tr>
+						<tr>
+							<th align="right">认证状态：</th>
+							<td>
+								<#if strkit('0',(abuser.certificatecard)!)>
+									未认证
+								<#elseif strkit('1',(abuser.certificatecard)!)>
+									认证通过
+								<#elseif strkit('2',(abuser.certificatecard)!)>
+									<span class="red bold">认证中</span>
+									<span>系统会自动向您的银行卡中汇入小于1元的一笔金额，收到汇款后请输入打款金额进行认证。</span>
+								</#if>
+							</td>
+						</tr>
+						<tr>
+							<th align="right"></th>
+							<td>
+								<#if strkit('0',(abuser.certificatecard)!)>
+									<input type="button" id="btn_send" class="button" value="提交" />
+								</#if>
+							</td>
+						</tr>
+				</table>
+			</form>
+			<form id="myformmoney" name="myformmoney" method="post" action="" style="margin: 0px;">
+				<input type="hidden" id="id" name="id" class="text" value="${(abuser.id)!''}">
+				<#if strkit('2',(abuser.certificatecard)!)>
+				<table class="input">
+						<tr>
+							<th align="right">打款金额：</th>
+							<td><input type="text" id="certificatemoney" name="certificatemoney" class="text" value=""></td>
+						</tr>
+						<tr>
+							<th align="right"></th>
+							<td>
+									<input type="button" id="btn_sendmoney" class="button" value="认证" />
+							</td>
+						</tr>
+				</table>
+				</#if>
+			</form>
+			</div>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</body>
+</html>

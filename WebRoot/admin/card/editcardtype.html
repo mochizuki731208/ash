@@ -1,0 +1,130 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+    <link rel="stylesheet" type="text/css" href="${CTX}/res/js/uploadify/uploadify.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					cardtype_name:{required:true,stringMaxLength:25},
+					cardtype_title:{required:true,stringMaxLength:100},
+					cardtype_type:{required:true},
+					cardtype_money:{required:true, min: 0},
+					cardtype_price:{required:true, min: 0},
+					cardtype_valid_days:{required:true, min: 0},
+					cardtype_status:{required:true}
+				}
+			});
+			$('#cardtypeimg').uploadify({
+				swf:'${CTX}/res/js/uploadify/uploadify.swf',
+				uploader:'${CTX}/common/upload',
+				multi: false,
+				sizeLimit:'1024*1024',
+				buttonText :'选择图片',
+				fileExt:'*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.JPG;*.JPEG;*.GIF;*.PNG;*.BMP;',
+				onUploadSuccess:function(file,data,response){
+					$('#myform').append("<input type='hidden' name='cardtype_image' value='"+data+"'/>");
+					$('#imga').html("<img src='${CTX}/upload/"+data+"' width=80px height=60px/>");
+	             }
+			});
+			
+			$("#cardtype_title").focus();
+			
+			$("#btn_save").click(function(){
+				if($("#myform").valid()){
+				    $("#myform").submit();
+				}
+			});
+			
+			$("#cardtype_type").change(function(){
+				var typ = $("#cardtype_type").val();
+				if(typ == '2'){
+					$("#times").hide();
+					$("#money").show();
+				}else if(typ == '1'){
+					$("#times").show();
+					$("#money").hide();
+				}else{
+					$("#times").hide();
+					$("#money").hide();
+				}
+			});
+		});
+		
+	
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" method="post" >
+	<input type="hidden" name="cardtype_id" id="cardtype_id" value="${(vo.id)!}"/>
+	<table class="input">
+		<tr>
+			<th align="right" width="20%;">会员卡名称：</th>
+			<td><input type="text" name="cardtype_name" id="cardtype_name" class="text" value="${(vo.name)!}"> <font color="red">*</font> </td>
+		</tr>
+		<tr>
+			<th align="right" width="20%;">会员卡标题：</th>
+			<td><input type="text" name="cardtype_title" id="cardtype_title" class="text" value="${(vo.title)!}"> <font color="red">*</font> </td>
+		</tr>
+		<tr>
+			<th align="right">会员卡类型：</th>
+			<td>
+				<select id="cardtype_type" name="cardtype_type" style="width:150px;" class="required">
+					<option value="">请选择</option>
+					<option value="1" <#if (((vo.type)!) == "1")>selected="selected"</#if> >送餐卡</option>
+					<option value="2" <#if (((vo.type)!) == "2")>selected="selected"</#if> >消费卡</option>
+				</select>
+				<font color="red">*</font>
+			</td>
+		</tr>
+		<tr>
+			<th align="right">卡图片：</th>
+			<td colspan="3">
+			<div id="imga">
+				<#if vo.img_url??>
+					<#if vo.img_url?substring(0,4) == 'res/'>
+						<img src="${CTX}/${(vo.img_url)!''}" style="width: 80px;height: 60px;">
+					<#else>
+						<img src="${CTX}/upload/${(vo.img_url)!''}" style="width: 80px;height: 60px;">
+					</#if>
+				</#if>
+			</div>
+				<input type="file" name="cardtypeimg" id="cardtypeimg" multiple="false"/> </td>
+		</tr>
+		<tr id="money" <#if (isAdd || ((vo.type)!) == "1")>style="display: none;"</#if>>
+			<th align="right">卡面值：</th>
+			<td><input type="number" name="cardtype_money" id="cardtype_money" class="text" value="${(vo.money)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">价格：</th>
+			<td><input type="number" name="cardtype_price" id="cardtype_price" class="text" value="${(vo.price)!}"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">有效天数：</th>
+			<!-- <td><input class="Wdate" id="card_expire_time" name="card_expire_time" value="${(vo.expire_time)!}" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'%y-%M-{%d}'})" /></td> -->
+			<td><input type="number" name="cardtype_valid_days" id="cardtype_valid_days" value="${(vo.valid_days)!}" class="text"> <font color="red">*</font></td>
+		</tr>
+		<tr>
+			<th align="right">状态：</th>
+			<td>
+			<select id="cardtype_status" name="cardtype_status" style="width:150px;" class="required">
+				<option value="">请选择</option>
+				<option value="1" <#if (((vo.status)!) == "1")>selected="selected"</#if> >有效</option>
+				<option value="0" <#if (((vo.status)!) == "0")>selected="selected"</#if> >无效</option>
+			</select>
+			<font color="red">*</font>
+		</td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

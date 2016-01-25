@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<head>
+<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/dd.css" />
+<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+<script type="text/javascript">
+	$().ready(function() {
+		/* 表单验证*/
+		$("#myform").validate({
+			rules : {
+				exc_rect : {
+					required : true,
+					stringMaxLength : 50
+				},
+				exc_rect_mobile : {
+					required : true,
+					stringMaxLength : 50
+				},
+				exc_rect_adrs : {
+					required : true,
+					stringMaxLength : 100
+				},
+				/* exc_count : {
+					required : true,
+					min : 1
+				} */
+			}
+		});
+		$("#rect").focus();
+
+		$("#btn_save").click(function() {
+			if ($("#myform").valid()) {
+				 $("#myform").submit();
+			}
+		});
+		
+	});
+	
+	function setpaytype(obj,typ){
+		$("exc_pay_type").attr("value", typ);
+	}
+</script>
+</head>
+<body>
+	<form id="myform" name="myform" action="${CTX}/ab/exc/addexchange"
+		method="post">
+			<input type="hidden" name="exc_user_id" id="exc_user_id" value="${(abuser.id)!}" />
+		    <input type="hidden" name="exc_goods_id" id="exc_goods_id" value="${(vo.id)!}" />
+		<div class="wrap">
+			<div class="header">
+				<div class="box">
+					<div class="logo">
+						<img src="${CTX}/res/css/ab/images/dd/logo1.png" />
+					</div>
+					<div class="cl"></div>
+					<div class="monitoring">
+						<img src="${CTX}/res/css/ab/images/dd/icon1.png" /><a href="#"><span>订单监控</span></a><span
+							class="username"> 当前用户:<#if
+							abuser??>${(abuser.loginid)!}</#if> </span>
+					</div>
+				</div>
+			</div>
+			<div class="body">
+				<div class="conent">
+					<div class="order">
+						<div class="linkman item">
+							<span>姓名</span>
+							<input type="text" name="exc_rect" id="rect" class="text"
+								value=""> <font color="red">*</font>
+						</div>
+						<div class="telephone item">
+							<span>电话</span><input type="text" name="exc_rect_mobile" id="rect_mobile"
+						class="text" value="${(abuser.mobile)!}"> <font
+						color="red">*</font>
+						</div>
+						<div class="telephone item">
+							<span>数量</span><input type="number" name="exc_count" id="count"
+						class="text" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"  
+                                    onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'0')}else{this.value=this.value.replace(/\D/g,'')}"
+						> <font color="red">*</font>${limitMsg!''}
+						</div>
+						<div class="address item">
+							<span>地址</span><input type="text" name="exc_rect_adrs" id="rect_adrs"
+						class="text" value="${(abuser.xxdz)!}"> <font color="red">*</font> <img
+								src="${CTX}/res/css/ab/images/img5.png" /><span class="map">标记地图位置</span>
+						</div>
+						<div class="line"></div>
+						<div class="item remark mt18">
+							<span>备注</span><input type="text" class="text" name="exc_remark" id="exc_remark"/>
+						</div>
+						<div class="line mt18"></div>
+						<#if (vo.money>0)>
+							<div class="pay item">
+								<span>支付</span>
+								<input type="radio" name="exc_pay_type" value="1" disabled="disabled"/><a href="#" class="a">充值直扣</a>
+								<input type="radio" name="exc_pay_type" value="2" disabled="disabled"/><a href="#" class="a">支付宝</a>
+								<input type="radio" name="exc_pay_type" value="3" checked="checked"/><a href="#" class="a">货到付款</a>
+							</div>
+						</#if>
+						<div class="line mt18"></div>
+					</div>
+					<div class="action mt24">
+						<input id="btn_save" type="button" value="提交订单" class="button" />
+					</div>
+				</div>
+				<div class="cl"></div>
+				<div class="right_bg"></div>
+			</div>
+			<div class="foot"></div>
+		</div>
+	</form>
+</body>
+</html>

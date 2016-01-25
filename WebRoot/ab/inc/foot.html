@@ -1,0 +1,22 @@
+
+	<!-- foot页 -->
+	<div class="foot clear">
+		<div class="flink">
+      		<@_cms_ctx_list lbid=1>
+				<#list list as lst>
+					<#if lst_index==0>
+					<a href="${CTX}/ab/news/about-${(lst.id)!}">${(lst.title)}</a>
+					<#else>
+					| <a href="${CTX}/ab/news/about-${(lst.id)!}">${(lst.title)}</a>
+					</#if>
+				</#list>
+			</@_cms_ctx_list>
+			| <a href="${CTX}/ab/jm">招商加盟</a>
+			| <a href="${CTX}/ab/newslist">新闻公告</a>
+		</div>
+          <div class="flink">
+               2007-2014 Aibang?粤ICP备15077815号
+          	<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255251175'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1255251175%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>
+          </div>
+	</div>
+	<div class="blank10"></div>

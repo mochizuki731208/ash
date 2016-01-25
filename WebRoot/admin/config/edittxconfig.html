@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			 $("#myform").validate({
+				rules: {
+					config_yt: {required:true,stringMaxLength:50},
+					config_c1: {required:true},
+				},
+				messages:{
+					config_yt:"名称不能为空！",
+					config_c1:"必选！"
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				if($("#myform").valid()){
+				    $.post("${CTX}/admin/config/saveconfig",$("#myform").serializeArray(),function(data){
+	                    if(data){
+	                    	$.dialog.alert("提现是否自动处理配置成功！",function () {
+								refresh();
+					        }).title('3秒后关闭').time(3);
+						}else{
+							$.dialog.alert("提现是否自动处理配置失败！");
+						}
+					});
+				}
+			});
+		});
+		
+		function refresh(){
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+			$('#myform').submit();
+		}
+	</script>
+</head>
+
+  <body>
+    <form id="myform" name="myform" method="post">
+	<input type="hidden" name="config_id" id="config_id" value="${(vo.id)!}"/>
+	<div class="path">
+		<a href="javascript:void(0);">首页</a> &raquo; 提现自动处理配置
+	</div>
+	<table class="input">
+		<tr>
+			<th align="right">名称：</th>
+			<td><input type="text" name="config_yt" id="config_yt" class="text" value="${(vo.yt)!}"></td>
+		</tr>
+		<tr>
+			<th align="right">是否自动处理：</th>
+			<td>
+				<select name="config_c1" id="config_c1" value="${(vo.c1)!}">
+					<option value="">请选择</option>
+					<option value="1" <#if strkit('1',(vo.c1)!)>selected="selected"</#if>>开启</option>
+					<option value="0" <#if strkit('0',(vo.c1)!)>selected="selected"</#if>>关闭</option>
+				</select>
+		</tr>
+		
+		<tr>
+		<td>&nbsp;</td>
+		<td>
+			<input type="button" id="btn_save" class="button" value="保 存" />
+			<input type="button" id="btn_return" class="button" value="刷 新" onclick="javascript:window.location.href='${CTX}/admin/config/edittxconfig'"/>
+		</td>
+		</tr>
+	</table>
+	</form>
+	
+  </body>
+</html>
+

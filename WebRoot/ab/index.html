@@ -1,0 +1,193 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+    <meta property="qc:admins" content="632306154762571676654" />
+	<meta property="wb:webmaster" content="75091cd95124f090" />
+	<meta name="description" content="${(config.c3)!}" />
+	<meta name="keywords" content="${(config.c2)!}" />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width = device-width, user-scalable=yes minimum-scale=1.0" />
+	<meta name="apple-touch-fullscreen" content="YES" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="white" />
+	<meta name="MobileOptimized" content="width" />
+	<meta name="HandheldFriendly" content="true" />
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/main.css"/>
+	<script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/style.css"/>
+	<title>${(config.c1)!}</title>
+	<!--[if lt IE 9]>
+	<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+	<![endif]-->
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
+	  <script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+	  <script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="author" content="Jophy" />
+	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="bootstrap/css/style.css">
+	<!--[if lte IE 9]>
+	<script src="bootstrap/js/respond.min.js"></script>
+	<script src="bootstrap/js/html5.js"></script>
+	<![endif]-->
+	<script src="http://libs.baidu.com/jquery/1.10.2/jquery.js"></script>
+	<script src="bootstrap/js/bootstrap.min.js"></script>
+</head>
+  <body>
+  	<#include 'inc/top.html'>
+	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+	<div class="blank10"></div>
+	<div class="main">
+	<#if list_subject??>	
+		<#list list_subject as lst>
+		<div class="floor">
+		  	<div class="floor_head">
+		  		<span>
+		  			<a href="${CTX}/ab/listitem/${(currcity.id)!}-${(lst.id)!}" class="floor1">${(lst.mc)!}</a>
+		  		</span>
+		  		<ul>
+		  			<#if lst.list_sub??>
+ 							<#list lst.list_sub as sub>
+ 							<li><a href="${CTX}/ab/listitem/${(currcity.id)!}-${(lst.id)!}?sub_id=${(sub.id)!}">${(sub.mc)!}</a></li>
+ 							</#list>
+ 					</#if>
+		  					<li><a href="${CTX}/ab/listitem/${(currcity.id)!}-${(lst.id)!}" class="all">全部></a></li>
+		  		</ul>
+		  	</div>
+		  	<div class="floor_content">
+		  		<ul>
+   						<#if lst.list_product??>
+   							<#list lst.list_product as t>
+				    				<#if (t_index lt 6)>
+				    				<li class="hover">
+						  				<div class="img">
+						  					<a href="${CTX}/ab/prodetail/${t.id}"><img src="${CTX}/upload/${(t.img_url)}"  /></a>
+						  					<div class="addr">
+						  						<p>商圈：${(t.area_name)!}</p>
+						  					</div>
+						  				</div>
+						  				
+						  				<div class="content">
+						  					<div class="title">
+						  						<h2><a href="${CTX}/ab/prodetail/${t.id}" title="${(t.mname)!}">${(t.mc)!}</a></h2>
+						  						<p>人均：<r>${(t.avgprice)!}</r>元 | 配送费：<r>${(t.avgptf)!}</r>元 | 送达：<r>${(t.avghour)!}</r>分钟</p>
+						  					</div>
+						  					<div class="price">
+						  						<span class="price1">¥${(t.price)!}</span>
+						  						<span class="price2">立减</span>
+						  						<span>原价 <span class="price3">¥${(t.mdprice)!}</span></span>
+						  					</div>
+						  				</div>
+						  				<div class="sale">
+						  					<span 
+						  					<#if strkit('zzyy',(t.iswork)!)>
+						  						class="status"
+						  					<#elseif strkit('gzz',(t.iswork)!)>
+						  						class="status"
+						  					<#elseif strkit('kyd',(t.iswork)!)>
+						  						class="status"
+						  					<#elseif strkit('ztyy',(t.iswork)!)>
+						  						class="statusno"
+						  					<#elseif strkit('ydy',(t.iswork)!)>
+						  						class="statusno"
+						  					</#if>
+						  					>
+						  					
+						  					<#if strkit('zzyy',(t.iswork)!)>
+						  						正常营业
+						  					<#elseif strkit('gzz',(t.iswork)!)>
+						  						工作中
+						  					<#elseif strkit('kyd',(t.iswork)!)>
+						  						可预订
+						  					<#elseif strkit('ztyy',(t.iswork)!)>
+						  						暂停营业
+						  					<#elseif strkit('ydy',(t.iswork)!)>
+						  						已打烊
+						  					</#if>
+						  					</span>
+						  					<div class="ping">
+						  					<span class="star">
+						  						<#if (t.rate?number>=0 && t.rate?number<1)> ☆☆☆☆☆ </#if> 
+												<#if (t.rate?number>=1 && t.rate?number<2)> ★☆☆☆☆ </#if> 
+											    <#if (t.rate?number>=2 && t.rate?number<3)> ★★☆☆☆ </#if>
+											    <#if (t.rate?number>=3 && t.rate?number<4)> ★★★☆☆ </#if> 
+											    <#if (t.rate?number>=4 && t.rate?number<5)> ★★★★☆ </#if> 
+											    <#if (t.rate?number>=5 && t.rate?number<6)> ★★★★★ </#if> 
+						  					</span>
+						  					${(t.appraise_count)!''}人评价</div>
+						  				</div>
+						  			</li>
+						  			</#if>
+   							</#list>
+   						</#if>
+		  		</ul>
+		  		
+		  		<div class="clear"></div>
+		  		<div class="more"><a href="${CTX}/ab/listitem/${(currcity.id)!}-${(lst.id)!}">更多服务，请点击查看  >></a></div>
+		  	</div>
+		  </div>		
+		</#list>
+	</#if>
+	  	<div class="main_right">
+	  		<div class="ad">
+				<a href="${CTX}/ab/ab_gzwx"><img src="${CTX}/res/css/ab/images/right1.jpg"  /></a>
+				<a href="${CTX}/ab/ab_cflj"><img src="${CTX}/res/css/ab/images/right2.jpg"  /></a>
+				<a href="${CTX}/ab/card/purchasesend"><img src="${CTX}/res/css/ab/images/right3.jpg"  /></a>
+				<a href="javascript:;"><img src="${CTX}/res/css/ab/images/time.jpg" /></a>
+	        </div>
+	        <div id="time">
+	        	<div class="title">最近浏览</div>
+	        	<ul>
+	        		<#if list_sj_tmp??>
+	        			<#list list_sj_tmp as t>
+	        			<li>
+		        			<a href="javascript:;"><img src="${CTX}/upload/${(t.img_url)}" width="50px" height="40px" /></a>
+		        			<h3><a href="javascript:;">${(t.mc)!}</a></h3>
+		        			<p><span class="price1">人均消费：¥${(t.avgprice)!}</span></p>
+		        		</li>
+	        			</#list>
+	        		</#if>
+	        	</ul>
+	        </div>
+		</div>
+	
+	</div>
+	<script type="text/javascript">
+  		$(document).ready(function(){
+  			$('.floor_content ul li').mouseover(function(){
+				$(this).find('.addr').css('visibility','visible');
+				$(this).css('border-bottom-color','#FF7F24');
+			});
+  			$('.floor_content ul li').mouseleave(function(){
+				$(this).find('.addr').css('visibility','hidden');
+				$(this).css('border-bottom-color','#EEEEEE');
+			});
+   		});
+       $(function() {
+           var offset = $("#time").offset();
+           var topPadding = 20;
+           $(window).scroll(function() {
+               if ($(window).scrollTop() > offset.top) {
+                   $("#time").stop().animate({
+                       marginTop: $(window).scrollTop() - offset.top + topPadding
+                   });
+               } else {
+                   $("#time").stop().animate({
+                       marginTop: 10
+                   });
+               };
+           });
+       });
+   </script>
+	<!-- 栏目页 -->
+	<div class="blank10"></div>
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</body>
+</html>

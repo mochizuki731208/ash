@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+	<#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<script type="text/javascript">
+	
+		function save(){
+			var to_self_rate = $("#to_self_rate").val();
+			var to_insurer_rate = $("#to_insurer_rate").val();
+			if(to_self_rate==null || to_self_rate == ""){
+				$.dialog.alert("平台费率不能为空！");
+				return false;
+			}
+			if(to_insurer_rate==null || to_insurer_rate == ""){
+				$.dialog.alert("保险公司费率不能为空！");
+				return false;
+			}
+			if(!$.isNumeric(to_self_rate)) {
+				$.dialog.alert("平台费率必须为数字！");
+				return false;
+			}
+			if(!$.isNumeric(to_insurer_rate)) {
+				$.dialog.alert("保险公司费率必须为数字！");
+				return false;
+			}
+			if(parseFloat(to_self_rate) < 0) {
+				$.dialog.alert("平台费率必须为大于等于0的数值！");
+				return false;
+			}
+			if(parseFloat(to_insurer_rate) < 0) {
+				$.dialog.alert("保险公司费率必须为大于等于0的数值！");
+				return false;
+			}
+			if(confirm("确认要修改当前的数据吗?")){
+			 	$.ajax({
+					url: $("#myform").attr("action"),
+					type: "POST",
+					data: $("#myform").serialize(),
+					dataType: "text",
+					cache: false,
+					success: function(data) {
+						if(data == "1"){
+							$.dialog.alert("保险费率数据修改成功！",function () {
+					        }).title('3秒后关闭').time(3);
+						}else if(data == "2"){
+							$.dialog.alert("保险费率数据修改失败！");
+						}
+					}
+				});
+			}else{
+				return false;
+			} 
+		}
+	</script>	
+</head>
+  <body>
+	<form id="myform" name="myform" method="post" action="${CTX}/admin/user/updatePolicyRate" style="margin: 0px;">
+		<input type="hidden" name="id" id="id" value="${(apr.id)!}">
+		平台保险费率：<input type="text" name="to_self_rate" id="to_self_rate" class="text" value="${(apr.to_self_rate)!}" style="width: 80px;"/>%
+		保险公司费率：<input type="text" name="to_insurer_rate" id="to_insurer_rate" class="text" value="${(apr.to_insurer_rate)!}" style="width: 80px;"/>%
+		<input type="button" id="btn_save" class="button" value="保存" onclick="save();"/>
+	</form>
+  </body>
+</html>

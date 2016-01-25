@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+</head>
+  <body>
+	<table class="input">
+		<tr>
+			<th align="right" style="width:70px;">被保险人：</th>
+			<td style="width:270px;">${(to.send_name)!}</td>
+			<th align="right" style="width:70px;">被保险人手机：</th>
+			<td style="width:270px;">${(to.send_phone)!}</td>
+		</tr>
+		<tr>
+			<th align="right">货物类型：</th>
+			<td>${(to.goods_type)!}</td>
+			<th align="right">货物重量</th>
+			<td>${(to.weight)!}公斤</td>
+		</tr>
+		<tr>
+			<th align="right">货物体积：</th>
+			<td>${(to.goods_volumn)!}立方米</td>
+			<th align="right">货物数量</th>
+			<td>${(to.goods_mount)!}件</td>
+		</tr>
+		<tr>
+			<th align="right">订单编号：</th>
+			<td>${(vo.sn)!}</td>
+			<th align="right">起运时间：</th>
+			<td>${(to.send_time)!}</td>
+		</tr>
+		<tr>
+			<th align="right">起运地：</th>
+			<td colspan="3">${(to.send_addr)!}</td>
+		</tr>
+		<tr>
+			<th align="right">目的地：</th>
+			<td colspan="3">${(to["rcv_addr"+1])!}</td>
+		</tr>
+		<tr>
+			<th align="right">订单总金额：</th>
+			<td style="color: red" colspan="3">${(vo.ddzje)?string("currency")}</td>
+		</tr>
+		<tr>
+			<th align="right">货物名称：</th>
+			<td>
+				<#if strkit('0',(is_policy)!)>
+					<input type="text" name="goods_name" id="goods_name" value="${(policy.goods_name)!}" size="30"/></td>
+				<#else>
+					${(policy.goods_name)!}
+				</#if>
+			<th align="right">运输工具：</th>
+			<td>
+				<#if strkit('0',(is_policy)!)>
+					<input type="text" name="transport_name" id="transport_name" value="${(policy.transport_name)!}" size="30"/></td>
+				<#else>
+					${(policy.transport_name)!}
+				</#if>
+		</tr>
+		<tr>
+			<th align="right">保单金额：</th>
+			<td colspan="3">
+				<#if strkit('0',(is_policy)!)>
+					<input type="text" name="policy_money" id="policy_money" value="${(policy.policy_money)!}" size="30"/>元</td>
+				<#else>
+					<font color="red">¥&nbsp;${(policy.policy_money)!}</font>
+				</#if>
+		</tr>
+		<tr>
+			<th colspan="4" style="text-align:center;">
+				<input type="hidden" name="from" id="from" value="${from!}" size="30"/>
+				<#if strkit('0',(is_policy)!)>
+					<input type="hidden" name="id" id="id" value="${(policy.id)!}" size="30"/>
+					<input type="hidden" name="order_id" id="order_id" value="${(order_id)!}" size="30"/>
+					<input type="button" id="btn_return" class="button" value="下保险单" onclick="save_policy();"/>
+				<#else>
+					<input type="hidden" name="id" id="id" value="${(policy.id)!}" size="30"/>
+					<input type="hidden" name="order_id" id="order_id" value="${(order_id)!}" size="30"/>
+				</#if>
+			</th>
+		</tr>
+		<form class="pr f0" id="queryform" name="queryform"
+									method="post" action="${CTX}/ab/order/policy" target="_top">
+			<input type="hidden" name="sn" id="sn" value="${(vo.sn)!}" size="30"/>							
+		</form>
+	</table>
+  </body>
+  <script type="text/javascript">
+  		// 保存保单
+  		function save_policy() {
+  			var order_id = $("#order_id").val();
+  			var goods_name = $("#goods_name").val();
+  			var transport_name = $("#transport_name").val();
+  			var policy_money = $("#policy_money").val();
+  			if(goods_name == "") {
+  				alert("货物名称不能为空!");
+  				return;
+  			}
+  			if(transport_name == "") {
+  				alert("运输工具不能为空!");
+  				return;
+  			}
+  			if(policy_money == "" || !$.isNumeric(policy_money) || parseInt(policy_money) <=0) {
+  				alert("保单金额不能为空并且必须为正数!");
+  				return;
+  			}
+  			$.post("${CTX}/admin/dd/save_policy",{"order_id":order_id,"goods_name":goods_name,"transport_name":transport_name,"policy_money":policy_money,"from":$("#from").val()},function(_data) {
+  				if(_data == "1") {
+  					alert("下单成功!");
+  					$("#btn_return").hide();
+  					$("#goods_name").parent().empty().text(goods_name);
+  					$("#transport_name").parent().empty().text(transport_name);
+  					$("#policy_money").parent().empty().html("<font color='red'>¥&nbsp;" + policy_money + "</font>");
+  				}else if(_data == "0"){
+  					alert("下单失败!");
+  				}else if(_data == "2") {
+  					$("#queryform").submit();
+  				}
+  			});
+  		}
+  </script>
+</html>

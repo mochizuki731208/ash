@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/style.css"/>
+</head>
+  <body>
+  	<#include 'inc/top.html'>
+	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+	<div class="blank10"></div>
+	<div class="main">
+	
+		<div class="floor_content" style="min-height: 600px;">
+			<table  class="list" style="border:0px;">
+				<tr style="border: 0px;">
+		  			<th style="border: 0px;">序号</th>
+		  			<th style="border: 0px;">名称</th>
+		  			<th style="border: 0px;">发布日期</th>
+		  		</tr>
+		  	<#if listpage ??>
+      			<#list listpage.list as lst>
+      			<tr>
+      				<td style="border: 0px;">${(lst_index+1)}</td>
+      				<td style="border: 0px;"><a href="${CTX}/ab/newsshow/${(lst.id)!}">${(lst.title)!}</a></td>
+      				<td style="border: 0px;">${(lst.release_date)!}</td>
+      			</tr>
+		  		</#list>
+				<tr>
+					<td colspan="3" style="border: 0px;">
+					<div class="pageinfo"><#include '../../../common/_abpaginate.html'></div>
+					</td>
+				</tr>
+			</#if>
+			</table>
+		</div>
+		
+	  	<div class="main_right">
+	  		<div class="ad">
+				<a href="${CTX}/ab/ab_gzwx"><img src="${CTX}/res/css/ab/images/right1.jpg"  /></a>
+				<a href="${CTX}/ab/ab_cflj"><img src="${CTX}/res/css/ab/images/right2.jpg"  /></a>
+				<a href="${CTX}/ab/card/purchasesend"><img src="${CTX}/res/css/ab/images/right3.jpg"  /></a>
+				<a href="javascript:;"><img src="${CTX}/res/css/ab/images/time.jpg" /></a>
+	        </div>
+	        <div id="time">
+	        	<div class="title">最近浏览</div>
+	        	<ul>
+	        		<#if list_sj_tmp??>
+	        			<#list list_sj_tmp as t>
+	        			<li>
+		        			<a href="javascript:;"><img src="${CTX}/upload/${(t.img_url)}" width="50px" height="40px" /></a>
+		        			<h3><a href="javascript:;">${(t.mc)!}</a></h3>
+		        			<p><span class="price1">人均消费：¥${(t.avgprice)!}</span></p>
+		        		</li>
+	        			</#list>
+	        		</#if>
+	        	</ul>
+	        </div>
+		</div>
+	
+	</div>
+	<script type="text/javascript">
+  		$(document).ready(function(){
+  			$('.floor_content ul li').mouseover(function(){
+				$(this).find('.addr').css('visibility','visible');
+				$(this).css('border-bottom-color','#FF7F24');
+			});
+  			$('.floor_content ul li').mouseleave(function(){
+				$(this).find('.addr').css('visibility','hidden');
+				$(this).css('border-bottom-color','#EEEEEE');
+			});
+   		});
+       $(function() {
+           var offset = $("#time").offset();
+           var topPadding = 20;
+           $(window).scroll(function() {
+               if ($(window).scrollTop() > offset.top) {
+                   $("#time").stop().animate({
+                       marginTop: $(window).scrollTop() - offset.top + topPadding
+                   });
+               } else {
+                   $("#time").stop().animate({
+                       marginTop: 10
+                   });
+               };
+           });
+       });
+   </script>
+	<!-- 栏目页 -->
+	<div class="blank10"></div>
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	</body>
+</html>

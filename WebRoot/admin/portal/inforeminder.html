@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>消息提醒</title>
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="${CTX}/res/js/jquery-1.9.1.js"></script>
+    <style type="text/css">
+    .name1{color: red;font-size: 20px;font-weight:700px}
+    </style>
+    <script type="text/javascript">
+    var time = 60;
+    $(function(){
+    	time = 60;
+    	do_timer();
+    })
+    function do_timer(){
+		$("#time").html("<font size='100' color='red'><strong>" + time +"</strong></font>");
+		if(0==time){
+			refresh();
+		}
+		time--;
+		setTimeout('do_timer()',1000);
+	}
+    function refresh(){
+		$('#myform').submit();
+		$('#myform').action = "";
+		$('#myform').target = "_self";
+	}
+    </script>
+  </head>
+  
+  <body>
+  <form id="myform" name="myform" method="post" action=""></form>
+ 	 <div style="margin-right: 130px;float: right;margin-top: -15px">
+	   		<span id="time">&nbsp;</span>秒后自动刷新. 	<input value="手动刷新" type="button" class="button" onclick="refresh()">
+	 </div>
+  	<div>尊敬的<span class="name1"><b>${(user.role_name)}(${(user.mc)})</b></span>,您好:</div>
+  	<div>您有如下事情<span class="name1"><b>尚未处理</b></span>，请及时处理，谢谢。</div>
+  	<ul>
+  		<li>未指派订单<span class="name1"><b><a href="${CTX}/admin/order/weiZhiPai" target="_self">${(wzpns)!'0'}</a></b></span>单</li>
+  		<li>待审核货源会员<span class="name1"><b><a href="${CTX}/admin/rz/listhy_rz?ds=1" target="_self">${(hyhyrzns)!'0'}</a></b></span>家</li>
+  		<li>待审核店铺物流企业<span class="name1"><b><a href="${CTX}/admin/merchant/listsjsh?ds=1" target="_self">${(dpwlrzns)!'0'}</a></b></span>家</li>
+  		<li>待审核店铺商品<span class="name1"><b><a href="${CTX}/admin/merchant/listsjspsh?ds=1" target="_self">${(dpwlsprzns)!'0'}</a></b></span>个</li>
+  		<li>待审核司机<span class="name1"><b><a href="${CTX}/admin/rz/listywy_rz?ds=1" target="_self">${(sjrzns)!'0'}</a></b></span>家</li>
+  		<li>待审核银行卡认证<span class="name1"><b><a href="${CTX}/admin/user/certiCard?ds=1" target="_self">${(yhkrzns)!'0'}</a></b></span>家</li>
+  		<li>待处理提现申请<span class="name1"><b><a href="${CTX}/admin/user/listtx?ds=1" target="_self">${(txns)!'0'}</a></b></span>单</li>
+  		<li>待处理充值申请<span class="name1"><b><a href="${CTX}/admin/user/listcz?ds=1" target="_self">${(czns)!'0'}</a></b></span>单</li>
+  	</ul>
+  	
+<!--   	<br>${(user)} -->
+  </body>
+</html>

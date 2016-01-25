@@ -1,0 +1,17 @@
+<div class="head-warp">
+  <div class="head">
+    <div class="nav-box">
+      <ul>      
+      	<#if zb?exists && zb=='Y'>
+        <li><a href="${CTX}/ab/tc/zx" style="font-size:16px;">服务介绍</a></li>
+        <#else>
+        <li><a href="${CTX}/ab/tc/ky" style="font-size:16px;">服务介绍</a></li>
+        </#if>
+        <li><a href="${CTX}/ab/tc?zb=${(zb)!}" style="font-size:16px;">在线下单</a></li>
+        <li><a href="${CTX}/ab/tc/kyDriverJoin" style="font-size:16px;">司机加入</a></li>
+        <li class="cur"><a href="${CTX}/ab/tc/kyZifei" style="font-size:16px;">资费说明</a></li>
+      </ul>
+      <div class="nav-line" style="left: 92px; width: 64px; "></div>
+    </div>
+  </div>
+</div>

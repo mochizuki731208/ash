@@ -1,0 +1,184 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	
+	<script type="text/javascript">
+		$().ready(function() {
+			/* 表单验证*/
+			$("#myform").validate({
+				rules:{
+					mobile: {required:true,stringMaxLength:50,
+						remote: { 
+							url: "${CTX}/ab/checkMobileExist", //url地址 
+							type: "post", //发送方式 
+							data: { //要传递的数据 
+								mobile:function(){return $("#mobile").val();}
+							}
+						}
+					},
+					smsCodeRand: {required:true,stringMaxLength:6,equalTo:"#checkcode"},
+					pwd: {required:true,stringMaxLength:50},
+					cfpwd: {required:true,stringMaxLength:50,equalTo:"#pwd"}
+				},
+				messages:{
+					mobile:{
+						remote: "手机号不存在，手机找回密码失败！"
+					},
+					smsCodeRand:{required:"手机验证码不能为空！",equalTo:"验证码不正确！"},
+					cfpwd:{required:"再次输入新密码不能为空！",equalTo:"两次输入的密码不一致！"}
+				}
+			});
+			
+			$("#btn_save").click(function(){
+				var r = $("#myform").valid();
+				if(!r) {
+					return false;
+				}else{
+					$("#btn_save").attr('disabled',true);
+					$("#btn_save").val("找回中...");
+					$.ajax({
+						url: "${CTX}/ab/savepwd_by_mobile",
+						type: "POST",
+						data: {mobile:$('#mobile').val(),pwd:$('#pwd').val()},
+						dataType: "json",
+						cache: false,
+						success: function(msg) {
+							if(msg){
+								$.dialog.alert("新密码保存成功，请使用新密码登录系统！",function(){
+									window.location.href="${CTX}/ab/login";
+								});
+							}else{
+								$.dialog.alert("重置密码失败！",function(){
+									$("#btn_save").attr('disabled',false);
+									$("#btn_save").val("确认修改")
+								});
+							}
+						}
+					});
+				}
+			});
+		});
+		
+		function refresh(){
+			$('#myform').submit();
+			$('#myform').action = "";
+			$('#myform').target = "_self";
+		}
+	</script>	
+ </head>
+  <body>
+  	<#include 'inc/top.html'>
+	<#include 'inc/header.html'>
+	<#include 'inc/nav.html'>
+	<div class="blank5"></div>
+	<!-- 用户中心 -->
+	<div class="cm">
+		<div class="leftmenu fl">
+			<#include 'inc/leftmenu.html'>
+		</div>
+		<div class="rightcon fr">
+			<h2 class="box_title">账号信息</h2>
+			<div class="editinfo">
+			<form id="myform" name="myform" method="post" action="" style="margin: 0px;">
+				<input type="hidden" id="checkcode" name="checkcode" value=""/>
+				<table class="input">
+						<tr>
+							<th align="right">请选择找回密码方式：</th>
+							<td>
+								<input type="radio" name="zhmmfs" value="" checked="checked" onclick="javascript:window.location.href='${CTX}/ab/sendmobilemsg'"/>手机
+								<input type="radio" name="zhmmfs" value="" onclick="javascript:window.location.href='${CTX}/ab/sendemailmsg'"/>邮箱
+							</td>
+						</tr>
+						<tr>
+							<th align="right">手机号：</th>
+							<td><input type="text" class="text" id="mobile" name="mobile" value=""></td>
+						</tr>
+						<tr>
+							<th align="right">收到的验证码：</th>
+							<td>
+								<input type="text" class="text" id="smsCodeRand" name="smsCodeRand" value="">
+								<a href="###" id="btn_send" title="获取验证码" class="codeBtn" style="width: auto;padding: 0 5px;">获取验证码</a>
+							</td>
+						</tr>
+						<tr>
+							<th align="right">新密码：</th>
+							<td><input type="password" class="text" id="pwd" name="pwd" value=""></td>
+						</tr>
+						<tr>
+							<th align="right">再次输入新密码：</th>
+							<td><input type="password" class="text" id="cfpwd" name="cfpwd" value=""></td>
+						</tr>
+						<tr>
+							<th align="right"></th>
+							<td>
+								<input type="button" id="btn_save" value="确认修改" />
+							</td>
+						</tr>
+				</table>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- 栏目页 -->
+	<!-- foot页 -->
+	<#include 'inc/foot.html'>
+	<script type="text/javascript">
+		var wait=60;
+		
+		//获取6位随机验证码
+		function random() {
+		    var num = "";
+		    for (i = 0; i < 6; i++) {
+		        num = num + Math.floor(Math.random() * 10);
+		    }
+		    return num;
+		}
+		
+		function time(o) {
+	        if (wait == 0) {
+	        	$("#checkcode").attr("value",'');
+	            o.removeAttribute("disabled");       
+	            $("#btn_send").text("获取验证码");
+	            wait = 60;
+	        } else {
+	        	if(wait==60){
+	        		$("#checkcode").attr("value",random());//填充内容
+	        		$.ajax({
+					      type: "POST",
+					      url: "${CTX}/ab/reg/sendSmsMsg?phone=" + $("#mobile").val() + "&smsCodeRand=" + $("#checkcode").val(),
+					      dataType:"json",
+					      success: function(data) {
+					          if (data) {
+					             	o.setAttribute("disabled", true);
+	            					$("#btn_send").text("重新发送(" + wait + ")");
+						            wait--;
+						            setTimeout(function() {
+						                time(o)
+						            },
+						            1000);
+					          }
+					          else {
+					              alert("验证码获取失败！请重新获取");
+					          }
+					       },
+					       error: function() { alert("error"); }
+					  });
+	        	}else{
+	        		o.setAttribute("disabled", true);
+		           $("#btn_send").text("重新发送(" + wait + ")");
+		            wait--;
+		            setTimeout(function() {
+		                time(o)
+		            },
+		            1000);
+	        	}
+	        }
+	    }
+		document.getElementById("btn_send").onclick=function(){time(document.getElementById("btn_send"));}
+	</script>
+	</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include 'inc/meta.html'>
+    <script type="text/javascript" src="${CTX}/res/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="${CTX}/res/js/messages_cn.js"></script>
+	<script type="text/javascript">
+		$().ready(function() {
+			// 表单验证
+			$("#myform").validate({
+				rules: {
+					username: {required:true,stringMaxLength:11},
+					password: {required:true},
+					captchaCode: {required:true,stringMaxLength:4}
+				}
+			});
+			
+			
+			$("#safecode").click(function(){
+				var d = new Date();
+				document.getElementById("safecode").src="${CTX}/25console/imgcode?t="+d.toString(40);
+			});
+		});
+	</script>	
+ </head>
+  <body>
+  	<#include 'inc/top.html'>
+  	<!-- 搜索栏 -->
+	<#include 'inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+	<#include 'inc/nav.html'>
+	<div class="blank10"></div>
+	<!-- 用户注册 -->
+	<div class="c">
+		<form id="myform" name="myform" action="${CTX}/ab/checklogin" method="post">
+		<table width="800px;" style="margin-left: 100px;" class="input" align="center">
+			<tr>
+				<td colspan="2"><h1>登录后台</h1></td>
+			</tr>
+			<tr>
+				<th>手机号：</th>
+				<td><input class="text" id="username" name="username" type="text" maxlength="11" value=""/>${nameMsg!''}</td>
+			</tr>
+			<tr>
+				<th>密码：</th>
+				<td><input class="text" id="password" name="password" type="password" maxlength="11" value=""/>${pwdMsg!''}</td>
+			</tr>
+			<tr>
+				<th>校验码：</th>
+				<td valign="middle">
+					<input class="text" id="captchaCode" name="captchaCode" type="text" maxlength="11" value="" style="vertical-align: middle"/><img src="${CTX}/25console/imgcode" alt="点击刷新" style="padding-top: 7px;vertical-align: middle" id="safecode"/>
+					${capcodeMsg!''}
+				</td>
+			</tr>
+			<tr>
+				<th>&nbsp;</th>
+				<td><input type="submit" id="btn_submit" name="btn_submit" class="button" value="登 录"/>
+				<input type="button" id="btn_zhmm" name="btn_zhmm" class="button" value="忘记密码" onclick="javascript:window.location.href='${CTX}/ab/sendemailmsg'"/>
+				</td>
+			</tr>
+		</table>
+		</form>
+		
+	</div>
+	
+	<!-- 栏目页 -->
+	<div class="blank10"></div>
+	<#include 'inc/foot.html'>
+	</body>
+</html>

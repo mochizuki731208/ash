@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <#include '../inc/meta.html'>
+	<script type="text/javascript" src="${CTX}/res/js/lhgdialog/lhgdialog.min.js?skin=discuz"></script>
+	<link rel="stylesheet" type="text/css" href="${CTX}/res/css/ab/boss.css"/>
+	<script type="text/javascript">
+		function uf_addtocart(id,userid){
+			if(userid==''){
+				alert("请登录后进行购买VIP卡！");
+				window.location.href="${CTX}/ab/login";
+				return false;
+			}else{
+				window.location.href="${CTX}/ab/card/hykorder/"+id;
+			}
+		}
+	</script>
+</head>
+  <body>
+  	<#include '../inc/top.html'>
+  	<!-- 搜索栏 -->
+	<#include '../inc/header.html'>
+	<!-- 导航 -->
+	<div class="blank10"></div>
+	<#include '../inc/nav.html'>
+	<div class="blank10"></div>
+	
+<div class="contentImg">
+    	<div class="bannerImg"></div>
+        <div class="productImg1">
+        	<div class="positionImg1">
+            	<a href="javascript:void(0);" onclick="uf_addtocart('75b930eb5bb447159af499fd32a49c87','${(userid)!}');">
+                	<img src="${CTX}/res/css/ab/images/01buy.gif" />
+                </a>            	
+            </div>
+        </div>
+        <div class="productImg2">
+        	<div class="positionImg2">
+            	<a href="javascript:void(0);" onclick="uf_addtocart('b4a61e4f905f482da6318c088bde67f8','${(userid)!}');">
+            		<img src="${CTX}/res/css/ab/images/02buy.gif" />
+                </a>
+            </div>
+        </div>
+        <div class="productImg3">
+        	<div class="positionImg3">
+            	<a href="javascript:void(0);" onclick="uf_addtocart('c0aa7b63f8164529a548823d0372b1f0','${(userid)!}');">
+            		<img src="${CTX}/res/css/ab/images/03buy.gif" />
+                </a>
+            </div>
+        </div>
+        <div class="productImg4">
+        	<div class="positionImg4">
+            	<a href="javascript:void(0);" onclick="uf_addtocart('4630723c5c3840248072cef65eff3aff','${(userid)!}');">
+            		<img src="${CTX}/res/css/ab/images/04buy.gif" />
+                </a>
+            </div>
+        </div>
+        
+        <div class="total"></div>
+	
+	<!-- foot页 -->
+	<div class="foot clear">
+		<div class="flink">
+      		<a href="ab/channel/">关于本地生活</a>|
+      		<a href="ab/channel/">本地生活招聘</a>|
+      		<a href="ab/channel/">联系我们</a>|
+      		<a href="ab/channel/">免责声明</a>|
+      		<a href="ab/channel/">建议意见</a>|
+      		<a href="ab/channel/">本地生活推广</a>|
+      		<a href="ab/channel/">商户登录</a>|
+      		<a href="ab/channel/">友情链接</a>|
+		</div>
+		<div class="flink">
+                  <a href="http://www.cdyou.net/yujiale/" target="_blank">长岛渔家乐</a>                                               
+                  <a href="http://www.medved-put.com/" target="_blank">车险计算器</a>                                               
+                  <a href="http://bj.offcn.com/" target="_blank">北京人事考试网</a>                                               
+                  <a href="http://bj.jxedt.com/" target="_blank">北京驾校一点通</a>                                               
+                  <a href="http://www.iqingren.com/" target="_blank">爱情人</a>                                               
+                  <a href="http://www.7940.com/" target="_blank">违章查询</a>                                               
+                  <a href="http://beijing.kuyiso.com/" target="_blank">北京分类信息</a>                                               
+                  <a href="http://www.globevisa.com.cn/beijing.html" target="_blank">北京移民公司</a>                                               
+                  <a href="http://www.xiaoma.com/chuguoyingyu/ " target="_blank">出国英语考试</a>                                               
+                  <a href="http://bj.cn2che.com/" target="_blank">北京二手车市场</a> 
+                  <a href="http://www.aikuaidi.cn/" target="_blank" >快递单号查询</a>
+          </div>
+          <div class="flink">
+               2007-2014 Aibang?<a class="icp" href="http://www.miibeian.gov.cn" target="_blank" onmousedown="sendHtmlReqForlog('in_home_foot_link');"  >京ICP备07008439号</a>?京公网安备110105005729号
+          </div>
+	</div>
+	<div class="blank10"></div>
+	</body>
+</html>
